@@ -1,10 +1,7 @@
-import { dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 
-export default function Welcome() {
-    const { auth } = usePage<SharedData>().props;
-
+export default function About() {
     return (
         <>
             <Head title="About Us" />
@@ -27,7 +24,7 @@ export default function Welcome() {
                     <div className="about-content">
                         {/* LEFT TEXT */}
                         <div className="text-box">
-                            <h2>We’re here to enhance every child’s potential</h2>
+                            <h2>We're here to enhance every child's potential</h2>
                             <p>
                                 Our mission is to provide quality education rooted in Christian values.
                                 The school emphasizes both academic excellence and spiritual development,
