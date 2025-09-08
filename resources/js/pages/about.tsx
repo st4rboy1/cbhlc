@@ -27,7 +27,7 @@ export default function Welcome() {
                     <div className="about-content">
                         {/* LEFT TEXT */}
                         <div className="text-box">
-                            <h2>We’re here to enhance every child’s potential</h2>
+                            <h2>We're here to enhance every child's potential</h2>
                             <p>
                                 Our mission is to provide quality education rooted in Christian values.
                                 The school emphasizes both academic excellence and spiritual development,
