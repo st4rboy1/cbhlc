@@ -1,8 +1,9 @@
 # Software Requirements Specification (SRS)
 ## Web-Based Enrollment System for Christian Bible Heritage Learning Center
 
-**Document Version:** 1.0  
+**Document Version:** 2.0 (Updated with actual technology stack)  
 **Date:** January 2025  
+**Technology Stack:** Laravel 11 + React 18 + Inertia.js + shadcn/ui + Tailwind CSS  
 **Authors:** Mhico D. Aro, Christian Kyle M. Masangcay, Manero SJ. Rodriguez, Carl Michael Tojino  
 **Client:** Christian Bible Heritage Learning Center  
 
@@ -69,17 +70,20 @@ The Web-Based Enrollment System is a standalone web application designed specifi
 - **Administrators:** Basic to intermediate technical skills; require comprehensive system oversight capabilities
 
 ### 2.4 Operating Environment
-- **Client Side:** Web browsers (Chrome, Firefox, Safari, Edge)
-- **Server Side:** Apache HTTP Server with PHP runtime
-- **Database:** MySQL Server
-- **Platform:** Cross-platform web-based solution
+- **Client Side:** Modern web browsers supporting React applications (Chrome, Firefox, Safari, Edge)
+- **Server Side:** Laravel framework with Inertia.js for SPA functionality
+- **Database:** MySQL Server (managed via Laravel's Eloquent ORM)
+- **Development Environment:** Docker Compose with Laravel Sail
+- **Deployment Platform:** Linode Nanode (1GB) managed by Laravel Forge
 - **Internet Connectivity:** Required for system access
 
 ### 2.5 Assumptions and Dependencies
-- Users have access to internet-connected devices with web browsers
-- CBHLC will provide necessary hosting infrastructure
+- Users have access to internet-connected devices with modern web browsers supporting React applications
+- Linode hosting infrastructure managed via Laravel Forge
+- Docker environment available for local development
 - Staff training will be provided for system usage
 - Current enrollment policies and procedures remain applicable
+- Modern JavaScript enabled in user browsers
 
 ---
 
@@ -201,19 +205,21 @@ Tools for communication between parents and school administration.
 ### 4.1 User Interfaces
 
 #### 4.1.1 General UI Requirements
-- **UI-1:** Interface shall be responsive and accessible across devices
-- **UI-2:** Design shall incorporate CBHLC branding and logo
-- **UI-3:** Navigation shall be intuitive and consistent
-- **UI-4:** Forms shall include appropriate input validation and error messaging
-- **UI-5:** Interface shall support accessibility standards (WCAG 2.1)
+- **UI-1:** Interface shall be responsive using Tailwind CSS responsive utilities across devices
+- **UI-2:** Design shall incorporate CBHLC branding with customized shadcn/ui theme
+- **UI-3:** Navigation shall be intuitive using consistent shadcn/ui navigation components
+- **UI-4:** Forms shall utilize shadcn/ui form components with React Hook Form validation
+- **UI-5:** Interface shall support accessibility standards (WCAG 2.1) via shadcn/ui's built-in accessibility features
+- **UI-6:** Component consistency maintained through shadcn/ui's design system
+- **UI-7:** Dark/light mode support available through Tailwind CSS and shadcn/ui theming
 
 #### 4.1.2 Specific Interface Components
-- **Login Page:** Secure authentication interface
-- **Dashboard:** Role-specific information display
-- **Enrollment Form:** Multi-step form with validation
-- **Document Upload:** File selection and upload interface
-- **Administrative Panels:** Data management interfaces
-- **Reporting Interface:** Report generation and viewing tools
+- **Login Page:** React component with shadcn/ui Card and Form components for secure authentication
+- **Dashboard:** Role-specific React dashboards using shadcn/ui layout components and data visualization
+- **Enrollment Form:** Multi-step React form utilizing shadcn/ui form components with real-time validation
+- **Document Upload:** Drag-and-drop interface using shadcn/ui file input components
+- **Administrative Panels:** Data management interfaces with shadcn/ui Tables, Modals, and Action components
+- **Reporting Interface:** Interactive reports using shadcn/ui Charts and export functionality
 
 ### 4.2 Hardware Interfaces
 - **HI-1:** System shall operate on standard web server hardware
@@ -223,38 +229,49 @@ Tools for communication between parents and school administration.
 ### 4.3 Software Interfaces
 
 #### 4.3.1 Web Server Interface
-- **SI-1:** Apache HTTP Server 2.4.58 or compatible
-- **SI-2:** PHP 8.2+ runtime environment
-- **SI-3:** SSL/TLS encryption for secure communications
+- **SI-1:** Nginx web server (configured via Laravel Forge)
+- **SI-2:** PHP 8.2+ runtime with Laravel 11+ framework
+- **SI-3:** SSL/TLS encryption via Let's Encrypt (automated by Laravel Forge)
+- **SI-4:** Laravel Forge server provisioning and configuration management
 
 #### 4.3.2 Database Interface
-- **SI-4:** MySQL 8.3.0 or compatible database management system
-- **SI-5:** Database connection pooling for performance optimization
-- **SI-6:** Backup and recovery capabilities
+- **SI-5:** MySQL 8.3.0 managed via Laravel's Eloquent ORM
+- **SI-6:** Database migrations and seeding via Laravel's migration system
+- **SI-7:** Connection pooling managed by Laravel's database configuration
+- **SI-8:** Automated backup and recovery via Laravel Forge
+- **SI-9:** Database monitoring and performance optimization through Laravel Forge dashboard
 
 #### 4.3.3 Browser Compatibility
-- **SI-7:** Google Chrome (latest version)
-- **SI-8:** Mozilla Firefox (latest version)
-- **SI-9:** Microsoft Edge (latest version)
-- **SI-10:** Safari (latest version)
+- **SI-10:** Google Chrome (latest version) - Primary development target
+- **SI-11:** Mozilla Firefox (latest version) - Full React support
+- **SI-12:** Microsoft Edge (latest version) - Modern JavaScript compatibility
+- **SI-13:** Safari (latest version) - iOS/macOS support
+- **SI-14:** Mobile browsers supporting modern JavaScript (React applications)
+- **SI-15:** Minimum ES2020 support required for React and Inertia.js functionality
 
 ---
 
 ## 5. Non-Functional Requirements
 
 ### 5.1 Performance Requirements
-- **NFR-1.1:** Page load times shall not exceed 3 seconds under normal conditions
-- **NFR-1.2:** System shall support concurrent access by up to 100 users
-- **NFR-1.3:** File uploads shall complete within 30 seconds for 50MB files
-- **NFR-1.4:** Database queries shall execute within 2 seconds
-- **NFR-1.5:** System downtime shall not exceed 1% annually
+- **NFR-1.1:** Initial page load shall not exceed 2 seconds (optimized through React SSR and Inertia.js)
+- **NFR-1.2:** Subsequent navigation shall be near-instantaneous (<500ms) via SPA functionality
+- **NFR-1.3:** System shall support concurrent access by up to 50 users on Nanode infrastructure
+- **NFR-1.4:** File uploads shall complete within 30 seconds for 50MB files with progress indication
+- **NFR-1.5:** Database queries shall execute within 1 second (optimized via Eloquent ORM and indexing)
+- **NFR-1.6:** React component rendering shall be optimized to prevent layout shifts
+- **NFR-1.7:** JavaScript bundle size shall be optimized through code splitting and tree shaking
+- **NFR-1.8:** System downtime shall not exceed 2% annually (accounting for Nanode server specifications)
 
 ### 5.2 Security Requirements
-- **NFR-2.1:** All user authentication shall be encrypted
-- **NFR-2.2:** Personal data shall be protected according to privacy standards
-- **NFR-2.3:** Role-based access control shall prevent unauthorized data access
-- **NFR-2.4:** System shall maintain audit logs of all user activities
-- **NFR-2.5:** File uploads shall be scanned for security threats
+- **NFR-2.1:** Laravel's built-in authentication with bcrypt hashing and secure session management
+- **NFR-2.2:** Personal data protection through Laravel's encrypted database columns and GDPR compliance features
+- **NFR-2.3:** RBAC implementation using Laravel Gates and Policies with Inertia.js middleware
+- **NFR-2.4:** Comprehensive audit logging using Laravel's event system and model observers
+- **NFR-2.5:** File upload validation through Laravel's built-in file validation rules and MIME type checking
+- **NFR-2.6:** CSRF protection automatically handled by Laravel and Inertia.js integration
+- **NFR-2.7:** SQL injection prevention through Eloquent ORM's parameter binding
+- **NFR-2.8:** XSS protection via React's built-in escaping and Laravel's output sanitization
 
 ### 5.3 Reliability Requirements
 - **NFR-3.1:** System availability shall be 99% during business hours
@@ -285,23 +302,57 @@ Tools for communication between parents and school administration.
 ## 6. System Architecture
 
 ### 6.1 Architectural Overview
-The system follows a three-tier architecture:
-- **Presentation Layer:** Web browser interface (HTML/CSS/JavaScript)
-- **Application Layer:** PHP-based business logic and processing
-- **Data Layer:** MySQL database for data persistence
+The system follows a modern full-stack architecture leveraging Laravel's ecosystem:
+- **Presentation Layer:** React-based SPA with shadcn/ui components and Tailwind CSS styling
+- **Application Layer:** Laravel framework with Inertia.js bridging server-side routing to client-side React components
+- **Data Layer:** MySQL database managed via Laravel's Eloquent ORM
+- **Development Environment:** Containerized using Docker Compose with Laravel Sail
+- **Deployment:** Automated deployment via Laravel Forge to Linode infrastructure
 
 ### 6.2 Technology Stack
-- **Frontend:** HTML5, CSS3, JavaScript ES2023
-- **Backend:** PHP 8.2+
-- **Database:** MySQL 8.3+
-- **Web Server:** Apache HTTP Server 2.4+
+- **Frontend Framework:** React 18+ with TypeScript support
+- **UI Components:** shadcn/ui component library (copy-paste approach with full customization)
+- **CSS Framework:** Tailwind CSS v4 with utility-first styling
+- **Full-Stack Bridge:** Inertia.js 2.0 (eliminating need for separate API)
+- **Backend Framework:** Laravel 11+ (PHP 8.2+)
+- **Database:** MySQL 8.3+ with Eloquent ORM
+- **Web Server:** Nginx (configured via Laravel Forge)
+- **Local Development:** Docker Compose with Laravel Sail
+- **Deployment Platform:** Laravel Forge managing Linode Nanode servers
+- **Version Control Integration:** Git with automated deployment triggers
 - **Development Methodology:** Agile with iterative sprints
 
 ### 6.3 Security Architecture
-- **Authentication:** Session-based with secure password hashing
-- **Authorization:** Role-based access control (RBAC)
-- **Data Protection:** SSL/TLS encryption for data transmission
-- **File Security:** Upload validation and secure storage
+- **Authentication:** Laravel's built-in authentication with bcrypt password hashing
+- **Authorization:** Laravel's Gate and Policy system for RBAC implementation
+- **CSRF Protection:** Laravel's automatic CSRF token handling via Inertia.js
+- **Data Protection:** SSL/TLS encryption (Let's Encrypt certificates via Laravel Forge)
+- **File Security:** Laravel's file validation and secure storage with configurable upload constraints
+- **API Security:** Inertia.js eliminates exposed API endpoints, reducing attack surface
+- **Server Security:** Laravel Forge automated security updates and firewall configuration
+
+### 6.4 Development Environment Architecture
+- **Local Development:** Docker Compose with Laravel Sail providing consistent development environment
+- **Container Services:** PHP 8.2+, MySQL 8.3+, Redis, Node.js for asset compilation
+- **Hot Module Replacement:** Vite development server integrated with Laravel for fast React development
+- **Database Seeding:** Laravel factories and seeders for consistent development data
+- **Testing Environment:** PHPUnit for backend testing, React Testing Library for frontend components
+
+### 6.5 Deployment Architecture
+- **Server Provisioning:** Laravel Forge automated server setup on Linode Nanode (1GB RAM, 1 CPU Core, 25GB SSD)
+- **Web Server:** Nginx optimized for Laravel applications
+- **Process Management:** PHP-FPM with optimized worker configuration for small server
+- **SSL Certificates:** Automated Let's Encrypt certificate management
+- **Monitoring:** Laravel Forge server monitoring and performance metrics
+- **Backup Strategy:** Automated daily database backups with 7-day retention
+- **Deployment Pipeline:** Git-based deployment with automatic deployment on repository push
+
+### 6.6 Asset Compilation and Management
+- **Build Tool:** Vite for fast asset compilation and bundling
+- **JavaScript Bundling:** React components and dependencies optimized for production
+- **CSS Processing:** Tailwind CSS with PurgeCSS for optimized bundle sizes
+- **Code Splitting:** Dynamic imports for optimized loading of React components
+- **Asset Versioning:** Laravel Mix/Vite asset versioning for cache busting
 
 ---
 
@@ -350,11 +401,13 @@ The system follows a three-tier architecture:
 - **CONS-13:** Single-school deployment (not multi-tenant)
 
 ### 8.4 Assumptions
-- **ASS-1:** Users have basic computer and internet skills
-- **ASS-2:** Reliable internet connectivity available
-- **ASS-3:** School provides necessary hosting environment
+- **ASS-1:** Users have basic computer and internet skills with modern browser support
+- **ASS-2:** Reliable internet connectivity available for SPA functionality
+- **ASS-3:** Linode Nanode hosting managed via Laravel Forge
 - **ASS-4:** Current enrollment procedures remain applicable
-- **ASS-5:** Staff will receive adequate system training
+- **ASS-5:** Staff will receive adequate system training including React-based interface usage
+- **ASS-6:** Development team has experience with Laravel, React, and Inertia.js
+- **ASS-7:** Docker environment available for local development setup
 
 ---
 
@@ -366,12 +419,57 @@ The system follows a three-tier architecture:
 | **RBAC** | Role-Based Access Control |
 | **SRS** | Software Requirements Specification |
 | **UI** | User Interface |
-| **API** | Application Programming Interface |
+| **SPA** | Single Page Application |
 | **SSL/TLS** | Secure Sockets Layer/Transport Layer Security |
 | **CRUD** | Create, Read, Update, Delete operations |
 | **MVP** | Minimum Viable Product |
 | **UAT** | User Acceptance Testing |
-| **GUI** | Graphical User Interface |
+| **ORM** | Object-Relational Mapping |
+| **Inertia.js** | Modern monolith framework bridging server-side Laravel with client-side React |
+| **shadcn/ui** | Copy-paste React component library built on Radix UI and Tailwind CSS |
+| **Laravel Sail** | Docker-based local development environment for Laravel |
+| **Laravel Forge** | Server provisioning and deployment service for Laravel applications |
+| **Eloquent** | Laravel's built-in ORM (Object-Relational Mapping) system |
+| **Vite** | Fast build tool and development server for modern web applications |
+| **Linode Nanode** | Entry-level VPS offering from Linode (1GB RAM, 1 CPU, 25GB SSD) |
+
+---
+
+## 10. Development Workflow and Standards
+
+### 10.1 Local Development Setup
+- **Environment:** Laravel Sail with Docker Compose
+- **Installation:** `curl -s https://laravel.build/cbhlc-enrollment | bash`
+- **Services:** PHP 8.2, MySQL 8.3, Redis, Node.js, Mailpit
+- **Frontend Development:** Vite dev server with Hot Module Replacement (HMR)
+- **React Development:** TypeScript support with shadcn/ui components
+
+### 10.2 Code Standards and Best Practices
+- **Backend:** Laravel coding standards with PSR-12 compliance
+- **Frontend:** React function components with TypeScript
+- **Component Library:** shadcn/ui components with customization through CSS variables
+- **Styling:** Tailwind CSS utility-first approach with custom design system
+- **State Management:** React hooks and Inertia.js shared data
+- **Form Handling:** React Hook Form with shadcn/ui form components
+
+### 10.3 Testing Strategy
+- **Backend Testing:** PHPUnit for feature and unit tests
+- **Frontend Testing:** React Testing Library for component testing
+- **Integration Testing:** Laravel Dusk for end-to-end browser testing
+- **API Testing:** Laravel's built-in testing tools for Inertia.js responses
+
+### 10.4 Deployment Process
+- **Version Control:** Git-based workflow with feature branches
+- **CI/CD:** Laravel Forge automated deployment on main branch push
+- **Environment Management:** Laravel's environment configuration system
+- **Database Migrations:** Automated via Laravel's migration system
+- **Asset Compilation:** Vite build process integrated with deployment pipeline
+
+### 10.5 Monitoring and Maintenance
+- **Server Monitoring:** Laravel Forge server metrics and alerts
+- **Application Monitoring:** Laravel's built-in logging and error tracking
+- **Performance Monitoring:** Database query optimization and React component profiling
+- **Security Updates:** Automated server security updates via Laravel Forge
 
 ---
 
@@ -384,8 +482,12 @@ Document certifying a student's good moral character and conduct from their prev
 ---
 
 **Document Control:**
-- Initial Version: 1.0 (January 2025)
-- Document Status: Draft for Review
+- Initial Version: 1.0 (January 2025) - Original requirements specification
+- Version 2.0: (January 2025) - Updated with actual technology stack implementation
+- Technology Stack: Laravel 11 + React 18 + Inertia.js + shadcn/ui + Tailwind CSS
+- Development Environment: Docker Compose with Laravel Sail
+- Deployment Platform: Linode Nanode managed by Laravel Forge
+- Document Status: Updated Technical Specification
 - Next Review Date: February 2025
 - Approved By: [To be completed]
 
