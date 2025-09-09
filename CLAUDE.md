@@ -1,10 +1,11 @@
 # Software Requirements Specification (SRS)
 ## Web-Based Enrollment System for Christian Bible Heritage Learning Center
 
-**Document Version:** 3.0 (Updated with Laravel 12 and CI/CD pipeline)  
+**Document Version:** 3.1 (Added comprehensive ERD and database design)  
 **Date:** January 2025  
 **Technology Stack:** Laravel 12 + React 18 + Inertia.js + shadcn/ui + Tailwind CSS  
 **CI/CD Pipeline:** GitHub Actions (CI) + Laravel Forge (CD)  
+**Database Design:** Comprehensive ERD with 11 entities and full normalization  
 **Authors:** Mhico D. Aro, Christian Kyle M. Masangcay, Manero SJ. Rodriguez, Carl Michael Tojino  
 **Client:** Christian Bible Heritage Learning Center  
 
@@ -386,26 +387,252 @@ The system follows a modern full-stack architecture leveraging Laravel 12's ecos
 
 ---
 
-## 7. Database Requirements
+## 7. Database Design and Requirements
 
-### 7.1 Data Storage Requirements
-- **Student information and enrollment applications**
-- **User accounts and authentication data**
-- **Document metadata and file references**
-- **System configuration and settings**
-- **Audit logs and activity tracking**
+### 7.1 Entity Relationship Diagram (ERD)
 
-### 7.2 Data Backup and Recovery
-- **Daily automated backups**
-- **Point-in-time recovery capability**
-- **Disaster recovery procedures**
-- **Data retention policies**
+The following ERD illustrates the logical database structure for the Web-Based Enrollment System, designed following normalization principles to ensure data integrity and minimize redundancy.
 
-### 7.3 Data Integrity Requirements
-- **Referential integrity constraints**
-- **Data validation rules**
-- **Transaction consistency**
-- **Concurrency control**
+```mermaid
+erDiagram
+    USER {
+        id BIGINT PK
+        name VARCHAR(255)
+        email VARCHAR(255) UK
+        email_verified_at TIMESTAMP
+        password VARCHAR(255)
+        role ENUM
+        created_at TIMESTAMP
+        updated_at TIMESTAMP
+    }
+
+    STUDENT {
+        id BIGINT PK
+        student_id VARCHAR(20) UK
+        first_name VARCHAR(100)
+        middle_name VARCHAR(100)
+        last_name VARCHAR(100)
+        birth_date DATE
+        gender ENUM
+        birth_place VARCHAR(255)
+        nationality VARCHAR(100)
+        religion VARCHAR(100)
+        address TEXT
+        phone VARCHAR(20)
+        email VARCHAR(255)
+        created_at TIMESTAMP
+        updated_at TIMESTAMP
+    }
+
+    GUARDIAN {
+        id BIGINT PK
+        first_name VARCHAR(100)
+        middle_name VARCHAR(100)
+        last_name VARCHAR(100)
+        relationship ENUM
+        occupation VARCHAR(100)
+        employer VARCHAR(255)
+        phone VARCHAR(20)
+        email VARCHAR(255)
+        address TEXT
+        emergency_contact BOOLEAN
+        created_at TIMESTAMP
+        updated_at TIMESTAMP
+    }
+
+    ENROLLMENT_APPLICATION {
+        id BIGINT PK
+        application_number VARCHAR(50) UK
+        student_id BIGINT FK
+        grade_level ENUM
+        school_year VARCHAR(9)
+        application_status ENUM
+        submission_date TIMESTAMP
+        review_date TIMESTAMP
+        approval_date TIMESTAMP
+        reviewer_id BIGINT FK
+        notes TEXT
+        created_at TIMESTAMP
+        updated_at TIMESTAMP
+    }
+
+    STUDENT_GUARDIAN {
+        id BIGINT PK
+        student_id BIGINT FK
+        guardian_id BIGINT FK
+        is_primary BOOLEAN
+        created_at TIMESTAMP
+        updated_at TIMESTAMP
+    }
+
+    DOCUMENT {
+        id BIGINT PK
+        student_id BIGINT FK
+        document_type ENUM
+        original_filename VARCHAR(255)
+        stored_filename VARCHAR(255)
+        file_path VARCHAR(500)
+        file_size INT
+        mime_type VARCHAR(100)
+        upload_date TIMESTAMP
+        verification_status ENUM
+        verified_by BIGINT FK
+        verified_at TIMESTAMP
+        created_at TIMESTAMP
+        updated_at TIMESTAMP
+    }
+
+    GRADE_LEVEL {
+        id BIGINT PK
+        level_code VARCHAR(10) UK
+        level_name VARCHAR(100)
+        description TEXT
+        age_range VARCHAR(20)
+        capacity INT
+        tuition_fee DECIMAL
+        miscellaneous_fee DECIMAL
+        active BOOLEAN
+        created_at TIMESTAMP
+        updated_at TIMESTAMP
+    }
+
+    ENROLLMENT_PERIOD {
+        id BIGINT PK
+        school_year VARCHAR(9) UK
+        start_date DATE
+        end_date DATE
+        early_registration_deadline DATE
+        regular_registration_deadline DATE
+        late_registration_deadline DATE
+        status ENUM
+        created_at TIMESTAMP
+        updated_at TIMESTAMP
+    }
+
+    AUDIT_LOG {
+        id BIGINT PK
+        user_id BIGINT FK
+        action VARCHAR(100)
+        model_type VARCHAR(100)
+        model_id BIGINT
+        changes JSON
+        ip_address VARCHAR(45)
+        user_agent TEXT
+        performed_at TIMESTAMP
+    }
+
+    SYSTEM_SETTING {
+        id BIGINT PK
+        key VARCHAR(100) UK
+        value TEXT
+        description TEXT
+        type ENUM
+        created_at TIMESTAMP
+        updated_at TIMESTAMP
+    }
+
+    NOTIFICATION {
+        id BIGINT PK
+        user_id BIGINT FK
+        title VARCHAR(255)
+        message TEXT
+        type ENUM
+        read_at TIMESTAMP
+        created_at TIMESTAMP
+        updated_at TIMESTAMP
+    }
+
+    %% Relationships
+    USER ||--o{ ENROLLMENT_APPLICATION : reviews
+    USER ||--o{ DOCUMENT : verifies
+    USER ||--o{ AUDIT_LOG : performs
+    USER ||--o{ NOTIFICATION : receives
+
+    STUDENT ||--|| ENROLLMENT_APPLICATION : submits
+    STUDENT ||--o{ DOCUMENT : uploads
+    STUDENT ||--o{ STUDENT_GUARDIAN : has
+
+    GUARDIAN ||--o{ STUDENT_GUARDIAN : guardianOf
+
+    ENROLLMENT_APPLICATION }|--|| GRADE_LEVEL : appliesTo
+    ENROLLMENT_APPLICATION }|--|| ENROLLMENT_PERIOD : duringPeriod
+
+    DOCUMENT }|--|| USER : verifiedBy
+```
+
+### 7.2 Entity Descriptions
+
+#### 7.2.1 Core Entities
+- **USER**: System users including administrators, registrars, and parents with role-based access control
+- **STUDENT**: Complete student information including personal details and contact information
+- **GUARDIAN**: Parent/guardian information with relationship details and emergency contact designation
+- **ENROLLMENT_APPLICATION**: Central entity tracking enrollment requests with status workflow
+- **STUDENT_GUARDIAN**: Junction table managing many-to-many relationship between students and guardians
+
+#### 7.2.2 Supporting Entities
+- **DOCUMENT**: File management for uploaded documents with verification tracking
+- **GRADE_LEVEL**: Academic level configuration with capacity and fee structure
+- **ENROLLMENT_PERIOD**: School year and registration deadline management
+- **AUDIT_LOG**: System activity tracking for compliance and security
+- **SYSTEM_SETTING**: Application configuration parameters
+- **NOTIFICATION**: User notification management system
+
+### 7.3 Data Storage Requirements
+- **Student information and enrollment applications** with full audit trail
+- **User accounts and authentication data** with secure password hashing
+- **Document metadata and file references** with verification status tracking
+- **System configuration and settings** with administrative controls
+- **Audit logs and activity tracking** for compliance and security monitoring
+- **Notification system** for user communications
+
+### 7.4 Database Constraints and Rules
+
+#### 7.4.1 Primary Key Constraints
+- All tables use `BIGINT` auto-incrementing primary keys for optimal performance
+- Unique application numbers generated automatically for enrollment applications
+- Composite unique constraints on junction tables to prevent duplicates
+
+#### 7.4.2 Foreign Key Constraints
+- **Enrollment Applications** must reference valid students and grade levels
+- **Document verification** must reference valid administrator users
+- **Audit logs** maintain referential integrity with user accounts
+- **Cascade delete rules** implemented for data consistency
+
+#### 7.4.3 Data Validation Rules
+- **Email addresses** validated using Laravel's built-in validation rules
+- **Phone numbers** formatted according to local standards
+- **File uploads** restricted by type, size, and security scanning
+- **Enumerated values** for status fields to ensure data integrity
+- **Date ranges** validated for logical consistency (birth dates, enrollment periods)
+
+#### 7.4.4 Business Rules Implementation
+- **Application workflow** enforced through status enum transitions
+- **Grade level capacity** checked before enrollment approval
+- **Document requirements** validated based on grade level and student type
+- **Enrollment period constraints** prevent applications outside valid timeframes
+- **Guardian relationship** rules ensure at least one primary guardian per student
+
+### 7.5 Data Backup and Recovery
+- **Daily automated backups** via Laravel Forge with 7-day retention
+- **Point-in-time recovery capability** using MySQL binary logs
+- **Disaster recovery procedures** with offsite backup storage
+- **Data retention policies** compliant with educational record requirements
+- **Backup verification** automated testing of restore procedures
+
+### 7.6 Data Integrity and Security
+- **Referential integrity constraints** enforced at database level
+- **Transaction consistency** using Laravel's database transactions
+- **Concurrency control** with optimistic locking for critical operations
+- **Data encryption** for sensitive information using Laravel's encryption
+- **Access logging** for all data modification operations
+- **GDPR compliance** features for data subject rights and privacy protection
+
+### 7.7 Performance Considerations
+- **Database indexing** on frequently queried columns (email, application_number, student_id)
+- **Query optimization** through Eloquent ORM relationship eager loading
+- **Connection pooling** managed by Laravel's database configuration
+- **Caching strategy** for lookup tables and frequently accessed data
+- **Pagination** for large result sets to maintain response times
 
 ---
 
@@ -478,6 +705,12 @@ The system follows a modern full-stack architecture leveraging Laravel 12's ecos
 | **Composer Audit** | Security vulnerability scanner for PHP dependencies |
 | **CI/CD** | Continuous Integration and Continuous Deployment pipeline |
 | **Fast-Fail** | CI strategy that stops pipeline execution on first failure to save resources |
+| **ERD** | Entity Relationship Diagram - Visual representation of database structure |
+| **Mermaid** | JavaScript-based diagramming tool for creating diagrams from text definitions |
+| **Junction Table** | Intermediary table that resolves many-to-many relationships between entities |
+| **RBAC** | Role-Based Access Control - Security model for managing user permissions |
+| **Audit Trail** | Chronological record of system activities for compliance and security |
+| **GDPR** | General Data Protection Regulation - EU privacy and data protection law |
 
 ---
 
@@ -550,12 +783,14 @@ Document certifying a student's good moral character and conduct from their prev
 - Initial Version: 1.0 (January 2025) - Original requirements specification
 - Version 2.0: (January 2025) - Updated with actual technology stack implementation
 - Version 3.0: (January 2025) - Updated with Laravel 12 and GitHub Actions CI/CD pipeline
+- Version 3.1: (January 2025) - Added comprehensive ERD and database design section
 - Technology Stack: Laravel 12 + React 18 + Inertia.js + shadcn/ui + Tailwind CSS
 - CI/CD Pipeline: GitHub Actions (CI) + Laravel Forge (CD)
 - Development Environment: Docker Compose with Laravel Sail
 - Deployment Platform: Linode Nanode managed by Laravel Forge
+- Database Design: 11-entity ERD with full normalization and business rules
 - Project Status: Core components pre-scaffolded, CI/CD pipeline configured
-- Document Status: Updated Technical Specification with Modern CI/CD
+- Document Status: IEEE-compliant SRS with comprehensive database design
 - Next Review Date: February 2025
 - Approved By: [To be completed]
 
