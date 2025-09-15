@@ -3,7 +3,7 @@ import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Index() {
-    const { auth } = usePage<SharedData>().props;
+
 
     return (
         <>
