@@ -15,6 +15,10 @@ Route::get('/index', function () {
     return Inertia::render('index');
 })->name('index');
 
+Route::get('/application', function () {
+    return Inertia::render('application');
+})->name('application');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
