@@ -2,9 +2,23 @@ import { dashboard } from '@/routes';
 import { LoginDialog } from '@/components/login-dialog';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
+import { useEffect, useRef } from 'react';
 
 export default function Landing() {
     const { auth } = usePage<SharedData>().props;
+    const loginTriggerRef = useRef<HTMLButtonElement>(null);
+    
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('login') === 'true') {
+            // Auto-click the login button to open the modal
+            setTimeout(() => {
+                loginTriggerRef.current?.click();
+            }, 100);
+            // Clean up the URL
+            window.history.replaceState({}, '', '/');
+        }
+    }, []);
 
     return (
         <>
@@ -18,20 +32,11 @@ export default function Landing() {
                     <Link href="/" className="logo relative text-2xl text-white no-underline font-medium ml-7 hover:text-[#a6b4c2]">CBHLC</Link>
                     <nav className="navigation flex items-center">
                         <Link href="/about" className="relative text-lg text-white no-underline font-medium ml-10">About</Link>
-                        {auth.user ? (
-                            <Link
-                                href={dashboard()}
-                                className="w-[130px] h-[45px] bg-transparent border-2 border-white rounded-md cursor-pointer text-lg text-white font-medium ml-10 transition-all duration-400 hover:bg-white hover:text-black flex items-center justify-center"
-                            >
-                                Dashboard
-                            </Link>
-                        ) : (
-                            <LoginDialog trigger={
-                                <button className="w-[130px] h-[45px] bg-transparent border-2 border-white rounded-md cursor-pointer text-lg text-white font-medium ml-10 transition-all duration-400 hover:bg-white hover:text-black flex items-center justify-center">
-                                    Login
-                                </button>
-                            } />
-                        )}
+                        <LoginDialog trigger={
+                            <button ref={loginTriggerRef} className="w-[130px] h-[45px] bg-transparent border-2 border-white rounded-md cursor-pointer text-lg text-white font-medium ml-10 transition-all duration-400 hover:bg-white hover:text-black flex items-center justify-center">
+                                Login
+                            </button>
+                        } />
                     </nav>
                 </header>
                 <section className="landing bg">
