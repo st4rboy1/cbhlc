@@ -4,16 +4,12 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return Inertia::render('landing');
 })->name('home');
 
 Route::get('/about', function () {
     return Inertia::render('about');
 })->name('about');
-
-Route::get('/index', function () {
-    return Inertia::render('index');
-})->name('index');
 
 Route::get('/enrollment', function () {
     return Inertia::render('enrollment');
