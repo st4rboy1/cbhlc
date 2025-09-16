@@ -931,15 +931,27 @@ erDiagram
 - **Database:** MySQL 8.0+
 - **Project Path:** `/home/forge/default`
 
-#### 11.5.2 GitHub Actions Deployment Setup
-To enable automated deployments via GitHub Actions, configure the following repository secrets:
+#### 11.5.2 Deployment Options (2025 Best Practices)
 
-| Secret Name | Description | Value |
-|-------------|-------------|-------|
-| `SSH_PRIVATE_KEY` | SSH private key for server access | Contents of `~/.ssh/mk` |
-| `SSH_KNOWN_HOSTS` | Server SSH fingerprint | Output of `ssh-keyscan -H 128.199.161.224` |
-| `SSH_HOST` | Server IP address | `128.199.161.224` |
-| `SSH_USER` | SSH username | `forge` |
+**Recommended: DigitalOcean App Platform**
+- Automatic GitHub integration with zero configuration
+- Built-in CI/CD pipeline on every git push
+- Starting at $5/month with auto-scaling
+- See `.do/app.yaml` for configuration
+
+**Alternative: GitHub Actions with Deploy Keys**
+For traditional droplet deployment, use GitHub Deploy Keys (not personal SSH keys):
+
+| Secret Name | Description | Best Practice |
+|-------------|-------------|---------------|
+| `DEPLOY_PRIVATE_KEY` | Deploy key (not personal) | Generate with `ssh-keygen -t ed25519` |
+| `DEPLOY_HOST` | Server IP address | Your DigitalOcean droplet IP |
+| `DEPLOY_USER` | Deployment user | Create dedicated `deploy` user |
+| `DEPLOY_PATH` | Application directory | `/var/www/cbhlc` |
+
+**Security Note:** Deploy keys are scoped to single repositories and are more secure than personal SSH keys for automation.
+
+For detailed deployment instructions, see `DEPLOYMENT-GUIDE.md`.
 
 #### 11.5.3 Deployment Workflow
 The automated deployment workflow (`deploy.yml`) executes on push to `main` branch:
