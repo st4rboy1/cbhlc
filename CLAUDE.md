@@ -25,6 +25,12 @@
 9. [Constraints and Assumptions](#9-constraints-and-assumptions)
 10. [Glossary](#10-glossary)
 11. [Development Workflow and Standards](#11-development-workflow-and-standards)
+    - [Local Development Setup](#111-local-development-setup)
+    - [Code Standards and Best Practices](#112-code-standards-and-best-practices)
+    - [Testing Strategy](#113-testing-strategy)
+    - [CI/CD and Deployment Process](#114-cicd-and-deployment-process)
+    - [Deployment Configuration](#115-deployment-configuration)
+    - [Monitoring and Maintenance](#116-monitoring-and-maintenance)
 
 ---
 
@@ -908,13 +914,55 @@ erDiagram
   - Security auditing (Composer audit)
   - Automated testing (PHPUnit/Pest)
   - Browser testing (Laravel Dusk)
-- **Continuous Deployment:** Laravel Forge deployment triggered by successful CI pipeline
+- **Continuous Deployment:** GitHub Actions deployment to production server
 - **Environment Management:** Laravel's environment configuration system
 - **Database Migrations:** Automated via Laravel's migration system
 - **Asset Compilation:** Vite build process integrated with deployment pipeline
 - **Deployment Strategy:** Zero-downtime deployments with rollback capability
 
-### 11.5 Monitoring and Maintenance
+### 11.5 Deployment Configuration
+
+#### 11.5.1 Server Information
+- **Host:** 128.199.161.224
+- **Platform:** Linode Nanode (1GB RAM, 1 CPU, 25GB SSD)
+- **Web Server:** Nginx (Laravel Forge managed)
+- **PHP Version:** 8.3.25
+- **Node Version:** 22.19.0
+- **Database:** MySQL 8.0+
+- **Project Path:** `/home/forge/default`
+
+#### 11.5.2 GitHub Actions Deployment Setup
+To enable automated deployments via GitHub Actions, configure the following repository secrets:
+
+| Secret Name | Description | Value |
+|-------------|-------------|-------|
+| `SSH_PRIVATE_KEY` | SSH private key for server access | Contents of `~/.ssh/mk` |
+| `SSH_KNOWN_HOSTS` | Server SSH fingerprint | Output of `ssh-keyscan -H 128.199.161.224` |
+| `SSH_HOST` | Server IP address | `128.199.161.224` |
+| `SSH_USER` | SSH username | `forge` |
+
+#### 11.5.3 Deployment Workflow
+The automated deployment workflow (`deploy.yml`) executes on push to `main` branch:
+1. **Testing Phase:** Runs all tests, linting, and security checks
+2. **Deployment Phase:** If tests pass, deploys to production
+3. **Deployment Steps:**
+   - Enables maintenance mode
+   - Pulls latest code from GitHub
+   - Installs Composer dependencies (production)
+   - Runs database migrations
+   - Installs NPM dependencies and builds assets
+   - Clears and optimizes caches
+   - Sets correct file permissions
+   - Disables maintenance mode
+
+#### 11.5.4 Troubleshooting Deployment Issues
+- **SSH Connection:** Verify SSH keys are correctly configured in GitHub secrets
+- **Permission Errors:** Ensure `forge` user has proper permissions
+- **Build Failures:** Check Node/NPM versions match development environment
+- **Migration Failures:** Review migration files and database state
+- **Cache Issues:** Clear all Laravel caches after deployment
+
+### 11.6 Monitoring and Maintenance
 - **Server Monitoring:** Laravel Forge server metrics and alerts
 - **Application Monitoring:** Laravel's built-in logging and error tracking
 - **Performance Monitoring:** Database query optimization and React component profiling
@@ -938,7 +986,8 @@ Document certifying a student's good moral character and conduct from their prev
 - Version 2.0: (January 2025) - Updated with actual technology stack implementation
 - Version 3.0: (January 2025) - Updated with Laravel 12 and GitHub Actions CI/CD pipeline
 - Version 3.1: (January 2025) - Added comprehensive ERD and database design section
-- **Version 4.0: (January 2025) - Full ISO/IEC/IEEE 29148:2018 compliance with requirements traceability, priority classification, and acceptance criteria**
+- Version 4.0: (January 2025) - Full ISO/IEC/IEEE 29148:2018 compliance with requirements traceability, priority classification, and acceptance criteria
+- **Version 4.1: (January 2025) - Added deployment configuration and GitHub Actions CI/CD workflow documentation**
 - Standards Compliance: ISO/IEC/IEEE 29148:2018 Systems and Software Engineering - Requirements Engineering
 - Technology Stack: Laravel 12 + React 18 + Inertia.js + shadcn/ui + Tailwind CSS
 - CI/CD Pipeline: GitHub Actions (CI) + Laravel Forge (CD)
