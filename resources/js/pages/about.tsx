@@ -1,15 +1,20 @@
 import { type SharedData } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, Link } from '@inertiajs/react';
+import { LoginDialog } from '@/components/login-dialog';
 
 export default function About() {
     return (
         <>
              <div className="font-sans">
       <header className="fixed top-0 left-0 w-full py-5 px-24 flex justify-between items-center z-[100] bg-[#2c3e50]">
-        <a href="index.html" className="logo relative text-2xl text-white no-underline font-medium ml-7 hover:text-[#a6b4c2]">CBHLC </a>
-        <nav className="navigation">
-          <a href="about.html" className="relative text-lg text-white no-underline font-medium ml-10">About</a>
-          <button className="btnLogin-popup w-[130px] h-[45px] bg-transparent border-2 border-white rounded-md cursor-pointer text-lg text-white font-medium ml-10 transition-all duration-400 hover:bg-white hover:text-black">Login</button>
+        <Link href="/" className="logo relative text-2xl text-white no-underline font-medium ml-7 hover:text-[#a6b4c2]">CBHLC</Link>
+        <nav className="navigation flex items-center">
+          <Link href="/about" className="relative text-lg text-white no-underline font-medium ml-10">About</Link>
+          <LoginDialog trigger={
+            <button className="btnLogin-popup w-[130px] h-[45px] bg-transparent border-2 border-white rounded-md cursor-pointer text-lg text-white font-medium ml-10 transition-all duration-400 hover:bg-white hover:text-black flex items-center justify-center">
+              Login
+            </button>
+          } />
         </nav>
       </header>
 
@@ -22,10 +27,10 @@ export default function About() {
             helping them grow into individuals with strong character and a brighter future.
           </p>
 
-          <div className="flex justify-between items-center gap-10 flex-wrap ml-48">
+          <div className="flex justify-between items-start gap-10 flex-wrap">
             {/* LEFT TEXT */}
-            <div className="ml-0 flex-1 text-left mb-[450px] h-[200px]">
-              <h2 className="text-3xl text-[#2c3e50] mb-4">We’re here to enhance every child’s potential</h2>
+            <div className="flex-1 text-left">
+              <h2 className="text-3xl text-[#2c3e50] mb-4">We're here to enhance every child's potential</h2>
               <p className="text-base text-[#444] leading-relaxed">
                 Our mission is to provide quality education rooted in Christian values.
                 The school emphasizes both academic excellence and spiritual development,
@@ -54,7 +59,7 @@ export default function About() {
 
               </p>
               
-              <p className="italic text-[#2e7d32] font-bold">“Start children off on the way they should go...” <br /> — Proverbs 22:6</p>
+              <p className="italic text-[#2e7d32] font-bold">"Start children off on the way they should go..." <br /> — Proverbs 22:6</p>
             </div>
 
 
@@ -65,7 +70,7 @@ export default function About() {
             </div>
           </div>
 
-          <div className="relative bottom-2.5 mr-[1500px] flex gap-4 text-base z-[100] justify-center mt-7 flex-wrap">
+          <div className="flex gap-4 text-base justify-center mt-12 flex-wrap">
             <a href="https://www.facebook.com/CBHLC.Pasig" className="text-4xl"><i className="fab fa-facebook"></i></a>
             <a href="https://www.instagram.com/awrabriguela/" className="text-4xl"><i className="fab fa-instagram"></i></a>
 
