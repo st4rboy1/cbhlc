@@ -1,13 +1,11 @@
-import { dashboard } from '@/routes';
 import { LoginDialog } from '@/components/login-dialog';
-import { type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 
 export default function Landing() {
-    const { auth } = usePage<SharedData>().props;
+
     const loginTriggerRef = useRef<HTMLButtonElement>(null);
-    
+
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('login') === 'true') {
