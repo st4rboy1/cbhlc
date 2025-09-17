@@ -83,15 +83,15 @@ The Web-Based Enrollment System is a standalone web application designed specifi
 ### 2.4 Operating Environment
 - **Client Side:** Modern web browsers supporting React applications (Chrome, Firefox, Safari, Edge)
 - **Server Side:** Laravel 12 framework with Inertia.js for SPA functionality
-- **Database:** MySQL 8.3+ Server (managed via Laravel's Eloquent ORM)
+- **Database:** MySQL 8.0.43 Server (local installation on same server)
 - **Development Environment:** Docker Compose with Laravel Sail
-- **Deployment Platform:** Linode Nanode (1GB) managed by Laravel Forge
-- **CI/CD Pipeline:** GitHub Actions for automated testing and Laravel Forge for deployment
+- **Deployment Platform:** Single VPS server with Laravel Forge management
+- **CI/CD Pipeline:** GitHub Actions for automated testing and deployment
 - **Internet Connectivity:** Required for system access
 
 ### 2.5 Assumptions and Dependencies
 - Users have access to internet-connected devices with modern web browsers supporting React applications
-- Linode hosting infrastructure managed via Laravel Forge with automated deployment
+- Single server infrastructure managed via Laravel Forge
 - Docker environment available for local development with Laravel Sail
 - GitHub repository configured with automated CI/CD pipeline
 - Staff training will be provided for system usage
@@ -435,23 +435,23 @@ Requirements are classified using the MoSCoW method:
 The system follows a modern full-stack architecture leveraging Laravel 12's ecosystem:
 - **Presentation Layer:** React 18+ based SPA with shadcn/ui components and Tailwind CSS styling
 - **Application Layer:** Laravel 12 framework with Inertia.js 2.0 bridging server-side routing to client-side React components
-- **Data Layer:** MySQL 8.0 database managed via Laravel's Eloquent ORM (MySQL 8.3+ recommended for production)
+- **Data Layer:** MySQL 8.0.43 database on local server managed via Laravel's Eloquent ORM
 - **Development Environment:** Containerized using Docker Compose with Laravel Sail
 - **CI/CD Pipeline:** GitHub Actions for automated testing, code quality checks, and security auditing
-- **Deployment:** Automated deployment via Laravel Forge to Linode infrastructure with zero-downtime deployments
+- **Deployment:** Single-server deployment with all components (web, app, database) on one VPS managed by Laravel Forge
 
 ### 7.2 Technology Stack
 - **Frontend Framework:** React 18+ with TypeScript support
 - **UI Components:** shadcn/ui component library (copy-paste approach with full customization)
 - **CSS Framework:** Tailwind CSS v4 with utility-first styling
 - **Full-Stack Bridge:** Inertia.js 2.0 (eliminating need for separate API)
-- **Backend Framework:** Laravel 12 (PHP 8.2+, PHP 8.4 recommended)
-- **Database:** MySQL 8.0 with Eloquent ORM (upgrading to 8.3+ recommended)
-- **Web Server:** Nginx (configured via Laravel Forge)
+- **Backend Framework:** Laravel 12 (PHP 8.3.25 installed)
+- **Database:** MySQL 8.0.43 with Eloquent ORM (local installation)
+- **Web Server:** Nginx 1.28.0 (configured via Laravel Forge)
 - **Local Development:** Docker Compose with Laravel Sail (PHP 8.4 container)
 - **CI/CD Pipeline:** GitHub Actions for continuous integration
-- **Deployment Platform:** Laravel Forge managing Linode Nanode servers
-- **Version Control Integration:** Git with automated deployment triggers via GitHub Actions
+- **Deployment Platform:** Single VPS server managed by Laravel Forge
+- **Version Control Integration:** Git with deployment options via GitHub Actions or Forge
 - **Testing Framework:** Pest 4.0 (primary), PHPUnit compatibility maintained
 - **Development Methodology:** Agile with iterative sprints and automated testing
 
@@ -487,14 +487,15 @@ The system follows a modern full-stack architecture leveraging Laravel 12's ecos
 - **Deployment Trigger:** Successful CI pipeline triggers automated deployment via Laravel Forge
 
 ### 7.6 Deployment Architecture
-- **Server Provisioning:** Laravel Forge automated server setup on Linode Nanode (1GB RAM, 1 CPU Core, 25GB SSD)
-- **Web Server:** Nginx optimized for Laravel 12 applications
-- **Process Management:** PHP-FPM with optimized worker configuration for small server
-- **SSL Certificates:** Automated Let's Encrypt certificate management
+- **Server Type:** Single VPS hosting all application components
+- **Web Server:** Nginx 1.28.0 optimized for Laravel applications
+- **Database Server:** MySQL 8.0.43 running locally on same server
+- **Process Management:** PHP-FPM 8.3 with optimized worker configuration
+- **SSL Certificates:** Available through Laravel Forge Let's Encrypt integration
+- **File Storage:** Local filesystem on server SSD
 - **Monitoring:** Laravel Forge server monitoring and performance metrics
-- **Backup Strategy:** Automated daily database backups with 7-day retention
-- **Deployment Pipeline:** GitHub Actions CI success triggers Laravel Forge deployment hooks
-- **Zero-Downtime Deployments:** Laravel Forge atomic deployments with rollback capability
+- **Backup Strategy:** Database backups configurable through Laravel Forge
+- **Deployment Options:** Manual via SSH, Laravel Forge quick deploy, or GitHub Actions automation
 
 ### 7.7 Asset Compilation and Management
 - **Build Tool:** Vite for fast asset compilation and bundling
@@ -924,55 +925,71 @@ erDiagram
 
 #### 11.5.1 Server Information
 - **Host:** 128.199.161.224
-- **Platform:** Linode Nanode (1GB RAM, 1 CPU, 25GB SSD)
-- **Web Server:** Nginx (Laravel Forge managed)
+- **Platform:** Single VPS Server (All-in-one deployment)
+- **Web Server:** Nginx 1.28.0 (Laravel Forge managed)
 - **PHP Version:** 8.3.25
-- **Node Version:** 22.19.0
-- **Database:** MySQL 8.0+
+- **Database:** MySQL 8.0.43 (local installation)
 - **Project Path:** `/home/forge/default`
+- **User:** forge (deployment and application user)
+- **SSH Access:** Available via `ssh cbhlc` (forge user) or `ssh cbhlc-root` (root user)
 
-#### 11.5.2 Deployment Options (2025 Best Practices)
+#### 11.5.2 Server Components
+All components run on a single server for simplified management:
+- **Laravel Application:** Located at `/home/forge/default`
+- **MySQL Database:** Local instance on 127.0.0.1:3306
+- **Nginx Web Server:** Configured with Laravel Forge
+- **PHP-FPM:** Process manager for PHP execution
+- **Composer:** Installed at `/usr/local/bin/composer`
+- **Node.js:** Available for asset compilation
 
-**Recommended: DigitalOcean App Platform**
-- Automatic GitHub integration with zero configuration
-- Built-in CI/CD pipeline on every git push
-- Starting at $5/month with auto-scaling
-- See `.do/app.yaml` for configuration
+#### 11.5.3 Database Configuration
+- **Database Name:** forge
+- **Database User:** forge
+- **Database Host:** 127.0.0.1 (local)
+- **Database Port:** 3306
+- **Connection:** Direct local socket connection for optimal performance
 
-**Alternative: GitHub Actions with Deploy Keys**
-For traditional droplet deployment, use GitHub Deploy Keys (not personal SSH keys):
+#### 11.5.4 Deployment Workflow
+The deployment workflow can be executed via:
 
-| Secret Name | Description | Best Practice |
-|-------------|-------------|---------------|
-| `DEPLOY_PRIVATE_KEY` | Deploy key (not personal) | Generate with `ssh-keygen -t ed25519` |
-| `DEPLOY_HOST` | Server IP address | Your DigitalOcean droplet IP |
-| `DEPLOY_USER` | Deployment user | Create dedicated `deploy` user |
-| `DEPLOY_PATH` | Application directory | `/var/www/cbhlc` |
+**Option 1: GitHub Actions Automated Deployment**
+- Configure GitHub Actions with server SSH access
+- Workflow triggers on push to `main` branch
+- Deployment steps execute via SSH to the server
 
-**Security Note:** Deploy keys are scoped to single repositories and are more secure than personal SSH keys for automation.
+**Option 2: Laravel Forge Deployment**
+- Use Laravel Forge's built-in deployment features
+- Quick deploy button in Forge dashboard
+- Automatic deployment hooks from GitHub
 
-For detailed deployment instructions, see `DEPLOYMENT-GUIDE.md`.
+**Option 3: Manual Deployment via SSH**
+```bash
+ssh cbhlc
+cd /home/forge/default
+git pull origin main
+composer install --optimize-autoloader --no-dev
+npm ci && npm run build
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
 
-#### 11.5.3 Deployment Workflow
-The automated deployment workflow (`deploy.yml`) executes on push to `main` branch:
-1. **Testing Phase:** Runs all tests, linting, and security checks
-2. **Deployment Phase:** If tests pass, deploys to production
-3. **Deployment Steps:**
-   - Enables maintenance mode
-   - Pulls latest code from GitHub
-   - Installs Composer dependencies (production)
-   - Runs database migrations
-   - Installs NPM dependencies and builds assets
-   - Clears and optimizes caches
-   - Sets correct file permissions
-   - Disables maintenance mode
+#### 11.5.5 Server Management
+- **SSH Access:**
+  - Application management: `ssh cbhlc` (forge user)
+  - System administration: `ssh cbhlc-root` (root access)
+- **Log Files:** Located in `/home/forge/default/storage/logs`
+- **Nginx Config:** `/etc/nginx/sites-available/default`
+- **PHP-FPM:** Managed via systemctl
+- **MySQL:** Local database accessible via forge user
 
-#### 11.5.4 Troubleshooting Deployment Issues
-- **SSH Connection:** Verify SSH keys are correctly configured in GitHub secrets
-- **Permission Errors:** Ensure `forge` user has proper permissions
-- **Build Failures:** Check Node/NPM versions match development environment
-- **Migration Failures:** Review migration files and database state
-- **Cache Issues:** Clear all Laravel caches after deployment
+#### 11.5.6 Troubleshooting
+- **Application Errors:** Check Laravel logs at `/home/forge/default/storage/logs/laravel.log`
+- **Web Server Issues:** Review Nginx error logs
+- **Database Connection:** Verify MySQL service status and credentials in `.env`
+- **Permission Issues:** Ensure forge user owns application files
+- **Cache Problems:** Clear all caches with `php artisan cache:clear`
 
 ### 11.6 Monitoring and Maintenance
 - **Server Monitoring:** Laravel Forge server metrics and alerts
