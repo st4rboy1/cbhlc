@@ -43,22 +43,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Admin dashboards (for super_admin and administrator roles)
     Route::get('admin/dashboard', function () {
         return Inertia::render('admin/dashboard');
-    })->name('admin.dashboard');
+    })->middleware('role:super_admin|administrator')->name('admin.dashboard');
 
     // Registrar dashboard
     Route::get('registrar/dashboard', function () {
         return Inertia::render('registrar/dashboard');
-    })->name('registrar.dashboard');
+    })->middleware('role:registrar')->name('registrar.dashboard');
 
     // Parent dashboard
     Route::get('parent/dashboard', function () {
         return Inertia::render('parent/dashboard');
-    })->name('parent.dashboard');
+    })->middleware('role:parent')->name('parent.dashboard');
 
     // Student dashboard
     Route::get('student/dashboard', function () {
         return Inertia::render('student/dashboard');
-    })->name('student.dashboard');
+    })->middleware('role:student')->name('student.dashboard');
 });
 
 require __DIR__.'/settings.php';
