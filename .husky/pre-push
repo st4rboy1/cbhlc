@@ -1,0 +1,19 @@
+#!/bin/bash
+
+echo "🚀 Running pre-push checks..."
+echo ""
+
+# Run the local test script
+./scripts/test-local.sh
+
+# If all checks pass, allow the push
+if [ $? -eq 0 ]; then
+    echo "✅ Pre-push checks completed successfully!"
+    exit 0
+else
+    echo ""
+    echo "❌ Pre-push checks failed! Fix the issues before pushing."
+    echo ""
+    echo "Tip: You can bypass this check with 'git push --no-verify' (not recommended)"
+    exit 1
+fi
