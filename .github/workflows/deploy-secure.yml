@@ -102,8 +102,8 @@ jobs:
             # Navigate to project directory
             cd /home/forge/default
 
-            # Enable maintenance mode with message
-            php artisan down --message="System is being updated. Please check back in a few minutes." --retry=60
+            # Enable maintenance mode
+            php artisan down --retry=60
 
             # Pull latest code
             git fetch origin main
