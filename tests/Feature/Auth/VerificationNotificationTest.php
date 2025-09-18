@@ -32,10 +32,11 @@ test('does not send verification notification if email is verified', function ()
     $user = User::factory()->create([
         'email_verified_at' => now(),
     ]);
+    $user->assignRole('parent'); // Assign a role so getDashboardRoute() works
 
     $this->actingAs($user)
         ->post(route('verification.send'))
-        ->assertRedirect(route('dashboard', absolute: false));
+        ->assertRedirect(route($user->getDashboardRoute(), absolute: false));
 
     Notification::assertNothingSent();
 });
