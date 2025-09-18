@@ -116,7 +116,7 @@ jobs:
             php artisan migrate --force
 
             # Install/update Node dependencies and build assets
-            npm ci --production
+            npm ci
             npm run build
 
             # Clear all caches
@@ -129,8 +129,6 @@ jobs:
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            php artisan icons:cache
-            php artisan filament:cache-components
 
             # Optimize application
             php artisan optimize
