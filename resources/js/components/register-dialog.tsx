@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Form } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
+import { GraduationCap, LoaderCircle, UserCircle } from 'lucide-react';
 
 interface RegisterDialogProps {
     isOpen: boolean;
@@ -46,12 +47,45 @@ export function RegisterDialog({ isOpen, onOpenChange, onLoginClick }: RegisterD
                                 </div>
 
                                 <div className="grid gap-2">
+                                    <Label>I am registering as a</Label>
+                                    <RadioGroup defaultValue="parent" name="role" className="grid grid-cols-1 gap-3">
+                                        <label
+                                            htmlFor="parent"
+                                            className="flex cursor-pointer items-center space-x-3 rounded-lg border border-input p-3 transition-colors hover:border-accent-foreground/20 hover:bg-accent has-[:checked]:border-primary has-[:checked]:bg-accent"
+                                        >
+                                            <RadioGroupItem value="parent" id="parent" />
+                                            <div className="flex items-center space-x-2">
+                                                <UserCircle className="h-5 w-5 text-muted-foreground" />
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-medium">Parent/Guardian</span>
+                                                    <span className="text-xs text-muted-foreground">Enrolling a child</span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                        <label
+                                            htmlFor="student"
+                                            className="flex cursor-pointer items-center space-x-3 rounded-lg border border-input p-3 transition-colors hover:border-accent-foreground/20 hover:bg-accent has-[:checked]:border-primary has-[:checked]:bg-accent"
+                                        >
+                                            <RadioGroupItem value="student" id="student" />
+                                            <div className="flex items-center space-x-2">
+                                                <GraduationCap className="h-5 w-5 text-muted-foreground" />
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-medium">Student</span>
+                                                    <span className="text-xs text-muted-foreground">18+ years old</span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </RadioGroup>
+                                    <InputError message={errors.role} />
+                                </div>
+
+                                <div className="grid gap-2">
                                     <Label htmlFor="email">Email address</Label>
                                     <Input
                                         id="email"
                                         type="email"
                                         required
-                                        tabIndex={2}
+                                        tabIndex={3}
                                         autoComplete="email"
                                         name="email"
                                         placeholder="email@example.com"
@@ -65,7 +99,7 @@ export function RegisterDialog({ isOpen, onOpenChange, onLoginClick }: RegisterD
                                         id="password"
                                         type="password"
                                         required
-                                        tabIndex={3}
+                                        tabIndex={4}
                                         autoComplete="new-password"
                                         name="password"
                                         placeholder="Password"
@@ -79,7 +113,7 @@ export function RegisterDialog({ isOpen, onOpenChange, onLoginClick }: RegisterD
                                         id="password_confirmation"
                                         type="password"
                                         required
-                                        tabIndex={4}
+                                        tabIndex={5}
                                         autoComplete="new-password"
                                         name="password_confirmation"
                                         placeholder="Confirm password"
@@ -87,7 +121,7 @@ export function RegisterDialog({ isOpen, onOpenChange, onLoginClick }: RegisterD
                                     <InputError message={errors.password_confirmation} />
                                 </div>
 
-                                <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
+                                <Button type="submit" className="mt-2 w-full" tabIndex={6} disabled={processing}>
                                     {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                     Create account
                                 </Button>
@@ -102,7 +136,7 @@ export function RegisterDialog({ isOpen, onOpenChange, onLoginClick }: RegisterD
                                         e.preventDefault();
                                         onLoginClick();
                                     }}
-                                    tabIndex={6}
+                                    tabIndex={7}
                                 >
                                     Log in
                                 </Button>

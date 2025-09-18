@@ -34,6 +34,7 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => 'required|in:parent,student',
         ]);
 
         $user = User::create([
@@ -42,10 +43,20 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Assign the selected role to the user
+        $user->assignRole($request->role);
+
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect()->intended(route($request->user()->getDashboardRoute(), absolute: false));
+        // Determine the dashboard route based on assigned role
+        $dashboardRoute = match ($request->role) {
+            'parent' => 'parent.dashboard',
+            'student' => 'student.dashboard',
+            default => 'home'
+        };
+
+        return redirect()->route($dashboardRoute);
     }
 }
