@@ -147,9 +147,7 @@ jobs:
             # Install npm dependencies and build assets
             # Clear npm cache to avoid corruption issues
             npm cache clean --force || true
-            # Remove node_modules to ensure clean install
-            rm -rf node_modules || true
-            # Install dependencies
+            # Clean install dependencies (will remove node_modules automatically)
             npm ci
             NODE_ENV=production npx vite build
 
