@@ -21,15 +21,8 @@ parameters:
         - bootstrap/cache/
         - database/factories/
 
-    checkMissingIterableValueType: false
-
     # Treat PHPDocs as authoritative
     treatPhpDocTypesAsCertain: true
 
     # Report unmatched ignored errors
     reportUnmatchedIgnoredErrors: true
-
-    # Check for dead code
-    checkAlwaysTrueCheckTypeFunctionCall: true
-    checkAlwaysTrueInstanceof: true
-    checkAlwaysTrueStrictComparison: true
