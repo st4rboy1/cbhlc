@@ -1,127 +1,229 @@
-import Sidebar from '../components/Sidebar';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Head } from '@inertiajs/react';
+import { Calendar, CheckCircle, FileText, GraduationCap, MapPin, User } from 'lucide-react';
+import PageLayout from '../components/PageLayout';
+
+interface StudentInfo {
+    name: string;
+    age: number;
+    gender: string;
+    section: string;
+    birthdate: string;
+    address: string;
+    gradeLevel: string;
+}
+
+interface ReportData {
+    academicYear: string;
+    semester: string;
+    status: 'enrolled' | 'pending' | 'completed';
+    enrollmentDate: string;
+}
 
 export default function StudentReport() {
+    const studentInfo: StudentInfo = {
+        name: 'Manero Sj Rodriguez',
+        age: 12,
+        gender: 'Male',
+        section: 'Grade 6-A',
+        birthdate: 'March 15, 2012',
+        address: '123 Sample Street, City, Province',
+        gradeLevel: 'Grade 6',
+    };
+
+    const reportData: ReportData = {
+        academicYear: '2024-2025',
+        semester: 'First Semester',
+        status: 'enrolled',
+        enrollmentDate: 'August 15, 2024',
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'enrolled':
+                return 'bg-green-100 text-green-800 border-green-200';
+            case 'pending':
+                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            case 'completed':
+                return 'bg-blue-100 text-blue-800 border-blue-200';
+            default:
+                return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    };
+
+    const getStatusText = (status: string) => {
+        switch (status) {
+            case 'enrolled':
+                return 'Currently Enrolled';
+            case 'pending':
+                return 'Enrollment Pending';
+            case 'completed':
+                return 'Academic Year Completed';
+            default:
+                return 'Unknown Status';
+        }
+    };
+
     return (
         <>
-            <div className="m-0 bg-[#eef2f5] p-0 font-['Segoe_UI',_Tahoma,_Verdana,_sans-serif] text-black">
-                <div className="flex min-h-screen">
-                    {/* Sidebar */}
-                    <Sidebar currentPage="studentreport" />
-
-                    <div className="flex flex-grow flex-col px-12 py-7">
-                        <div className="top-bar mb-0 flex items-center justify-between border-b-2 border-gray-300 py-4">
-                            <h1 id="pageTitle" className="m-0 text-3xl text-[#2c3e50]">
-                                STUDENT REPORT
-                            </h1>
-                            <div className="user-info flex items-center">
-                                <button
-                                    className="icon-btn ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300"
-                                    id="openModal"
-                                >
-                                    <i className="fas fa-bell" style={{ color: 'gray' }}></i>
-                                    <span className="badge absolute top-[-5px] right-[-5px] rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white">
-                                        3
-                                    </span>
-                                </button>
-                                <span className="mr-5 font-medium text-[#555]">Welcome, Bronny!</span>
-                                <button className="icon-btn ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300">
-                                    <i className="fas fa-user-circle"></i>
-                                </button>
-
-                                {/* Notification Dropdown */}
-                                <div
-                                    className="notification-dropdown absolute top-[50px] right-0 z-[1000] hidden w-[350px] rounded-xl bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
-                                    id="notificationDropdown"
-                                >
-                                    <h3 className="m-0 mb-2.5 border-b border-gray-300 pb-2 text-lg text-[#2c3e50]">Notifications</h3>
-                                    <div className="my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to the folder{' '}
-                                            <b>Web App Designs 2019</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Today at 12:28 PM</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> invited you to the folder{' '}
-                                            <b>EMEA Major Deal Close Plans</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Yesterday at 5:15 PM</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="notification-item my-3 flex items-start border-b-0 pb-3">
-                                        <div className="circle-avatar mr-3 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#2c3e50] text-sm font-bold text-white">
-                                            AS
-                                        </div>
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to{' '}
-                                            <b>Enterprise Corporation Contracts.pdf</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Sep 20 at 3:13 PM</div>
-                                        </div>
-                                    </div>
-                                </div>
+            <Head title="Student Report" />
+            <PageLayout title="STUDENT REPORT" currentPage="studentreport">
+                {/* Status Banner */}
+                <Card className="mb-6 border-green-200 bg-green-50">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-green-800">
+                            <CheckCircle className="h-5 w-5" />
+                            Enrollment Status
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <Badge className={getStatusColor(reportData.status)}>{getStatusText(reportData.status)}</Badge>
+                                <p className="mt-2 text-green-700">
+                                    Academic Year {reportData.academicYear} - {reportData.semester}
+                                </p>
                             </div>
-
-                            <div className="repContent my-5 max-w-4xl rounded-lg bg-[#f9f9f9] p-5 shadow-[0_4px_10px_rgba(0,0,0,0.1)]">
-                                <h1 className="text-[#2c3e50] underline">READY FOR PAYMENT!</h1>
-                                <p>Visit cashier on-site to finish the process.</p>
-                                <h3 className="underline">
-                                    {' '}
-                                    <u>Student Information</u>
-                                </h3>
-                                <p>
-                                    {' '}
-                                    <b>Age: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Gender: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Section: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Birthdate: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Student Name: </b>Manero Sj Rodriguez.
-                                </p>
-
-                                <h3 className="underline">
-                                    {' '}
-                                    <u>Student Information</u>
-                                </h3>
-                                <p>
-                                    {' '}
-                                    <b>Age: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Gender: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Section: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Birthdate: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Student Name: </b>Manero Sj Rodriguez.
-                                </p>
+                            <div className="text-right text-sm text-green-600">
+                                <p>Enrolled since: {reportData.enrollmentDate}</p>
                             </div>
                         </div>
-                    </div>
+                    </CardContent>
+                </Card>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                    {/* Student Personal Information */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <User className="h-5 w-5 text-primary" />
+                                Student Information
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid gap-3">
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Full Name:</span>
+                                    <span className="text-right font-semibold">{studentInfo.name}</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Age:</span>
+                                    <span className="font-semibold">{studentInfo.age} years old</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Gender:</span>
+                                    <span className="font-semibold">{studentInfo.gender}</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Grade Level:</span>
+                                    <span className="flex items-center gap-1 font-semibold">
+                                        <GraduationCap className="h-4 w-4 text-muted-foreground" />
+                                        {studentInfo.gradeLevel}
+                                    </span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Section:</span>
+                                    <span className="font-semibold">{studentInfo.section}</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Date of Birth:</span>
+                                    <span className="flex items-center gap-1 font-semibold">
+                                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                                        {studentInfo.birthdate}
+                                    </span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Academic Information */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <FileText className="h-5 w-5 text-primary" />
+                                Academic Information
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid gap-3">
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Academic Year:</span>
+                                    <span className="font-semibold">{reportData.academicYear}</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Current Semester:</span>
+                                    <span className="font-semibold">{reportData.semester}</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Enrollment Date:</span>
+                                    <span className="font-semibold">{reportData.enrollmentDate}</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Student Status:</span>
+                                    <Badge className={getStatusColor(reportData.status)}>{getStatusText(reportData.status)}</Badge>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
-            </div>
+
+                {/* Contact Information */}
+                <Card className="mt-6">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <MapPin className="h-5 w-5 text-primary" />
+                            Contact Information
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-3">
+                            <div className="flex items-start gap-2">
+                                <MapPin className="mt-1 h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                                <div>
+                                    <span className="font-medium">Home Address:</span>
+                                    <p className="text-muted-foreground">{studentInfo.address}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Report Summary */}
+                <Card className="mt-6 border-blue-200 bg-blue-50">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-blue-800">
+                            <FileText className="h-5 w-5" />
+                            Report Summary
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-blue-700">
+                        <div className="space-y-2">
+                            <p>
+                                <strong>Student Status:</strong> {studentInfo.name} is currently enrolled for the {reportData.academicYear} academic
+                                year.
+                            </p>
+                            <p>
+                                <strong>Grade Placement:</strong> The student is assigned to {studentInfo.section} and is progressing normally through
+                                the curriculum.
+                            </p>
+                            <p>
+                                <strong>Next Steps:</strong> Continue regular attendance and maintain academic performance. Report any changes in
+                                contact information to the registrar's office.
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </PageLayout>
         </>
     );
 }

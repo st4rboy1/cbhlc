@@ -1,217 +1,343 @@
-import { Link } from '@inertiajs/react';
-import Sidebar from '../components/Sidebar';
+import PageLayout from '@/components/PageLayout';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Head } from '@inertiajs/react';
+import { Upload } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Enrollment() {
+    const [activeTab, setActiveTab] = useState('student-info');
+    const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File | null }>({
+        birthCertificate: null,
+        reportCard: null,
+        form138: null,
+        goodMoral: null,
+    });
+
+    const handleFileUpload = (fileType: string, file: File | null) => {
+        setUploadedFiles((prev) => ({
+            ...prev,
+            [fileType]: file,
+        }));
+    };
+
     return (
         <>
-            <div className="m-0 bg-[#eef2f5] p-0 font-['Segoe_UI',Tahoma,Geneva,Verdana,sans-serif] text-[#333]">
-                <div className="flex min-h-screen">
-                    {/* Sidebar */}
-                    <Sidebar currentPage="enrollment" />
-                    {/*NAV SIDE BAR, SAME LANG TO SA LAHAT NG SIDES  */}
-                    {/* Enrollment Main Content */}
+            <Head title="Enrollment" />
+            <PageLayout title="ENROLLMENT" currentPage="enrollment">
+                <div className="space-y-6">
+                    {/* Progress Indicator */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Enrollment Progress</CardTitle>
+                            <CardDescription>Complete all sections to submit your enrollment</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex items-center gap-2">
+                                <Badge variant={activeTab === 'student-info' ? 'default' : 'secondary'}>1. Student Information</Badge>
+                                <Separator className="w-8" />
+                                <Badge variant={activeTab === 'guardian-info' ? 'default' : 'secondary'}>2. Guardian Information</Badge>
+                                <Separator className="w-8" />
+                                <Badge variant={activeTab === 'academic' ? 'default' : 'secondary'}>3. Academic Details</Badge>
+                                <Separator className="w-8" />
+                                <Badge variant={activeTab === 'documents' ? 'default' : 'secondary'}>4. Documents</Badge>
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                    <main className="flex flex-grow flex-col px-12 py-7">
-                        <div className="top-bar mb-0 flex items-center justify-between border-b-2 border-gray-300 py-4">
-                            <h1 className="m-0 text-3xl text-[#2c3e50]">ENROLL</h1>
-                            <div className="user-info flex items-center">
-                                <button
-                                    className="icon-btn ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300"
-                                    id="openModal"
-                                >
-                                    <i className="fas fa-bell"></i>
-                                    <span className="badge absolute top-[-5px] right-[-5px] rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white">
-                                        3
-                                    </span>
-                                </button>
-                                <span className="mr-5 font-medium text-[#555]">Welcome, Bronny!</span>
-                                <button className="icon-btn ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300">
-                                    <i className="fas fa-user-circle"></i>
-                                </button>
-                                <div
-                                    className="notification-dropdown absolute top-[50px] right-0 z-[1000] hidden w-[350px] rounded-xl bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
-                                    id="notificationDropdown"
-                                >
-                                    <h3 className="m-0 mb-2.5 border-b border-gray-300 pb-2 text-lg text-[#2c3e50]">Notifications</h3>
-                                    <div className="notification-item new my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to the folder{' '}
-                                            <b>Web App Designs 2019</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Today at 12:28 PM</div>
+                    {/* Main Enrollment Form */}
+                    <Card>
+                        <CardContent className="p-6">
+                            <Tabs value={activeTab} onValueChange={setActiveTab}>
+                                <TabsList className="grid w-full grid-cols-4">
+                                    <TabsTrigger value="student-info">Student Info</TabsTrigger>
+                                    <TabsTrigger value="guardian-info">Guardian Info</TabsTrigger>
+                                    <TabsTrigger value="academic">Academic</TabsTrigger>
+                                    <TabsTrigger value="documents">Documents</TabsTrigger>
+                                </TabsList>
+
+                                {/* Student Information Tab */}
+                                <TabsContent value="student-info" className="space-y-4">
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="firstName">First Name</Label>
+                                            <Input id="firstName" placeholder="Enter first name" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="lastName">Last Name</Label>
+                                            <Input id="lastName" placeholder="Enter last name" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="middleName">Middle Name</Label>
+                                            <Input id="middleName" placeholder="Enter middle name" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="birthDate">Birth Date</Label>
+                                            <Input id="birthDate" type="date" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="gender">Gender</Label>
+                                            <Select>
+                                                <SelectTrigger id="gender">
+                                                    <SelectValue placeholder="Select gender" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="male">Male</SelectItem>
+                                                    <SelectItem value="female">Female</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="nationality">Nationality</Label>
+                                            <Input id="nationality" placeholder="Enter nationality" />
                                         </div>
                                     </div>
 
-                                    <div className="notification-item new my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> invited you to the folder{' '}
-                                            <b>EMEA Major Deal Close Plans</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Yesterday at 5:15 PM</div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="address">Complete Address</Label>
+                                        <Input id="address" placeholder="Enter complete address" />
+                                    </div>
+
+                                    <div className="flex justify-end">
+                                        <Button onClick={() => setActiveTab('guardian-info')}>Next: Guardian Information</Button>
+                                    </div>
+                                </TabsContent>
+
+                                {/* Guardian Information Tab */}
+                                <TabsContent value="guardian-info" className="space-y-4">
+                                    <div className="space-y-4">
+                                        <h3 className="text-lg font-semibold">Father's Information</h3>
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="fatherName">Full Name</Label>
+                                                <Input id="fatherName" placeholder="Enter father's name" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="fatherOccupation">Occupation</Label>
+                                                <Input id="fatherOccupation" placeholder="Enter occupation" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="fatherPhone">Contact Number</Label>
+                                                <Input id="fatherPhone" type="tel" placeholder="Enter phone number" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="fatherEmail">Email Address</Label>
+                                                <Input id="fatherEmail" type="email" placeholder="Enter email" />
+                                            </div>
+                                        </div>
+
+                                        <Separator className="my-4" />
+
+                                        <h3 className="text-lg font-semibold">Mother's Information</h3>
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="motherName">Full Name</Label>
+                                                <Input id="motherName" placeholder="Enter mother's name" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="motherOccupation">Occupation</Label>
+                                                <Input id="motherOccupation" placeholder="Enter occupation" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="motherPhone">Contact Number</Label>
+                                                <Input id="motherPhone" type="tel" placeholder="Enter phone number" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="motherEmail">Email Address</Label>
+                                                <Input id="motherEmail" type="email" placeholder="Enter email" />
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="notification-item my-3 flex items-start border-b-0 pb-3">
-                                        <div className="circle-avatar mr-3 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#2c3e50] text-sm font-bold text-white">
-                                            AS
+                                    <div className="flex justify-between">
+                                        <Button variant="outline" onClick={() => setActiveTab('student-info')}>
+                                            Previous
+                                        </Button>
+                                        <Button onClick={() => setActiveTab('academic')}>Next: Academic Details</Button>
+                                    </div>
+                                </TabsContent>
+
+                                {/* Academic Information Tab */}
+                                <TabsContent value="academic" className="space-y-4">
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="gradeLevel">Grade Level</Label>
+                                            <Select>
+                                                <SelectTrigger id="gradeLevel">
+                                                    <SelectValue placeholder="Select grade level" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="kindergarten">Kindergarten</SelectItem>
+                                                    <SelectItem value="grade1">Grade 1</SelectItem>
+                                                    <SelectItem value="grade2">Grade 2</SelectItem>
+                                                    <SelectItem value="grade3">Grade 3</SelectItem>
+                                                    <SelectItem value="grade4">Grade 4</SelectItem>
+                                                    <SelectItem value="grade5">Grade 5</SelectItem>
+                                                    <SelectItem value="grade6">Grade 6</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to{' '}
-                                            <b>Enterprise Corporation Contracts.pdf</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Sep 20 at 3:13 PM</div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="schoolYear">School Year</Label>
+                                            <Input id="schoolYear" placeholder="e.g., 2024-2025" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="previousSchool">Previous School</Label>
+                                            <Input id="previousSchool" placeholder="Enter previous school name" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="previousGrade">Previous Grade Level</Label>
+                                            <Input id="previousGrade" placeholder="Enter previous grade level" />
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <hr className="my-4 border-b-2 border-none border-gray-300" />
+                                    <div className="flex justify-between">
+                                        <Button variant="outline" onClick={() => setActiveTab('guardian-info')}>
+                                            Previous
+                                        </Button>
+                                        <Button onClick={() => setActiveTab('documents')}>Next: Upload Documents</Button>
+                                    </div>
+                                </TabsContent>
 
-                        <form id="applicationForm" className="rounded-xl bg-white px-7 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-                            {/* Student details */}
-                            <h2 style={{ fontSize: '25px' }} className="mb-4 text-xl text-[#1d3557]">
-                                Student Details{' '}
-                            </h2>
-                            <div className="form-section mb-5 flex flex-wrap gap-5">
-                                <div className="form-group flex min-w-[250px] flex-1 flex-col gap-3">
-                                    <label className="mb-1 text-sm font-semibold text-[#333]">Grade Level</label>
-                                    <select
-                                        required
-                                        className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                    >
-                                        <option value="">Choose Grade</option>
-                                        <option>Grade 1</option>
-                                        <option>Grade 2</option>
-                                        <option>Grade 3</option>
-                                        <option>Grade 4</option>
-                                        <option>Grade 5</option>
-                                        <option>Grade 6</option>
-                                    </select>
-                                </div>
-                                <label className="mb-1 text-sm font-semibold text-[#333]">LRN Number</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
-                            </div>
+                                {/* Documents Tab */}
+                                <TabsContent value="documents" className="space-y-4">
+                                    <Alert>
+                                        <AlertDescription>
+                                            Please upload clear, readable copies of the required documents in JPEG or PNG format (max 50MB per file).
+                                        </AlertDescription>
+                                    </Alert>
 
-                            <div className="form-group flex min-w-[250px] flex-1 flex-col gap-3">
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Surname*</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        <Card>
+                                            <CardHeader className="pb-3">
+                                                <CardTitle className="text-base">Birth Certificate</CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="birthCert" className="cursor-pointer">
+                                                        <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 hover:border-muted-foreground/50">
+                                                            <div className="text-center">
+                                                                <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+                                                                <p className="mt-2 text-sm text-muted-foreground">
+                                                                    {uploadedFiles.birthCertificate
+                                                                        ? uploadedFiles.birthCertificate.name
+                                                                        : 'Click to upload'}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </Label>
+                                                    <Input
+                                                        id="birthCert"
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept=".jpg,.jpeg,.png"
+                                                        onChange={(e) => handleFileUpload('birthCertificate', e.target.files?.[0] || null)}
+                                                    />
+                                                </div>
+                                            </CardContent>
+                                        </Card>
 
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Given Name*</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
+                                        <Card>
+                                            <CardHeader className="pb-3">
+                                                <CardTitle className="text-base">Report Card</CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="reportCard" className="cursor-pointer">
+                                                        <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 hover:border-muted-foreground/50">
+                                                            <div className="text-center">
+                                                                <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+                                                                <p className="mt-2 text-sm text-muted-foreground">
+                                                                    {uploadedFiles.reportCard ? uploadedFiles.reportCard.name : 'Click to upload'}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </Label>
+                                                    <Input
+                                                        id="reportCard"
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept=".jpg,.jpeg,.png"
+                                                        onChange={(e) => handleFileUpload('reportCard', e.target.files?.[0] || null)}
+                                                    />
+                                                </div>
+                                            </CardContent>
+                                        </Card>
 
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Middle Name</label>
-                                <input
-                                    type="text"
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
-                            </div>
+                                        <Card>
+                                            <CardHeader className="pb-3">
+                                                <CardTitle className="text-base">Form 138</CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="form138" className="cursor-pointer">
+                                                        <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 hover:border-muted-foreground/50">
+                                                            <div className="text-center">
+                                                                <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+                                                                <p className="mt-2 text-sm text-muted-foreground">
+                                                                    {uploadedFiles.form138 ? uploadedFiles.form138.name : 'Click to upload'}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </Label>
+                                                    <Input
+                                                        id="form138"
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept=".jpg,.jpeg,.png"
+                                                        onChange={(e) => handleFileUpload('form138', e.target.files?.[0] || null)}
+                                                    />
+                                                </div>
+                                            </CardContent>
+                                        </Card>
 
-                            <div className="form-group flex min-w-[250px] flex-1 flex-col gap-3">
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Date of Birth*</label>
-                                <input
-                                    type="date"
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
+                                        <Card>
+                                            <CardHeader className="pb-3">
+                                                <CardTitle className="text-base">Good Moral Certificate</CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="goodMoral" className="cursor-pointer">
+                                                        <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 hover:border-muted-foreground/50">
+                                                            <div className="text-center">
+                                                                <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
+                                                                <p className="mt-2 text-sm text-muted-foreground">
+                                                                    {uploadedFiles.goodMoral ? uploadedFiles.goodMoral.name : 'Click to upload'}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </Label>
+                                                    <Input
+                                                        id="goodMoral"
+                                                        type="file"
+                                                        className="hidden"
+                                                        accept=".jpg,.jpeg,.png"
+                                                        onChange={(e) => handleFileUpload('goodMoral', e.target.files?.[0] || null)}
+                                                    />
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </div>
 
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Gender*</label>
-                                <select
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                >
-                                    <option value="">Choose Gender</option>
-                                    <option>Male</option>
-                                    <option>Female</option>
-                                </select>
-
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Address*</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
-                            </div>
-
-                            {/* Guardian details */}
-                            <h2 className="mb-4 text-xl text-[#1d3557]">Guardian Contact Details</h2>
-                            <div className="form-group flex min-w-[250px] flex-1 flex-col gap-3">
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Surname*</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
-
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Given Name*</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
-
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Middle Name*</label>
-                                <input
-                                    type="text"
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
-                            </div>
-
-                            <div className="form-group flex min-w-[250px] flex-1 flex-col gap-3">
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Cellphone Number*</label>
-                                <input
-                                    type="tel"
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
-
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Email Address</label>
-                                <input
-                                    type="email"
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
-
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Relation to Student</label>
-                                <input
-                                    type="text"
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
-                            </div>
-
-                            {/* File upload */}
-                            <div className="upload my-5">
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Upload Documents*</label>
-                                <br />
-                                <input type="file" required className="mt-2.5 text-sm" />
-                            </div>
-
-                            <button
-                                type="submit"
-                                className="btn-submit inline-block cursor-pointer rounded-lg border-none bg-[#1d3557] px-5 py-3 text-base text-white transition-all duration-300 hover:bg-[#457b9d]"
-                            >
-                                Submit
-                            </button>
-                            <nav className="navigation">
-                                <br />
-                                <Link href="/application" style={{ color: 'blue' }}>
-                                    Edit Submitted Application
-                                </Link>
-                            </nav>
-                        </form>
-                    </main>
+                                    <div className="flex justify-between">
+                                        <Button variant="outline" onClick={() => setActiveTab('academic')}>
+                                            Previous
+                                        </Button>
+                                        <Button>Submit Enrollment Application</Button>
+                                    </div>
+                                </TabsContent>
+                            </Tabs>
+                        </CardContent>
+                    </Card>
                 </div>
-            </div>
+            </PageLayout>
         </>
     );
 }

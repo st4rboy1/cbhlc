@@ -1,119 +1,209 @@
-import Sidebar from '../components/Sidebar';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Head } from '@inertiajs/react';
+import { BookOpen, Building, Calendar, Gift, GraduationCap, Users } from 'lucide-react';
+import PageLayout from '../components/PageLayout';
+
+interface SchoolEvent {
+    icon: React.ReactNode;
+    title: string;
+    date?: string;
+    status?: 'upcoming' | 'completed' | 'in-progress';
+}
 
 export default function Registrar() {
+    const schoolEvents: SchoolEvent[] = [
+        {
+            icon: <BookOpen className="h-5 w-5 text-blue-600" />,
+            title: 'START OF CLASSES',
+            date: 'August 15, 2024',
+            status: 'completed',
+        },
+        {
+            icon: <Users className="h-5 w-5 text-blue-600" />,
+            title: 'PARENT ORIENTATION',
+            date: 'August 20, 2024',
+            status: 'completed',
+        },
+        {
+            icon: <Building className="h-5 w-5 text-blue-600" />,
+            title: 'FOUNDATION DAY',
+            date: 'November 15, 2024',
+            status: 'upcoming',
+        },
+        {
+            icon: <Gift className="h-5 w-5 text-blue-600" />,
+            title: 'CHRISTMAS PROGRAM',
+            date: 'December 20, 2024',
+            status: 'upcoming',
+        },
+        {
+            icon: <GraduationCap className="h-5 w-5 text-blue-600" />,
+            title: 'GRADUATION DAY',
+            date: 'March 20, 2025',
+            status: 'upcoming',
+        },
+    ];
+
+    const getStatusColor = (status?: string) => {
+        switch (status) {
+            case 'completed':
+                return 'bg-green-100 text-green-800 border-green-200';
+            case 'upcoming':
+                return 'bg-blue-100 text-blue-800 border-blue-200';
+            case 'in-progress':
+                return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+            default:
+                return 'bg-gray-100 text-gray-800 border-gray-200';
+        }
+    };
+
+    const getStatusText = (status?: string) => {
+        switch (status) {
+            case 'completed':
+                return 'Completed';
+            case 'upcoming':
+                return 'Upcoming';
+            case 'in-progress':
+                return 'In Progress';
+            default:
+                return 'Scheduled';
+        }
+    };
+
     return (
         <>
-            <div className="m-0 bg-[#eef2f5] p-0 font-['Segoe_UI',_Tahoma,_Verdana,_sans-serif] text-[#333]">
-                <div className="flex min-h-screen">
-                    {/* Sidebar */}
-                    <Sidebar currentPage="registrar" />
-
-                    <div className="flex flex-grow flex-col px-12 py-7">
-                        <div className="top-bar mb-5 flex items-center justify-between border-b-2 border-gray-300 py-4">
-                            <h1 id="pageTitle" className="m-0 text-3xl text-[#2c3e50]">
-                                REGISTRAR
-                            </h1>
-                            <div className="user-info relative flex items-center">
-                                <button
-                                    className="icon-btn relative ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300"
-                                    id="openModal"
-                                >
-                                    <i className="fas fa-bell"></i>
-                                    <span className="badge absolute top-[-5px] right-[-5px] rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white">
-                                        3
-                                    </span>
-                                </button>
-                                <span className="mr-5 font-medium text-[#555]">Welcome, Bronny!</span>
-                                <button className="icon-btn relative ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300">
-                                    <i className="fas fa-user-circle"></i>
-                                </button>
-                                <div
-                                    className="notification-dropdown absolute top-[50px] right-0 z-[1000] hidden w-[350px] rounded-xl bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
-                                    id="notificationDropdown"
-                                >
-                                    <h3 className="m-0 mb-2.5 border-b border-gray-300 pb-2 text-lg text-[#2c3e50]">Notifications</h3>
-                                    <div className="notification-item new my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to the folder{' '}
-                                            <b>Web App Designs 2019</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Today at 12:28 PM</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="notification-item new my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> invited you to the folder{' '}
-                                            <b>EMEA Major Deal Close Plans</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Yesterday at 5:15 PM</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="notification-item my-3 flex items-start border-b-0 pb-3">
-                                        <div className="circle-avatar mr-3 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#2c3e50] text-sm font-bold text-white">
-                                            AS
-                                        </div>
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to{' '}
-                                            <b>Enterprise Corporation Contracts.pdf</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Sep 20 at 3:13 PM</div>
-                                        </div>
-                                    </div>
-                                </div>
+            <Head title="Registrar" />
+            <PageLayout title="REGISTRAR" currentPage="registrar">
+                {/* Hero Images */}
+                <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <Card className="min-h-[200px] overflow-hidden">
+                        <div className="relative flex h-full items-center justify-center bg-gradient-to-br from-blue-400 via-purple-500 to-teal-500">
+                            <div
+                                className="absolute inset-0 bg-cover bg-center opacity-60"
+                                style={{ backgroundImage: "url('ra_2022-06-19_22-17-45.jpg')" }}
+                            />
+                            <div className="relative z-10 text-center text-white">
+                                <h3 className="mb-2 text-xl font-bold">School Gallery</h3>
+                                <p className="text-sm opacity-90">Moments from our school community</p>
                             </div>
                         </div>
-
-                        <div id="contentArea">
-                            <div className="mb-7 grid grid-cols-2 gap-7">
-                                <div
-                                    className="flex min-h-[300px] items-center justify-center rounded-xl bg-[#d1d8e0] bg-cover bg-center bg-no-repeat text-lg text-[#7f8c8d] shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)]"
-                                    style={{ backgroundImage: "url('ra_2022-06-19_22-17-45.jpg')" }}
-                                ></div>
-                                <div
-                                    className="rounded-xl bg-cover bg-center bg-no-repeat"
-                                    style={{ backgroundImage: "url('ra_2022-06-19_22-17-45.jpg')" }}
-                                ></div>
-                            </div>
-
-                            <div className="col-span-2 rounded-xl bg-white p-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-                                <h2 className="mt-0 flex items-center justify-between border-b-2 border-[#ecf0f1] pb-2.5 text-2xl text-[#2c3e50]">
-                                    Schedules
-                                    <i className="fas fa-calendar-alt"></i>
-                                </h2>
-                                <div className="mt-5 grid grid-cols-2 gap-7">
-                                    <div className="rounded-lg bg-[#f8f9fa] p-5 shadow-[inset_0_1px_3px_rgba(0,0,0,0.05)]">
-                                        <h3 className="m-0 mb-4 text-base text-[#7f8c8d] uppercase">SCHOOL EVENTS</h3>
-                                        <ul className="m-0 list-none p-0">
-                                            <li className="flex items-center border-b border-[#eef2f5] py-4 transition-all duration-200 ease-in-out">
-                                                <i className="fas fa-bullhorn mr-5 text-xl text-[#3498db]"></i>
-                                                <span className="text-base font-medium">START OF CLASSES:</span>
-                                            </li>
-                                            <li className="flex items-center border-b border-[#eef2f5] py-4 transition-all duration-200 ease-in-out">
-                                                <i className="fas fa-users-cog mr-5 text-xl text-[#3498db]"></i>
-                                                <span className="text-base font-medium">PARENT ORIENTATION:</span>
-                                            </li>
-                                            <li className="flex items-center border-b border-[#eef2f5] py-4 transition-all duration-200 ease-in-out">
-                                                <i className="fas fa-building mr-5 text-xl text-[#3498db]"></i>
-                                                <span className="text-base font-medium">FOUNDATION DAY:</span>
-                                            </li>
-                                            <li className="flex items-center border-b border-[#eef2f5] py-4 transition-all duration-200 ease-in-out">
-                                                <i className="fas fa-gifts mr-5 text-xl text-[#3498db]"></i>
-                                                <span className="text-base font-medium">CHRISTMAS PROGRAM:</span>
-                                            </li>
-                                            <li className="flex items-center border-b-0 py-4">
-                                                <i className="fas fa-award mr-5 text-xl text-[#3498db]"></i>
-                                                <span className="text-base font-medium">GRADUATION DAY:</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
+                    </Card>
+                    <Card className="min-h-[200px] overflow-hidden">
+                        <div className="relative flex h-full items-center justify-center bg-gradient-to-br from-green-400 via-blue-500 to-purple-500">
+                            <div
+                                className="absolute inset-0 bg-cover bg-center opacity-60"
+                                style={{ backgroundImage: "url('ra_2022-06-19_22-17-45.jpg')" }}
+                            />
+                            <div className="relative z-10 text-center text-white">
+                                <h3 className="mb-2 text-xl font-bold">Campus Life</h3>
+                                <p className="text-sm opacity-90">Discover our vibrant campus environment</p>
                             </div>
                         </div>
-                        {/* end contentArea */}
-                    </div>
+                    </Card>
                 </div>
-            </div>
+
+                {/* School Events Schedule */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Calendar className="h-6 w-6 text-primary" />
+                            School Events Schedule
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground">Academic year 2024-2025 important dates and events</p>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+                            <div>
+                                <h3 className="mb-4 text-sm font-semibold tracking-wide text-muted-foreground uppercase">SCHOOL EVENTS</h3>
+                                <div className="space-y-4">
+                                    {schoolEvents.map((event, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center justify-between rounded-lg border bg-card p-4 transition-shadow hover:shadow-md"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">{event.icon}</div>
+                                                <div>
+                                                    <p className="font-medium">{event.title}</p>
+                                                    {event.date && <p className="text-sm text-muted-foreground">{event.date}</p>}
+                                                </div>
+                                            </div>
+                                            {event.status && <Badge className={getStatusColor(event.status)}>{getStatusText(event.status)}</Badge>}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Additional Information Panel */}
+                            <div className="space-y-4">
+                                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                                    <h4 className="mb-2 font-semibold text-blue-900">Important Notice</h4>
+                                    <p className="text-sm text-blue-800">
+                                        All students and parents are expected to attend the Parent Orientation. Please check the school calendar for
+                                        any updates or changes to the schedule.
+                                    </p>
+                                </div>
+
+                                <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+                                    <h4 className="mb-2 font-semibold text-green-900">Registration Status</h4>
+                                    <p className="text-sm text-green-800">
+                                        New student registration is now open for the upcoming academic year. Please submit all required documents on
+                                        time.
+                                    </p>
+                                </div>
+
+                                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+                                    <h4 className="mb-2 font-semibold text-amber-900">Academic Calendar</h4>
+                                    <p className="text-sm text-amber-800">
+                                        The complete academic calendar is available at the registrar's office. Contact us for any questions about
+                                        important dates.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Quick Stats */}
+                <div className="mt-6 grid gap-4 md:grid-cols-3">
+                    <Card>
+                        <CardContent className="flex items-center p-6">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+                                <Users className="h-6 w-6 text-blue-600" />
+                            </div>
+                            <div className="ml-4">
+                                <p className="text-sm font-medium text-muted-foreground">Total Students</p>
+                                <p className="text-2xl font-bold">450</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardContent className="flex items-center p-6">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                                <GraduationCap className="h-6 w-6 text-green-600" />
+                            </div>
+                            <div className="ml-4">
+                                <p className="text-sm font-medium text-muted-foreground">Grade Levels</p>
+                                <p className="text-2xl font-bold">6</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardContent className="flex items-center p-6">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
+                                <Calendar className="h-6 w-6 text-purple-600" />
+                            </div>
+                            <div className="ml-4">
+                                <p className="text-sm font-medium text-muted-foreground">School Days</p>
+                                <p className="text-2xl font-bold">200</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </PageLayout>
         </>
     );
 }
