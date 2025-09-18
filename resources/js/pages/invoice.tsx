@@ -1,165 +1,181 @@
-import Sidebar from '../components/Sidebar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Head } from '@inertiajs/react';
+import { Building2, Calendar, Download, FileText, Mail, Phone, Printer } from 'lucide-react';
+import PageLayout from '../components/PageLayout';
+
+interface InvoiceItem {
+    description: string;
+    amount: string;
+}
 
 export default function Invoice() {
+    const invoiceItems: InvoiceItem[] = [
+        { description: 'Tuition Fee (Monthly)', amount: '₱10,000.00' },
+        { description: 'Miscellaneous Fee', amount: '₱3,000.00' },
+    ];
+
+    const subtotal = '₱13,000.00';
+    const discount = '₱0.00';
+    const totalDue = '₱13,000.00';
+
+    const schoolInfo = {
+        name: 'Christian Bible Heritage Learning Center',
+        address: '123 School St, City, Country',
+        phone: '(02) 123-4567',
+        email: 'info@cbhlc.edu',
+    };
+
+    const studentInfo = {
+        name: 'Bronny James',
+        gradeLevel: 'Grade 2',
+    };
+
+    const invoiceDetails = {
+        number: 'INV-00123',
+        date: 'October 20, 2023',
+        dueDate: 'October 31, 2023',
+    };
+
     return (
         <>
-            <div className="m-0 bg-[#eef2f5] p-0 font-['Segoe_UI',Tahoma,Geneva,Verdana,sans-serif] text-[#333]">
-                <div className="flex min-h-screen">
-                    {/* Sidebar */}
-                    <Sidebar currentPage="invoice" />
-
-                    <div className="flex flex-grow flex-col px-12 py-7">
-                        <div className="top-bar mb-5 flex items-center justify-between border-b-2 border-gray-300 py-4">
-                            <h1 id="pageTitle" className="m-0 text-3xl text-[#2c3e50]">
-                                INVOICE
-                            </h1>
-                            <div className="user-info relative flex items-center">
-                                <button
-                                    className="icon-btn relative ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300"
-                                    id="openModal"
-                                >
-                                    <i className="fas fa-bell"></i>
-                                    <span className="badge absolute top-[-5px] right-[-5px] rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white">
-                                        3
-                                    </span>
-                                </button>
-                                <span className="mr-5 font-medium text-[#555]">Welcome, Bronny!</span>
-                                <button className="icon-btn relative ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300">
-                                    <i className="fas fa-user-circle"></i>
-                                </button>
-                                <div
-                                    className="notification-dropdown absolute top-[50px] right-0 z-[1000] hidden w-[350px] rounded-xl bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
-                                    id="notificationDropdown"
-                                >
-                                    <h3 className="m-0 mb-2.5 border-b border-gray-300 pb-2 text-lg text-[#2c3e50]">Notifications</h3>
-                                    <div className="notification-item new my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to the folder{' '}
-                                            <b>Web App Designs 2019</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Today at 12:28 PM</div>
-                                        </div>
+            <Head title="Invoice" />
+            <PageLayout title="INVOICE" currentPage="invoice">
+                <Card className="mx-auto max-w-4xl">
+                    <CardContent className="p-8">
+                        {/* Invoice Header */}
+                        <div className="mb-8 flex items-start justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                                    <Building2 className="h-8 w-8 text-primary" />
+                                </div>
+                                <div>
+                                    <h1 className="text-2xl font-bold text-primary">{schoolInfo.name}</h1>
+                                    <p className="text-sm text-muted-foreground">{schoolInfo.address}</p>
+                                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                        <span className="flex items-center gap-1">
+                                            <Phone className="h-3 w-3" />
+                                            {schoolInfo.phone}
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <Mail className="h-3 w-3" />
+                                            {schoolInfo.email}
+                                        </span>
                                     </div>
+                                </div>
+                            </div>
 
-                                    <div className="notification-item new my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> invited you to the folder{' '}
-                                            <b>EMEA Major Deal Close Plans</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Yesterday at 5:15 PM</div>
-                                        </div>
+                            <div className="text-right">
+                                <div className="mb-4">
+                                    <h2 className="text-3xl font-bold">INVOICE</h2>
+                                    <Badge variant="outline" className="mt-1">
+                                        {invoiceDetails.number}
+                                    </Badge>
+                                </div>
+                            </div>
+                        </div>
+
+                        <Separator className="mb-8" />
+
+                        {/* Invoice Details */}
+                        <div className="mb-8 grid gap-8 md:grid-cols-2">
+                            <div>
+                                <h3 className="mb-4 text-lg font-semibold">Billed To:</h3>
+                                <div className="space-y-2">
+                                    <p className="font-medium">{studentInfo.name}</p>
+                                    <p className="text-sm text-muted-foreground">Grade Level: {studentInfo.gradeLevel}</p>
+                                </div>
+                            </div>
+
+                            <div className="text-right">
+                                <div className="space-y-2">
+                                    <div className="flex justify-between">
+                                        <span className="font-medium">Invoice Date:</span>
+                                        <span className="flex items-center gap-1">
+                                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                                            {invoiceDetails.date}
+                                        </span>
                                     </div>
-
-                                    <div className="notification-item my-3 flex items-start border-b-0 pb-3">
-                                        <div className="circle-avatar mr-3 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#2c3e50] text-sm font-bold text-white">
-                                            AS
-                                        </div>
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to{' '}
-                                            <b>Enterprise Corporation Contracts.pdf</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Sep 20 at 3:13 PM</div>
-                                        </div>
+                                    <div className="flex justify-between">
+                                        <span className="font-medium">Due Date:</span>
+                                        <span className="flex items-center gap-1">
+                                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                                            {invoiceDetails.dueDate}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="invoice-container mt-5 rounded-xl bg-white p-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-                            <div className="invoice-header mb-6 flex items-start justify-between">
-                                <div className="invoice-logo">
-                                    <img src="ra_2022-06-19_22-17-45.jpg" alt="CBHLC Logo" className="logo h-24 w-24 rounded-full" />
-                                </div>
-                                <div className="school-info text-right">
-                                    <h3 className="text-xl font-bold text-[#2c3e50]">Christian Bible Heritage Learning Center</h3>
-                                    <p>123 School St, City, Country</p>
-                                    <p>Phone: (02) 123-4567</p>
-                                    <p>Email: info@cbhlc.edu</p>
-                                </div>
-                            </div>
-                            <div className="invoice-details mb-6 flex items-start justify-between">
-                                <div className="student-info">
-                                    <p>
-                                        <strong>Billed To:</strong>
-                                    </p>
-                                    <p>Bronny James</p>
-                                    <p>Grade Level: Grade 2</p>
-                                </div>
-                                <div className="invoice-meta text-right">
-                                    <p>
-                                        <strong>Invoice #:</strong> INV-00123
-                                    </p>
-                                    <p>
-                                        <strong>Invoice Date:</strong> October 20, 2023
-                                    </p>
-                                    <p>
-                                        <strong>Due Date:</strong> October 31, 2023
-                                    </p>
-                                </div>
-                            </div>
 
-                            <table className="invoice-table w-full border-collapse">
-                                <thead>
-                                    <tr className="bg-gray-100">
-                                        <th className="p-3 text-left font-semibold text-gray-600">Description</th>
-                                        <th className="p-3 text-right font-semibold text-gray-600">Amount</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr className="border-b">
-                                        <td className="p-3">Tuition Fee (Monthly)</td>
-                                        <td className="p-3 text-right">₱10,000.00</td>
-                                    </tr>
-                                    <tr className="border-b">
-                                        <td className="p-3">Miscellaneous Fee</td>
-                                        <td className="p-3 text-right">₱3,000.00</td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td colSpan={1} className="p-3 text-right font-semibold">
-                                            Subtotal
-                                        </td>
-                                        <td className="p-3 text-right">₱13,000.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td colSpan={1} className="p-3 text-right font-semibold">
-                                            Less: Discounts & Rebates
-                                        </td>
-                                        <td className="p-3 text-right">₱0.00</td>
-                                    </tr>
-                                    <tr>
-                                        <td colSpan={1} className="total-amount p-3 text-right text-xl font-bold text-[#2c3e50]">
-                                            TOTAL DUE
-                                        </td>
-                                        <td className="total-amount p-3 text-right text-xl font-bold text-[#2c3e50]">₱13,000.00</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                        {/* Invoice Items Table */}
+                        <div className="mb-8">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="text-left">Description</TableHead>
+                                        <TableHead className="text-right">Amount</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {invoiceItems.map((item, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell className="font-medium">{item.description}</TableCell>
+                                            <TableCell className="text-right font-semibold">{item.amount}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                    <TableRow>
+                                        <TableCell colSpan={2} className="h-4" />
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell className="text-right font-semibold">Subtotal:</TableCell>
+                                        <TableCell className="text-right font-semibold">{subtotal}</TableCell>
+                                    </TableRow>
+                                    <TableRow>
+                                        <TableCell className="text-right font-semibold">Less: Discounts & Rebates:</TableCell>
+                                        <TableCell className="text-right font-semibold">{discount}</TableCell>
+                                    </TableRow>
+                                    <TableRow className="border-t-2">
+                                        <TableCell className="text-right text-xl font-bold">TOTAL DUE:</TableCell>
+                                        <TableCell className="text-right text-xl font-bold text-primary">{totalDue}</TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </div>
 
-                            <div className="terms-notes mt-6">
-                                <h4 className="mb-2 text-lg font-semibold">Payment Instructions:</h4>
+                        {/* Payment Instructions */}
+                        <Card className="mb-8 bg-muted/30">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <FileText className="h-5 w-5" />
+                                    Payment Instructions
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3 text-sm">
                                 <p>
                                     Please pay the total amount by the due date to avoid penalties. Payments can be made via online transfer or bank
                                     deposit to our official school accounts.
                                 </p>
-                                <p>Thank you for your prompt payment!</p>
-                            </div>
+                                <p className="font-medium">Thank you for your prompt payment!</p>
+                            </CardContent>
+                        </Card>
 
-                            <div className="invoice-actions mt-6 text-right">
-                                <button className="print-btn mr-2 rounded-lg bg-[#3498db] px-4 py-2 text-white hover:bg-[#2980b9]">
-                                    <i className="fas fa-print mr-2"></i> Print
-                                </button>
-                                <button className="download-btn rounded-lg bg-[#2ecc71] px-4 py-2 text-white hover:bg-[#27ae60]">
-                                    <i className="fas fa-download mr-2"></i> Download
-                                </button>
-                            </div>
+                        {/* Action Buttons */}
+                        <div className="flex justify-end gap-3">
+                            <Button variant="outline" className="flex items-center gap-2">
+                                <Printer className="h-4 w-4" />
+                                Print
+                            </Button>
+                            <Button className="flex items-center gap-2">
+                                <Download className="h-4 w-4" />
+                                Download PDF
+                            </Button>
                         </div>
-                    </div>
-                </div>
-            </div>
+                    </CardContent>
+                </Card>
+            </PageLayout>
         </>
     );
 }

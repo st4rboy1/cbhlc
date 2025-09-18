@@ -1,171 +1,229 @@
-import { Link } from '@inertiajs/react';
-import Sidebar from '../components/Sidebar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Head, Link } from '@inertiajs/react';
+import { Calendar, Mail, MapPin, Phone, Save, Upload, User, UserCheck, Users } from 'lucide-react';
+import PageLayout from '../components/PageLayout';
 
 export default function Application() {
     return (
         <>
-            <div className="m-0 bg-[#eef2f5] p-0 font-['Segoe_UI',Tahoma,Geneva,Verdana,sans-serif] text-[#333]">
-                <div className="flex min-h-screen">
-                    {/* Sidebar */}
-                    <Sidebar currentPage="application" />
-                    {/*NAV SIDE BAR, SAME LANG TO SA LAHAT NG SIDES  */}
-                    {/* Enrollment Main Content */}
+            <Head title="Application" />
+            <PageLayout title="ENROLL > View My Application" currentPage="application">
+                <div className="mx-auto max-w-4xl">
+                    <div className="mb-6">
+                        <h2 className="mb-2 text-2xl font-bold">Edit Application</h2>
+                        <p className="text-muted-foreground">
+                            Please fill out all required fields accurately. Your application will be reviewed once submitted.
+                        </p>
+                    </div>
 
-                    <main className="flex flex-grow flex-col px-12 py-7">
-                        <div className="top-bar mb-0 flex items-center justify-between border-b-2 border-gray-300 py-4">
-                            <h1 className="m-0 text-3xl text-[#2c3e50]">ENROLL &gt; View My Application</h1>
-                            <div className="user-info flex items-center">
-                                <button className="icon-btn ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300">
-                                    <i className="fas fa-bell"></i>
-                                </button>
-                                <span className="mr-5 font-medium text-[#555]">Welcome, Bronny!</span>
-                                <button className="icon-btn ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300">
-                                    <i className="fas fa-user-circle"></i>
-                                </button>
-                            </div>
-                        </div>
+                    <form id="applicationForm" className="space-y-8">
+                        {/* Student Information */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <User className="h-5 w-5 text-primary" />
+                                    Student Information
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="grid gap-6 md:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="gradeLevel">Grade Level *</Label>
+                                        <Select required>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Choose Grade" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="grade1">Grade 1</SelectItem>
+                                                <SelectItem value="grade2">Grade 2</SelectItem>
+                                                <SelectItem value="grade3">Grade 3</SelectItem>
+                                                <SelectItem value="grade4">Grade 4</SelectItem>
+                                                <SelectItem value="grade5">Grade 5</SelectItem>
+                                                <SelectItem value="grade6">Grade 6</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
 
-                        <hr className="my-4 border-b-2 border-none border-gray-300" />
-                        <h2 className="mb-4 text-2xl font-semibold">Edit Application</h2>
-
-                        <form id="applicationForm" className="rounded-xl bg-white px-7 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)]">
-                            {/* Student details */}
-                            <div className="form-section mb-5 flex flex-wrap gap-5">
-                                <div className="form-group flex min-w-[250px] flex-1 flex-col gap-3">
-                                    <label className="mb-1 text-sm font-semibold text-[#333]">Grade Level</label>
-                                    <select
-                                        required
-                                        className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                    >
-                                        <option value="">Choose Grade</option>
-                                        <option>Grade 1</option>
-                                        <option>Grade 2</option>
-                                        <option>Grade 3</option>
-                                        <option>Grade 4</option>
-                                        <option>Grade 5</option>
-                                        <option>Grade 6</option>
-                                    </select>
-
-                                    <label className="mb-1 text-sm font-semibold text-[#333]">LRN Number</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                    />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="lrn">LRN Number *</Label>
+                                        <Input id="lrn" type="text" placeholder="Enter LRN Number" required />
+                                    </div>
                                 </div>
 
-                                <div className="form-group flex min-w-[250px] flex-1 flex-col gap-3">
-                                    <label className="mb-1 text-sm font-semibold text-[#333]">Surname*</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                    />
+                                <div className="grid gap-6 md:grid-cols-3">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="surname">Surname *</Label>
+                                        <Input id="surname" type="text" placeholder="Enter surname" required />
+                                    </div>
 
-                                    <label className="mb-1 text-sm font-semibold text-[#333]">Given Name*</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                    />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="givenName">Given Name *</Label>
+                                        <Input id="givenName" type="text" placeholder="Enter given name" required />
+                                    </div>
 
-                                    <label className="mb-1 text-sm font-semibold text-[#333]">Middle Name</label>
-                                    <input
-                                        type="text"
-                                        className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                    />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="middleName">Middle Name</Label>
+                                        <Input id="middleName" type="text" placeholder="Enter middle name" />
+                                    </div>
                                 </div>
 
-                                <div className="form-group flex min-w-[250px] flex-1 flex-col gap-3">
-                                    <label className="mb-1 text-sm font-semibold text-[#333]">Date of Birth*</label>
-                                    <input
-                                        type="date"
-                                        required
-                                        className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                    />
+                                <div className="grid gap-6 md:grid-cols-3">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="birthDate">Date of Birth *</Label>
+                                        <div className="relative">
+                                            <Input id="birthDate" type="date" required />
+                                            <Calendar className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+                                        </div>
+                                    </div>
 
-                                    <label className="mb-1 text-sm font-semibold text-[#333]">Gender*</label>
-                                    <select
-                                        required
-                                        className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                    >
-                                        <option value="">Choose Gender</option>
-                                        <option>Male</option>
-                                        <option>Female</option>
-                                    </select>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="gender">Gender *</Label>
+                                        <Select required>
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Choose Gender" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="male">Male</SelectItem>
+                                                <SelectItem value="female">Female</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
 
-                                    <label className="mb-1 text-sm font-semibold text-[#333]">Address*</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                    />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="address">Address *</Label>
+                                        <div className="relative">
+                                            <Input id="address" type="text" placeholder="Enter address" required />
+                                            <MapPin className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            </CardContent>
+                        </Card>
 
-                            {/* Guardian details */}
-                            <h2 className="mb-4 text-2xl font-semibold">Guardian Contact Details</h2>
-                            <div className="form-group flex min-w-[250px] flex-1 flex-col gap-3">
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Surname*</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
+                        {/* Guardian Information */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <UserCheck className="h-5 w-5 text-primary" />
+                                    Guardian Contact Details
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="grid gap-6 md:grid-cols-3">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="guardianSurname">Surname *</Label>
+                                        <Input id="guardianSurname" type="text" placeholder="Enter guardian surname" required />
+                                    </div>
 
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Given Name*</label>
-                                <input
-                                    type="text"
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="guardianGivenName">Given Name *</Label>
+                                        <Input id="guardianGivenName" type="text" placeholder="Enter guardian given name" required />
+                                    </div>
 
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Middle Name*</label>
-                                <input
-                                    type="text"
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
-                            </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="guardianMiddleName">Middle Name</Label>
+                                        <Input id="guardianMiddleName" type="text" placeholder="Enter guardian middle name" />
+                                    </div>
+                                </div>
 
-                            <div className="form-group flex min-w-[250px] flex-1 flex-col gap-3">
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Cellphone Number*</label>
-                                <input
-                                    type="tel"
-                                    required
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
+                                <div className="grid gap-6 md:grid-cols-3">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="cellphone">Cellphone Number *</Label>
+                                        <div className="relative">
+                                            <Input id="cellphone" type="tel" placeholder="Enter phone number" required />
+                                            <Phone className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+                                        </div>
+                                    </div>
 
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Email Address</label>
-                                <input
-                                    type="email"
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email">Email Address</Label>
+                                        <div className="relative">
+                                            <Input id="email" type="email" placeholder="Enter email address" />
+                                            <Mail className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+                                        </div>
+                                    </div>
 
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Relation to Student</label>
-                                <input
-                                    type="text"
-                                    className="rounded-md border border-gray-300 px-3 py-2.5 text-sm transition-all duration-200 outline-none focus:border-[#457b9d]"
-                                />
-                            </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="relation">Relation to Student</Label>
+                                        <div className="relative">
+                                            <Input id="relation" type="text" placeholder="e.g., Father, Mother" />
+                                            <Users className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                            {/* File upload */}
-                            <div className="upload my-5">
-                                <label className="mb-1 text-sm font-semibold text-[#333]">Upload Documents*</label>
-                                <br />
-                                <input type="file" required className="mt-2.5 text-sm" />
-                            </div>
+                        {/* Document Upload */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <Upload className="h-5 w-5 text-primary" />
+                                    Document Upload
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="documents">Upload Required Documents *</Label>
+                                        <div className="rounded-lg border-2 border-dashed border-muted-foreground/25 p-8 text-center transition-colors hover:border-muted-foreground/50">
+                                            <Upload className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
+                                            <div className="space-y-2">
+                                                <p className="text-sm text-muted-foreground">Click to upload or drag and drop</p>
+                                                <p className="text-xs text-muted-foreground">Supported formats: JPG, PNG, PDF (Max 50MB)</p>
+                                            </div>
+                                            <Input id="documents" type="file" required className="hidden" multiple accept=".jpg,.jpeg,.png,.pdf" />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                className="mt-4"
+                                                onClick={() => document.getElementById('documents')?.click()}
+                                            >
+                                                Choose Files
+                                            </Button>
+                                        </div>
+                                    </div>
 
-                            <nav className="navigation">
-                                <Link href="/enrollment" style={{ fontSize: '20px', color: 'blue' }}>
-                                    Save
-                                </Link>
-                            </nav>
-                        </form>
-                    </main>
+                                    <div className="text-xs text-muted-foreground">
+                                        <p className="mb-2 font-medium">Required Documents:</p>
+                                        <ul className="ml-4 space-y-1">
+                                            <li>• Birth Certificate</li>
+                                            <li>• Report Cards from previous school</li>
+                                            <li>• Form 138 (if transferring)</li>
+                                            <li>• Good Moral Certificate</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Submit Section */}
+                        <Card>
+                            <CardContent className="pt-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Please review all information before saving.</p>
+                                        <p className="mt-1 text-xs text-muted-foreground">Fields marked with * are required.</p>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button variant="outline" asChild>
+                                            <Link href="/enrollment">Cancel</Link>
+                                        </Button>
+                                        <Button type="submit" className="gap-2">
+                                            <Save className="h-4 w-4" />
+                                            Save Application
+                                        </Button>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </form>
                 </div>
-                {/* The script.js script would be handled by React's build process or public/index.html */}
-                {/* <script src="script.js"></script> */}
-            </div>
+            </PageLayout>
         </>
     );
 }
