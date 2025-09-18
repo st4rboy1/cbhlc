@@ -40,11 +40,6 @@ Route::get('/tuition', function () {
 })->name('tuition');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Default dashboard (fallback)
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-
     // Admin dashboards (for super_admin and administrator roles)
     Route::get('admin/dashboard', function () {
         return Inertia::render('admin/dashboard');
