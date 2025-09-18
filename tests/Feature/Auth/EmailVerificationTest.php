@@ -23,6 +23,7 @@ test('email verification screen can be rendered', function () {
 
 test('email can be verified', function () {
     $user = User::factory()->unverified()->create();
+    $user->assignRole('parent'); // Assign a role so getDashboardRoute() works
 
     Event::fake();
 
@@ -36,7 +37,7 @@ test('email can be verified', function () {
 
     Event::assertDispatched(Verified::class);
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
-    $response->assertRedirect(route('dashboard', absolute: false).'?verified=1');
+    $response->assertRedirect(route($user->getDashboardRoute(), absolute: false).'?verified=1');
 });
 
 test('email is not verified with invalid hash', function () {
@@ -73,16 +74,18 @@ test('verified user is redirected to dashboard from verification prompt', functi
     $user = User::factory()->create([
         'email_verified_at' => now(),
     ]);
+    $user->assignRole('parent'); // Assign a role so getDashboardRoute() works
 
     $response = $this->actingAs($user)->get(route('verification.notice'));
 
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $response->assertRedirect(route($user->getDashboardRoute(), absolute: false));
 });
 
 test('already verified user visiting verification link is redirected without firing event again', function () {
     $user = User::factory()->create([
         'email_verified_at' => now(),
     ]);
+    $user->assignRole('parent'); // Assign a role so getDashboardRoute() works
 
     Event::fake();
 
@@ -93,7 +96,7 @@ test('already verified user visiting verification link is redirected without fir
     );
 
     $this->actingAs($user)->get($verificationUrl)
-        ->assertRedirect(route('dashboard', absolute: false).'?verified=1');
+        ->assertRedirect(route($user->getDashboardRoute(), absolute: false).'?verified=1');
 
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
     Event::assertNotDispatched(Verified::class);
