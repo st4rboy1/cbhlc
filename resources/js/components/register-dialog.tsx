@@ -1,13 +1,7 @@
 import RegisteredUserController from '@/actions/App/Http/Controllers/Auth/RegisteredUserController';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form } from '@inertiajs/react';
@@ -25,9 +19,7 @@ export function RegisterDialog({ isOpen, onOpenChange, onLoginClick }: RegisterD
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Create an account</DialogTitle>
-                    <DialogDescription>
-                        Enter your details below to create your account
-                    </DialogDescription>
+                    <DialogDescription>Enter your details below to create your account</DialogDescription>
                 </DialogHeader>
                 <Form
                     {...RegisteredUserController.store.form()}

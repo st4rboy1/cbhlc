@@ -1,0 +1,193 @@
+# DigitalOcean App Platform specification for Laravel + Inertia.js
+# This file enables automatic deployments from GitHub
+name: cbhlc-enrollment
+
+# GitHub repository configuration
+region: sgp1  # Singapore region for Philippines proximity
+domains:
+  - domain: cbhlc.edu.ph
+    type: PRIMARY
+    zone: cbhlc.edu.ph
+
+# Laravel application service
+services:
+  - name: web
+    # GitHub repository settings
+    github:
+      repo: st4rboy1/cbhlc
+      branch: main
+      deploy_on_push: true
+
+    # Build configuration
+    build_command: |
+      composer install --optimize-autoloader --no-dev
+      npm ci --production
+      npm run build
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+
+    run_command: heroku-php-apache2 -C apache_app.conf public/
+
+    # Environment configuration
+    environment_slug: php
+    instance_size_slug: basic-xs  # $5/month starter
+    instance_count: 1
+    http_port: 8080
+
+    # Health check
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+
+    # Environment variables (configure in DigitalOcean dashboard)
+    envs:
+      - key: APP_NAME
+        value: "CBHLC Enrollment System"
+        type: GENERAL
+
+      - key: APP_ENV
+        value: production
+        type: GENERAL
+
+      - key: APP_DEBUG
+        value: "false"
+        type: GENERAL
+
+      - key: APP_URL
+        scope: RUN_AND_BUILD_TIME
+        value: ${APP_URL}
+        type: GENERAL
+
+      - key: APP_KEY
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+
+      - key: LOG_CHANNEL
+        value: stack
+        type: GENERAL
+
+      - key: LOG_LEVEL
+        value: error
+        type: GENERAL
+
+      # Database connection (use managed database)
+      - key: DB_CONNECTION
+        value: mysql
+        type: GENERAL
+
+      - key: DB_HOST
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.HOSTNAME}
+        type: GENERAL
+
+      - key: DB_PORT
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.PORT}
+        type: GENERAL
+
+      - key: DB_DATABASE
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.DATABASE}
+        type: GENERAL
+
+      - key: DB_USERNAME
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.USERNAME}
+        type: SECRET
+
+      - key: DB_PASSWORD
+        scope: RUN_AND_BUILD_TIME
+        value: ${db.PASSWORD}
+        type: SECRET
+
+      # Session configuration
+      - key: SESSION_DRIVER
+        value: database
+        type: GENERAL
+
+      - key: SESSION_LIFETIME
+        value: "120"
+        type: GENERAL
+
+      # Queue configuration
+      - key: QUEUE_CONNECTION
+        value: database
+        type: GENERAL
+
+      # Mail configuration (optional)
+      - key: MAIL_MAILER
+        value: smtp
+        type: GENERAL
+
+      - key: MAIL_FROM_ADDRESS
+        value: noreply@cbhlc.edu.ph
+        type: GENERAL
+
+      - key: MAIL_FROM_NAME
+        value: "CBHLC Enrollment"
+        type: GENERAL
+
+  # Queue worker service (if using queues)
+  - name: worker
+    github:
+      repo: st4rboy1/cbhlc
+      branch: main
+      deploy_on_push: true
+
+    run_command: php artisan queue:work --tries=3 --timeout=90
+
+    environment_slug: php
+    instance_size_slug: basic-xxs  # $4/month for worker
+    instance_count: 1
+
+    # Share environment variables with web service
+    envs:
+      - key: APP_ENV
+        value: production
+        type: GENERAL
+      # Include same database and app configuration as web service
+
+# Database configuration
+databases:
+  - name: db
+    engine: MYSQL
+    version: "8"
+    size: db-s-1vcpu-1gb  # $15/month starter
+    num_nodes: 1
+
+# Jobs for migrations and maintenance
+jobs:
+  - name: migrate
+    kind: POST_DEPLOY
+    github:
+      repo: st4rboy1/cbhlc
+      branch: main
+    run_command: php artisan migrate --force
+    environment_slug: php
+    instance_size_slug: basic-xxs
+    instance_count: 1
+
+    envs:
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        value: ${db.DATABASE_URL}
+
+# Static assets (optional - if serving from App Platform)
+static_sites:
+  - name: storage
+    github:
+      repo: st4rboy1/cbhlc
+      branch: main
+      deploy_on_push: false
+
+    source_dir: storage/app/public
+    index_document: index.html
+    error_document: 404.html
+
+    routes:
+      - path: /storage
