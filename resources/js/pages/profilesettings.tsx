@@ -1,85 +1,12 @@
+import Sidebar from '../components/Sidebar';
+
 export default function ProfileSettings() {
     return (
         <>
             <div className="m-0 bg-[#eef2f5] p-0 font-['Segoe_UI',Tahoma,Geneva,Verdana,sans-serif] text-[#333]">
                 <div className="flex min-h-screen">
-                    {/* Sidebar (same as dashboard) */}
-                    <aside className="flex w-[280px] flex-col justify-between bg-[#2c3e50] py-5 text-[#ecf0f1] shadow-[2px_0_10px_rgba(0,0,0,0.15)]">
-                        <div className="pt-2.5 pb-7 text-center">
-                            <img
-                                src="ra_2022-06-19_22-17-45.jpg"
-                                alt="CBHLC Logo"
-                                className="h-auto w-[120px] rounded-full border-3 border-[#3498db]"
-                            />
-                        </div>
-                        <ul className="m-0 list-none p-0">
-                            <li
-                                className="nav-item mx-4 my-1 flex cursor-pointer items-center rounded-lg px-6 py-4 transition-all duration-300 ease-in-out hover:bg-[#34495e] hover:text-white"
-                                id="dashboardBtn"
-                            >
-                                <i className="fas fa-chart-line mr-5 text-xl text-[#bdc3c7] transition-colors duration-300 ease-in-out"></i>
-                                <span>DASHBOARD</span>
-                            </li>
-
-                            <li
-                                className="nav-item mx-4 my-1 flex cursor-pointer items-center rounded-lg px-6 py-4 transition-all duration-300 ease-in-out hover:bg-[#34495e] hover:text-white"
-                                id="enrollmentBtn"
-                            >
-                                <i className="fas fa-user-plus mr-5 text-xl text-[#bdc3c7] transition-colors duration-300 ease-in-out"></i>
-                                <span>ENROLLMENT</span>
-                            </li>
-
-                            {/* BILLING WITH DROPDOWN */}
-                            <li
-                                className="nav-item has-dropdown mx-4 my-1 flex cursor-pointer items-center rounded-lg px-6 py-4 transition-all duration-300 ease-in-out hover:bg-[#34495e] hover:text-white"
-                                id="billingBtn"
-                            >
-                                <div className="nav-link">
-                                    <i className="fas fa-file-invoice mr-5 text-xl text-[#bdc3c7] transition-colors duration-300 ease-in-out"></i>
-                                    <span className="font-medium">BILLING</span>
-                                    <i className="fas fa-chevron-down arrow" style={{ marginLeft: '55px' }}></i>
-                                </div>
-                                <ul className="dropdown hidden">
-                                    <li>Tuition Fee</li>
-
-                                    <li>Generate Invoice</li>
-                                </ul>
-                            </li>
-
-                            <li
-                                className="nav-item mx-4 my-1 flex cursor-pointer items-center rounded-lg px-6 py-4 transition-all duration-300 ease-in-out hover:bg-[#34495e] hover:text-white"
-                                id="studRepBtn"
-                            >
-                                <i className="fas fa-book mr-5 text-xl text-[#bdc3c7] transition-colors duration-300 ease-in-out"></i>
-                                <span>STUDENT REPORT</span>
-                            </li>
-
-                            <li
-                                className="nav-item has-dropdown mx-4 my-1 flex cursor-pointer items-center rounded-lg px-6 py-4 transition-all duration-300 ease-in-out hover:bg-[#34495e] hover:text-white"
-                                id="registrarBtn"
-                            >
-                                <div className="nav-link">
-                                    <i className="fas fa-building mr-5 text-xl text-[#bdc3c7] transition-colors duration-300 ease-in-out"></i>
-                                    <span className="font-medium">REGISTRAR</span>
-                                    <i className="fas fa-chevron-down arrow" style={{ marginLeft: '30px' }}></i>
-                                </div>
-                                <ul className="dropdown hidden">
-                                    <li>Student Records</li>
-                                    <li>Enrollment List</li>
-                                    <li>Clearances</li>
-                                </ul>
-                            </li>
-                        </ul>
-                        <div className="logout mt-auto w-[280px]">
-                            <li
-                                className="nav-item mx-4 my-1 flex cursor-pointer items-center rounded-lg bg-[#f5f5f5] px-6 py-4 text-black transition-all duration-300 ease-in-out hover:bg-[#c0392b]"
-                                id="logoutBtn"
-                            >
-                                <i className="fas fa-sign-out-alt mr-5 text-xl text-[#bdc3c7] transition-colors duration-300 ease-in-out"></i>
-                                <span className="font-medium">LOGOUT</span>
-                            </li>
-                        </div>
-                    </aside>
+                    {/* Sidebar */}
+                    <Sidebar currentPage="profilesettings" />
 
                     <div className="flex flex-grow flex-col px-12 py-7">
                         <div className="top-bar mb-5 flex items-center justify-between border-b-2 border-gray-300 py-4">
