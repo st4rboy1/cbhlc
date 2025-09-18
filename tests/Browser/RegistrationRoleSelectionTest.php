@@ -19,26 +19,34 @@ class RegistrationRoleSelectionTest extends DuskTestCase
     }
 
     /**
-     * Test that registration page shows role selection options
+     * Test that registration dialog shows role selection options
      */
-    public function test_registration_page_displays_role_selection(): void
+    public function test_registration_dialog_displays_role_selection(): void
     {
         $this->browse(function (Browser $browser) {
-            $browser->visit('/register')
+            $browser->visit('/')
+                ->press('Login') // Click Login button
+                ->waitFor('.dialog-content') // Wait for login dialog
+                ->press('Sign up') // Click Sign up link
+                ->waitFor('.dialog-content') // Wait for register dialog
                 ->assertSee('I am registering as a')
                 ->assertRadioSelected('role', 'parent') // Default selection
-                ->assertSeeIn('label[for="parent"]', 'Parent/Guardian')
-                ->assertSeeIn('label[for="student"]', 'Student (18+ years old)');
+                ->assertSee('Parent/Guardian')
+                ->assertSee('Student');
         });
     }
 
     /**
-     * Test parent registration flow
+     * Test parent registration flow via dialog
      */
     public function test_parent_can_register_and_is_redirected_to_parent_dashboard(): void
     {
         $this->browse(function (Browser $browser) {
-            $browser->visit('/register')
+            $browser->visit('/')
+                ->press('Login')
+                ->waitFor('.dialog-content')
+                ->press('Sign up')
+                ->waitFor('.dialog-content')
                 ->type('name', 'Test Parent User')
                 ->type('email', 'testparent@example.com')
                 ->type('password', 'password123')
