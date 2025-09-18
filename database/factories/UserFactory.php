@@ -41,4 +41,67 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Configure the model factory to create with parent role.
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            // Default role is parent if no role is assigned
+            if (! $user->hasAnyRole()) {
+                $user->assignRole('parent');
+            }
+        });
+    }
+
+    /**
+     * Indicate that the user is a super admin.
+     */
+    public function superAdmin(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $user->syncRoles('super_admin');
+        });
+    }
+
+    /**
+     * Indicate that the user is an administrator.
+     */
+    public function administrator(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $user->syncRoles('administrator');
+        });
+    }
+
+    /**
+     * Indicate that the user is a registrar.
+     */
+    public function registrar(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $user->syncRoles('registrar');
+        });
+    }
+
+    /**
+     * Indicate that the user is a parent.
+     */
+    public function parent(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $user->syncRoles('parent');
+        });
+    }
+
+    /**
+     * Indicate that the user is a student.
+     */
+    public function student(): static
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $user->syncRoles('student');
+        });
+    }
 }

@@ -1,3 +1,5 @@
+import { Link } from '@inertiajs/react';
+
 export default function Enrollment() {
     return (
         <>
@@ -275,9 +277,9 @@ export default function Enrollment() {
                             </button>
                             <nav className="navigation">
                                 <br />
-                                <a href="application.html" style={{ color: 'blue' }}>
+                                <Link href="/application" style={{ color: 'blue' }}>
                                     Edit Submitted Application
-                                </a>
+                                </Link>
                             </nav>
                         </form>
                     </main>
