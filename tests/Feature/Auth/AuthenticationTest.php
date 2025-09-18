@@ -17,7 +17,7 @@ test('login screen can be rendered', function () {
 });
 
 test('users can authenticate using the login screen', function () {
-    // Default role is 'parent' as per UserFactory
+    // User without role should redirect to home
     $user = User::factory()->create();
 
     $response = $this->post(route('login.store'), [
@@ -26,8 +26,8 @@ test('users can authenticate using the login screen', function () {
     ]);
 
     $this->assertAuthenticated();
-    // Default users (parent role) should redirect to parent dashboard
-    $response->assertRedirect(route('parent.dashboard'));
+    // Users without roles should redirect to home
+    $response->assertRedirect(route('home'));
 });
 
 test('super admin redirects to admin dashboard after login', function () {
