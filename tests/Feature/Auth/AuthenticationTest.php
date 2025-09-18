@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Database\Seeders\RolesAndPermissionsSeeder;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);

@@ -24,8 +24,8 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->enum('role', ['super_admin', 'administrator', 'registrar', 'parent', 'student'])
-                  ->default('parent')
-                  ->after('email');
+                ->default('parent')
+                ->after('email');
             $table->index('role');
         });
     }

@@ -49,7 +49,7 @@ class UserFactory extends Factory
     {
         return $this->afterCreating(function (\App\Models\User $user) {
             // Default role is parent if no role is assigned
-            if (!$user->hasAnyRole()) {
+            if (! $user->hasAnyRole()) {
                 $user->assignRole('parent');
             }
         });

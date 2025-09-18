@@ -1,7 +1,7 @@
 <?php
 
-use Laravel\Dusk\Browser;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Laravel\Dusk\Browser;
 
 uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
 
@@ -136,7 +136,7 @@ test('visually browse all pages with mouse movements', function () {
             '/studentreport' => 'Student Report',
             '/registrar' => 'Registrar',
             '/profilesettings' => 'Profile Settings',
-            '/invoice' => 'Invoice'
+            '/invoice' => 'Invoice',
         ];
 
         $count = 8;

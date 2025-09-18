@@ -3,7 +3,6 @@
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Laravel\Dusk\Browser;
-use Illuminate\Http\UploadedFile;
 
 uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
 
@@ -74,8 +73,8 @@ test('enrollment form allows document upload', function () {
     $this->browse(function (Browser $browser) use ($parent) {
         $browser->loginAs($parent)
             ->visit('/enrollment')
-            ->attach('birth_certificate', __DIR__ . '/../../storage/app/test-files/birth_cert.jpg')
-            ->attach('report_card', __DIR__ . '/../../storage/app/test-files/report_card.pdf')
+            ->attach('birth_certificate', __DIR__.'/../../storage/app/test-files/birth_cert.jpg')
+            ->attach('report_card', __DIR__.'/../../storage/app/test-files/report_card.pdf')
             ->assertSee('birth_cert.jpg')
             ->assertSee('report_card.pdf');
     });
@@ -178,7 +177,7 @@ test('file upload validates file types and size', function () {
     $this->browse(function (Browser $browser) use ($parent) {
         $browser->loginAs($parent)
             ->visit('/enrollment')
-            ->attach('birth_certificate', __DIR__ . '/../../storage/app/test-files/invalid.txt')
+            ->attach('birth_certificate', __DIR__.'/../../storage/app/test-files/invalid.txt')
             ->waitForText('File must be JPEG or PNG')
             ->assertSee('File must be JPEG or PNG');
     });
