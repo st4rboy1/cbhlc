@@ -32,6 +32,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
+          extensions: mbstring, dom, fileinfo, mysql, iconv
           tools: composer:v2
           coverage: xdebug
 
@@ -41,11 +42,24 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      # Fast-fail: PHP Syntax Check
+      - name: PHP Syntax Check
+        run: find . -name "*.php" -not -path "./vendor/*" -not -path "./storage/*" | xargs -n1 php -l
+
+      # Cache Composer dependencies for faster builds
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
       - name: Install Node Dependencies
         run: npm ci
 
       - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv
 
       - name: Build Assets
         run: npm run build
@@ -56,7 +70,18 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
-      - name: Tests
+      # Code Quality Checks
+      - name: Code Style Check (Laravel Pint)
+        run: ./vendor/bin/pint --test
+
+      - name: Static Analysis (Larastan)
+        run: ./vendor/bin/phpstan analyse --memory-limit=2G
+
+      - name: Security Vulnerability Check
+        run: composer audit
+
+      # Run tests with code coverage
+      - name: Tests with Coverage
         env:
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
@@ -64,7 +89,16 @@ jobs:
           DB_DATABASE: testing
           DB_USERNAME: root
           DB_PASSWORD: password
-        run: ./vendor/bin/pest
+          XDEBUG_MODE: coverage
+        run: ./vendor/bin/pest --coverage --min=60 --coverage-html=coverage --coverage-clover=coverage.xml
+
+      # Upload coverage reports (optional)
+      - name: Upload Coverage Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
 
   deploy:
     needs: test
@@ -102,7 +136,7 @@ jobs:
             git reset --hard origin/main
 
             # Install dependencies
-            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --ignore-platform-req=ext-iconv
 
             # Run migrations
             php artisan migrate --force
