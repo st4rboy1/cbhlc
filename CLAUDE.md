@@ -6,7 +6,7 @@
 **Date:** January 2025  
 **Standards Compliance:** ISO/IEC/IEEE 29148:2018 Requirements Engineering  
 **Technology Stack:** Laravel 12 + React 18 + Inertia.js + shadcn/ui + Tailwind CSS  
-**CI/CD Pipeline:** GitHub Actions (CI) + Laravel Forge (CD)  
+**CI/CD Pipeline:** GitHub Actions (CI only) + Laravel Forge (Automatic Deployment)  
 **Requirements Coverage:** Complete traceability matrix with priority classification and acceptance criteria  
 **Authors:** Mhico D. Aro, Christian Kyle M. Masangcay, Manero SJ. Rodriguez, Carl Michael Tojino  
 **Client:** Christian Bible Heritage Learning Center
@@ -29,7 +29,7 @@
     - [Local Development Setup](#111-local-development-setup)
     - [Code Standards and Best Practices](#112-code-standards-and-best-practices)
     - [Testing Strategy](#113-testing-strategy)
-    - [CI/CD and Deployment Process](#114-cicd-and-deployment-process)
+    - [CI and Deployment Process](#114-ci-and-deployment-process)
     - [Deployment Configuration](#115-deployment-configuration)
     - [Monitoring and Maintenance](#116-monitoring-and-maintenance)
 
@@ -95,8 +95,9 @@ The Web-Based Enrollment System is a standalone web application designed specifi
 - **Server Side:** Laravel 12 framework with Inertia.js for SPA functionality
 - **Database:** MySQL 8.0.43 Server (local installation on same server)
 - **Development Environment:** Docker Compose with Laravel Sail
-- **Deployment Platform:** DigitalOcean Droplet with Laravel Forge management
-- **CI/CD Pipeline:** GitHub Actions for automated testing and deployment
+- **Deployment Platform:** DigitalOcean Droplet with Laravel Forge (Paid Subscription)
+- **CI Pipeline:** GitHub Actions for automated testing and code quality checks
+- **CD Pipeline:** Laravel Forge automatic deployment on push to main branch
 - **Internet Connectivity:** Required for system access
 
 ### 2.5 Assumptions and Dependencies
@@ -898,7 +899,7 @@ erDiagram
 
 - **ASS-1:** Users have basic computer and internet skills with modern browser support
 - **ASS-2:** Reliable internet connectivity available for SPA functionality
-- **ASS-3:** Linode Nanode hosting managed via Laravel Forge with automated deployments
+- **ASS-3:** DigitalOcean Droplet managed via Laravel Forge (Paid Subscription) with automatic deployments
 - **ASS-4:** Current enrollment procedures remain applicable
 - **ASS-5:** Staff will receive adequate system training including React-based interface usage
 - **ASS-6:** Development team has experience with Laravel 12, React, and Inertia.js
@@ -983,22 +984,32 @@ erDiagram
 - **Test Database:** Automated test database provisioning and cleanup via GitHub Actions
 - **Coverage:** Code coverage reporting integrated in CI pipeline
 
-### 11.4 CI/CD and Deployment Process
+### 11.4 CI and Deployment Process
 
 - **Version Control:** Git-based workflow with feature branches and pull requests
-- **Continuous Integration:** GitHub Actions workflows with automated testing and quality checks
-- **CI Pipeline Stages:**
+- **Continuous Integration:** GitHub Actions workflows for testing and quality checks
+- **CI Pipeline Stages (GitHub Actions):**
     - PHP syntax validation
     - Code style formatting (Laravel Pint)
     - Static analysis (Larastan)
     - Security auditing (Composer audit)
     - Automated testing (PHPUnit/Pest)
-    - Browser testing (Laravel Dusk)
-- **Continuous Deployment:** GitHub Actions deployment to production server
-- **Environment Management:** Laravel's environment configuration system
-- **Database Migrations:** Automated via Laravel's migration system
-- **Asset Compilation:** Vite build process integrated with deployment pipeline
-- **Deployment Strategy:** Zero-downtime deployments with rollback capability
+    - TypeScript/ESLint checks
+    - Prettier formatting validation
+- **Continuous Deployment:** Laravel Forge automatic deployment (Paid Subscription)
+- **Forge Deployment Features:**
+    - Automatic deployment on push to main branch
+    - Zero-downtime deployments
+    - Deployment script customization
+    - Environment variable management
+    - SSL certificate management
+    - Database backup before deployment
+    - Deployment notifications
+    - Quick rollback capability
+- **Environment Management:** Laravel Forge environment configuration
+- **Database Migrations:** Automated via Forge deployment script
+- **Asset Compilation:** Vite build process in Forge deployment script
+- **Deployment Strategy:** Zero-downtime deployments with automatic health checks
 
 ### 11.5 Deployment Configuration
 
@@ -1034,23 +1045,26 @@ All components run on a single server for simplified management:
 
 #### 11.5.4 Deployment Workflow
 
-The deployment workflow can be executed via:
+The deployment workflow is automated via Laravel Forge:
 
-**Option 1: GitHub Actions Automated Deployment (Primary Method)**
+**Laravel Forge Automatic Deployment (Primary Method)**
 
-- Configure GitHub Actions with server SSH access
-- Workflow triggers on push to `main` branch
-- Deployment steps execute via SSH to the server
-- Recommended approach due to Laravel Forge free trial limitations
+- Laravel Forge (Paid Subscription) monitors the GitHub repository
+- Automatic deployment triggers on push to `main` branch
+- Zero-downtime deployments with health checks
+- Built-in rollback capabilities if deployment fails
+- No manual intervention required
 
-**Option 2: Laravel Forge Deployment (Limited - Free Trial)**
+**Deployment Process:**
 
-- Use Laravel Forge's built-in deployment features
-- Quick deploy button in Forge dashboard
-- Automatic deployment hooks from GitHub
-- Note: Limited to free trial period
+1. Push code to `main` branch on GitHub
+2. Laravel Forge detects the push via webhook
+3. Forge pulls latest code from repository
+4. Runs deployment script (composer install, npm build, migrations, etc.)
+5. Gracefully reloads PHP-FPM without downtime
+6. Sends deployment notifications
 
-**Option 3: Manual Deployment via SSH**
+**Manual Deployment via SSH (Backup Method)**
 
 ```bash
 ssh cbhlc
@@ -1084,13 +1098,21 @@ php artisan view:cache
 
 ### 11.6 Monitoring and Maintenance
 
-- **Server Monitoring:** Laravel Forge server metrics and alerts
+- **Server Monitoring:** Laravel Forge comprehensive server metrics and alerts (Paid Features)
 - **Application Monitoring:** Laravel's built-in logging and error tracking
+- **Deployment Monitoring:** Laravel Forge deployment history and notifications
 - **Performance Monitoring:** Database query optimization and React component profiling
 - **Security Updates:** Automated server security updates via Laravel Forge
-- **CI/CD Monitoring:** GitHub Actions workflow execution monitoring and failure notifications
-- **Dependency Management:** Automated security vulnerability scanning and dependency updates
-- **Code Quality Monitoring:** Continuous code quality metrics and technical debt tracking
+- **CI Monitoring:** GitHub Actions workflow execution monitoring and failure notifications
+- **Dependency Management:** Automated security vulnerability scanning in CI pipeline
+- **Code Quality Monitoring:** Continuous code quality metrics via GitHub Actions
+- **Forge Features:**
+    - Server health monitoring
+    - Deployment success/failure tracking
+    - Database backup management
+    - SSL certificate monitoring
+    - Queue worker monitoring
+    - Scheduled job monitoring
 
 ---
 
@@ -1111,12 +1133,14 @@ Document certifying a student's good moral character and conduct from their prev
 - Version 3.0: (January 2025) - Updated with Laravel 12 and GitHub Actions CI/CD pipeline
 - Version 3.1: (January 2025) - Added comprehensive ERD and database design section
 - Version 4.0: (January 2025) - Full ISO/IEC/IEEE 29148:2018 compliance with requirements traceability, priority classification, and acceptance criteria
-- **Version 4.1: (January 2025) - Added deployment configuration and GitHub Actions CI/CD workflow documentation**
+- **Version 4.1: (January 2025) - Added deployment configuration and GitHub Actions CI workflow documentation**
+- **Version 4.2: (January 2025) - Updated to Laravel Forge paid subscription with automatic deployment**
 - Standards Compliance: ISO/IEC/IEEE 29148:2018 Systems and Software Engineering - Requirements Engineering
 - Technology Stack: Laravel 12 + React 18 + Inertia.js + shadcn/ui + Tailwind CSS
-- CI/CD Pipeline: GitHub Actions (CI) + Laravel Forge (CD)
+- CI Pipeline: GitHub Actions (Testing and Code Quality only)
+- CD Pipeline: Laravel Forge Automatic Deployment (Paid Subscription)
 - Development Environment: Docker Compose with Laravel Sail
-- Deployment Platform: Linode Nanode managed by Laravel Forge
+- Deployment Platform: DigitalOcean Droplet managed by Laravel Forge (Paid)
 - Database Design: 11-entity ERD with full normalization and business rules
 - Requirements Engineering: Complete traceability matrix linking 9 business needs to 40+ functional requirements
 - Project Status: Core components pre-scaffolded, CI/CD pipeline configured
