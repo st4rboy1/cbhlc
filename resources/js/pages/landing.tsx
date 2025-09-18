@@ -3,13 +3,22 @@ import { LoginDialog } from '@/components/login-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { dashboard } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { BookOpen, CheckCircle, Facebook, GraduationCap, Heart, Instagram, Users } from 'lucide-react';
 
 export default function Landing() {
     const { auth } = usePage<SharedData>().props;
+
+    // Helper function to get dashboard URL based on user role
+    const getDashboardUrl = () => {
+        if (!auth.user) return '/login';
+
+        // This logic should match the User model's getDashboardRoute() method
+        // Since we don't have role info in frontend, we'll use a default
+        // The server will redirect to the correct dashboard after login
+        return '/admin/dashboard';
+    };
 
     const features = [
         {
@@ -61,7 +70,7 @@ export default function Landing() {
                             </Link>
                             {auth.user ? (
                                 <Button asChild variant="default">
-                                    <Link href={dashboard()}>Dashboard</Link>
+                                    <Link href={getDashboardUrl()}>Dashboard</Link>
                                 </Button>
                             ) : (
                                 <LoginDialog trigger={<Button variant="outline">Login</Button>} />

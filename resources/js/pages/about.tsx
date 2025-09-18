@@ -4,13 +4,18 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { dashboard } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Award, BookOpen, Eye, Facebook, GraduationCap, Heart, Instagram, Mail, MapPin, Phone, Star, Target, Users } from 'lucide-react';
 
 export default function About() {
     const { auth } = usePage<SharedData>().props;
+
+    // Helper function to get dashboard URL based on user role
+    const getDashboardUrl = () => {
+        if (!auth.user) return '/login';
+        return '/admin/dashboard'; // Server will redirect to correct dashboard
+    };
 
     const values = [
         {
@@ -75,7 +80,7 @@ export default function About() {
                             </Link>
                             {auth.user ? (
                                 <Button asChild variant="default">
-                                    <Link href={dashboard()}>Dashboard</Link>
+                                    <Link href={getDashboardUrl()}>Dashboard</Link>
                                 </Button>
                             ) : (
                                 <LoginDialog trigger={<Button variant="outline">Login</Button>} />

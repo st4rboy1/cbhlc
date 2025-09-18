@@ -104,6 +104,7 @@ class User extends Authenticatable
             return 'student.dashboard';
         }
 
-        return 'dashboard';
+        // Default to home page if user has no role (shouldn't happen in production)
+        return 'home';
     }
 }
