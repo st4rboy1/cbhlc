@@ -1,15 +1,17 @@
+import { Link } from '@inertiajs/react';
+
 export default function About() {
     return (
         <>
             <div className="font-sans">
                 <header className="fixed top-0 left-0 z-[100] flex w-full items-center justify-between bg-[#2c3e50] px-24 py-5">
-                    <a href="index.html" className="logo relative ml-7 text-2xl font-medium text-white no-underline hover:text-[#a6b4c2]">
+                    <Link href="/" className="logo relative ml-7 text-2xl font-medium text-white no-underline hover:text-[#a6b4c2]">
                         CBHLC{' '}
-                    </a>
+                    </Link>
                     <nav className="navigation">
-                        <a href="about.html" className="relative ml-10 text-lg font-medium text-white no-underline">
+                        <Link href="/about" className="relative ml-10 text-lg font-medium text-white no-underline">
                             About
-                        </a>
+                        </Link>
                         <button className="btnLogin-popup ml-10 h-[45px] w-[130px] cursor-pointer rounded-md border-2 border-white bg-transparent text-lg font-medium text-white transition-all duration-400 hover:bg-white hover:text-black">
                             Login
                         </button>
