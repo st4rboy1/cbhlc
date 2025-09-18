@@ -2,10 +2,10 @@
 
 namespace Tests\Browser;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
-use App\Models\User;
 
 class SidebarNavigationTest extends DuskTestCase
 {
