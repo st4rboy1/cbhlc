@@ -86,22 +86,21 @@ jobs:
       - name: Setup SSH using Deploy Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
       - name: Deploy to DigitalOcean Droplet
         env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
         run: |
-          ssh -i ~/.ssh/deploy_key ${DEPLOY_USER}@${DEPLOY_HOST} << 'ENDSSH'
+          ssh -i ~/.ssh/deploy_key ${SSH_USER}@${SSH_HOST} << 'ENDSSH'
             set -e
 
             # Navigate to project directory
-            cd ${{ env.DEPLOY_PATH }}
+            cd /home/forge/default
 
             # Enable maintenance mode with message
             php artisan down --message="System is being updated. Please check back in a few minutes." --retry=60
@@ -151,7 +150,7 @@ jobs:
 
       - name: Verify deployment
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.DEPLOY_HOST }})
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.SSH_HOST }})
           if [ $response -eq 200 ]; then
             echo "✅ Site is responding correctly"
           else
