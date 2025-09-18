@@ -17,5 +17,6 @@ test('new users can register', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    // New users without roles get redirected to 'home' as per getDashboardRoute() fallback
+    $response->assertRedirect(route('home', absolute: false));
 });
