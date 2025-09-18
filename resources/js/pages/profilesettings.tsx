@@ -1,145 +1,167 @@
-import Sidebar from '../components/Sidebar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Head } from '@inertiajs/react';
+import { ChevronRight, Cookie, HelpCircle, LogOut, MessageSquare, Palette, Settings, Shield, User, Users } from 'lucide-react';
+import PageLayout from '../components/PageLayout';
+
+interface ProfileOption {
+    icon: React.ReactNode;
+    title: string;
+    description?: string;
+    hasArrow?: boolean;
+    action?: () => void;
+    variant?: 'default' | 'destructive';
+}
 
 export default function ProfileSettings() {
+    const profileOptions: ProfileOption[] = [
+        {
+            icon: <User className="h-5 w-5" />,
+            title: 'Profile',
+            description: 'Manage your personal information',
+        },
+        {
+            icon: <Users className="h-5 w-5" />,
+            title: 'See all profiles',
+            description: 'View family member profiles',
+        },
+        {
+            icon: <Settings className="h-5 w-5" />,
+            title: 'Settings & privacy',
+            description: 'Account settings and privacy controls',
+            hasArrow: true,
+        },
+        {
+            icon: <HelpCircle className="h-5 w-5" />,
+            title: 'Help & support',
+            description: 'Get assistance and contact support',
+            hasArrow: true,
+        },
+        {
+            icon: <Palette className="h-5 w-5" />,
+            title: 'Display & accessibility',
+            description: 'Customize appearance and accessibility',
+            hasArrow: true,
+        },
+        {
+            icon: <MessageSquare className="h-5 w-5" />,
+            title: 'Give feedback',
+            description: 'Share your thoughts with us',
+        },
+    ];
+
+    const quickLinks = [
+        { title: 'Privacy', href: '#' },
+        { title: 'Terms', href: '#' },
+        { title: 'Advertising', href: '#' },
+        { title: 'Ad Choices', href: '#' },
+        { title: 'Cookies', href: '#' },
+        { title: 'More', href: '#' },
+    ];
+
     return (
         <>
-            <div className="m-0 bg-[#eef2f5] p-0 font-['Segoe_UI',Tahoma,Geneva,Verdana,sans-serif] text-[#333]">
-                <div className="flex min-h-screen">
-                    {/* Sidebar */}
-                    <Sidebar currentPage="profilesettings" />
+            <Head title="Profile Settings" />
+            <PageLayout title="PROFILE SETTINGS" currentPage="profilesettings">
+                <div className="mx-auto max-w-2xl">
+                    {/* Profile Header */}
+                    <Card className="mb-6">
+                        <CardContent className="p-6">
+                            <div className="flex items-center gap-4">
+                                <Avatar className="h-16 w-16">
+                                    <AvatarImage src="ra_2022-06-19_22-17-45.jpg" alt="Profile Avatar" />
+                                    <AvatarFallback className="bg-primary/10 text-lg font-semibold text-primary">BR</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                    <h2 className="text-xl font-semibold">Bronny</h2>
+                                    <p className="text-muted-foreground">View profile</p>
+                                </div>
+                                <Button variant="outline" size="sm">
+                                    Edit Profile
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                    <div className="flex flex-grow flex-col px-12 py-7">
-                        <div className="top-bar mb-5 flex items-center justify-between border-b-2 border-gray-300 py-4">
-                            <h1 id="pageTitle" className="m-0 text-3xl text-[#2c3e50]">
-                                INVOICE
-                            </h1>
-                            <div className="user-info relative flex items-center">
-                                <button
-                                    className="icon-btn relative ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300"
-                                    id="openModal"
-                                >
-                                    <i className="fas fa-bell"></i>
-                                    <span className="badge absolute top-[-5px] right-[-5px] rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white">
-                                        3
+                    {/* Profile Options */}
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle className="text-lg">Account Management</CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="divide-y">
+                                {profileOptions.map((option, index) => (
+                                    <Button key={index} variant="ghost" className="h-auto w-full justify-start rounded-none p-4 hover:bg-muted/50">
+                                        <div className="flex flex-1 items-center gap-3">
+                                            <div className="text-muted-foreground">{option.icon}</div>
+                                            <div className="flex-1 text-left">
+                                                <p className="font-medium">{option.title}</p>
+                                                {option.description && <p className="text-sm text-muted-foreground">{option.description}</p>}
+                                            </div>
+                                            {option.hasArrow && <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+                                        </div>
+                                    </Button>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Account Actions */}
+                    <Card className="mb-6">
+                        <CardHeader>
+                            <CardTitle className="text-lg">Account Actions</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <Button variant="destructive" className="w-full justify-start gap-3">
+                                <LogOut className="h-4 w-4" />
+                                Log Out
+                            </Button>
+                        </CardContent>
+                    </Card>
+
+                    {/* Quick Links */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-lg">Legal & Support</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                                {quickLinks.map((link, index) => (
+                                    <span key={index} className="flex items-center">
+                                        <Button variant="link" className="h-auto p-0 text-sm text-muted-foreground hover:text-foreground">
+                                            {link.title}
+                                        </Button>
+                                        {index < quickLinks.length - 1 && <span className="mx-2">·</span>}
                                     </span>
-                                </button>
-                                <span className="mr-5 font-medium text-[#555]">Welcome, Bronny!</span>
-                                <button className="icon-btn relative ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300">
-                                    <i className="fas fa-user-circle"></i>
-                                </button>
-                                <div
-                                    className="notification-dropdown absolute top-[50px] right-0 z-[1000] hidden w-[350px] rounded-xl bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
-                                    id="notificationDropdown"
-                                >
-                                    <h3 className="m-0 mb-2.5 border-b border-gray-300 pb-2 text-lg text-[#2c3e50]">Notifications</h3>
-                                    <div className="notification-item new my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to the folder{' '}
-                                            <b>Web App Designs 2019</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Today at 12:28 PM</div>
-                                        </div>
-                                    </div>
+                                ))}
+                            </div>
 
-                                    <div className="notification-item new my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> invited you to the folder{' '}
-                                            <b>EMEA Major Deal Close Plans</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Yesterday at 5:15 PM</div>
-                                        </div>
-                                    </div>
+                            <Separator className="my-4" />
 
-                                    <div className="notification-item my-3 flex items-start border-b-0 pb-3">
-                                        <div className="circle-avatar mr-3 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#2c3e50] text-sm font-bold text-white">
-                                            AS
-                                        </div>
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to{' '}
-                                            <b>Enterprise Corporation Contracts.pdf</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Sep 20 at 3:13 PM</div>
-                                        </div>
-                                    </div>
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Shield className="h-4 w-4" />
+                                    <span>Your data is protected by industry-standard security measures</span>
+                                </div>
+
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Cookie className="h-4 w-4" />
+                                    <span>We use cookies to enhance your experience</span>
                                 </div>
                             </div>
-                        </div>
-                        <div className="Profile-Settings">
-                            <div className="filter-group flex min-w-[180px] flex-col">
-                                <div className="profile-menu-container">
-                                    <div className="profile-header flex items-center">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="Profile Avatar" className="avatar mr-4 h-12 w-12 rounded-full" />
-                                        <div>
-                                            <h3 className="m-0 text-lg font-semibold">Bronny</h3>
-                                            <p style={{ margin: '0', fontSize: '0.9rem', color: '#000000' }}>View profile</p>
-                                        </div>
-                                    </div>
 
-                                    <div className="profile-list mt-4">
-                                        <div className="profile-option flex cursor-pointer items-center rounded-lg p-3 hover:bg-gray-200">
-                                            <i className="fas fa-user mr-3 w-6 text-center"></i>
-                                            <span>Profile</span>
-                                        </div>
-                                        <div className="profile-option flex cursor-pointer items-center justify-center rounded-lg p-3 hover:bg-gray-200">
-                                            <i className="fas fa-users mr-3 w-6 text-center" style={{ marginRight: '10px' }}></i>
-                                            <span>See all profiles</span>
-                                        </div>
-                                        <div className="profile-option flex cursor-pointer items-center rounded-lg p-3 hover:bg-gray-200">
-                                            <i className="fas fa-cog mr-3 w-6 text-center"></i>
-                                            <span>Settings & privacy</span>
-                                            <i className="fas fa-chevron-right arrow ml-auto"></i>
-                                        </div>
-                                        <div className="profile-option flex cursor-pointer items-center rounded-lg p-3 hover:bg-gray-200">
-                                            <i className="fas fa-question-circle mr-3 w-6 text-center"></i>
-                                            <span>Help & support</span>
-                                            <i className="fas fa-chevron-right arrow ml-auto"></i>
-                                        </div>
-                                        <div className="profile-option flex cursor-pointer items-center rounded-lg p-3 hover:bg-gray-200">
-                                            <i className="fas fa-adjust mr-3 w-6 text-center"></i>
-                                            <span>Display & accessibility</span>
-                                            <i className="fas fa-chevron-right arrow ml-auto"></i>
-                                        </div>
-                                        <div className="profile-option flex cursor-pointer items-center rounded-lg p-3 hover:bg-gray-200">
-                                            <i className="fas fa-comment-dots mr-3 w-6 text-center"></i>
-                                            <span>Give feedback</span>
-                                        </div>
-                                        <div className="profile-option logout-option flex cursor-pointer items-center rounded-lg p-3 hover:bg-gray-200">
-                                            <i className="fas fa-sign-out-alt mr-3 w-6 text-center"></i>
-                                            <span>Log Out</span>
-                                        </div>
-
-                                        <div className="privacy-links mt-4 text-xs text-gray-500">
-                                            <a href="#" className="hover:underline">
-                                                Privacy
-                                            </a>
-                                            <span className="mx-1">·</span>
-                                            <a href="#" className="hover:underline">
-                                                Terms
-                                            </a>
-                                            <span className="mx-1">·</span>
-                                            <a href="#" className="hover:underline">
-                                                Advertising
-                                            </a>
-                                            <span className="mx-1">·</span>
-                                            <a href="#" className="hover:underline">
-                                                Ad Choices
-                                            </a>
-                                            <i className="fas fa-caret-right ml-1"></i>
-                                            <span className="mx-1">·</span>
-                                            <a href="#" className="hover:underline">
-                                                Cookies
-                                            </a>
-                                            <span className="mx-1">·</span>
-                                            <a href="#" className="hover:underline">
-                                                More
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div className="mt-4 rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+                                <p>
+                                    © 2024 Christian Bible Heritage Learning Center. All rights reserved. By using this application, you agree to our
+                                    Terms of Service and Privacy Policy.
+                                </p>
                             </div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
                 </div>
-            </div>
+            </PageLayout>
         </>
     );
 }

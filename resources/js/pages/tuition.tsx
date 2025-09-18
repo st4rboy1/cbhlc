@@ -1,127 +1,160 @@
-import Sidebar from '../components/Sidebar';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Head } from '@inertiajs/react';
+import { Calendar, DollarSign, MapPin, User } from 'lucide-react';
+import PageLayout from '../components/PageLayout';
+
+interface StudentInfo {
+    name: string;
+    age: number;
+    gender: string;
+    section: string;
+    birthdate: string;
+}
 
 export default function Tuition() {
+    const studentInfo: StudentInfo = {
+        name: 'Manero Sj Rodriguez',
+        age: 12,
+        gender: 'Male',
+        section: 'Grade 6-A',
+        birthdate: 'March 15, 2012',
+    };
+
+    const tuitionDetails = [
+        { label: 'Monthly Tuition Fee', amount: '₱12,000.00' },
+        { label: 'Miscellaneous Fee', amount: '₱3,500.00' },
+        { label: 'Laboratory Fee', amount: '₱2,000.00' },
+        { label: 'Library Fee', amount: '₱800.00' },
+        { label: 'Sports Fee', amount: '₱1,200.00' },
+    ];
+
+    const totalAmount = '₱19,500.00';
+
     return (
         <>
-            <div className="m-0 bg-[#eef2f5] p-0 font-['Segoe_UI',_Tahoma,_Verdana,_sans-serif] text-black">
-                <div className="flex min-h-screen">
-                    {/* Sidebar */}
-                    <Sidebar currentPage="tuition" />
+            <Head title="Tuition" />
+            <PageLayout title="TUITION" currentPage="tuition">
+                {/* Payment Status Alert */}
+                <Card className="mb-6 border-green-200 bg-green-50">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-green-800">
+                            <DollarSign className="h-5 w-5" />
+                            Payment Status
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-2">
+                            <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">
+                                READY FOR PAYMENT!
+                            </Badge>
+                            <p className="text-green-700">Visit cashier on-site to finish the process.</p>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                    <div className="flex flex-grow flex-col px-12 py-7">
-                        <div className="top-bar mb-0 flex items-center justify-between border-b-2 border-gray-300 py-4">
-                            <h1 id="pageTitle" className="m-0 text-3xl text-[#2c3e50]">
-                                TUITION
-                            </h1>
-                            <div className="user-info flex items-center">
-                                <button
-                                    className="icon-btn ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300"
-                                    id="openModal"
-                                >
-                                    <i className="fas fa-bell" style={{ color: 'gray' }}></i>
-                                    <span className="badge absolute top-[-5px] right-[-5px] rounded-full bg-red-500 px-1.5 py-0.5 text-xs text-white">
-                                        3
+                <div className="grid gap-6 md:grid-cols-2">
+                    {/* Student Information */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <User className="h-5 w-5 text-primary" />
+                                Student Information
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid gap-3">
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Student Name:</span>
+                                    <span className="font-semibold">{studentInfo.name}</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Age:</span>
+                                    <span className="font-semibold">{studentInfo.age} years old</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Gender:</span>
+                                    <span className="font-semibold">{studentInfo.gender}</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Section:</span>
+                                    <span className="font-semibold">{studentInfo.section}</span>
+                                </div>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-medium text-muted-foreground">Birthdate:</span>
+                                    <span className="flex items-center gap-1 font-semibold">
+                                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                                        {studentInfo.birthdate}
                                     </span>
-                                </button>
-                                <span className="mr-5 font-medium text-[#555]">Welcome, Bronny!</span>
-                                <button className="icon-btn ml-4 cursor-pointer border-none bg-transparent text-2xl text-[#95a5a6] transition-colors duration-300">
-                                    <i className="fas fa-user-circle"></i>
-                                </button>
-
-                                {/* Notification Dropdown */}
-                                <div
-                                    className="notification-dropdown absolute top-[50px] right-0 z-[1000] hidden w-[350px] rounded-xl bg-white p-4 shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
-                                    id="notificationDropdown"
-                                >
-                                    <h3 className="m-0 mb-2.5 border-b border-gray-300 pb-2 text-lg text-[#2c3e50]">Notifications</h3>
-                                    <div className="my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to the folder{' '}
-                                            <b>Web App Designs 2019</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Today at 12:28 PM</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="my-3 flex items-start border-b border-gray-100 pb-3">
-                                        <img src="ra_2022-06-19_22-17-45.jpg" alt="User" className="mr-3 h-10 w-10 flex-shrink-0 rounded-full" />
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> invited you to the folder{' '}
-                                            <b>EMEA Major Deal Close Plans</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Yesterday at 5:15 PM</div>
-                                        </div>
-                                    </div>
-
-                                    <div className="notification-item my-3 flex items-start border-b-0 pb-3">
-                                        <div className="circle-avatar mr-3 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#2c3e50] text-sm font-bold text-white">
-                                            AS
-                                        </div>
-                                        <div className="notification-text flex-1 text-sm text-[#333]">
-                                            <strong className="text-[#2c3e50]">Bronny James</strong> added you to{' '}
-                                            <b>Enterprise Corporation Contracts.pdf</b>
-                                            <div className="time my-1 mb-1.5 text-xs text-[#777]">Sep 20 at 3:13 PM</div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
+                        </CardContent>
+                    </Card>
 
-                            <div className="repContent my-5 max-w-4xl rounded-lg bg-[#f9f9f9] p-5 shadow-[0_4px_10px_rgba(0,0,0,0.1)]">
-                                <h1 className="text-[#2c3e50] underline">READY FOR PAYMENT!</h1>
-                                <p>Visit cashier on-site to finish the process.</p>
-                                <h3 className="underline">
-                                    {' '}
-                                    <u>Student Information</u>
-                                </h3>
-                                <p>
-                                    {' '}
-                                    <b>Age: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Gender: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Section: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Birthdate: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Student Name: </b>Manero Sj Rodriguez.
-                                </p>
-
-                                <h3 className="underline">
-                                    {' '}
-                                    <u>Student Information</u>
-                                </h3>
-                                <p>
-                                    {' '}
-                                    <b>Age: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Gender: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Section: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Birthdate: </b>Manero Sj Rodriguez.
-                                </p>
-                                <p>
-                                    {' '}
-                                    <b>Student Name: </b>Manero Sj Rodriguez.
-                                </p>
+                    {/* Tuition Breakdown */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <DollarSign className="h-5 w-5 text-primary" />
+                                Tuition Breakdown
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-3">
+                                {tuitionDetails.map((item, index) => (
+                                    <div key={index}>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-medium text-muted-foreground">{item.label}</span>
+                                            <span className="text-right font-semibold">{item.amount}</span>
+                                        </div>
+                                        {index < tuitionDetails.length - 1 && <Separator className="mt-2" />}
+                                    </div>
+                                ))}
                             </div>
-                        </div>
-                    </div>
+
+                            <Separator className="my-4" />
+
+                            <div className="flex items-center justify-between rounded-lg bg-primary/5 p-3">
+                                <span className="text-lg font-bold">Total Amount:</span>
+                                <span className="text-lg font-bold text-primary">{totalAmount}</span>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
-            </div>
+
+                {/* Payment Instructions */}
+                <Card className="mt-6">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <MapPin className="h-5 w-5 text-primary" />
+                            Payment Instructions
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-3 text-muted-foreground">
+                            <p>
+                                <strong className="text-foreground">Payment Location:</strong> Visit the school cashier's office during business
+                                hours.
+                            </p>
+                            <p>
+                                <strong className="text-foreground">Business Hours:</strong> Monday to Friday, 8:00 AM - 5:00 PM
+                            </p>
+                            <p>
+                                <strong className="text-foreground">Payment Methods:</strong> Cash, Check, or Bank Transfer
+                            </p>
+                            <p>
+                                <strong className="text-foreground">Note:</strong> Please bring this tuition statement and a valid ID when making
+                                payment.
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </PageLayout>
         </>
     );
 }
