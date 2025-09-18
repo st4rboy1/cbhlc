@@ -51,7 +51,7 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         // Determine the dashboard route based on assigned role
-        $dashboardRoute = match($request->role) {
+        $dashboardRoute = match ($request->role) {
             'parent' => 'parent.dashboard',
             'student' => 'student.dashboard',
             default => 'home'
