@@ -1,9 +1,15 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Hash;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+
+beforeEach(function () {
+    // Seed roles and permissions for each test
+    $this->seed(RolesAndPermissionsSeeder::class);
+});
 
 test('password update page is displayed', function () {
     $user = User::factory()->create();

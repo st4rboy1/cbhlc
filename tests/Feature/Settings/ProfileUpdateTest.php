@@ -1,8 +1,14 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+
+beforeEach(function () {
+    // Seed roles and permissions for each test
+    $this->seed(RolesAndPermissionsSeeder::class);
+});
 
 test('profile page is displayed', function () {
     $user = User::factory()->create();
