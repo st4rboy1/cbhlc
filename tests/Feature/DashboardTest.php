@@ -61,33 +61,37 @@ test('student can visit student dashboard', function () {
     $this->actingAs($user)->get(route('student.dashboard'))->assertOk();
 });
 
-test('user is redirected to correct dashboard based on role', function () {
-    // Test super admin
+test('super admin is redirected to admin dashboard', function () {
     $superAdmin = User::factory()->create();
     $superAdmin->assignRole('super_admin');
     expect($superAdmin->getDashboardRoute())->toBe('admin.dashboard');
+});
 
-    // Test administrator
+test('administrator is redirected to admin dashboard', function () {
     $admin = User::factory()->create();
     $admin->assignRole('administrator');
     expect($admin->getDashboardRoute())->toBe('admin.dashboard');
+});
 
-    // Test registrar
+test('registrar is redirected to registrar dashboard', function () {
     $registrar = User::factory()->create();
     $registrar->assignRole('registrar');
     expect($registrar->getDashboardRoute())->toBe('registrar.dashboard');
+});
 
-    // Test parent
+test('parent is redirected to parent dashboard', function () {
     $parent = User::factory()->create();
     $parent->assignRole('parent');
     expect($parent->getDashboardRoute())->toBe('parent.dashboard');
+});
 
-    // Test student
+test('student is redirected to student dashboard', function () {
     $student = User::factory()->create();
     $student->assignRole('student');
     expect($student->getDashboardRoute())->toBe('student.dashboard');
+});
 
-    // Test user without role (fallback to home)
+test('user without role is redirected to home', function () {
     $userWithoutRole = User::factory()->create();
     expect($userWithoutRole->getDashboardRoute())->toBe('home');
 });
