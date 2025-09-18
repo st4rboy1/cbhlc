@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Run lint-staged for changed files only
+npx lint-staged

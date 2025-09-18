@@ -1,0 +1,181 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: mbstring, dom, fileinfo, mysql, iconv
+          tools: composer:v2
+          coverage: xdebug
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # Fast-fail: PHP Syntax Check
+      - name: PHP Syntax Check
+        run: find . -name "*.php" -not -path "./vendor/*" -not -path "./storage/*" | xargs -n1 php -l
+
+      # Cache Composer dependencies for faster builds
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv
+
+      - name: Build Assets
+        run: npm run build
+
+      - name: Copy Environment File
+        run: cp .env.example .env
+
+      - name: Generate Application Key
+        run: php artisan key:generate
+
+      # Code Quality Checks
+      - name: Code Style Check (Laravel Pint)
+        run: ./vendor/bin/pint --test
+
+      - name: Static Analysis (Larastan)
+        run: ./vendor/bin/phpstan analyse --memory-limit=2G
+
+      - name: Security Vulnerability Check
+        run: composer audit
+
+      # Run tests with code coverage
+      - name: Tests with Coverage
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: testing
+          DB_USERNAME: root
+          DB_PASSWORD: password
+          XDEBUG_MODE: coverage
+        run: ./vendor/bin/pest --coverage --min=60 --coverage-html=coverage --coverage-clover=coverage.xml
+
+      # Upload coverage reports (optional)
+      - name: Upload Coverage Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          ssh -i ~/.ssh/deploy_key ${SSH_USER}@${SSH_HOST} << 'EOF'
+            set -e
+
+            echo "Starting deployment..."
+            cd /home/forge/default
+
+            # Enable maintenance mode
+            php artisan down --retry=60
+
+            # Pull latest code
+            git fetch origin main
+            git reset --hard origin/main
+
+            # Install dependencies
+            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --ignore-platform-req=ext-iconv
+
+            # Run migrations
+            php artisan migrate --force
+
+            # Install npm dependencies and build assets
+            npm ci
+            npm run build
+
+            # Clear and cache configuration
+            php artisan cache:clear
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
+
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan optimize
+
+            # Set permissions
+            chmod -R 755 storage bootstrap/cache
+            chown -R forge:forge storage bootstrap/cache
+
+            # Disable maintenance mode
+            php artisan up
+
+            echo "Deployment completed successfully!"
+          EOF
+
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -f ~/.ssh/deploy_key
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment to production successful!"
+          else
+            echo "❌ Deployment to production failed!"
+          fi

@@ -1,83 +1,76 @@
-import { Link } from '@inertiajs/react';
-import { LoginDialog } from '@/components/login-dialog';
-
 export default function About() {
-  return (
-    <>
-      <div className="font-sans">
-        <header className="fixed top-0 left-0 w-full py-5 px-24 flex justify-between items-center z-[100] bg-[#2c3e50]">
-          <Link href="/" className="logo relative text-2xl text-white no-underline font-medium ml-7 hover:text-[#a6b4c2]">CBHLC</Link>
-          <nav className="navigation flex items-center">
-            <Link href="/about" className="relative text-lg text-white no-underline font-medium ml-10">About</Link>
-            <LoginDialog trigger={
-              <button className="btnLogin-popup w-[130px] h-[45px] bg-transparent border-2 border-white rounded-md cursor-pointer text-lg text-white font-medium ml-10 transition-all duration-400 hover:bg-white hover:text-black flex items-center justify-center">
-                Login
-              </button>
-            } />
-          </nav>
-        </header>
+    return (
+        <>
+            <div className="font-sans">
+                <header className="fixed top-0 left-0 z-[100] flex w-full items-center justify-between bg-[#2c3e50] px-24 py-5">
+                    <a href="index.html" className="logo relative ml-7 text-2xl font-medium text-white no-underline hover:text-[#a6b4c2]">
+                        CBHLC{' '}
+                    </a>
+                    <nav className="navigation">
+                        <a href="about.html" className="relative ml-10 text-lg font-medium text-white no-underline">
+                            About
+                        </a>
+                        <button className="btnLogin-popup ml-10 h-[45px] w-[130px] cursor-pointer rounded-md border-2 border-white bg-transparent text-lg font-medium text-white transition-all duration-400 hover:bg-white hover:text-black">
+                            Login
+                        </button>
+                    </nav>
+                </header>
 
+                <section className="mt-[50px] bg-[#f9f9f9] p-[60px] px-[80px] text-center">
+                    <div className="container mx-auto">
+                        <h1 className="mb-2.5 text-4xl font-bold text-[#2c3e50]">About Us</h1>
+                        <p className="mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-[#555]">
+                            <b>Christian Bible Heritage Learning</b> Center is dedicated to nurturing children in both academics and faith, helping
+                            them grow into individuals with strong character and a brighter future.
+                        </p>
 
-        <section className="p-[60px] px-[80px] bg-[#f9f9f9] text-center mt-[50px]">
-          <div className="container mx-auto">
-            <h1 className="text-4xl font-bold mb-2.5 text-[#2c3e50]">About Us</h1>
-            <p className="max-w-2xl mx-auto mb-12 text-lg text-[#555] leading-relaxed">
-              <b>Christian Bible Heritage Learning</b> Center is dedicated to nurturing children in both academics and faith,
-              helping them grow into individuals with strong character and a brighter future.
-            </p>
+                        <div className="ml-48 flex flex-wrap items-center justify-between gap-10">
+                            {/* LEFT TEXT */}
+                            <div className="mb-[450px] ml-0 h-[200px] flex-1 text-left">
+                                <h2 className="mb-4 text-3xl text-[#2c3e50]">We’re here to enhance every child’s potential</h2>
+                                <p className="text-base leading-relaxed text-[#444]">
+                                    Our mission is to provide quality education rooted in Christian values. The school emphasizes both academic
+                                    excellence and spiritual development, ensuring that each child receives holistic growth. Through engaging
+                                    programs, announcements, and activities, we support learners in achieving success while living by faith.{' '}
+                                </p>
+                                <br />
 
-            <div className="flex justify-between items-start gap-10 flex-wrap">
-              {/* LEFT TEXT */}
-              <div className="flex-1 text-left">
-                <h2 className="text-3xl text-[#2c3e50] mb-4">We're here to enhance every child's potential</h2>
-                <p className="text-base text-[#444] leading-relaxed">
-                  Our mission is to provide quality education rooted in Christian values.
-                  The school emphasizes both academic excellence and spiritual development,
-                  ensuring that each child receives holistic growth.
-                  Through engaging programs, announcements, and activities,
-                  we support learners in achieving success while living by faith. </p><br />
+                                <h2 className="mb-4 text-3xl text-[#2c3e50]">Achievements</h2>
+                                <p className="text-base leading-relaxed text-[#444]">
+                                    Our mission is to provide quality education rooted in Christian values. The school emphasizes both academic
+                                    excellence and spiritual development, ensuring that each child receives holistic growth.
+                                </p>
+                                <br />
+                                <h2 className="mb-4 text-3xl text-[#2c3e50]">Founded</h2>
+                                <p className="text-base leading-relaxed text-[#444]">
+                                    Our mission is to provide quality education rooted in Christian values. The school emphasizes both academic
+                                    excellence and spiritual development, ensuring that each child receives holistic growth. Through engaging
+                                    programs, announcements, and activities, we support learners in achieving success while living by faith.
+                                </p>
 
-                <h2 className="text-3xl text-[#2c3e50] mb-4">Achievements</h2>
-                <p className="text-base text-[#444] leading-relaxed">
-                  Our mission is to provide quality education rooted in Christian values.
-                  The school emphasizes both academic excellence and spiritual development,
-                  ensuring that each child receives holistic growth.
+                                <p className="font-bold text-[#2e7d32] italic">
+                                    “Start children off on the way they should go...” <br /> — Proverbs 22:6
+                                </p>
+                            </div>
 
+                            {/* RIGHT IMAGE */}
+                            <div className="flex-1 text-center">
+                                <img className="mb-2.5 max-w-[80%] rounded-xl shadow-md" src="landing.png" alt="CBHLC Students" />
+                                <img className="mb-2.5 max-w-[80%] rounded-xl shadow-md" src="landing.png" alt="CBHLC Students" />
+                            </div>
+                        </div>
 
-
-                </p>
-                <br />
-                <h2 className="text-3xl text-[#2c3e50] mb-4">Founded</h2>
-                <p className="text-base text-[#444] leading-relaxed">
-                  Our mission is to provide quality education rooted in Christian values.
-                  The school emphasizes both academic excellence and spiritual development,
-                  ensuring that each child receives holistic growth.
-                  Through engaging programs, announcements, and activities,
-                  we support learners in achieving success while living by faith.
-
-
-                </p>
-
-                <p className="italic text-[#2e7d32] font-bold">"Start children off on the way they should go..." <br /> — Proverbs 22:6</p>
-              </div>
-
-
-              {/* RIGHT IMAGE */}
-              <div className="flex-1 text-center">
-                <img className="max-w-[80%] rounded-xl shadow-md mb-2.5" src="landing.png" alt="CBHLC Students" />
-                <img className="max-w-[80%] rounded-xl shadow-md mb-2.5" src="landing.png" alt="CBHLC Students" />
-              </div>
+                        <div className="relative bottom-2.5 z-[100] mt-7 mr-[1500px] flex flex-wrap justify-center gap-4 text-base">
+                            <a href="https://www.facebook.com/CBHLC.Pasig" className="text-4xl">
+                                <i className="fab fa-facebook"></i>
+                            </a>
+                            <a href="https://www.instagram.com/awrabriguela/" className="text-4xl">
+                                <i className="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                </section>
             </div>
-
-            <div className="flex gap-4 text-base justify-center mt-12 flex-wrap">
-              <a href="https://www.facebook.com/CBHLC.Pasig" className="text-4xl"><i className="fab fa-facebook"></i></a>
-              <a href="https://www.instagram.com/awrabriguela/" className="text-4xl"><i className="fab fa-instagram"></i></a>
-
-            </div>
-          </div>
-        </section>
-      </div>
-    </>
-  )
+        </>
+    );
 }
-
