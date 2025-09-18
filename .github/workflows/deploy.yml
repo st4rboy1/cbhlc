@@ -128,8 +128,11 @@ jobs:
             echo "Starting deployment..."
             cd /home/forge/default
 
-            # Enable maintenance mode
+            # Enable maintenance mode with trap to ensure it's disabled on error
             php artisan down --retry=60
+
+            # Set trap to disable maintenance mode on any error
+            trap 'echo "Error occurred during deployment. Disabling maintenance mode..."; php artisan up; exit 1' ERR
 
             # Pull latest code
             git fetch origin main
@@ -165,6 +168,15 @@ jobs:
 
             echo "Deployment completed successfully!"
           EOF
+
+      - name: Ensure maintenance mode is disabled
+        if: failure()
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          ssh -i ~/.ssh/deploy_key ${SSH_USER}@${SSH_HOST} "cd /home/forge/default && php artisan up" || true
+          echo "⚠️ Deployment failed - maintenance mode has been disabled"
 
       - name: Cleanup
         if: always()
