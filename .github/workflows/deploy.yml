@@ -146,7 +146,7 @@ jobs:
 
             # Install npm dependencies and build assets
             npm ci
-            NODE_ENV=production npm run build
+            NODE_ENV=production npx vite build
 
             # Clear and cache configuration
             php artisan cache:clear
