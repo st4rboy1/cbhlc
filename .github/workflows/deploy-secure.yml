@@ -116,7 +116,7 @@ jobs:
             php artisan migrate --force
 
             # Install/update Node dependencies and build assets
-            npm ci --ignore-scripts
+            NODE_ENV=production npm ci
             npm run build
 
             # Clear all caches
