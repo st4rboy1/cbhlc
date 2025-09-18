@@ -27,4 +27,3 @@ yarn-error.log
 /.zed
 /coverage
 *.cache
-package-lock.json
