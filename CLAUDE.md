@@ -25,6 +25,12 @@
 9. [Constraints and Assumptions](#9-constraints-and-assumptions)
 10. [Glossary](#10-glossary)
 11. [Development Workflow and Standards](#11-development-workflow-and-standards)
+    - [Local Development Setup](#111-local-development-setup)
+    - [Code Standards and Best Practices](#112-code-standards-and-best-practices)
+    - [Testing Strategy](#113-testing-strategy)
+    - [CI/CD and Deployment Process](#114-cicd-and-deployment-process)
+    - [Deployment Configuration](#115-deployment-configuration)
+    - [Monitoring and Maintenance](#116-monitoring-and-maintenance)
 
 ---
 
@@ -77,15 +83,15 @@ The Web-Based Enrollment System is a standalone web application designed specifi
 ### 2.4 Operating Environment
 - **Client Side:** Modern web browsers supporting React applications (Chrome, Firefox, Safari, Edge)
 - **Server Side:** Laravel 12 framework with Inertia.js for SPA functionality
-- **Database:** MySQL 8.3+ Server (managed via Laravel's Eloquent ORM)
+- **Database:** MySQL 8.0.43 Server (local installation on same server)
 - **Development Environment:** Docker Compose with Laravel Sail
-- **Deployment Platform:** Linode Nanode (1GB) managed by Laravel Forge
-- **CI/CD Pipeline:** GitHub Actions for automated testing and Laravel Forge for deployment
+- **Deployment Platform:** DigitalOcean Droplet with Laravel Forge management
+- **CI/CD Pipeline:** GitHub Actions for automated testing and deployment
 - **Internet Connectivity:** Required for system access
 
 ### 2.5 Assumptions and Dependencies
 - Users have access to internet-connected devices with modern web browsers supporting React applications
-- Linode hosting infrastructure managed via Laravel Forge with automated deployment
+- DigitalOcean Droplet infrastructure managed via Laravel Forge (free trial)
 - Docker environment available for local development with Laravel Sail
 - GitHub repository configured with automated CI/CD pipeline
 - Staff training will be provided for system usage
@@ -429,23 +435,23 @@ Requirements are classified using the MoSCoW method:
 The system follows a modern full-stack architecture leveraging Laravel 12's ecosystem:
 - **Presentation Layer:** React 18+ based SPA with shadcn/ui components and Tailwind CSS styling
 - **Application Layer:** Laravel 12 framework with Inertia.js 2.0 bridging server-side routing to client-side React components
-- **Data Layer:** MySQL 8.0 database managed via Laravel's Eloquent ORM (MySQL 8.3+ recommended for production)
+- **Data Layer:** MySQL 8.0.43 database on local server managed via Laravel's Eloquent ORM
 - **Development Environment:** Containerized using Docker Compose with Laravel Sail
 - **CI/CD Pipeline:** GitHub Actions for automated testing, code quality checks, and security auditing
-- **Deployment:** Automated deployment via Laravel Forge to Linode infrastructure with zero-downtime deployments
+- **Deployment:** Single-server deployment with all components (web, app, database) on one DigitalOcean Droplet managed by Laravel Forge
 
 ### 7.2 Technology Stack
 - **Frontend Framework:** React 18+ with TypeScript support
 - **UI Components:** shadcn/ui component library (copy-paste approach with full customization)
 - **CSS Framework:** Tailwind CSS v4 with utility-first styling
 - **Full-Stack Bridge:** Inertia.js 2.0 (eliminating need for separate API)
-- **Backend Framework:** Laravel 12 (PHP 8.2+, PHP 8.4 recommended)
-- **Database:** MySQL 8.0 with Eloquent ORM (upgrading to 8.3+ recommended)
-- **Web Server:** Nginx (configured via Laravel Forge)
+- **Backend Framework:** Laravel 12 (PHP 8.3.25 installed)
+- **Database:** MySQL 8.0.43 with Eloquent ORM (local installation)
+- **Web Server:** Nginx 1.28.0 (configured via Laravel Forge)
 - **Local Development:** Docker Compose with Laravel Sail (PHP 8.4 container)
 - **CI/CD Pipeline:** GitHub Actions for continuous integration
-- **Deployment Platform:** Laravel Forge managing Linode Nanode servers
-- **Version Control Integration:** Git with automated deployment triggers via GitHub Actions
+- **Deployment Platform:** DigitalOcean Droplet managed by Laravel Forge
+- **Version Control Integration:** Git with deployment options via GitHub Actions or Forge
 - **Testing Framework:** Pest 4.0 (primary), PHPUnit compatibility maintained
 - **Development Methodology:** Agile with iterative sprints and automated testing
 
@@ -481,14 +487,15 @@ The system follows a modern full-stack architecture leveraging Laravel 12's ecos
 - **Deployment Trigger:** Successful CI pipeline triggers automated deployment via Laravel Forge
 
 ### 7.6 Deployment Architecture
-- **Server Provisioning:** Laravel Forge automated server setup on Linode Nanode (1GB RAM, 1 CPU Core, 25GB SSD)
-- **Web Server:** Nginx optimized for Laravel 12 applications
-- **Process Management:** PHP-FPM with optimized worker configuration for small server
-- **SSL Certificates:** Automated Let's Encrypt certificate management
+- **Server Type:** DigitalOcean Droplet hosting all application components
+- **Web Server:** Nginx 1.28.0 optimized for Laravel applications
+- **Database Server:** MySQL 8.0.43 running locally on same server
+- **Process Management:** PHP-FPM 8.3 with optimized worker configuration
+- **SSL Certificates:** Available through Laravel Forge Let's Encrypt integration
+- **File Storage:** Local filesystem on server SSD
 - **Monitoring:** Laravel Forge server monitoring and performance metrics
-- **Backup Strategy:** Automated daily database backups with 7-day retention
-- **Deployment Pipeline:** GitHub Actions CI success triggers Laravel Forge deployment hooks
-- **Zero-Downtime Deployments:** Laravel Forge atomic deployments with rollback capability
+- **Backup Strategy:** Database backups configurable through Laravel Forge
+- **Deployment Options:** Manual via SSH, Laravel Forge quick deploy, or GitHub Actions automation
 
 ### 7.7 Asset Compilation and Management
 - **Build Tool:** Vite for fast asset compilation and bundling
@@ -908,13 +915,85 @@ erDiagram
   - Security auditing (Composer audit)
   - Automated testing (PHPUnit/Pest)
   - Browser testing (Laravel Dusk)
-- **Continuous Deployment:** Laravel Forge deployment triggered by successful CI pipeline
+- **Continuous Deployment:** GitHub Actions deployment to production server
 - **Environment Management:** Laravel's environment configuration system
 - **Database Migrations:** Automated via Laravel's migration system
 - **Asset Compilation:** Vite build process integrated with deployment pipeline
 - **Deployment Strategy:** Zero-downtime deployments with rollback capability
 
-### 11.5 Monitoring and Maintenance
+### 11.5 Deployment Configuration
+
+#### 11.5.1 Server Information
+- **Host:** 128.199.161.224
+- **Platform:** DigitalOcean Droplet (All-in-one deployment)
+- **Web Server:** Nginx 1.28.0 (Laravel Forge managed)
+- **PHP Version:** 8.3.25
+- **Database:** MySQL 8.0.43 (local installation)
+- **Project Path:** `/home/forge/default`
+- **User:** forge (deployment and application user)
+- **SSH Access:** Available via `ssh cbhlc` (forge user) or `ssh cbhlc-root` (root user)
+
+#### 11.5.2 Server Components
+All components run on a single server for simplified management:
+- **Laravel Application:** Located at `/home/forge/default`
+- **MySQL Database:** Local instance on 127.0.0.1:3306
+- **Nginx Web Server:** Configured with Laravel Forge
+- **PHP-FPM:** Process manager for PHP execution
+- **Composer:** Installed at `/usr/local/bin/composer`
+- **Node.js:** Available for asset compilation
+
+#### 11.5.3 Database Configuration
+- **Database Name:** forge
+- **Database User:** forge
+- **Database Host:** 127.0.0.1 (local)
+- **Database Port:** 3306
+- **Connection:** Direct local socket connection for optimal performance
+
+#### 11.5.4 Deployment Workflow
+The deployment workflow can be executed via:
+
+**Option 1: GitHub Actions Automated Deployment (Primary Method)**
+- Configure GitHub Actions with server SSH access
+- Workflow triggers on push to `main` branch
+- Deployment steps execute via SSH to the server
+- Recommended approach due to Laravel Forge free trial limitations
+
+**Option 2: Laravel Forge Deployment (Limited - Free Trial)**
+- Use Laravel Forge's built-in deployment features
+- Quick deploy button in Forge dashboard
+- Automatic deployment hooks from GitHub
+- Note: Limited to free trial period
+
+**Option 3: Manual Deployment via SSH**
+```bash
+ssh cbhlc
+cd /home/forge/default
+git pull origin main
+composer install --optimize-autoloader --no-dev
+npm ci && npm run build
+php artisan migrate --force
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+#### 11.5.5 Server Management
+- **SSH Access:**
+  - Application management: `ssh cbhlc` (forge user)
+  - System administration: `ssh cbhlc-root` (root access)
+- **Log Files:** Located in `/home/forge/default/storage/logs`
+- **Nginx Config:** `/etc/nginx/sites-available/default`
+- **PHP-FPM:** Managed via systemctl
+- **MySQL:** Local database accessible via forge user
+
+#### 11.5.6 Troubleshooting
+- **Application Errors:** Check Laravel logs at `/home/forge/default/storage/logs/laravel.log`
+- **Web Server Issues:** Review Nginx error logs
+- **Database Connection:** Verify MySQL service status and credentials in `.env`
+- **Permission Issues:** Ensure forge user owns application files
+- **Cache Problems:** Clear all caches with `php artisan cache:clear`
+
+### 11.6 Monitoring and Maintenance
 - **Server Monitoring:** Laravel Forge server metrics and alerts
 - **Application Monitoring:** Laravel's built-in logging and error tracking
 - **Performance Monitoring:** Database query optimization and React component profiling
@@ -938,7 +1017,8 @@ Document certifying a student's good moral character and conduct from their prev
 - Version 2.0: (January 2025) - Updated with actual technology stack implementation
 - Version 3.0: (January 2025) - Updated with Laravel 12 and GitHub Actions CI/CD pipeline
 - Version 3.1: (January 2025) - Added comprehensive ERD and database design section
-- **Version 4.0: (January 2025) - Full ISO/IEC/IEEE 29148:2018 compliance with requirements traceability, priority classification, and acceptance criteria**
+- Version 4.0: (January 2025) - Full ISO/IEC/IEEE 29148:2018 compliance with requirements traceability, priority classification, and acceptance criteria
+- **Version 4.1: (January 2025) - Added deployment configuration and GitHub Actions CI/CD workflow documentation**
 - Standards Compliance: ISO/IEC/IEEE 29148:2018 Systems and Software Engineering - Requirements Engineering
 - Technology Stack: Laravel 12 + React 18 + Inertia.js + shadcn/ui + Tailwind CSS
 - CI/CD Pipeline: GitHub Actions (CI) + Laravel Forge (CD)
