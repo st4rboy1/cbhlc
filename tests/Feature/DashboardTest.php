@@ -87,7 +87,7 @@ test('parent is redirected to parent dashboard', function () {
 
 test('student is redirected to student dashboard', function () {
     $student = User::factory()->create();
-    $student->assignRole('student');
+    $student->syncRoles('student');
     expect($student->getDashboardRoute())->toBe('student.dashboard');
 });
 
@@ -119,7 +119,7 @@ test('registrar cannot access admin dashboard', function () {
 
 test('student cannot access other dashboards', function () {
     $student = User::factory()->create();
-    $student->assignRole('student');
+    $student->syncRoles('student');
 
     $this->actingAs($student)->get(route('admin.dashboard'))->assertForbidden();
     $this->actingAs($student)->get(route('registrar.dashboard'))->assertForbidden();

@@ -43,16 +43,12 @@ class UserFactory extends Factory
     }
 
     /**
-     * Configure the model factory to create with parent role.
+     * Configure the model factory.
      */
     public function configure(): static
     {
-        return $this->afterCreating(function (\App\Models\User $user) {
-            // Default role is parent if no role is assigned
-            if (! $user->hasAnyRole()) {
-                $user->assignRole('parent');
-            }
-        });
+        // Don't assign a default role - let tests handle role assignment explicitly
+        return $this;
     }
 
     /**
