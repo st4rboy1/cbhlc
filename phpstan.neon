@@ -1,0 +1,27 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+
+    paths:
+        - app/
+        - database/
+        - routes/
+
+    # Level 5 for balanced strictness (0-9 available, with 9 being the strictest)
+    level: 5
+
+    # Ignore specific errors that are not relevant
+    ignoreErrors: []
+
+    excludePaths:
+        - vendor/
+        - storage/
+        - bootstrap/cache/
+        - database/factories/
+
+    # Treat PHPDocs as authoritative
+    treatPhpDocTypesAsCertain: true
+
+    # Report unmatched ignored errors
+    reportUnmatchedIgnoredErrors: true
