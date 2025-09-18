@@ -1,3 +1,5 @@
+import { Link } from '@inertiajs/react';
+
 export default function Application() {
     return (
         <>
@@ -229,9 +231,9 @@ export default function Application() {
                             </div>
 
                             <nav className="navigation">
-                                <a href="enrollment.html" style={{ fontSize: '20px', color: 'blue' }}>
+                                <Link href="/enrollment" style={{ fontSize: '20px', color: 'blue' }}>
                                     Save
-                                </a>
+                                </Link>
                             </nav>
                         </form>
                     </main>
