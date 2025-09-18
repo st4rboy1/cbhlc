@@ -1,25 +1,12 @@
 import { Icon } from '@/components/icon';
-import { LoginDialog } from '@/components/login-dialog';
+import { PublicNav } from '@/components/public-nav';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { BookOpen, CheckCircle, Facebook, GraduationCap, Heart, Instagram, Users } from 'lucide-react';
 
 export default function Landing() {
-    const { auth } = usePage<SharedData>().props;
-
-    // Helper function to get dashboard URL based on user role
-    const getDashboardUrl = () => {
-        if (!auth.user) return '/login';
-
-        // This logic should match the User model's getDashboardRoute() method
-        // Since we don't have role info in frontend, we'll use a default
-        // The server will redirect to the correct dashboard after login
-        return '/admin/dashboard';
-    };
-
     const features = [
         {
             icon: BookOpen,
@@ -57,27 +44,7 @@ export default function Landing() {
                 <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
             </Head>
             <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-                {/* Navigation Header */}
-                <header className="fixed top-0 left-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
-                    <div className="container mx-auto flex h-16 items-center justify-between px-6">
-                        <Link href="/" className="flex items-center space-x-2 text-xl font-bold text-slate-800 transition-colors hover:text-blue-600">
-                            <Icon iconNode={GraduationCap} className="h-6 w-6" />
-                            <span>CBHLC</span>
-                        </Link>
-                        <nav className="flex items-center space-x-8">
-                            <Link href="/about" className="font-medium text-slate-600 transition-colors hover:text-slate-800">
-                                About
-                            </Link>
-                            {auth.user ? (
-                                <Button asChild variant="default">
-                                    <Link href={getDashboardUrl()}>Dashboard</Link>
-                                </Button>
-                            ) : (
-                                <LoginDialog trigger={<Button variant="outline">Login</Button>} />
-                            )}
-                        </nav>
-                    </div>
-                </header>
+                <PublicNav currentPage="home" />
 
                 {/* Hero Section */}
                 <section className="pt-16">
