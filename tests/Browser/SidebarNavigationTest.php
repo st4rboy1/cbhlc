@@ -20,52 +20,52 @@ class SidebarNavigationTest extends DuskTestCase
             $user = User::factory()->create();
 
             $browser->loginAs($user)
-                    ->visit('/dashboard')
-                    ->assertSee('DASHBOARD')
-                    ->assertSee('ENROLLMENT')
-                    ->assertSee('BILLING')
-                    ->assertSee('STUDENT REPORT')
-                    ->assertSee('REGISTRAR');
+                ->visit('/dashboard')
+                ->assertSee('DASHBOARD')
+                ->assertSee('ENROLLMENT')
+                ->assertSee('BILLING')
+                ->assertSee('STUDENT REPORT')
+                ->assertSee('REGISTRAR');
 
             // Test navigation to enrollment page
             $browser->clickLink('ENROLLMENT')
-                    ->pause(500)
-                    ->assertPathIs('/enrollment')
-                    ->assertSee('Enrollment Form');
+                ->pause(500)
+                ->assertPathIs('/enrollment')
+                ->assertSee('Enrollment Form');
 
             // Test navigation to billing/invoice page
             $browser->clickLink('BILLING')
-                    ->pause(200)
-                    ->clickLink('Generate Invoice')
-                    ->pause(500)
-                    ->assertPathIs('/invoice')
-                    ->assertSee('INVOICE');
+                ->pause(200)
+                ->clickLink('Generate Invoice')
+                ->pause(500)
+                ->assertPathIs('/invoice')
+                ->assertSee('INVOICE');
 
             // Test navigation to tuition page
             $browser->clickLink('BILLING')
-                    ->pause(200)
-                    ->clickLink('Tuition Fee')
-                    ->pause(500)
-                    ->assertPathIs('/tuition')
-                    ->assertSee('TUITION');
+                ->pause(200)
+                ->clickLink('Tuition Fee')
+                ->pause(500)
+                ->assertPathIs('/tuition')
+                ->assertSee('TUITION');
 
             // Test navigation to student report page
             $browser->clickLink('STUDENT REPORT')
-                    ->pause(500)
-                    ->assertPathIs('/studentreport')
-                    ->assertSee('STUDENT REPORT');
+                ->pause(500)
+                ->assertPathIs('/studentreport')
+                ->assertSee('STUDENT REPORT');
 
             // Test navigation to registrar page
             $browser->clickLink('REGISTRAR')
-                    ->pause(500)
-                    ->assertPathIs('/registrar')
-                    ->assertSee('REGISTRAR');
+                ->pause(500)
+                ->assertPathIs('/registrar')
+                ->assertSee('REGISTRAR');
 
             // Test navigation back to dashboard
             $browser->clickLink('DASHBOARD')
-                    ->pause(500)
-                    ->assertPathIs('/dashboard')
-                    ->assertSee('Dashboard');
+                ->pause(500)
+                ->assertPathIs('/dashboard')
+                ->assertSee('Dashboard');
         });
     }
 
@@ -78,13 +78,13 @@ class SidebarNavigationTest extends DuskTestCase
             $user = User::factory()->create();
 
             $browser->loginAs($user)
-                    ->visit('/enrollment')
-                    ->assertPresent('.nav-item.active')
-                    ->assertSeeIn('.nav-item.active', 'ENROLLMENT');
+                ->visit('/enrollment')
+                ->assertPresent('.nav-item.active')
+                ->assertSeeIn('.nav-item.active', 'ENROLLMENT');
 
             $browser->visit('/studentreport')
-                    ->assertPresent('.nav-item.active')
-                    ->assertSeeIn('.nav-item.active', 'STUDENT REPORT');
+                ->assertPresent('.nav-item.active')
+                ->assertSeeIn('.nav-item.active', 'STUDENT REPORT');
         });
     }
 
@@ -97,12 +97,12 @@ class SidebarNavigationTest extends DuskTestCase
             $user = User::factory()->create();
 
             $browser->loginAs($user)
-                    ->visit('/dashboard')
-                    ->assertSee('LOGOUT')
-                    ->click('form[action="/logout"] button')
-                    ->pause(500)
-                    ->assertPathIs('/login')
-                    ->assertGuest();
+                ->visit('/dashboard')
+                ->assertSee('LOGOUT')
+                ->click('form[action="/logout"] button')
+                ->pause(500)
+                ->assertPathIs('/login')
+                ->assertGuest();
         });
     }
 
@@ -128,12 +128,12 @@ class SidebarNavigationTest extends DuskTestCase
 
             foreach ($pages as $page) {
                 $browser->visit($page)
-                        ->assertSee('DASHBOARD')
-                        ->assertSee('ENROLLMENT')
-                        ->assertSee('BILLING')
-                        ->assertSee('STUDENT REPORT')
-                        ->assertSee('REGISTRAR')
-                        ->assertSee('LOGOUT');
+                    ->assertSee('DASHBOARD')
+                    ->assertSee('ENROLLMENT')
+                    ->assertSee('BILLING')
+                    ->assertSee('STUDENT REPORT')
+                    ->assertSee('REGISTRAR')
+                    ->assertSee('LOGOUT');
             }
         });
     }
