@@ -7,10 +7,10 @@ beforeEach(function () {
     $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 });
 
-test('registration screen can be rendered', function () {
+test('registration route redirects to home', function () {
     $response = $this->get(route('register'));
 
-    $response->assertStatus(200);
+    $response->assertRedirect('/');
 });
 
 test('new parent users can register', function () {
