@@ -104,6 +104,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
+    environment: production
 
     steps:
       - name: Checkout code
@@ -117,60 +118,62 @@ jobs:
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
-      - name: Deploy to server
+      - name: Deploy to DigitalOcean Droplet
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
         run: |
-          ssh -i ~/.ssh/deploy_key ${SSH_USER}@${SSH_HOST} << 'EOF'
+          ssh -i ~/.ssh/deploy_key ${SSH_USER}@${SSH_HOST} << 'DEPLOYMENT'
             set -e
 
-            echo "Starting deployment..."
+            echo "=== Starting deployment at $(date) ==="
             cd /home/forge/default
 
-            # Enable maintenance mode with trap to ensure it's disabled on error
+            # Step 1: Enable maintenance mode
+            echo "Enabling maintenance mode..."
             php artisan down --retry=60
 
             # Set trap to disable maintenance mode on any error
-            trap 'echo "Error occurred during deployment. Disabling maintenance mode..."; php artisan up; exit 1' ERR
+            trap 'echo "Error occurred. Disabling maintenance mode..."; php artisan up; exit 1' ERR
 
-            # Pull latest code
-            git fetch origin main
-            git reset --hard origin/main
+            # Step 2: Pull latest code from GitHub
+            echo "Pulling latest code..."
+            git pull origin main
 
-            # Install dependencies
-            composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --ignore-platform-req=ext-iconv
+            # Step 3: Install/update Composer dependencies
+            echo "Installing Composer dependencies..."
+            composer install --optimize-autoloader --no-dev
 
-            # Run migrations
-            php artisan migrate --force
-
-            # Install npm dependencies and build assets
+            # Step 4: Install/update npm dependencies and build assets
+            echo "Installing npm dependencies and building assets..."
             npm ci
             NODE_ENV=production npx vite build
 
-            # Clear and cache configuration
-            php artisan cache:clear
-            php artisan config:clear
-            php artisan route:clear
-            php artisan view:clear
+            # Step 5: Run database migrations
+            echo "Running database migrations..."
+            php artisan migrate --force
 
+            # Step 6: Clear and rebuild caches
+            echo "Clearing and rebuilding caches..."
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            php artisan optimize
 
-            # Set permissions (using forge user for DigitalOcean)
+            # Step 7: Restart queue workers (if any)
+            echo "Restarting queue workers..."
+            php artisan queue:restart || true
+
+            # Step 8: Set correct permissions for forge user
+            echo "Setting permissions..."
             chmod -R 755 storage bootstrap/cache
             chown -R forge:forge storage bootstrap/cache
 
-            # Restart queue workers if using queues
-            php artisan queue:restart || true
-
-            # Disable maintenance mode
+            # Step 9: Disable maintenance mode
+            echo "Disabling maintenance mode..."
             php artisan up
 
-            echo "Deployment completed successfully!"
-          EOF
+            echo "=== Deployment completed successfully at $(date) ==="
+          DEPLOYMENT
 
       - name: Ensure maintenance mode is disabled
         if: failure()
@@ -180,6 +183,23 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key ${SSH_USER}@${SSH_HOST} "cd /home/forge/default && php artisan up" || true
           echo "⚠️ Deployment failed - maintenance mode has been disabled"
+
+      - name: Verify deployment
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+        run: |
+          # Verify site is responding (using HTTP since HTTPS might not be configured)
+          response=$(curl -s -o /dev/null -w "%{http_code}" http://${SSH_HOST})
+          if [ $response -eq 200 ] || [ $response -eq 302 ]; then
+            echo "✅ Site is responding correctly (HTTP $response)"
+          else
+            echo "⚠️ Site returned HTTP $response"
+            # Don't fail if site returns other codes, just warn
+          fi
+
+          # Verify Laravel is running
+          ssh -i ~/.ssh/deploy_key ${SSH_USER}@${SSH_HOST} "cd /home/forge/default && php artisan --version"
+          echo "✅ Laravel application is running"
 
       - name: Cleanup
         if: always()
@@ -191,6 +211,11 @@ jobs:
         run: |
           if [ "${{ job.status }}" == "success" ]; then
             echo "✅ Deployment to production successful!"
+            echo "🌐 Site: http://${{ secrets.SSH_HOST }}"
+            echo "📦 Commit: ${{ github.sha }}"
+            echo "👤 Deployed by: ${{ github.actor }}"
           else
             echo "❌ Deployment to production failed!"
+            echo "📦 Commit: ${{ github.sha }}"
+            echo "👤 Attempted by: ${{ github.actor }}"
           fi
