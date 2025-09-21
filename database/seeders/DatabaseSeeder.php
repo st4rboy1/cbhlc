@@ -72,14 +72,5 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
         $student->assignRole('student');
-
-        // Additional test parent user
-        $testUser = User::create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'),
-        ]);
-        $testUser->assignRole('parent');
     }
 }
