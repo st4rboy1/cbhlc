@@ -18,8 +18,8 @@ test('guests are redirected to the login page for registrar dashboard', function
     $this->get(route('registrar.dashboard'))->assertRedirect(route('login'));
 });
 
-test('guests are redirected to the login page for parent dashboard', function () {
-    $this->get(route('parent.dashboard'))->assertRedirect(route('login'));
+test('guests are redirected to the login page for guardian dashboard', function () {
+    $this->get(route('guardian.dashboard'))->assertRedirect(route('login'));
 });
 
 test('guests are redirected to the login page for student dashboard', function () {
@@ -47,11 +47,11 @@ test('registrar can visit registrar dashboard', function () {
     $this->actingAs($user)->get(route('registrar.dashboard'))->assertOk();
 });
 
-test('parent can visit parent dashboard', function () {
+test('guardian can visit guardian dashboard', function () {
     $user = User::factory()->create();
-    $user->assignRole('parent');
+    $user->assignRole('guardian');
 
-    $this->actingAs($user)->get(route('parent.dashboard'))->assertOk();
+    $this->actingAs($user)->get(route('guardian.dashboard'))->assertOk();
 });
 
 test('student can visit student dashboard', function () {
@@ -79,10 +79,10 @@ test('registrar is redirected to registrar dashboard', function () {
     expect($registrar->getDashboardRoute())->toBe('registrar.dashboard');
 });
 
-test('parent is redirected to parent dashboard', function () {
-    $parent = User::factory()->create();
-    $parent->assignRole('parent');
-    expect($parent->getDashboardRoute())->toBe('parent.dashboard');
+test('guardian is redirected to guardian dashboard', function () {
+    $guardian = User::factory()->create();
+    $guardian->assignRole('guardian');
+    expect($guardian->getDashboardRoute())->toBe('guardian.dashboard');
 });
 
 test('student is redirected to student dashboard', function () {
@@ -97,17 +97,17 @@ test('user without role is redirected to home', function () {
 });
 
 test('users cannot access dashboards they do not have permission for', function () {
-    $parent = User::factory()->create();
-    $parent->assignRole('parent');
+    $guardian = User::factory()->create();
+    $guardian->assignRole('guardian');
 
-    // Parent should not be able to access admin dashboard
-    $this->actingAs($parent)->get(route('admin.dashboard'))->assertForbidden();
+    // Guardian should not be able to access admin dashboard
+    $this->actingAs($guardian)->get(route('admin.dashboard'))->assertForbidden();
 
-    // Parent should not be able to access registrar dashboard
-    $this->actingAs($parent)->get(route('registrar.dashboard'))->assertForbidden();
+    // Guardian should not be able to access registrar dashboard
+    $this->actingAs($guardian)->get(route('registrar.dashboard'))->assertForbidden();
 
-    // Parent should not be able to access student dashboard
-    $this->actingAs($parent)->get(route('student.dashboard'))->assertForbidden();
+    // Guardian should not be able to access student dashboard
+    $this->actingAs($guardian)->get(route('student.dashboard'))->assertForbidden();
 });
 
 test('registrar cannot access admin dashboard', function () {
@@ -123,5 +123,5 @@ test('student cannot access other dashboards', function () {
 
     $this->actingAs($student)->get(route('admin.dashboard'))->assertForbidden();
     $this->actingAs($student)->get(route('registrar.dashboard'))->assertForbidden();
-    $this->actingAs($student)->get(route('parent.dashboard'))->assertForbidden();
+    $this->actingAs($student)->get(route('guardian.dashboard'))->assertForbidden();
 });

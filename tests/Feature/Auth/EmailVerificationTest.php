@@ -23,7 +23,7 @@ test('email verification screen can be rendered', function () {
 
 test('email can be verified', function () {
     $user = User::factory()->unverified()->create();
-    $user->assignRole('parent'); // Assign a role so getDashboardRoute() works
+    $user->assignRole('guardian'); // Assign a role so getDashboardRoute() works
 
     Event::fake();
 
@@ -74,7 +74,7 @@ test('verified user is redirected to dashboard from verification prompt', functi
     $user = User::factory()->create([
         'email_verified_at' => now(),
     ]);
-    $user->assignRole('parent'); // Assign a role so getDashboardRoute() works
+    $user->assignRole('guardian'); // Assign a role so getDashboardRoute() works
 
     $response = $this->actingAs($user)->get(route('verification.notice'));
 
@@ -85,7 +85,7 @@ test('already verified user visiting verification link is redirected without fir
     $user = User::factory()->create([
         'email_verified_at' => now(),
     ]);
-    $user->assignRole('parent'); // Assign a role so getDashboardRoute() works
+    $user->assignRole('guardian'); // Assign a role so getDashboardRoute() works
 
     Event::fake();
 
