@@ -124,5 +124,4 @@ class UserSeeder extends Seeder
             'is_primary_contact' => false,
         ]);
     }
-
 }

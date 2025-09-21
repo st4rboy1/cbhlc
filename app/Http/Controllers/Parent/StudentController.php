@@ -281,5 +281,4 @@ class StudentController extends Controller
         return redirect()->back()
             ->with('success', 'Login account created successfully for '.$student->first_name.'.');
     }
-
 }
