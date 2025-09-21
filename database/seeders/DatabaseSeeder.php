@@ -16,42 +16,70 @@ class DatabaseSeeder extends Seeder
         // Seed roles and permissions first
         $this->call(RolesAndPermissionsSeeder::class);
 
-        // Create test users for each role
+        // Only create default users if we're not in production
+        // or if the users table is empty (initial setup)
+        if (app()->environment('local', 'testing') || User::count() === 0) {
+            $this->createDefaultUsers();
+        }
+    }
 
+    /**
+     * Create default users without using factories (for production compatibility)
+     */
+    private function createDefaultUsers(): void
+    {
         // Super Admin
-        User::factory()->superAdmin()->create([
+        $superAdmin = User::create([
             'name' => 'Super Admin',
             'email' => 'super.admin@cbhlc.edu',
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
         ]);
+        $superAdmin->assignRole('super_admin');
 
         // Administrator
-        User::factory()->administrator()->create([
+        $admin = User::create([
             'name' => 'Administrator',
             'email' => 'admin@cbhlc.edu',
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
         ]);
+        $admin->assignRole('administrator');
 
         // Registrar
-        User::factory()->registrar()->create([
+        $registrar = User::create([
             'name' => 'Registrar User',
             'email' => 'registrar@cbhlc.edu',
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
         ]);
+        $registrar->assignRole('registrar');
 
         // Parent
-        User::factory()->parent()->create([
+        $parent = User::create([
             'name' => 'Parent User',
             'email' => 'parent@example.com',
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
         ]);
+        $parent->assignRole('parent');
 
         // Student
-        User::factory()->student()->create([
+        $student = User::create([
             'name' => 'Student User',
             'email' => 'student@example.com',
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
         ]);
+        $student->assignRole('student');
 
         // Additional test parent user
-        User::factory()->parent()->create([
+        $testUser = User::create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
         ]);
+        $testUser->assignRole('parent');
     }
 }
