@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
+use App\Enums\Semester;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,17 +19,17 @@ class Enrollment extends Model
         'school_year',
         'semester',
         'status',
-        'tuition_fee',
-        'miscellaneous_fee',
-        'laboratory_fee',
-        'library_fee',
-        'sports_fee',
-        'total_amount',
-        'discount',
-        'net_amount',
+        'tuition_fee_cents',
+        'miscellaneous_fee_cents',
+        'laboratory_fee_cents',
+        'library_fee_cents',
+        'sports_fee_cents',
+        'total_amount_cents',
+        'discount_cents',
+        'net_amount_cents',
         'payment_status',
-        'amount_paid',
-        'balance',
+        'amount_paid_cents',
+        'balance_cents',
         'payment_due_date',
         'remarks',
         'approved_at',
@@ -37,16 +39,8 @@ class Enrollment extends Model
     protected $casts = [
         'approved_at' => 'datetime',
         'payment_due_date' => 'date',
-        'tuition_fee' => 'decimal:2',
-        'miscellaneous_fee' => 'decimal:2',
-        'laboratory_fee' => 'decimal:2',
-        'library_fee' => 'decimal:2',
-        'sports_fee' => 'decimal:2',
-        'total_amount' => 'decimal:2',
-        'discount' => 'decimal:2',
-        'net_amount' => 'decimal:2',
-        'amount_paid' => 'decimal:2',
-        'balance' => 'decimal:2',
+        'semester' => Semester::class,
+        'payment_status' => PaymentStatus::class,
     ];
 
     /**
@@ -73,16 +67,116 @@ class Enrollment extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    // Money accessors (convert cents to dollars)
+    public function getTuitionFeeAttribute(): float
+    {
+        return $this->tuition_fee_cents / 100;
+    }
+
+    public function getMiscellaneousFeeAttribute(): float
+    {
+        return $this->miscellaneous_fee_cents / 100;
+    }
+
+    public function getLaboratoryFeeAttribute(): float
+    {
+        return $this->laboratory_fee_cents / 100;
+    }
+
+    public function getLibraryFeeAttribute(): float
+    {
+        return $this->library_fee_cents / 100;
+    }
+
+    public function getSportsFeeAttribute(): float
+    {
+        return $this->sports_fee_cents / 100;
+    }
+
+    public function getTotalAmountAttribute(): float
+    {
+        return $this->total_amount_cents / 100;
+    }
+
+    public function getDiscountAttribute(): float
+    {
+        return $this->discount_cents / 100;
+    }
+
+    public function getNetAmountAttribute(): float
+    {
+        return $this->net_amount_cents / 100;
+    }
+
+    public function getAmountPaidAttribute(): float
+    {
+        return $this->amount_paid_cents / 100;
+    }
+
+    public function getBalanceAttribute(): float
+    {
+        return $this->balance_cents / 100;
+    }
+
+    // Money mutators (convert dollars to cents)
+    public function setTuitionFeeAttribute(float $value): void
+    {
+        $this->tuition_fee_cents = (int) ($value * 100);
+    }
+
+    public function setMiscellaneousFeeAttribute(float $value): void
+    {
+        $this->miscellaneous_fee_cents = (int) ($value * 100);
+    }
+
+    public function setLaboratoryFeeAttribute(float $value): void
+    {
+        $this->laboratory_fee_cents = (int) ($value * 100);
+    }
+
+    public function setLibraryFeeAttribute(float $value): void
+    {
+        $this->library_fee_cents = (int) ($value * 100);
+    }
+
+    public function setSportsFeeAttribute(float $value): void
+    {
+        $this->sports_fee_cents = (int) ($value * 100);
+    }
+
+    public function setTotalAmountAttribute(float $value): void
+    {
+        $this->total_amount_cents = (int) ($value * 100);
+    }
+
+    public function setDiscountAttribute(float $value): void
+    {
+        $this->discount_cents = (int) ($value * 100);
+    }
+
+    public function setNetAmountAttribute(float $value): void
+    {
+        $this->net_amount_cents = (int) ($value * 100);
+    }
+
+    public function setAmountPaidAttribute(float $value): void
+    {
+        $this->amount_paid_cents = (int) ($value * 100);
+    }
+
+    public function setBalanceAttribute(float $value): void
+    {
+        $this->balance_cents = (int) ($value * 100);
+    }
+
     /**
      * Calculate the total amount before discount
      */
     public function calculateTotalAmount(): float
     {
-        return $this->tuition_fee
-            + $this->miscellaneous_fee
-            + $this->laboratory_fee
-            + $this->library_fee
-            + $this->sports_fee;
+        return ($this->tuition_fee_cents + $this->miscellaneous_fee_cents +
+                $this->laboratory_fee_cents + $this->library_fee_cents +
+                $this->sports_fee_cents) / 100;
     }
 
     /**
@@ -90,7 +184,7 @@ class Enrollment extends Model
      */
     public function calculateNetAmount(): float
     {
-        return $this->calculateTotalAmount() - $this->discount;
+        return ($this->total_amount_cents - $this->discount_cents) / 100;
     }
 
     /**
@@ -98,7 +192,7 @@ class Enrollment extends Model
      */
     public function calculateBalance(): float
     {
-        return $this->net_amount - $this->amount_paid;
+        return ($this->net_amount_cents - $this->amount_paid_cents) / 100;
     }
 
     /**
@@ -106,7 +200,7 @@ class Enrollment extends Model
      */
     public function isFullyPaid(): bool
     {
-        return $this->payment_status === 'paid' || $this->balance <= 0;
+        return $this->payment_status === PaymentStatus::PAID || $this->balance_cents <= 0;
     }
 
     /**
