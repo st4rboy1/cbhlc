@@ -192,9 +192,9 @@ class GradeLevelFee extends Model
     /**
      * Get fees for a specific grade level and school year
      */
-    public static function getFeesForGrade(GradeLevel $gradeLevel, string $schoolYear = null): ?self
+    public static function getFeesForGrade(GradeLevel $gradeLevel, ?string $schoolYear = null): ?self
     {
-        if (! $schoolYear) {
+        if (!$schoolYear) {
             $currentYear = date('Y');
             $nextYear = $currentYear + 1;
             $schoolYear = "{$currentYear}-{$nextYear}";

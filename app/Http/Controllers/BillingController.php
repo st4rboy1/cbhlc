@@ -46,7 +46,7 @@ class BillingController extends Controller
                         'library' => $fee->library_fee,
                         'sports' => $fee->sports_fee,
                         'total' => $fee->total_fee,
-                    ]
+                    ],
                 ];
             });
 
