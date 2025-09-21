@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BillingController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,9 +16,9 @@ Route::get('/enrollment', function () {
     return Inertia::render('enrollment');
 })->name('enrollment');
 
-Route::get('/invoice', function () {
-    return Inertia::render('invoice');
-})->name('invoice');
+Route::get('/invoice/{enrollmentId?}', [BillingController::class, 'invoice'])
+    ->middleware('auth')
+    ->name('invoice');
 
 Route::get('/profilesettings', function () {
     return Inertia::render('profilesettings');
@@ -35,9 +36,9 @@ Route::get('/studentreport', function () {
     return Inertia::render('studentreport');
 })->name('studentreport');
 
-Route::get('/tuition', function () {
-    return Inertia::render('tuition');
-})->name('tuition');
+Route::get('/tuition', [BillingController::class, 'tuition'])
+    ->middleware('auth')
+    ->name('tuition');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Admin dashboards (for super_admin and administrator roles)
