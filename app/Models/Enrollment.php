@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\EnrollmentStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\Quarter;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,9 +17,9 @@ class Enrollment extends Model
     protected $fillable = [
         'enrollment_id',
         'student_id',
-        'user_id',
+        'guardian_id',
         'school_year',
-        'semester',
+        'quarter',
         'status',
         'tuition_fee_cents',
         'miscellaneous_fee_cents',
@@ -40,6 +42,7 @@ class Enrollment extends Model
         'approved_at' => 'datetime',
         'payment_due_date' => 'date',
         'quarter' => Quarter::class,
+        'status' => EnrollmentStatus::class,
         'payment_status' => PaymentStatus::class,
     ];
 
@@ -52,11 +55,11 @@ class Enrollment extends Model
     }
 
     /**
-     * Get the user (parent) who created the enrollment
+     * Get the guardian who created the enrollment
      */
-    public function user(): BelongsTo
+    public function guardian(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'guardian_id');
     }
 
     /**
@@ -67,106 +70,87 @@ class Enrollment extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    // Money accessors (convert cents to dollars)
-    public function getTuitionFeeAttribute(): float
+    /**
+     * Money attributes using Laravel 12 Attribute syntax
+     */
+    protected function tuitionFee(): Attribute
     {
-        return $this->tuition_fee_cents / 100;
+        return Attribute::make(
+            get: fn () => $this->tuition_fee_cents / 100,
+            set: fn (float $value) => ['tuition_fee_cents' => (int) ($value * 100)]
+        );
     }
 
-    public function getMiscellaneousFeeAttribute(): float
+    protected function miscellaneousFee(): Attribute
     {
-        return $this->miscellaneous_fee_cents / 100;
+        return Attribute::make(
+            get: fn () => $this->miscellaneous_fee_cents / 100,
+            set: fn (float $value) => ['miscellaneous_fee_cents' => (int) ($value * 100)]
+        );
     }
 
-    public function getLaboratoryFeeAttribute(): float
+    protected function laboratoryFee(): Attribute
     {
-        return $this->laboratory_fee_cents / 100;
+        return Attribute::make(
+            get: fn () => $this->laboratory_fee_cents / 100,
+            set: fn (float $value) => ['laboratory_fee_cents' => (int) ($value * 100)]
+        );
     }
 
-    public function getLibraryFeeAttribute(): float
+    protected function libraryFee(): Attribute
     {
-        return $this->library_fee_cents / 100;
+        return Attribute::make(
+            get: fn () => $this->library_fee_cents / 100,
+            set: fn (float $value) => ['library_fee_cents' => (int) ($value * 100)]
+        );
     }
 
-    public function getSportsFeeAttribute(): float
+    protected function sportsFee(): Attribute
     {
-        return $this->sports_fee_cents / 100;
+        return Attribute::make(
+            get: fn () => $this->sports_fee_cents / 100,
+            set: fn (float $value) => ['sports_fee_cents' => (int) ($value * 100)]
+        );
     }
 
-    public function getTotalAmountAttribute(): float
+    protected function totalAmount(): Attribute
     {
-        return $this->total_amount_cents / 100;
+        return Attribute::make(
+            get: fn () => $this->total_amount_cents / 100,
+            set: fn (float $value) => ['total_amount_cents' => (int) ($value * 100)]
+        );
     }
 
-    public function getDiscountAttribute(): float
+    protected function discount(): Attribute
     {
-        return $this->discount_cents / 100;
+        return Attribute::make(
+            get: fn () => $this->discount_cents / 100,
+            set: fn (float $value) => ['discount_cents' => (int) ($value * 100)]
+        );
     }
 
-    public function getNetAmountAttribute(): float
+    protected function netAmount(): Attribute
     {
-        return $this->net_amount_cents / 100;
+        return Attribute::make(
+            get: fn () => $this->net_amount_cents / 100,
+            set: fn (float $value) => ['net_amount_cents' => (int) ($value * 100)]
+        );
     }
 
-    public function getAmountPaidAttribute(): float
+    protected function amountPaid(): Attribute
     {
-        return $this->amount_paid_cents / 100;
+        return Attribute::make(
+            get: fn () => $this->amount_paid_cents / 100,
+            set: fn (float $value) => ['amount_paid_cents' => (int) ($value * 100)]
+        );
     }
 
-    public function getBalanceAttribute(): float
+    protected function balance(): Attribute
     {
-        return $this->balance_cents / 100;
-    }
-
-    // Money mutators (convert dollars to cents)
-    public function setTuitionFeeAttribute(float $value): void
-    {
-        $this->tuition_fee_cents = (int) ($value * 100);
-    }
-
-    public function setMiscellaneousFeeAttribute(float $value): void
-    {
-        $this->miscellaneous_fee_cents = (int) ($value * 100);
-    }
-
-    public function setLaboratoryFeeAttribute(float $value): void
-    {
-        $this->laboratory_fee_cents = (int) ($value * 100);
-    }
-
-    public function setLibraryFeeAttribute(float $value): void
-    {
-        $this->library_fee_cents = (int) ($value * 100);
-    }
-
-    public function setSportsFeeAttribute(float $value): void
-    {
-        $this->sports_fee_cents = (int) ($value * 100);
-    }
-
-    public function setTotalAmountAttribute(float $value): void
-    {
-        $this->total_amount_cents = (int) ($value * 100);
-    }
-
-    public function setDiscountAttribute(float $value): void
-    {
-        $this->discount_cents = (int) ($value * 100);
-    }
-
-    public function setNetAmountAttribute(float $value): void
-    {
-        $this->net_amount_cents = (int) ($value * 100);
-    }
-
-    public function setAmountPaidAttribute(float $value): void
-    {
-        $this->amount_paid_cents = (int) ($value * 100);
-    }
-
-    public function setBalanceAttribute(float $value): void
-    {
-        $this->balance_cents = (int) ($value * 100);
+        return Attribute::make(
+            get: fn () => $this->balance_cents / 100,
+            set: fn (float $value) => ['balance_cents' => (int) ($value * 100)]
+        );
     }
 
     /**
@@ -208,6 +192,6 @@ class Enrollment extends Model
      */
     public function isApproved(): bool
     {
-        return $this->status === 'approved' || $this->status === 'enrolled';
+        return $this->status->isApproved();
     }
 }
