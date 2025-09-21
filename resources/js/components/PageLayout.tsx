@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,9 +9,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { type SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
-import { Bell, User } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 import Sidebar from './Sidebar';
 
@@ -32,7 +29,6 @@ interface Notification {
 }
 
 export default function PageLayout({ children, title, currentPage = '' }: PageLayoutProps) {
-    const { auth } = usePage<SharedData>().props;
     const [notifications] = useState<Notification[]>([
         {
             id: 1,
@@ -110,32 +106,6 @@ export default function PageLayout({ children, title, currentPage = '' }: PageLa
                                     <DropdownMenuItem className="w-full text-center">View all notifications</DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
-
-                            {/* User Menu */}
-                            <div className="flex items-center gap-3">
-                                <span className="text-sm text-muted-foreground">Welcome, {auth.user?.name || 'User'}!</span>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon">
-                                            <Avatar className="h-8 w-8">
-                                                <AvatarImage src="/api/placeholder/32/32" />
-                                                <AvatarFallback>
-                                                    <User className="h-4 w-4" />
-                                                </AvatarFallback>
-                                            </Avatar>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem>Profile</DropdownMenuItem>
-                                        <DropdownMenuItem>Settings</DropdownMenuItem>
-                                        <DropdownMenuItem>Support</DropdownMenuItem>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem className="text-destructive">Log out</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
                         </div>
                     </div>
                 </header>
