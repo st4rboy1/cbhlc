@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\Parent\StudentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -60,6 +61,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('student/dashboard', function () {
         return Inertia::render('student/dashboard');
     })->middleware('role:student')->name('student.dashboard');
+
+    // Parent routes for managing students
+    Route::middleware('role:parent')->prefix('parent')->name('parent.')->group(function () {
+        Route::resource('students', StudentController::class);
+        Route::post('students/{student}/create-login', [StudentController::class, 'createLogin'])
+            ->name('students.create-login');
+    });
 });
 
 require __DIR__.'/settings.php';
