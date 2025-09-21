@@ -42,13 +42,13 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Registration is now limited to parents only
-        $user->assignRole('parent');
+        // Registration is now limited to guardians only
+        $user->assignRole('guardian');
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect()->route('parent.dashboard');
+        return redirect()->route('guardian.dashboard');
     }
 }
