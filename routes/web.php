@@ -41,6 +41,10 @@ Route::get('/tuition', [BillingController::class, 'tuition'])
     ->middleware('auth')
     ->name('tuition');
 
+Route::put('/billing/payment/{enrollmentId}', [BillingController::class, 'updatePayment'])
+    ->middleware('auth')
+    ->name('billing.updatePayment');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     // Admin dashboards (for super_admin and administrator roles)
     Route::get('admin/dashboard', function () {
