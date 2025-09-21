@@ -17,23 +17,23 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // parent who enrolled
             $table->string('school_year');
-            $table->enum('semester', ['First', 'Second', 'Summer'])->nullable();
+            $table->string('semester')->nullable(); // Will use Semester enum in model
             $table->enum('status', ['pending', 'approved', 'rejected', 'enrolled'])->default('pending');
 
-            // Billing Information
-            $table->decimal('tuition_fee', 10, 2);
-            $table->decimal('miscellaneous_fee', 10, 2)->default(0);
-            $table->decimal('laboratory_fee', 10, 2)->default(0);
-            $table->decimal('library_fee', 10, 2)->default(0);
-            $table->decimal('sports_fee', 10, 2)->default(0);
-            $table->decimal('total_amount', 10, 2);
-            $table->decimal('discount', 10, 2)->default(0);
-            $table->decimal('net_amount', 10, 2);
+            // Billing Information (stored in cents for precision)
+            $table->integer('tuition_fee_cents');
+            $table->integer('miscellaneous_fee_cents')->default(0);
+            $table->integer('laboratory_fee_cents')->default(0);
+            $table->integer('library_fee_cents')->default(0);
+            $table->integer('sports_fee_cents')->default(0);
+            $table->integer('total_amount_cents');
+            $table->integer('discount_cents')->default(0);
+            $table->integer('net_amount_cents');
 
-            // Payment Status
-            $table->enum('payment_status', ['pending', 'partial', 'paid'])->default('pending');
-            $table->decimal('amount_paid', 10, 2)->default(0);
-            $table->decimal('balance', 10, 2);
+            // Payment Status (stored in cents for precision)
+            $table->string('payment_status')->default('pending'); // Will use PaymentStatus enum in model
+            $table->integer('amount_paid_cents')->default(0);
+            $table->integer('balance_cents');
             $table->date('payment_due_date')->nullable();
 
             // Additional Information
