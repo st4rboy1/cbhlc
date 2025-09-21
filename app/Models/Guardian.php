@@ -38,9 +38,7 @@ class Guardian extends Model
      */
     public function children(): BelongsToMany
     {
-        // Note: Using 'parent_students' table with 'parent_id' for backward compatibility
-        // The 'parent_id' conceptually represents guardian_id in this context
-        return $this->belongsToMany(Student::class, 'parent_students', 'parent_id', 'student_id')
+        return $this->belongsToMany(Student::class, 'guardian_students', 'guardian_id', 'student_id')
             ->withPivot(['relationship_type', 'is_primary_contact'])
             ->withTimestamps();
     }

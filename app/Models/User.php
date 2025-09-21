@@ -115,9 +115,7 @@ class User extends Authenticatable
      */
     public function children(): BelongsToMany
     {
-        // Note: Table still named 'parent_students' for backward compatibility
-        // but conceptually this represents guardian-student relationships
-        return $this->belongsToMany(Student::class, 'parent_students', 'parent_id', 'student_id')
+        return $this->belongsToMany(Student::class, 'guardian_students', 'guardian_id', 'student_id')
             ->withPivot(['relationship_type', 'is_primary_contact'])
             ->withTimestamps();
     }
@@ -130,4 +128,5 @@ class User extends Authenticatable
     {
         return Enrollment::whereIn('student_id', $this->children()->pluck('students.id'));
     }
+
 }

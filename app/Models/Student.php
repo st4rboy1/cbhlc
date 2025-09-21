@@ -70,7 +70,7 @@ class Student extends Model
      */
     public function parents(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'parent_students', 'student_id', 'parent_id')
+        return $this->belongsToMany(User::class, 'guardian_students', 'student_id', 'guardian_id')
             ->withPivot(['relationship_type', 'is_primary_contact'])
             ->withTimestamps();
     }
