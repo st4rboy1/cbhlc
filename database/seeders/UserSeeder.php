@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\GradeLevel;
-use App\Models\ParentStudent;
+use App\Models\GuardianStudent;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -119,8 +119,8 @@ class UserSeeder extends Seeder
         );
 
         // Link student to guardian (check if relationship already exists)
-        ParentStudent::firstOrCreate([
-            'parent_id' => $guardian->id,
+        GuardianStudent::firstOrCreate([
+            'guardian_id' => $guardian->id,
             'student_id' => $student1->id,
         ], [
             'relationship_type' => 'mother',
@@ -158,8 +158,8 @@ class UserSeeder extends Seeder
         );
 
         // Link second student to guardian
-        ParentStudent::firstOrCreate([
-            'parent_id' => $guardian->id,
+        GuardianStudent::firstOrCreate([
+            'guardian_id' => $guardian->id,
             'student_id' => $student2->id,
         ], [
             'relationship_type' => 'mother',

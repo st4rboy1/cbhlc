@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Guardian;
 use App\Enums\GradeLevel;
 use App\Enums\RelationshipType;
 use App\Http\Controllers\Controller;
-use App\Models\ParentStudent;
+use App\Models\GuardianStudent;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -120,8 +120,8 @@ class StudentController extends Controller
             $student->update(['user_id' => $user->id]);
 
             // Create guardian-student relationship
-            ParentStudent::create([
-                'parent_id' => $guardian->id,
+            GuardianStudent::create([
+                'guardian_id' => $guardian->id,
                 'student_id' => $student->id,
                 'relationship_type' => $validated['relationship_type'],
                 'is_primary_contact' => $validated['is_primary_contact'] ?? false,
