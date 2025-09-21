@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Enrollment;
-use App\Models\Student;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -77,7 +76,7 @@ class BillingController extends Controller
                     ->find($enrollmentId);
             }
 
-            if (!$enrollment) {
+            if (! $enrollment) {
                 abort(404, 'Enrollment not found or you do not have permission to view this invoice.');
             }
         } else {
@@ -91,7 +90,7 @@ class BillingController extends Controller
         }
 
         // If no enrollment found, create sample data for display purposes
-        if (!$enrollment) {
+        if (! $enrollment) {
             $enrollment = $this->createSampleEnrollment();
         }
 
@@ -108,16 +107,16 @@ class BillingController extends Controller
     private function createSampleEnrollment()
     {
         return (object) [
-            'enrollment_id' => 'ENR-' . date('Y') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT),
+            'enrollment_id' => 'ENR-'.date('Y').'-'.str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT),
             'student' => (object) [
                 'first_name' => 'Sample',
                 'last_name' => 'Student',
                 'middle_name' => 'Middle',
-                'student_id' => 'STU-' . date('Y') . '-001',
+                'student_id' => 'STU-'.date('Y').'-001',
                 'grade_level' => 'Grade 7',
                 'section' => 'Section A',
             ],
-            'school_year' => date('Y') . '-' . (date('Y') + 1),
+            'school_year' => date('Y').'-'.(date('Y') + 1),
             'semester' => 'First',
             'tuition_fee' => 22000,
             'miscellaneous_fee' => 3000,
@@ -143,7 +142,7 @@ class BillingController extends Controller
         $user = $request->user();
 
         // Only admin users can update payment status
-        if (!$user->hasRole(['super_admin', 'administrator', 'registrar'])) {
+        if (! $user->hasRole(['super_admin', 'administrator', 'registrar'])) {
             abort(403, 'Unauthorized action.');
         }
 
