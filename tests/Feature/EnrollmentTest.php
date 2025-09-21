@@ -14,7 +14,7 @@ beforeEach(function () {
 });
 
 test('enrollment model stores money values in cents and returns float', function () {
-    $enrollment = new Enrollment();
+    $enrollment = new Enrollment;
 
     // Test tuition fee attribute
     $enrollment->tuition_fee = 15000.50;
@@ -130,7 +130,7 @@ test('enrollment model enum casting works correctly', function () {
 });
 
 test('enrollment model handles zero amounts correctly', function () {
-    $enrollment = new Enrollment();
+    $enrollment = new Enrollment;
 
     $enrollment->discount = 0.00;
     expect($enrollment->discount_cents)->toBe(0);
@@ -142,7 +142,7 @@ test('enrollment model handles zero amounts correctly', function () {
 });
 
 test('enrollment model handles large amounts correctly', function () {
-    $enrollment = new Enrollment();
+    $enrollment = new Enrollment;
 
     // Test very large amounts
     $enrollment->tuition_fee = 999999.99;
@@ -156,7 +156,7 @@ test('enrollment model handles large amounts correctly', function () {
 });
 
 test('enrollment model handles negative amounts correctly', function () {
-    $enrollment = new Enrollment();
+    $enrollment = new Enrollment;
 
     // Test negative discount (which shouldn't happen but should handle gracefully)
     $enrollment->discount = -100.50;
@@ -165,7 +165,7 @@ test('enrollment model handles negative amounts correctly', function () {
 });
 
 test('enrollment model Laravel 12 attribute syntax works correctly', function () {
-    $enrollment = new Enrollment();
+    $enrollment = new Enrollment;
 
     // Test all money fields use Laravel 12 Attribute syntax
     $moneyFields = [
