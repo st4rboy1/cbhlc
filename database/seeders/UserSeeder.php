@@ -28,98 +28,132 @@ class UserSeeder extends Seeder
     private function createDefaultUsers(): void
     {
         // Super Admin
-        $superAdmin = User::create([
-            'name' => 'Super Admin',
-            'email' => 'super.admin@cbhlc.edu',
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'),
-        ]);
-        $superAdmin->assignRole('super_admin');
+        $superAdmin = User::firstOrCreate(
+            ['email' => 'super.admin@cbhlc.edu'],
+            [
+                'name' => 'Super Admin',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+            ]
+        );
+        if (!$superAdmin->hasRole('super_admin')) {
+            $superAdmin->assignRole('super_admin');
+        }
 
         // Administrator
-        $admin = User::create([
-            'name' => 'Administrator',
-            'email' => 'admin@cbhlc.edu',
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'),
-        ]);
-        $admin->assignRole('administrator');
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@cbhlc.edu'],
+            [
+                'name' => 'Administrator',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+            ]
+        );
+        if (!$admin->hasRole('administrator')) {
+            $admin->assignRole('administrator');
+        }
 
         // Registrar
-        $registrar = User::create([
-            'name' => 'Registrar User',
-            'email' => 'registrar@cbhlc.edu',
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'),
-        ]);
-        $registrar->assignRole('registrar');
+        $registrar = User::firstOrCreate(
+            ['email' => 'registrar@cbhlc.edu'],
+            [
+                'name' => 'Registrar User',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+            ]
+        );
+        if (!$registrar->hasRole('registrar')) {
+            $registrar->assignRole('registrar');
+        }
 
-        // Parent with children
-        $parent = User::create([
-            'name' => 'Maria Santos',
-            'email' => 'maria.santos@example.com',
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'),
-        ]);
-        $parent->assignRole('parent');
+        // Guardian with children
+        $guardian = User::firstOrCreate(
+            ['email' => 'maria.santos@example.com'],
+            [
+                'name' => 'Maria Santos',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+            ]
+        );
+        if (!$guardian->hasRole('guardian')) {
+            $guardian->assignRole('guardian');
+        }
 
-        // Create students linked to the parent
-        $this->createStudentsForParent($parent);
+        // Create students linked to the guardian
+        $this->createStudentsForGuardian($guardian);
     }
 
     /**
-     * Create student records for a parent
+     * Create student records for a guardian (all students get login accounts)
      */
-    private function createStudentsForParent(User $parent): void
+    private function createStudentsForGuardian(User $guardian): void
     {
         // Create first child with login account
-        $studentUser1 = User::create([
-            'name' => 'Juan Santos',
-            'email' => 'juan.santos@student.cbhlc.edu',
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'),
-        ]);
-        $studentUser1->assignRole('student');
+        $studentUser1 = User::firstOrCreate(
+            ['email' => 'juan.santos@student.cbhlc.edu'],
+            [
+                'name' => 'Juan Santos',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+            ]
+        );
+        if (!$studentUser1->hasRole('student')) {
+            $studentUser1->assignRole('student');
+        }
 
-        $student1 = Student::create([
-            'student_id' => Student::generateStudentId(),
-            'first_name' => 'Juan',
-            'middle_name' => 'Garcia',
-            'last_name' => 'Santos',
-            'birthdate' => '2012-03-15',
-            'gender' => 'male',
-            'grade_level' => GradeLevel::GRADE_6,
-            'address' => '123 Rizal Street, Pasig City',
-            'phone' => '+63912345678',
-            'user_id' => $studentUser1->id,
-        ]);
+        $student1 = Student::firstOrCreate(
+            ['first_name' => 'Juan', 'last_name' => 'Santos', 'birthdate' => '2012-03-15'],
+            [
+                'student_id' => Student::generateStudentId(),
+                'middle_name' => 'Garcia',
+                'gender' => 'male',
+                'grade_level' => GradeLevel::GRADE_6,
+                'address' => '123 Rizal Street, Pasig City',
+                'phone' => '+63912345678',
+                'user_id' => $studentUser1->id,
+            ]
+        );
 
-        // Link student to parent
-        ParentStudent::create([
-            'parent_id' => $parent->id,
+        // Link student to guardian (check if relationship already exists)
+        ParentStudent::firstOrCreate([
+            'parent_id' => $guardian->id,
             'student_id' => $student1->id,
+        ], [
             'relationship_type' => 'mother',
             'is_primary_contact' => true,
         ]);
 
-        // Create second child without login account
-        $student2 = Student::create([
-            'student_id' => Student::generateStudentId(),
-            'first_name' => 'Ana',
-            'middle_name' => 'Garcia',
-            'last_name' => 'Santos',
-            'birthdate' => '2015-08-22',
-            'gender' => 'female',
-            'grade_level' => GradeLevel::GRADE_3,
-            'address' => '123 Rizal Street, Pasig City',
-            'phone' => '+63912345678',
-            'user_id' => null,
-        ]);
+        // Create second child with login account (all students now get login accounts)
+        $studentUser2 = User::firstOrCreate(
+            ['email' => 'ana.santos@student.cbhlc.edu'],
+            [
+                'name' => 'Ana Santos',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+            ]
+        );
+        if (!$studentUser2->hasRole('student')) {
+            $studentUser2->assignRole('student');
+        }
 
-        // Link second student to parent
-        ParentStudent::create([
-            'parent_id' => $parent->id,
+        $student2 = Student::firstOrCreate(
+            ['first_name' => 'Ana', 'last_name' => 'Santos', 'birthdate' => '2015-08-22'],
+            [
+                'student_id' => Student::generateStudentId(),
+                'middle_name' => 'Garcia',
+                'gender' => 'female',
+                'grade_level' => GradeLevel::GRADE_3,
+                'address' => '123 Rizal Street, Pasig City',
+                'phone' => '+63912345678',
+                'user_id' => $studentUser2->id,
+            ]
+        );
+
+        // Link second student to guardian
+        ParentStudent::firstOrCreate([
+            'parent_id' => $guardian->id,
             'student_id' => $student2->id,
+        ], [
             'relationship_type' => 'mother',
             'is_primary_contact' => false,
         ]);
