@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PaymentStatus;
 use App\Models\Enrollment;
+use App\Models\GradeLevelFee;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -24,30 +26,29 @@ class BillingController extends Controller
                 ->paginate(10);
         } elseif ($user->hasRole('parent')) {
             // Parents can only see their children's enrollments
+            $studentIds = $user->children()->pluck('students.id');
             $enrollments = Enrollment::with(['student', 'user'])
-                ->where('user_id', $user->id)
+                ->whereIn('student_id', $studentIds)
                 ->latest()
                 ->paginate(10);
         }
 
-        // Calculate grade level fees (static for now)
-        $gradeLevelFees = [
-            'Nursery' => ['tuition' => 15000, 'miscellaneous' => 2000],
-            'Kinder 1' => ['tuition' => 16000, 'miscellaneous' => 2200],
-            'Kinder 2' => ['tuition' => 16000, 'miscellaneous' => 2200],
-            'Grade 1' => ['tuition' => 18000, 'miscellaneous' => 2500],
-            'Grade 2' => ['tuition' => 18000, 'miscellaneous' => 2500],
-            'Grade 3' => ['tuition' => 18000, 'miscellaneous' => 2500],
-            'Grade 4' => ['tuition' => 19000, 'miscellaneous' => 2800],
-            'Grade 5' => ['tuition' => 19000, 'miscellaneous' => 2800],
-            'Grade 6' => ['tuition' => 19000, 'miscellaneous' => 2800],
-            'Grade 7' => ['tuition' => 22000, 'miscellaneous' => 3000],
-            'Grade 8' => ['tuition' => 22000, 'miscellaneous' => 3000],
-            'Grade 9' => ['tuition' => 22000, 'miscellaneous' => 3000],
-            'Grade 10' => ['tuition' => 22000, 'miscellaneous' => 3000],
-            'Grade 11' => ['tuition' => 25000, 'miscellaneous' => 3500],
-            'Grade 12' => ['tuition' => 25000, 'miscellaneous' => 3500],
-        ];
+        // Get configurable grade level fees for current school year
+        $gradeLevelFees = GradeLevelFee::currentSchoolYear()
+            ->active()
+            ->get()
+            ->mapWithKeys(function ($fee) {
+                return [
+                    $fee->grade_level->value => [
+                        'tuition' => $fee->tuition_fee,
+                        'miscellaneous' => $fee->miscellaneous_fee,
+                        'laboratory' => $fee->laboratory_fee,
+                        'library' => $fee->library_fee,
+                        'sports' => $fee->sports_fee,
+                        'total' => $fee->total_fee,
+                    ]
+                ];
+            });
 
         return Inertia::render('tuition', [
             'enrollments' => $enrollments,
@@ -72,7 +73,8 @@ class BillingController extends Controller
                 $enrollment = $query->find($enrollmentId);
             } elseif ($user->hasRole('parent')) {
                 // Parents can only see their children's invoices
-                $enrollment = $query->where('user_id', $user->id)
+                $studentIds = $user->children()->pluck('students.id');
+                $enrollment = $query->whereIn('student_id', $studentIds)
                     ->find($enrollmentId);
             }
 
@@ -82,56 +84,19 @@ class BillingController extends Controller
         } else {
             // Get the latest enrollment for the user if no ID specified
             if ($user->hasRole('parent')) {
+                $studentIds = $user->children()->pluck('students.id');
                 $enrollment = Enrollment::with(['student', 'user'])
-                    ->where('user_id', $user->id)
+                    ->whereIn('student_id', $studentIds)
                     ->latest()
                     ->first();
             }
         }
 
-        // If no enrollment found, create sample data for display purposes
-        if (! $enrollment) {
-            $enrollment = $this->createSampleEnrollment();
-        }
-
         return Inertia::render('invoice', [
             'enrollment' => $enrollment,
-            'invoiceNumber' => $enrollment->enrollment_id ?? 'INV-2025-001',
+            'invoiceNumber' => $enrollment?->enrollment_id ?? 'No Invoice Available',
             'currentDate' => now()->format('F d, Y'),
         ]);
-    }
-
-    /**
-     * Create sample enrollment data for display purposes
-     */
-    private function createSampleEnrollment()
-    {
-        return (object) [
-            'enrollment_id' => 'ENR-'.date('Y').'-'.str_pad((string) rand(1, 999), 3, '0', STR_PAD_LEFT),
-            'student' => (object) [
-                'first_name' => 'Sample',
-                'last_name' => 'Student',
-                'middle_name' => 'Middle',
-                'student_id' => 'STU-'.date('Y').'-001',
-                'grade_level' => 'Grade 7',
-                'section' => 'Section A',
-            ],
-            'school_year' => date('Y').'-'.(date('Y') + 1),
-            'semester' => 'First',
-            'tuition_fee' => 22000,
-            'miscellaneous_fee' => 3000,
-            'laboratory_fee' => 500,
-            'library_fee' => 300,
-            'sports_fee' => 200,
-            'total_amount' => 26000,
-            'discount' => 0,
-            'net_amount' => 26000,
-            'amount_paid' => 0,
-            'balance' => 26000,
-            'payment_status' => 'pending',
-            'payment_due_date' => now()->addMonth()->format('Y-m-d'),
-            'created_at' => now(),
-        ];
     }
 
     /**
@@ -148,14 +113,14 @@ class BillingController extends Controller
 
         $validated = $request->validate([
             'amount_paid' => 'required|numeric|min:0',
-            'payment_status' => 'required|in:pending,partial,paid',
+            'payment_status' => ['required', 'in:'.implode(',', PaymentStatus::values())],
             'remarks' => 'nullable|string|max:500',
         ]);
 
         $enrollment = Enrollment::findOrFail($enrollmentId);
 
         $enrollment->amount_paid = $validated['amount_paid'];
-        $enrollment->payment_status = $validated['payment_status'];
+        $enrollment->payment_status = PaymentStatus::from($validated['payment_status']);
         $enrollment->balance = $enrollment->net_amount - $validated['amount_paid'];
 
         if ($validated['remarks']) {
