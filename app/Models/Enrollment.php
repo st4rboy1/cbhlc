@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Enums\PaymentStatus;
-use App\Enums\Semester;
+use App\Enums\Quarter;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,7 +39,7 @@ class Enrollment extends Model
     protected $casts = [
         'approved_at' => 'datetime',
         'payment_due_date' => 'date',
-        'semester' => Semester::class,
+        'quarter' => Quarter::class,
         'payment_status' => PaymentStatus::class,
     ];
 

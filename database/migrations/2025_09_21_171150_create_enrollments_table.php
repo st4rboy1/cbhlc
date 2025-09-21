@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // parent who enrolled
             $table->string('school_year');
-            $table->string('semester')->nullable(); // Will use Semester enum in model
+            $table->string('quarter')->nullable(); // Will use Quarter enum in model
             $table->enum('status', ['pending', 'approved', 'rejected', 'enrolled'])->default('pending');
 
             // Billing Information (stored in cents for precision)
