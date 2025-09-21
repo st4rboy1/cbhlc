@@ -34,7 +34,6 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:parent,student',
         ]);
 
         $user = User::create([
@@ -43,20 +42,13 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Assign the selected role to the user
-        $user->assignRole($request->role);
+        // Registration is now limited to parents only
+        $user->assignRole('parent');
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        // Determine the dashboard route based on assigned role
-        $dashboardRoute = match ($request->role) {
-            'parent' => 'parent.dashboard',
-            'student' => 'student.dashboard',
-            default => 'home'
-        };
-
-        return redirect()->route($dashboardRoute);
+        return redirect()->route('parent.dashboard');
     }
 }
