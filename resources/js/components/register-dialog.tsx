@@ -4,9 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Form } from '@inertiajs/react';
-import { GraduationCap, LoaderCircle, UserCircle } from 'lucide-react';
+import { LoaderCircle, UserCircle } from 'lucide-react';
 
 interface RegisterDialogProps {
     isOpen: boolean;
@@ -46,37 +45,17 @@ export function RegisterDialog({ isOpen, onOpenChange, onLoginClick }: RegisterD
                                     <InputError message={errors.name} className="mt-2" />
                                 </div>
 
-                                <div className="grid gap-2">
-                                    <Label>I am registering as a</Label>
-                                    <RadioGroup defaultValue="parent" name="role" className="grid grid-cols-1 gap-3">
-                                        <label
-                                            htmlFor="parent"
-                                            className="flex cursor-pointer items-center space-x-3 rounded-lg border border-input p-3 transition-colors hover:border-accent-foreground/20 hover:bg-accent has-[:checked]:border-primary has-[:checked]:bg-accent"
-                                        >
-                                            <RadioGroupItem value="parent" id="parent" />
-                                            <div className="flex items-center space-x-2">
-                                                <UserCircle className="h-5 w-5 text-muted-foreground" />
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-medium">Parent/Guardian</span>
-                                                    <span className="text-xs text-muted-foreground">Enrolling a child</span>
-                                                </div>
-                                            </div>
-                                        </label>
-                                        <label
-                                            htmlFor="student"
-                                            className="flex cursor-pointer items-center space-x-3 rounded-lg border border-input p-3 transition-colors hover:border-accent-foreground/20 hover:bg-accent has-[:checked]:border-primary has-[:checked]:bg-accent"
-                                        >
-                                            <RadioGroupItem value="student" id="student" />
-                                            <div className="flex items-center space-x-2">
-                                                <GraduationCap className="h-5 w-5 text-muted-foreground" />
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm font-medium">Student</span>
-                                                    <span className="text-xs text-muted-foreground">18+ years old</span>
-                                                </div>
-                                            </div>
-                                        </label>
-                                    </RadioGroup>
-                                    <InputError message={errors.role} />
+                                {/* Registration is now limited to parents only */}
+                                <div className="rounded-lg border border-input bg-muted/50 p-3">
+                                    <div className="flex items-center space-x-2">
+                                        <UserCircle className="h-5 w-5 text-muted-foreground" />
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-medium">Parent/Guardian Registration</span>
+                                            <span className="text-xs text-muted-foreground">
+                                                Registration is limited to parents and guardians only
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="grid gap-2">
