@@ -32,16 +32,6 @@ class Student extends Model
     ];
 
     /**
-     * Get the full name of the student
-     */
-    public function getFullNameAttribute(): string
-    {
-        $middle = $this->middle_name ? " {$this->middle_name}" : '';
-
-        return "{$this->first_name}{$middle} {$this->last_name}";
-    }
-
-    /**
      * Get the user associated with the student (if any)
      */
     public function user(): BelongsTo
@@ -58,14 +48,6 @@ class Student extends Model
     }
 
     /**
-     * Get the current enrollment
-     */
-    public function currentEnrollment()
-    {
-        return $this->enrollments()->where('status', 'enrolled')->latest()->first();
-    }
-
-    /**
      * Get the parents associated with this student
      */
     public function parents(): BelongsToMany
@@ -73,15 +55,6 @@ class Student extends Model
         return $this->belongsToMany(User::class, 'guardian_students', 'student_id', 'guardian_id')
             ->withPivot(['relationship_type', 'is_primary_contact'])
             ->withTimestamps();
-    }
-
-    /**
-     * Get the primary parent contact
-     */
-    public function primaryParent()
-    {
-        return $this->parents()->wherePivot('is_primary_contact', true)->first() ??
-               $this->parents()->first();
     }
 
     /**
