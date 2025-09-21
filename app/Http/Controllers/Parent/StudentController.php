@@ -27,7 +27,7 @@ class StudentController extends Controller
         $children = $parent->children()
             ->with('user')
             ->get()
-            ->map(function ($student) {
+            ->map(function (Student $student) {
                 return [
                     'id' => $student->id,
                     'student_id' => $student->student_id,
@@ -35,7 +35,7 @@ class StudentController extends Controller
                     'middle_name' => $student->middle_name,
                     'last_name' => $student->last_name,
                     'full_name' => trim($student->first_name.' '.$student->middle_name.' '.$student->last_name),
-                    'birthdate' => $student->birthdate?->format('M d, Y'),
+                    'birthdate' => $student->birthdate->format('M d, Y'),
                     'grade_level' => $student->grade_level,
                     'relationship_type' => $student->pivot->relationship_type,
                     'is_primary_contact' => $student->pivot->is_primary_contact,
@@ -158,7 +158,7 @@ class StudentController extends Controller
             'first_name' => $student->first_name,
             'middle_name' => $student->middle_name,
             'last_name' => $student->last_name,
-            'birthdate' => $student->birthdate?->format('Y-m-d'),
+            'birthdate' => $student->birthdate->format('Y-m-d'),
             'grade_level' => $student->grade_level,
             'gender' => $student->gender,
             'address' => $student->address,
