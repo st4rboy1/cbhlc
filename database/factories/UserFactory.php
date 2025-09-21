@@ -82,12 +82,12 @@ class UserFactory extends Factory
     }
 
     /**
-     * Indicate that the user is a parent.
+     * Indicate that the user is a guardian.
      */
-    public function parent(): static
+    public function guardian(): static
     {
         return $this->afterCreating(function (\App\Models\User $user) {
-            $user->syncRoles('parent');
+            $user->syncRoles('guardian');
         });
     }
 
