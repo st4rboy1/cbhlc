@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('enrollment_id')->unique();
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // parent who enrolled
+            $table->foreignId('guardian_id')->constrained('users')->onDelete('cascade'); // guardian who enrolled
             $table->string('school_year');
             $table->string('quarter')->nullable(); // Will use Quarter enum in model
-            $table->enum('status', ['pending', 'approved', 'rejected', 'enrolled'])->default('pending');
+            $table->string('status')->default('pending'); // Will use EnrollmentStatus enum in model
 
             // Billing Information (stored in cents for precision)
             $table->integer('tuition_fee_cents');
