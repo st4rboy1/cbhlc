@@ -39,10 +39,10 @@ describe('tuition method', function () {
                 'tuition_fee_cents' => 2000000,
                 'miscellaneous_fee_cents' => 500000,
                 'laboratory_fee_cents' => 200000,
-                'total_amount_cents' =>27000,
-                'net_amount_cents' =>27000,
-                'amount_paid_cents' =>0,
-                'balance_cents' =>27000,
+                'total_amount_cents' => 27000,
+                'net_amount_cents' => 27000,
+                'amount_paid_cents' => 0,
+                'balance_cents' => 27000,
                 'payment_status' => PaymentStatus::PENDING,
             ]);
         }
@@ -103,10 +103,10 @@ describe('tuition method', function () {
                 'status' => EnrollmentStatus::APPROVED,
                 'tuition_fee_cents' => 2000000,
                 'miscellaneous_fee_cents' => 500000,
-                'total_amount_cents' =>25000,
-                'net_amount_cents' =>25000,
-                'amount_paid_cents' =>0,
-                'balance_cents' =>25000,
+                'total_amount_cents' => 25000,
+                'net_amount_cents' => 25000,
+                'amount_paid_cents' => 0,
+                'balance_cents' => 25000,
                 'payment_status' => PaymentStatus::PENDING,
             ]);
         }
@@ -152,12 +152,12 @@ describe('tuition method', function () {
                 'quarter' => Quarter::FIRST,
                 'grade_level' => GradeLevel::GRADE_3,
                 'status' => EnrollmentStatus::APPROVED,
-                'tuition_fee_cents' =>22000,
-                'miscellaneous_fee_cents' =>5500,
-                'total_amount_cents' =>27500,
-                'net_amount_cents' =>27500,
-                'amount_paid_cents' =>0,
-                'balance_cents' =>27500,
+                'tuition_fee_cents' => 22000,
+                'miscellaneous_fee_cents' => 5500,
+                'total_amount_cents' => 27500,
+                'net_amount_cents' => 27500,
+                'amount_paid_cents' => 0,
+                'balance_cents' => 27500,
                 'payment_status' => PaymentStatus::PENDING,
             ]);
         });
