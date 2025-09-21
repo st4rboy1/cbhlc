@@ -35,7 +35,7 @@ describe('tuition method', function () {
                 'school_year' => '2024-2025',
                 'quarter' => Quarter::FIRST,
                 'grade_level' => GradeLevel::GRADE_1,
-                'status' => EnrollmentStatus::APPROVED,
+                'enrollment_status' => EnrollmentStatus::APPROVED,
                 'tuition_fee_cents' => 2000000,
                 'miscellaneous_fee_cents' => 500000,
                 'laboratory_fee_cents' => 200000,
@@ -100,7 +100,7 @@ describe('tuition method', function () {
                 'school_year' => '2024-2025',
                 'quarter' => Quarter::FIRST,
                 'grade_level' => GradeLevel::GRADE_1,
-                'status' => EnrollmentStatus::APPROVED,
+                'enrollment_status' => EnrollmentStatus::APPROVED,
                 'tuition_fee_cents' => 2000000,
                 'miscellaneous_fee_cents' => 500000,
                 'total_amount_cents' => 25000,
@@ -121,12 +121,12 @@ describe('tuition method', function () {
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_2,
             'enrollment_status' => EnrollmentStatus::APPROVED,
-            'tuition_fee' => 25000,
-            'miscellaneous_fee' => 5000,
-            'total_amount' => 30000,
-            'net_amount' => 30000,
-            'amount_paid' => 0,
-            'balance' => 30000,
+            'tuition_fee_cents' => 2500000,
+            'miscellaneous_fee_cents' => 500000,
+            'total_amount_cents' => 3000000,
+            'net_amount_cents' => 3000000,
+            'amount_paid_cents' => 0,
+            'balance_cents' => 3000000,
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
@@ -151,7 +151,7 @@ describe('tuition method', function () {
                 'school_year' => '2024-2025',
                 'quarter' => Quarter::FIRST,
                 'grade_level' => GradeLevel::GRADE_3,
-                'status' => EnrollmentStatus::APPROVED,
+                'enrollment_status' => EnrollmentStatus::APPROVED,
                 'tuition_fee_cents' => 22000,
                 'miscellaneous_fee_cents' => 5500,
                 'total_amount_cents' => 27500,
@@ -186,12 +186,12 @@ describe('invoice method', function () {
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_4,
             'enrollment_status' => EnrollmentStatus::APPROVED,
-            'tuition_fee' => 23000,
-            'miscellaneous_fee' => 6000,
-            'total_amount' => 29000,
-            'net_amount' => 29000,
-            'amount_paid' => 0,
-            'balance' => 29000,
+            'tuition_fee_cents' => 2300000,
+            'miscellaneous_fee_cents' => 600000,
+            'total_amount_cents' => 2900000,
+            'net_amount_cents' => 2900000,
+            'amount_paid_cents' => 0,
+            'balance_cents' => 2900000,
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
@@ -231,17 +231,17 @@ describe('invoice method', function () {
         $ownEnrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0002',
             'student_id' => $ownChild->id,
-            'guardian_id' => $guardianModel->id,
+            'guardian_id' => $guardian->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::SECOND,
             'grade_level' => GradeLevel::GRADE_5,
             'enrollment_status' => EnrollmentStatus::APPROVED,
-            'tuition_fee' => 24000,
-            'miscellaneous_fee' => 6500,
-            'total_amount' => 30500,
-            'net_amount' => 30500,
-            'amount_paid' => 10000,
-            'balance' => 20500,
+            'tuition_fee_cents' => 2400000,
+            'miscellaneous_fee_cents' => 650000,
+            'total_amount_cents' => 3050000,
+            'net_amount_cents' => 3050000,
+            'amount_paid_cents' => 1000000,
+            'balance_cents' => 2050000,
             'payment_status' => PaymentStatus::PARTIAL,
         ]);
 
@@ -255,12 +255,12 @@ describe('invoice method', function () {
             'quarter' => Quarter::THIRD,
             'grade_level' => GradeLevel::GRADE_6,
             'enrollment_status' => EnrollmentStatus::APPROVED,
-            'tuition_fee' => 25000,
-            'miscellaneous_fee' => 7000,
-            'total_amount' => 32000,
-            'net_amount' => 32000,
-            'amount_paid' => 0,
-            'balance' => 32000,
+            'tuition_fee_cents' => 2500000,
+            'miscellaneous_fee_cents' => 700000,
+            'total_amount_cents' => 3200000,
+            'net_amount_cents' => 3200000,
+            'amount_paid_cents' => 0,
+            'balance_cents' => 3200000,
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
@@ -301,17 +301,17 @@ describe('invoice method', function () {
         $oldEnrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0004',
             'student_id' => $child->id,
-            'guardian_id' => $guardianModel->id,
+            'guardian_id' => $guardian->id,
             'school_year' => '2023-2024',
             'quarter' => Quarter::FOURTH,
             'grade_level' => GradeLevel::KINDER,
             'enrollment_status' => EnrollmentStatus::APPROVED,
-            'tuition_fee' => 18000,
-            'miscellaneous_fee' => 4000,
-            'total_amount' => 22000,
-            'net_amount' => 22000,
-            'amount_paid' => 22000,
-            'balance' => 0,
+            'tuition_fee_cents' => 1800000,
+            'miscellaneous_fee_cents' => 400000,
+            'total_amount_cents' => 2200000,
+            'net_amount_cents' => 2200000,
+            'amount_paid_cents' => 2200000,
+            'balance_cents' => 0,
             'payment_status' => PaymentStatus::PAID,
             'created_at' => now()->subYear(),
         ]);
@@ -319,17 +319,17 @@ describe('invoice method', function () {
         $latestEnrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0005',
             'student_id' => $child->id,
-            'guardian_id' => $guardianModel->id,
+            'guardian_id' => $guardian->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_1,
             'enrollment_status' => EnrollmentStatus::APPROVED,
-            'tuition_fee' => 20000,
-            'miscellaneous_fee' => 5000,
-            'total_amount' => 25000,
-            'net_amount' => 25000,
-            'amount_paid' => 0,
-            'balance' => 25000,
+            'tuition_fee_cents' => 2000000,
+            'miscellaneous_fee_cents' => 500000,
+            'total_amount_cents' => 2500000,
+            'net_amount_cents' => 2500000,
+            'amount_paid_cents' => 0,
+            'balance_cents' => 2500000,
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
@@ -365,12 +365,12 @@ describe('updatePayment method', function () {
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_2,
             'enrollment_status' => EnrollmentStatus::APPROVED,
-            'tuition_fee' => 21000,
-            'miscellaneous_fee' => 5500,
-            'total_amount' => 26500,
-            'net_amount' => 26500,
-            'amount_paid' => 0,
-            'balance' => 26500,
+            'tuition_fee_cents' => 2100000,
+            'miscellaneous_fee_cents' => 550000,
+            'total_amount_cents' => 2650000,
+            'net_amount_cents' => 2650000,
+            'amount_paid_cents' => 0,
+            'balance_cents' => 2650000,
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
@@ -384,9 +384,9 @@ describe('updatePayment method', function () {
         $response->assertSessionHas('success', 'Payment status updated successfully.');
 
         $enrollment->refresh();
-        expect($enrollment->amount_paid)->toBe(100.0);  // 10000 cents = 100.0 dollars
+        expect($enrollment->amount_paid)->toBe(10000.0);  // amount_paid is now in cents
         expect($enrollment->payment_status)->toBe(PaymentStatus::PARTIAL);
-        expect($enrollment->balance)->toBe(165.0);  // 16500 cents = 165.0 dollars
+        expect($enrollment->balance)->toBe(16500.0);  // balance is now in cents
         expect($enrollment->remarks)->toBe('First payment received');
     });
 
@@ -402,12 +402,12 @@ describe('updatePayment method', function () {
             'quarter' => Quarter::SECOND,
             'grade_level' => GradeLevel::GRADE_3,
             'enrollment_status' => EnrollmentStatus::APPROVED,
-            'tuition_fee' => 22000,
-            'miscellaneous_fee' => 5500,
-            'total_amount' => 27500,
-            'net_amount' => 27500,
-            'amount_paid' => 0,
-            'balance' => 27500,
+            'tuition_fee_cents' => 2200000,
+            'miscellaneous_fee_cents' => 550000,
+            'total_amount_cents' => 2750000,
+            'net_amount_cents' => 2750000,
+            'amount_paid_cents' => 0,
+            'balance_cents' => 2750000,
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
@@ -418,7 +418,7 @@ describe('updatePayment method', function () {
 
         $response->assertRedirect();
         $enrollment->refresh();
-        expect($enrollment->amount_paid)->toBe(275.0);  // 27500 cents = 275.0 dollars
+        expect($enrollment->amount_paid)->toBe(27500.0);  // amount_paid is now in cents
         expect($enrollment->payment_status)->toBe(PaymentStatus::PAID);
         expect($enrollment->balance)->toBe(0.0);
     });
@@ -435,12 +435,12 @@ describe('updatePayment method', function () {
             'quarter' => Quarter::THIRD,
             'grade_level' => GradeLevel::GRADE_4,
             'enrollment_status' => EnrollmentStatus::APPROVED,
-            'tuition_fee' => 23000,
-            'miscellaneous_fee' => 6000,
-            'total_amount' => 29000,
-            'net_amount' => 29000,
-            'amount_paid' => 0,
-            'balance' => 29000,
+            'tuition_fee_cents' => 2300000,
+            'miscellaneous_fee_cents' => 600000,
+            'total_amount_cents' => 2900000,
+            'net_amount_cents' => 2900000,
+            'amount_paid_cents' => 0,
+            'balance_cents' => 2900000,
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
@@ -469,12 +469,12 @@ describe('updatePayment method', function () {
             'quarter' => Quarter::FOURTH,
             'grade_level' => GradeLevel::GRADE_5,
             'enrollment_status' => EnrollmentStatus::APPROVED,
-            'tuition_fee' => 24000,
-            'miscellaneous_fee' => 6500,
-            'total_amount' => 30500,
-            'net_amount' => 30500,
-            'amount_paid' => 0,
-            'balance' => 30500,
+            'tuition_fee_cents' => 2400000,
+            'miscellaneous_fee_cents' => 650000,
+            'total_amount_cents' => 3050000,
+            'net_amount_cents' => 3050000,
+            'amount_paid_cents' => 0,
+            'balance_cents' => 3050000,
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
@@ -529,12 +529,12 @@ describe('updatePayment method', function () {
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_6,
             'enrollment_status' => EnrollmentStatus::APPROVED,
-            'tuition_fee' => 25000,
-            'miscellaneous_fee' => 7000,
-            'total_amount' => 32000,
-            'net_amount' => 32000,
-            'amount_paid' => 16000,
-            'balance' => 16000,
+            'tuition_fee_cents' => 2500000,
+            'miscellaneous_fee_cents' => 700000,
+            'total_amount_cents' => 3200000,
+            'net_amount_cents' => 3200000,
+            'amount_paid_cents' => 1600000,
+            'balance_cents' => 1600000,
             'payment_status' => PaymentStatus::PARTIAL,
         ]);
 
@@ -546,7 +546,7 @@ describe('updatePayment method', function () {
 
         $response->assertRedirect();
         $enrollment->refresh();
-        expect($enrollment->amount_paid)->toBe(320.0);  // 32000 cents = 320.0 dollars
+        expect($enrollment->amount_paid)->toBe(32000.0);  // amount_paid is now in cents
         expect($enrollment->payment_status)->toBe(PaymentStatus::PAID);
         expect($enrollment->balance)->toBe(0.0);
     });

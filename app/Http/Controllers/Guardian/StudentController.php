@@ -23,12 +23,12 @@ class StudentController extends Controller
      */
     public function index(): Response
     {
-        $guardian = auth()->user();
+        $user = auth()->user();
+        $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
 
-        $children = $guardian->children()
-            ->with('user')
+        $children = $guardian ? $guardian->children()
             ->get()
-            ->map(function (Student $student) {
+            ->map(function ($student) {
                 return [
                     'id' => $student->id,
                     'student_id' => $student->student_id,
@@ -45,7 +45,7 @@ class StudentController extends Controller
                         'email' => $student->user->email,
                     ] : null,
                 ];
-            });
+            }) : collect();
 
         return Inertia::render('guardian/students/index', [
             'children' => $children,
@@ -75,7 +75,9 @@ class StudentController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $guardian = auth()->user();
+        $user = auth()->user();
+        $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
+        if (!$guardian) { abort(404); }
 
         $validated = $request->validate([
             'first_name' => 'required|string|max:100',
@@ -121,7 +123,7 @@ class StudentController extends Controller
 
             // Create guardian-student relationship
             GuardianStudent::create([
-                'guardian_id' => $guardian->id,
+                'guardian_id' => $guardian->user_id,
                 'student_id' => $student->id,
                 'relationship_type' => $validated['relationship_type'],
                 'is_primary_contact' => $validated['is_primary_contact'] ?? false,
@@ -137,7 +139,9 @@ class StudentController extends Controller
      */
     public function edit(Student $student): Response
     {
-        $guardian = auth()->user();
+        $user = auth()->user();
+        $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
+        if (!$guardian) { abort(404); }
 
         // Verify guardian has access to this student
         if (! $guardian->children()->where('students.id', $student->id)->exists()) {
@@ -185,7 +189,9 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student): RedirectResponse
     {
-        $guardian = auth()->user();
+        $user = auth()->user();
+        $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
+        if (!$guardian) { abort(404); }
 
         // Verify guardian has access to this student
         if (! $guardian->children()->where('students.id', $student->id)->exists()) {
@@ -205,7 +211,7 @@ class StudentController extends Controller
             'is_primary_contact' => 'boolean',
         ]);
 
-        DB::transaction(function () use ($validated, $guardian, $student) {
+        DB::transaction(function () use ($validated, $guardian, $student, $user) {
             // Update student record
             $student->update([
                 'first_name' => $validated['first_name'],
@@ -219,9 +225,9 @@ class StudentController extends Controller
             ]);
 
             // Update relationship
-            $guardian->children()
-                ->where('students.id', $student->id)
-                ->updateExistingPivot($student->id, [
+            GuardianStudent::where('guardian_id', $guardian->user_id)
+                ->where('student_id', $student->id)
+                ->update([
                     'relationship_type' => $validated['relationship_type'],
                     'is_primary_contact' => $validated['is_primary_contact'] ?? false,
                 ]);

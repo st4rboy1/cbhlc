@@ -88,11 +88,11 @@ test('guardian can have many children', function () {
         'is_primary_contact' => true,
     ]);
 
-    $children = $guardian->children;
+    $children = $guardian->children()->get();
 
     expect($children)->toHaveCount(2);
-    expect($children->contains($student1))->toBeTrue();
-    expect($children->contains($student2))->toBeTrue();
+    expect($children->pluck('id')->contains($student1->id))->toBeTrue();
+    expect($children->pluck('id')->contains($student2->id))->toBeTrue();
 });
 
 test('guardian children relationship includes pivot data', function () {
@@ -118,8 +118,8 @@ test('guardian children relationship includes pivot data', function () {
 
     $child = $guardian->children()->first();
 
-    expect($child->pivot->relationship_type)->toBe('mother');
-    expect($child->pivot->is_primary_contact)->toBe(1);
+    expect($child->relationship_type)->toBe('mother');
+    expect($child->is_primary_contact)->toBe(1);
 });
 
 test('guardian model fillable attributes work correctly', function () {
