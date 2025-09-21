@@ -75,11 +75,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is a parent
+     * Check if user is a guardian
      */
-    public function isParent(): bool
+    public function isGuardian(): bool
     {
-        return $this->hasRole('parent');
+        return $this->hasRole('guardian');
     }
 
     /**
@@ -99,8 +99,8 @@ class User extends Authenticatable
             return 'admin.dashboard';
         } elseif ($this->hasRole('registrar')) {
             return 'registrar.dashboard';
-        } elseif ($this->hasRole('parent')) {
-            return 'parent.dashboard';
+        } elseif ($this->hasRole('guardian')) {
+            return 'guardian.dashboard';
         } elseif ($this->hasRole('student')) {
             return 'student.dashboard';
         }
