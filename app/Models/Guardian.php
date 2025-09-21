@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Guardian extends Model
 {
@@ -35,11 +34,13 @@ class Guardian extends Model
 
     /**
      * Get the students (children) associated with this guardian
+     * Note: guardian_students table uses user_id (not guardian.id) as guardian_id
      */
-    public function children(): BelongsToMany
+    public function children()
     {
-        // Note: guardian_students table uses user_id as guardian_id, not guardian model id
-        // This method delegates to the User model's children() relationship
-        return $this->user->children();
+        // We use the user's ID since guardian_students.guardian_id references users.id
+        return Student::join('guardian_students', 'students.id', '=', 'guardian_students.student_id')
+            ->where('guardian_students.guardian_id', $this->user_id)
+            ->select('students.*', 'guardian_students.relationship_type', 'guardian_students.is_primary_contact');
     }
 }

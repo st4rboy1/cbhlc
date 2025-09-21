@@ -26,11 +26,14 @@ class BillingController extends Controller
                 ->paginate(10);
         } elseif ($user->hasRole('guardian')) {
             // Guardians can only see their children's enrollments
-            $studentIds = $user->children()->pluck('students.id');
-            $enrollments = Enrollment::with(['student', 'guardian'])
-                ->whereIn('student_id', $studentIds)
-                ->latest()
-                ->paginate(10);
+            $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
+            if ($guardian) {
+                $studentIds = $guardian->children()->pluck('students.id');
+                $enrollments = Enrollment::with(['student', 'guardian'])
+                    ->whereIn('student_id', $studentIds)
+                    ->latest()
+                    ->paginate(10);
+            }
         }
 
         // Get configurable grade level fees for current school year
@@ -73,9 +76,12 @@ class BillingController extends Controller
                 $enrollment = $query->find($enrollmentId);
             } elseif ($user->hasRole('guardian')) {
                 // Guardians can only see their children's invoices
-                $studentIds = $user->children()->pluck('students.id');
-                $enrollment = $query->whereIn('student_id', $studentIds)
-                    ->find($enrollmentId);
+                $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
+                if ($guardian) {
+                    $studentIds = $guardian->children()->pluck('students.id');
+                    $enrollment = $query->whereIn('student_id', $studentIds)
+                        ->find($enrollmentId);
+                }
             }
 
             if (! $enrollment) {
@@ -84,11 +90,14 @@ class BillingController extends Controller
         } else {
             // Get the latest enrollment for the user if no ID specified
             if ($user->hasRole('guardian')) {
-                $studentIds = $user->children()->pluck('students.id');
-                $enrollment = Enrollment::with(['student', 'guardian'])
-                    ->whereIn('student_id', $studentIds)
-                    ->latest()
-                    ->first();
+                $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
+                if ($guardian) {
+                    $studentIds = $guardian->children()->pluck('students.id');
+                    $enrollment = Enrollment::with(['student', 'guardian'])
+                        ->whereIn('student_id', $studentIds)
+                        ->latest()
+                        ->first();
+                }
             }
         }
 
