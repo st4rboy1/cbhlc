@@ -128,5 +128,4 @@ class User extends Authenticatable
     {
         return Enrollment::whereIn('student_id', $this->children()->pluck('students.id'));
     }
-
 }
