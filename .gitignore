@@ -27,3 +27,5 @@ yarn-error.log
 /.zed
 /coverage
 *.cache
+
+coverage.xml
