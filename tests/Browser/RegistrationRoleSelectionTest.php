@@ -30,16 +30,16 @@ class RegistrationRoleSelectionTest extends DuskTestCase
                 ->press('Sign up') // Click Sign up link
                 ->waitFor('.dialog-content') // Wait for register dialog
                 ->assertSee('I am registering as a')
-                ->assertRadioSelected('role', 'parent') // Default selection
+                ->assertRadioSelected('role', 'guardian') // Default selection
                 ->assertSee('Parent/Guardian')
                 ->assertSee('Student');
         });
     }
 
     /**
-     * Test parent registration flow via dialog
+     * Test guardian registration flow via dialog
      */
-    public function test_parent_can_register_and_is_redirected_to_parent_dashboard(): void
+    public function test_guardian_can_register_and_is_redirected_to_guardian_dashboard(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/')
@@ -48,24 +48,24 @@ class RegistrationRoleSelectionTest extends DuskTestCase
                 ->press('Sign up')
                 ->waitFor('.dialog-content')
                 ->type('name', 'Test Parent User')
-                ->type('email', 'testparent@example.com')
+                ->type('email', 'testguardian@example.com')
                 ->type('password', 'password123')
                 ->type('password_confirmation', 'password123')
-                ->radio('role', 'parent')
+                ->radio('role', 'guardian')
                 ->press('Create account')
-                ->waitForLocation('/parent/dashboard')
-                ->assertPathIs('/parent/dashboard')
+                ->waitForLocation('/guardian/dashboard')
+                ->assertPathIs('/guardian/dashboard')
                 ->assertSee('Parent Dashboard');
         });
 
         // Verify the user was created with the correct role
         $this->assertDatabaseHas('users', [
-            'email' => 'testparent@example.com',
+            'email' => 'testguardian@example.com',
             'name' => 'Test Parent User',
         ]);
 
-        $user = \App\Models\User::where('email', 'testparent@example.com')->first();
-        $this->assertTrue($user->hasRole('parent'));
+        $user = \App\Models\User::where('email', 'testguardian@example.com')->first();
+        $this->assertTrue($user->hasRole('guardian'));
     }
 
     /**
@@ -146,32 +146,32 @@ class RegistrationRoleSelectionTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/register')
-                ->assertRadioSelected('role', 'parent') // Default
+                ->assertRadioSelected('role', 'guardian') // Default
                 ->radio('role', 'student')
                 ->assertRadioSelected('role', 'student')
-                ->assertRadioNotSelected('role', 'parent')
-                ->radio('role', 'parent')
-                ->assertRadioSelected('role', 'parent')
+                ->assertRadioNotSelected('role', 'guardian')
+                ->radio('role', 'guardian')
+                ->assertRadioSelected('role', 'guardian')
                 ->assertRadioNotSelected('role', 'student');
         });
     }
 
     /**
-     * Test registration with all required fields and parent role via form submission
+     * Test registration with all required fields and guardian role via form submission
      */
-    public function test_complete_parent_registration_flow(): void
+    public function test_complete_guardian_registration_flow(): void
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/register')
                 ->assertSee('Create an account')
                 ->assertSee('Enter your details below to create your account')
                 ->type('name', 'John Parent')
-                ->radio('role', 'parent')
-                ->type('email', 'john.parent@example.com')
+                ->radio('role', 'guardian')
+                ->type('email', 'john.guardian@example.com')
                 ->type('password', 'SecurePassword123!')
                 ->type('password_confirmation', 'SecurePassword123!')
                 ->press('Create account')
-                ->waitForLocation('/parent/dashboard', 10)
+                ->waitForLocation('/guardian/dashboard', 10)
                 ->assertAuthenticated();
 
             // Logout for cleanup
