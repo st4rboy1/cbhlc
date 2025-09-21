@@ -7,7 +7,7 @@ import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Bell, Book, Calendar, CreditCard, FileText, GraduationCap, MessageSquare, User } from 'lucide-react';
 
-export default function ParentDashboard() {
+export default function GuardianDashboard() {
     const { auth } = usePage<SharedData>().props;
 
     // Mock data - replace with real data from backend
@@ -61,8 +61,8 @@ export default function ParentDashboard() {
 
     return (
         <>
-            <Head title="Parent Dashboard" />
-            <PageLayout title="PARENT DASHBOARD" currentPage="parent.dashboard">
+            <Head title="Guardian Dashboard" />
+            <PageLayout title="GUARDIAN DASHBOARD" currentPage="guardian.dashboard">
                 {/* Welcome Section */}
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold text-foreground">Welcome, {auth.user?.name}!</h2>
