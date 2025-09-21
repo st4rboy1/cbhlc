@@ -2,7 +2,6 @@
 
 use App\Enums\GradeLevel;
 use App\Models\GradeLevelFee;
-use App\Services\CurrencyService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
@@ -12,7 +11,7 @@ beforeEach(function () {
 });
 
 test('grade level fee model stores money values in cents and returns float', function () {
-    $fee = new GradeLevelFee();
+    $fee = new GradeLevelFee;
 
     // Test tuition fee attribute
     $fee->tuition_fee = 15000.50;
@@ -90,7 +89,7 @@ test('grade level fee model formatted attributes work correctly', function () {
 });
 
 test('grade level fee model handles zero amounts correctly', function () {
-    $fee = new GradeLevelFee();
+    $fee = new GradeLevelFee;
 
     $fee->tuition_fee = 0.00;
     expect($fee->tuition_fee_cents)->toBe(0);
@@ -134,7 +133,7 @@ test('grade level fee model current school year scope works correctly', function
     $currentYear = date('Y');
     $nextYear = $currentYear + 1;
     $currentSchoolYear = "{$currentYear}-{$nextYear}";
-    $pastSchoolYear = ($currentYear - 1) . '-' . $currentYear;
+    $pastSchoolYear = ($currentYear - 1).'-'.$currentYear;
 
     GradeLevelFee::create([
         'grade_level' => GradeLevel::KINDER,
@@ -192,7 +191,7 @@ test('grade level fee model getFeesForGrade method works correctly', function ()
     ]);
 
     // Inactive fee for same grade in different school year
-    $pastSchoolYear = ($currentYear - 1) . '-' . $currentYear;
+    $pastSchoolYear = ($currentYear - 1).'-'.$currentYear;
     GradeLevelFee::create([
         'grade_level' => GradeLevel::KINDER,
         'school_year' => $pastSchoolYear,
