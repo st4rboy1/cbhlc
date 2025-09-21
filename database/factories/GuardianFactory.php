@@ -29,9 +29,6 @@ class GuardianFactory extends Factory
             'address' => fake()->address(),
             'occupation' => fake()->jobTitle(),
             'employer' => fake()->company(),
-            'emergency_contact_name' => fake()->name(),
-            'emergency_contact_phone' => fake()->phoneNumber(),
-            'emergency_contact_relationship' => fake()->randomElement(['Spouse', 'Sibling', 'Parent', 'Friend']),
         ];
     }
 }

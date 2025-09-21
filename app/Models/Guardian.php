@@ -38,8 +38,8 @@ class Guardian extends Model
      */
     public function children(): BelongsToMany
     {
-        return $this->belongsToMany(Student::class, 'guardian_students', 'guardian_id', 'student_id')
-            ->withPivot(['relationship_type', 'is_primary_contact'])
-            ->withTimestamps();
+        // Note: guardian_students table uses user_id as guardian_id, not guardian model id
+        // This method delegates to the User model's children() relationship
+        return $this->user->children();
     }
 }
