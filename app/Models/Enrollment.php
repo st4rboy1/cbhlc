@@ -10,6 +10,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property float $tuition_fee
+ * @property float $miscellaneous_fee
+ * @property float $laboratory_fee
+ * @property float $library_fee
+ * @property float $sports_fee
+ * @property float $total_amount
+ * @property float $discount
+ * @property float $net_amount
+ * @property float $amount_paid
+ * @property float $balance
+ */
 class Enrollment extends Model
 {
     use HasFactory;
