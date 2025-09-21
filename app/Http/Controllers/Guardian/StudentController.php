@@ -241,5 +241,4 @@ class StudentController extends Controller
         return redirect()->route('guardian.students.index')
             ->with('success', 'Student updated successfully.');
     }
-
 }
