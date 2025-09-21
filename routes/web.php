@@ -65,8 +65,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Guardian routes for managing students
     Route::middleware('role:guardian')->prefix('guardian')->name('guardian.')->group(function () {
         Route::resource('students', StudentController::class);
-        Route::post('students/{student}/create-login', [StudentController::class, 'createLogin'])
-            ->name('students.create-login');
     });
 });
 

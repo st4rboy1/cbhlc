@@ -110,17 +110,21 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the children (students) associated with this parent
+     * Get the children (students) associated with this guardian
+     * Only available for users with guardian role
      */
     public function children(): BelongsToMany
     {
+        // Note: Table still named 'parent_students' for backward compatibility
+        // but conceptually this represents guardian-student relationships
         return $this->belongsToMany(Student::class, 'parent_students', 'parent_id', 'student_id')
             ->withPivot(['relationship_type', 'is_primary_contact'])
             ->withTimestamps();
     }
 
     /**
-     * Get enrollments for this parent's children
+     * Get enrollments for this guardian's children
+     * Only available for users with guardian role
      */
     public function childrenEnrollments()
     {
