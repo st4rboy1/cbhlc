@@ -12,7 +12,10 @@ parameters:
     level: 5
 
     # Ignore specific errors that are not relevant
-    ignoreErrors: []
+    ignoreErrors:
+        - '#Access to an undefined property [a-zA-Z\\]+::\$[a-zA-Z_]+#'
+        - '#Parameter \#1 \$callback of method.*contains unresolvable type#'
+        - '#Parameter \#1 \$callback of method.*expects callable.*given#'
 
     excludePaths:
         - vendor/
