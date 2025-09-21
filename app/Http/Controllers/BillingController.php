@@ -107,7 +107,7 @@ class BillingController extends Controller
     private function createSampleEnrollment()
     {
         return (object) [
-            'enrollment_id' => 'ENR-'.date('Y').'-'.str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT),
+            'enrollment_id' => 'ENR-'.date('Y').'-'.str_pad((string) rand(1, 999), 3, '0', STR_PAD_LEFT),
             'student' => (object) [
                 'first_name' => 'Sample',
                 'last_name' => 'Student',
