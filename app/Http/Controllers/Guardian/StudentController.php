@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Guardian;
 
 use App\Enums\GradeLevel;
+use App\Enums\RelationshipType;
 use App\Http\Controllers\Controller;
 use App\Models\ParentStudent;
 use App\Models\Student;
@@ -65,13 +66,7 @@ class StudentController extends Controller
                 'value' => $level->value,
                 'label' => $level->value,
             ]),
-            'relationshipTypes' => [
-                ['value' => 'father', 'label' => 'Father'],
-                ['value' => 'mother', 'label' => 'Mother'],
-                ['value' => 'guardian', 'label' => 'Guardian'],
-                ['value' => 'grandparent', 'label' => 'Grandparent'],
-                ['value' => 'other', 'label' => 'Other'],
-            ],
+            'relationshipTypes' => RelationshipType::options(),
         ]);
     }
 
@@ -91,7 +86,7 @@ class StudentController extends Controller
             'gender' => 'required|in:male,female',
             'address' => 'required|string|max:500',
             'phone' => 'nullable|string|max:20',
-            'relationship_type' => 'required|in:father,mother,guardian,grandparent,other',
+            'relationship_type' => 'required|in:'.implode(',', RelationshipType::values()),
             'is_primary_contact' => 'boolean',
             // All students now require login accounts
             'email' => 'required|email|unique:users,email',
@@ -181,13 +176,7 @@ class StudentController extends Controller
                 'value' => $level->value,
                 'label' => $level->value,
             ]),
-            'relationshipTypes' => [
-                ['value' => 'father', 'label' => 'Father'],
-                ['value' => 'mother', 'label' => 'Mother'],
-                ['value' => 'guardian', 'label' => 'Guardian'],
-                ['value' => 'grandparent', 'label' => 'Grandparent'],
-                ['value' => 'other', 'label' => 'Other'],
-            ],
+            'relationshipTypes' => RelationshipType::options(),
         ]);
     }
 
@@ -212,7 +201,7 @@ class StudentController extends Controller
             'gender' => 'required|in:male,female',
             'address' => 'required|string|max:500',
             'phone' => 'nullable|string|max:20',
-            'relationship_type' => 'required|in:father,mother,guardian,grandparent,other',
+            'relationship_type' => 'required|in:'.implode(',', RelationshipType::values()),
             'is_primary_contact' => 'boolean',
         ]);
 
