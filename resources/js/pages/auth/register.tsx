@@ -8,7 +8,6 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function Register() {
@@ -39,24 +38,7 @@ export default function Register() {
                                 <InputError message={errors.name} className="mt-2" />
                             </div>
 
-                            <div className="grid gap-2">
-                                <Label>I am registering as a</Label>
-                                <RadioGroup defaultValue="parent" name="role" className="flex flex-col space-y-2">
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="parent" id="parent" />
-                                        <Label htmlFor="parent" className="cursor-pointer font-normal">
-                                            Parent/Guardian
-                                        </Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value="student" id="student" />
-                                        <Label htmlFor="student" className="cursor-pointer font-normal">
-                                            Student (18+ years old)
-                                        </Label>
-                                    </div>
-                                </RadioGroup>
-                                <InputError message={errors.role} />
-                            </div>
+                            {/* Registration is now limited to parents only (handled by backend) */}
 
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email address</Label>
