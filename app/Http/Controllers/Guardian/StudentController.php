@@ -39,7 +39,6 @@ class StudentController extends Controller
                     'grade_level' => $student->grade_level,
                     'relationship_type' => $student->pivot->relationship_type,
                     'is_primary_contact' => $student->pivot->is_primary_contact,
-                    'has_login' => $student->user_id !== null,
                     'user' => $student->user ? [
                         'id' => $student->user->id,
                         'email' => $student->user->email,
@@ -161,7 +160,6 @@ class StudentController extends Controller
             'gender' => $student->gender,
             'address' => $student->address,
             'phone' => $student->phone,
-            'has_login' => $student->user_id !== null,
             'user' => $student->user ? [
                 'id' => $student->user->id,
                 'email' => $student->user->email,
@@ -244,39 +242,4 @@ class StudentController extends Controller
             ->with('success', 'Student updated successfully.');
     }
 
-    /**
-     * Create login account for student
-     */
-    public function createLogin(Request $request, Student $student): RedirectResponse
-    {
-        $guardian = auth()->user();
-
-        // Verify guardian has access to this student
-        if (! $guardian->children()->where('students.id', $student->id)->exists()) {
-            abort(403);
-        }
-
-        // Check if student already has login
-        if ($student->user_id) {
-            return redirect()->back()->with('error', 'Student already has a login account.');
-        }
-
-        $validated = $request->validate([
-            'email' => 'required|email|unique:users,email',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
-
-        $user = User::create([
-            'name' => trim($student->first_name.' '.$student->last_name),
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
-
-        $user->assignRole('student');
-
-        $student->update(['user_id' => $user->id]);
-
-        return redirect()->back()
-            ->with('success', 'Login account created successfully for '.$student->first_name.'.');
-    }
 }
