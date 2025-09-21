@@ -29,9 +29,9 @@ test('users can login with valid credentials', function () {
             ->type('email', $user->email)
             ->type('password', 'password')
             ->press('Sign in')
-            ->waitForLocation('/parent/dashboard')
+            ->waitForLocation('/guardian/dashboard')
             ->assertAuthenticated()
-            ->assertPathIs('/parent/dashboard');
+            ->assertPathIs('/guardian/dashboard');
     });
 });
 
@@ -63,17 +63,17 @@ test('registrar redirects to registrar dashboard', function () {
     });
 });
 
-test('parent redirects to parent dashboard', function () {
-    $parent = User::factory()->parent()->create();
+test('guardian redirects to guardian dashboard', function () {
+    $guardian = User::factory()->guardian()->create();
 
-    $this->browse(function (Browser $browser) use ($parent) {
+    $this->browse(function (Browser $browser) use ($guardian) {
         $browser->visit('/login')
-            ->type('email', $parent->email)
+            ->type('email', $guardian->email)
             ->type('password', 'password')
             ->press('Sign in')
-            ->waitForLocation('/parent/dashboard')
+            ->waitForLocation('/guardian/dashboard')
             ->assertAuthenticated()
-            ->assertPathIs('/parent/dashboard');
+            ->assertPathIs('/guardian/dashboard');
     });
 });
 
