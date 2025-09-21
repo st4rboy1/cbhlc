@@ -133,7 +133,7 @@ class UserSeeder extends Seeder
         do {
             $year = date('Y');
             $number = str_pad((string) rand(1, 9999), 4, '0', STR_PAD_LEFT);
-            $studentId = $year . '-' . $number;
+            $studentId = $year.'-'.$number;
         } while (Student::where('student_id', $studentId)->exists());
 
         return $studentId;

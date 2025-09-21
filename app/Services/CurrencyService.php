@@ -20,10 +20,10 @@ class CurrencyService
         );
 
         if ($config['symbol_position'] === 'before') {
-            return $config['symbol'] . $formattedNumber;
+            return $config['symbol'].$formattedNumber;
         }
 
-        return $formattedNumber . ' ' . $config['symbol'];
+        return $formattedNumber.' '.$config['symbol'];
     }
 
     /**
