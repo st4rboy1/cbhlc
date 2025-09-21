@@ -83,4 +83,18 @@ class Student extends Model
         return $this->parents()->wherePivot('is_primary_contact', true)->first() ??
                $this->parents()->first();
     }
+
+    /**
+     * Generate a unique student ID
+     */
+    public static function generateStudentId(): string
+    {
+        do {
+            $year = date('Y');
+            $number = str_pad((string) rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            $studentId = $year.'-'.$number;
+        } while (self::where('student_id', $studentId)->exists());
+
+        return $studentId;
+    }
 }
