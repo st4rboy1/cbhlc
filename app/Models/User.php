@@ -4,7 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -67,16 +66,5 @@ class User extends Authenticatable
 
         // Default to home page if user has no role (shouldn't happen in production)
         return 'home';
-    }
-
-    /**
-     * Get the children (students) associated with this guardian
-     * Only available for users with guardian role
-     */
-    public function children(): BelongsToMany
-    {
-        return $this->belongsToMany(Student::class, 'guardian_students', 'guardian_id', 'student_id')
-            ->withPivot(['relationship_type', 'is_primary_contact'])
-            ->withTimestamps();
     }
 }
