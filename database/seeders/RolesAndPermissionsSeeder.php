@@ -47,22 +47,22 @@ class RolesAndPermissionsSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
         // Create roles and assign permissions based on SRS Section 3.1.3
 
         // Super Admin - Complete system access
-        $superAdmin = Role::create(['name' => 'super_admin']);
-        $superAdmin->givePermissionTo(Permission::all());
+        $superAdmin = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
+        $superAdmin->syncPermissions(Permission::all());
 
         // Administrator - Full system access, user management, system configuration
-        $administrator = Role::create(['name' => 'administrator']);
-        $administrator->givePermissionTo(Permission::all());
+        $administrator = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
+        $administrator->syncPermissions(Permission::all());
 
         // Registrar - Enrollment processing, student records management, reporting
-        $registrar = Role::create(['name' => 'registrar']);
-        $registrar->givePermissionTo([
+        $registrar = Role::firstOrCreate(['name' => 'registrar', 'guard_name' => 'web']);
+        $registrar->syncPermissions([
             'student.view',
             'student.create',
             'student.update',
@@ -78,8 +78,8 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
 
         // Parent/Guardian - Enrollment form submission, status tracking, billing access
-        $parent = Role::create(['name' => 'parent']);
-        $parent->givePermissionTo([
+        $parent = Role::firstOrCreate(['name' => 'parent', 'guard_name' => 'web']);
+        $parent->syncPermissions([
             'enrollment.view',
             'enrollment.create',
             'enrollment.update',
@@ -87,8 +87,8 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
 
         // Student - Limited access to own enrollment status and information
-        $student = Role::create(['name' => 'student']);
-        $student->givePermissionTo([
+        $student = Role::firstOrCreate(['name' => 'student', 'guard_name' => 'web']);
+        $student->syncPermissions([
             'enrollment.view',
         ]);
     }
