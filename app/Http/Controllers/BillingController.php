@@ -94,7 +94,7 @@ class BillingController extends Controller
 
         return Inertia::render('invoice', [
             'enrollment' => $enrollment,
-            'invoiceNumber' => $enrollment?->enrollment_id ?? 'No Invoice Available',
+            'invoiceNumber' => $enrollment->enrollment_id ?? 'No Invoice Available',
             'currentDate' => now()->format('F d, Y'),
         ]);
     }

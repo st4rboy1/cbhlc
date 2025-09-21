@@ -34,7 +34,7 @@ class StudentController extends Controller
                     'first_name' => $student->first_name,
                     'middle_name' => $student->middle_name,
                     'last_name' => $student->last_name,
-                    'full_name' => trim($student->first_name . ' ' . $student->middle_name . ' ' . $student->last_name),
+                    'full_name' => trim($student->first_name.' '.$student->middle_name.' '.$student->last_name),
                     'birthdate' => $student->birthdate?->format('M d, Y'),
                     'grade_level' => $student->grade_level,
                     'relationship_type' => $student->pivot->relationship_type,
@@ -49,7 +49,7 @@ class StudentController extends Controller
 
         return Inertia::render('parent/students/index', [
             'children' => $children,
-            'gradeLevels' => collect(GradeLevel::cases())->map(fn($level) => [
+            'gradeLevels' => collect(GradeLevel::cases())->map(fn ($level) => [
                 'value' => $level->value,
                 'label' => $level->value,
             ]),
@@ -62,7 +62,7 @@ class StudentController extends Controller
     public function create(): Response
     {
         return Inertia::render('parent/students/create', [
-            'gradeLevels' => collect(GradeLevel::cases())->map(fn($level) => [
+            'gradeLevels' => collect(GradeLevel::cases())->map(fn ($level) => [
                 'value' => $level->value,
                 'label' => $level->value,
             ]),
@@ -88,7 +88,7 @@ class StudentController extends Controller
             'middle_name' => 'nullable|string|max:100',
             'last_name' => 'required|string|max:100',
             'birthdate' => 'required|date|before:today',
-            'grade_level' => 'required|in:' . implode(',', array_column(GradeLevel::cases(), 'value')),
+            'grade_level' => 'required|in:'.implode(',', array_column(GradeLevel::cases(), 'value')),
             'gender' => 'required|in:male,female',
             'address' => 'required|string|max:500',
             'phone' => 'nullable|string|max:20',
@@ -96,7 +96,7 @@ class StudentController extends Controller
             'is_primary_contact' => 'boolean',
             'create_login' => 'boolean',
             'email' => 'required_if:create_login,true|nullable|email|unique:users,email',
-            'password' => 'required_if:create_login,true|nullable|confirmed|' . Rules\Password::defaults(),
+            'password' => 'required_if:create_login,true|nullable|confirmed|'.Rules\Password::defaults(),
         ]);
 
         DB::transaction(function () use ($validated, $parent) {
@@ -116,7 +116,7 @@ class StudentController extends Controller
             // Create user account if requested
             if ($validated['create_login'] && $validated['email']) {
                 $user = User::create([
-                    'name' => trim($validated['first_name'] . ' ' . $validated['last_name']),
+                    'name' => trim($validated['first_name'].' '.$validated['last_name']),
                     'email' => $validated['email'],
                     'password' => Hash::make($validated['password']),
                 ]);
@@ -148,7 +148,7 @@ class StudentController extends Controller
         $parent = auth()->user();
 
         // Verify parent has access to this student
-        if (!$parent->children()->where('students.id', $student->id)->exists()) {
+        if (! $parent->children()->where('students.id', $student->id)->exists()) {
             abort(403);
         }
 
@@ -181,7 +181,7 @@ class StudentController extends Controller
                 'type' => $relationship->relationship_type,
                 'is_primary_contact' => $relationship->is_primary_contact,
             ],
-            'gradeLevels' => collect(GradeLevel::cases())->map(fn($level) => [
+            'gradeLevels' => collect(GradeLevel::cases())->map(fn ($level) => [
                 'value' => $level->value,
                 'label' => $level->value,
             ]),
@@ -203,7 +203,7 @@ class StudentController extends Controller
         $parent = auth()->user();
 
         // Verify parent has access to this student
-        if (!$parent->children()->where('students.id', $student->id)->exists()) {
+        if (! $parent->children()->where('students.id', $student->id)->exists()) {
             abort(403);
         }
 
@@ -212,7 +212,7 @@ class StudentController extends Controller
             'middle_name' => 'nullable|string|max:100',
             'last_name' => 'required|string|max:100',
             'birthdate' => 'required|date|before:today',
-            'grade_level' => 'required|in:' . implode(',', array_column(GradeLevel::cases(), 'value')),
+            'grade_level' => 'required|in:'.implode(',', array_column(GradeLevel::cases(), 'value')),
             'gender' => 'required|in:male,female',
             'address' => 'required|string|max:500',
             'phone' => 'nullable|string|max:20',
@@ -254,7 +254,7 @@ class StudentController extends Controller
         $parent = auth()->user();
 
         // Verify parent has access to this student
-        if (!$parent->children()->where('students.id', $student->id)->exists()) {
+        if (! $parent->children()->where('students.id', $student->id)->exists()) {
             abort(403);
         }
 
@@ -269,7 +269,7 @@ class StudentController extends Controller
         ]);
 
         $user = User::create([
-            'name' => trim($student->first_name . ' ' . $student->last_name),
+            'name' => trim($student->first_name.' '.$student->last_name),
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
@@ -279,7 +279,7 @@ class StudentController extends Controller
         $student->update(['user_id' => $user->id]);
 
         return redirect()->back()
-            ->with('success', 'Login account created successfully for ' . $student->first_name . '.');
+            ->with('success', 'Login account created successfully for '.$student->first_name.'.');
     }
 
     /**
@@ -290,7 +290,7 @@ class StudentController extends Controller
         do {
             $year = date('Y');
             $number = str_pad((string) rand(1, 9999), 4, '0', STR_PAD_LEFT);
-            $studentId = $year . '-' . $number;
+            $studentId = $year.'-'.$number;
         } while (Student::where('student_id', $studentId)->exists());
 
         return $studentId;
