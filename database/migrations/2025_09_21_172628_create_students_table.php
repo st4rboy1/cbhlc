@@ -26,11 +26,7 @@ return new class extends Migration
             $table->string('guardian_name');
             $table->string('guardian_contact');
             $table->string('guardian_email')->nullable();
-            $table->enum('grade_level', [
-                'Nursery', 'Kinder 1', 'Kinder 2',
-                'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6',
-                'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12',
-            ]);
+            $table->string('grade_level'); // Will use GradeLevel enum in model
             $table->string('section')->nullable();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
