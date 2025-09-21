@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\GradeLevel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends Model
@@ -18,20 +20,15 @@ class Student extends Model
         'middle_name',
         'birthdate',
         'gender',
-        'age',
         'address',
-        'contact_number',
-        'email',
-        'guardian_name',
-        'guardian_contact',
-        'guardian_email',
+        'phone',
         'grade_level',
-        'section',
         'user_id',
     ];
 
     protected $casts = [
         'birthdate' => 'date',
+        'grade_level' => GradeLevel::class,
     ];
 
     /**
@@ -66,5 +63,24 @@ class Student extends Model
     public function currentEnrollment()
     {
         return $this->enrollments()->where('status', 'enrolled')->latest()->first();
+    }
+
+    /**
+     * Get the parents associated with this student
+     */
+    public function parents(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'parent_students', 'student_id', 'parent_id')
+            ->withPivot(['relationship_type', 'is_primary_contact'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the primary parent contact
+     */
+    public function primaryParent()
+    {
+        return $this->parents()->wherePivot('is_primary_contact', true)->first() ??
+               $this->parents()->first();
     }
 }
