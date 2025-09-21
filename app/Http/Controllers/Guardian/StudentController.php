@@ -77,7 +77,9 @@ class StudentController extends Controller
     {
         $user = auth()->user();
         $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
-        if (!$guardian) { abort(404); }
+        if (! $guardian) {
+            abort(404);
+        }
 
         $validated = $request->validate([
             'first_name' => 'required|string|max:100',
@@ -141,7 +143,9 @@ class StudentController extends Controller
     {
         $user = auth()->user();
         $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
-        if (!$guardian) { abort(404); }
+        if (! $guardian) {
+            abort(404);
+        }
 
         // Verify guardian has access to this student
         if (! $guardian->children()->where('students.id', $student->id)->exists()) {
@@ -191,7 +195,9 @@ class StudentController extends Controller
     {
         $user = auth()->user();
         $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
-        if (!$guardian) { abort(404); }
+        if (! $guardian) {
+            abort(404);
+        }
 
         // Verify guardian has access to this student
         if (! $guardian->children()->where('students.id', $student->id)->exists()) {
@@ -211,7 +217,7 @@ class StudentController extends Controller
             'is_primary_contact' => 'boolean',
         ]);
 
-        DB::transaction(function () use ($validated, $guardian, $student, $user) {
+        DB::transaction(function () use ($validated, $guardian, $student) {
             // Update student record
             $student->update([
                 'first_name' => $validated['first_name'],
