@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import { logout } from '@/routes';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, CreditCard, FileText, GraduationCap, Home, LogOut, UserCircle, Users } from 'lucide-react';
@@ -133,7 +134,7 @@ export default function Sidebar({ currentPage = '' }: SidebarProps) {
                     className="w-full justify-start gap-3 text-destructive hover:bg-destructive/10 hover:text-destructive"
                     asChild
                 >
-                    <Link href="/logout" method="post">
+                    <Link href={logout()} method="post" as="button">
                         <LogOut className="h-4 w-4" />
                         Logout
                     </Link>
