@@ -16,6 +16,12 @@ export default function Sidebar({ currentPage = '' }: SidebarProps) {
     const [billingOpen, setBillingOpen] = useState(false);
     const isActive = (page: string) => currentPage === page;
 
+    // Get the dashboard URL from the auth props (provided by backend)
+    const getDashboardUrl = () => {
+        // Use the dashboard_route provided by the backend
+        return auth.user?.dashboard_route || '/';
+    };
+
     return (
         <div className="flex w-64 flex-col border-r bg-card">
             {/* Profile Section */}
@@ -41,7 +47,7 @@ export default function Sidebar({ currentPage = '' }: SidebarProps) {
                     className={cn('w-full justify-start gap-3', isActive('dashboard') && 'bg-accent')}
                     asChild
                 >
-                    <Link href="/dashboard">
+                    <Link href={getDashboardUrl()}>
                         <Home className="h-4 w-4" />
                         Dashboard
                     </Link>
