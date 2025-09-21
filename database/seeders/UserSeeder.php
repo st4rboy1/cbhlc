@@ -36,7 +36,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('password'),
             ]
         );
-        if (!$superAdmin->hasRole('super_admin')) {
+        if (! $superAdmin->hasRole('super_admin')) {
             $superAdmin->assignRole('super_admin');
         }
 
@@ -49,7 +49,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('password'),
             ]
         );
-        if (!$admin->hasRole('administrator')) {
+        if (! $admin->hasRole('administrator')) {
             $admin->assignRole('administrator');
         }
 
@@ -62,7 +62,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('password'),
             ]
         );
-        if (!$registrar->hasRole('registrar')) {
+        if (! $registrar->hasRole('registrar')) {
             $registrar->assignRole('registrar');
         }
 
@@ -75,7 +75,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('password'),
             ]
         );
-        if (!$guardian->hasRole('guardian')) {
+        if (! $guardian->hasRole('guardian')) {
             $guardian->assignRole('guardian');
         }
 
@@ -97,7 +97,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('password'),
             ]
         );
-        if (!$studentUser1->hasRole('student')) {
+        if (! $studentUser1->hasRole('student')) {
             $studentUser1->assignRole('student');
         }
 
@@ -106,10 +106,14 @@ class UserSeeder extends Seeder
             [
                 'student_id' => Student::generateStudentId(),
                 'middle_name' => 'Garcia',
-                'gender' => 'male',
-                'grade_level' => GradeLevel::GRADE_6,
+                'gender' => 'Male',
+                'age' => 12,
+                'grade_level' => GradeLevel::GRADE_6->value,
                 'address' => '123 Rizal Street, Pasig City',
-                'phone' => '+63912345678',
+                'contact_number' => '+63912345678',
+                'guardian_name' => 'Maria Santos',
+                'guardian_contact' => '+63987654321',
+                'guardian_email' => 'maria.santos@example.com',
                 'user_id' => $studentUser1->id,
             ]
         );
@@ -132,7 +136,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('password'),
             ]
         );
-        if (!$studentUser2->hasRole('student')) {
+        if (! $studentUser2->hasRole('student')) {
             $studentUser2->assignRole('student');
         }
 
@@ -141,10 +145,14 @@ class UserSeeder extends Seeder
             [
                 'student_id' => Student::generateStudentId(),
                 'middle_name' => 'Garcia',
-                'gender' => 'female',
-                'grade_level' => GradeLevel::GRADE_3,
+                'gender' => 'Female',
+                'age' => 9,
+                'grade_level' => GradeLevel::GRADE_3->value,
                 'address' => '123 Rizal Street, Pasig City',
-                'phone' => '+63912345678',
+                'contact_number' => '+63912345678',
+                'guardian_name' => 'Maria Santos',
+                'guardian_contact' => '+63987654321',
+                'guardian_email' => 'maria.santos@example.com',
                 'user_id' => $studentUser2->id,
             ]
         );
