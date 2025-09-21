@@ -29,7 +29,7 @@ describe('tuition method', function () {
 
         foreach ($students as $student) {
             $enrollments[] = Enrollment::create([
-                'enrollment_id' => 'ENR-' . str_pad($student->id, 4, '0', STR_PAD_LEFT),
+                'enrollment_id' => 'ENR-'.str_pad($student->id, 4, '0', STR_PAD_LEFT),
                 'student_id' => $student->id,
                 'guardian_id' => Guardian::factory()->create()->id,
                 'school_year' => '2024-2025',
@@ -66,8 +66,8 @@ describe('tuition method', function () {
             ->component('tuition')
             ->has('enrollments.data', 3)
             ->has('gradeLevelFees')
-            ->where('gradeLevelFees.' . GradeLevel::GRADE_1->value . '.tuition', 20000.0)
-            ->where('gradeLevelFees.' . GradeLevel::GRADE_1->value . '.miscellaneous', 5000.0)
+            ->where('gradeLevelFees.'.GradeLevel::GRADE_1->value.'.tuition', 20000.0)
+            ->where('gradeLevelFees.'.GradeLevel::GRADE_1->value.'.miscellaneous', 5000.0)
         );
     });
 
@@ -94,7 +94,7 @@ describe('tuition method', function () {
             ]);
 
             Enrollment::create([
-                'enrollment_id' => 'ENR-' . str_pad($child->id, 4, '0', STR_PAD_LEFT),
+                'enrollment_id' => 'ENR-'.str_pad($child->id, 4, '0', STR_PAD_LEFT),
                 'student_id' => $child->id,
                 'guardian_id' => $guardianModel->id,
                 'school_year' => '2024-2025',
@@ -145,7 +145,7 @@ describe('tuition method', function () {
 
         Student::factory()->count(5)->create()->each(function ($student) {
             Enrollment::create([
-                'enrollment_id' => 'ENR-' . str_pad($student->id, 4, '0', STR_PAD_LEFT),
+                'enrollment_id' => 'ENR-'.str_pad($student->id, 4, '0', STR_PAD_LEFT),
                 'student_id' => $student->id,
                 'guardian_id' => Guardian::factory()->create()->id,
                 'school_year' => '2024-2025',
@@ -195,7 +195,7 @@ describe('invoice method', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($admin)->get('/billing/invoice/' . $enrollment->id);
+        $response = $this->actingAs($admin)->get('/billing/invoice/'.$enrollment->id);
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -265,7 +265,7 @@ describe('invoice method', function () {
         ]);
 
         // Guardian can view own child's invoice
-        $response = $this->actingAs($guardian)->get('/billing/invoice/' . $ownEnrollment->id);
+        $response = $this->actingAs($guardian)->get('/billing/invoice/'.$ownEnrollment->id);
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('invoice')
@@ -273,7 +273,7 @@ describe('invoice method', function () {
         );
 
         // Guardian cannot view other child's invoice
-        $response = $this->actingAs($guardian)->get('/billing/invoice/' . $otherEnrollment->id);
+        $response = $this->actingAs($guardian)->get('/billing/invoice/'.$otherEnrollment->id);
         $response->assertStatus(404);
     });
 
@@ -374,7 +374,7 @@ describe('updatePayment method', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($admin)->put('/billing/payment/' . $enrollment->id, [
+        $response = $this->actingAs($admin)->put('/billing/payment/'.$enrollment->id, [
             'amount_paid' => 10000,
             'payment_status' => PaymentStatus::PARTIAL->value,
             'remarks' => 'First payment received',
@@ -411,7 +411,7 @@ describe('updatePayment method', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($registrar)->put('/billing/payment/' . $enrollment->id, [
+        $response = $this->actingAs($registrar)->put('/billing/payment/'.$enrollment->id, [
             'amount_paid' => 27500,
             'payment_status' => PaymentStatus::PAID->value,
         ]);
@@ -444,7 +444,7 @@ describe('updatePayment method', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($guardian)->put('/billing/payment/' . $enrollment->id, [
+        $response = $this->actingAs($guardian)->put('/billing/payment/'.$enrollment->id, [
             'amount_paid' => 15000,
             'payment_status' => PaymentStatus::PARTIAL->value,
         ]);
@@ -479,25 +479,25 @@ describe('updatePayment method', function () {
         ]);
 
         // Test negative amount
-        $response = $this->actingAs($admin)->put('/billing/payment/' . $enrollment->id, [
+        $response = $this->actingAs($admin)->put('/billing/payment/'.$enrollment->id, [
             'amount_paid' => -100,
             'payment_status' => PaymentStatus::PARTIAL->value,
         ]);
         $response->assertSessionHasErrors('amount_paid');
 
         // Test invalid payment status
-        $response = $this->actingAs($admin)->put('/billing/payment/' . $enrollment->id, [
+        $response = $this->actingAs($admin)->put('/billing/payment/'.$enrollment->id, [
             'amount_paid' => 10000,
             'payment_status' => 'invalid_status',
         ]);
         $response->assertSessionHasErrors('payment_status');
 
         // Test missing required fields
-        $response = $this->actingAs($admin)->put('/billing/payment/' . $enrollment->id, []);
+        $response = $this->actingAs($admin)->put('/billing/payment/'.$enrollment->id, []);
         $response->assertSessionHasErrors(['amount_paid', 'payment_status']);
 
         // Test remarks max length
-        $response = $this->actingAs($admin)->put('/billing/payment/' . $enrollment->id, [
+        $response = $this->actingAs($admin)->put('/billing/payment/'.$enrollment->id, [
             'amount_paid' => 10000,
             'payment_status' => PaymentStatus::PARTIAL->value,
             'remarks' => str_repeat('a', 501),
@@ -538,7 +538,7 @@ describe('updatePayment method', function () {
             'payment_status' => PaymentStatus::PARTIAL,
         ]);
 
-        $response = $this->actingAs($superAdmin)->put('/billing/payment/' . $enrollment->id, [
+        $response = $this->actingAs($superAdmin)->put('/billing/payment/'.$enrollment->id, [
             'amount_paid' => 32000,
             'payment_status' => PaymentStatus::PAID->value,
             'remarks' => 'Full payment completed',
