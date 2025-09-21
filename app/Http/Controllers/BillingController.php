@@ -21,13 +21,13 @@ class BillingController extends Controller
         // Get enrollments based on user role
         if ($user->hasRole(['super_admin', 'administrator', 'registrar'])) {
             // Admin users can see all enrollments
-            $enrollments = Enrollment::with(['student', 'user'])
+            $enrollments = Enrollment::with(['student', 'guardian'])
                 ->latest()
                 ->paginate(10);
-        } elseif ($user->hasRole('parent')) {
-            // Parents can only see their children's enrollments
+        } elseif ($user->hasRole('guardian')) {
+            // Guardians can only see their children's enrollments
             $studentIds = $user->children()->pluck('students.id');
-            $enrollments = Enrollment::with(['student', 'user'])
+            $enrollments = Enrollment::with(['student', 'guardian'])
                 ->whereIn('student_id', $studentIds)
                 ->latest()
                 ->paginate(10);
@@ -65,14 +65,14 @@ class BillingController extends Controller
         $enrollment = null;
 
         if ($enrollmentId) {
-            $query = Enrollment::with(['student', 'user']);
+            $query = Enrollment::with(['student', 'guardian']);
 
             // Check permissions
             if ($user->hasRole(['super_admin', 'administrator', 'registrar'])) {
                 // Admin users can see any invoice
                 $enrollment = $query->find($enrollmentId);
-            } elseif ($user->hasRole('parent')) {
-                // Parents can only see their children's invoices
+            } elseif ($user->hasRole('guardian')) {
+                // Guardians can only see their children's invoices
                 $studentIds = $user->children()->pluck('students.id');
                 $enrollment = $query->whereIn('student_id', $studentIds)
                     ->find($enrollmentId);
@@ -83,9 +83,9 @@ class BillingController extends Controller
             }
         } else {
             // Get the latest enrollment for the user if no ID specified
-            if ($user->hasRole('parent')) {
+            if ($user->hasRole('guardian')) {
                 $studentIds = $user->children()->pluck('students.id');
-                $enrollment = Enrollment::with(['student', 'user'])
+                $enrollment = Enrollment::with(['student', 'guardian'])
                     ->whereIn('student_id', $studentIds)
                     ->latest()
                     ->first();
