@@ -102,7 +102,7 @@ class StudentController extends Controller
         DB::transaction(function () use ($validated, $parent) {
             // Create student record
             $student = Student::create([
-                'student_id' => $this->generateStudentId(),
+                'student_id' => Student::generateStudentId(),
                 'first_name' => $validated['first_name'],
                 'middle_name' => $validated['middle_name'],
                 'last_name' => $validated['last_name'],
@@ -282,17 +282,4 @@ class StudentController extends Controller
             ->with('success', 'Login account created successfully for '.$student->first_name.'.');
     }
 
-    /**
-     * Generate a unique student ID
-     */
-    private function generateStudentId(): string
-    {
-        do {
-            $year = date('Y');
-            $number = str_pad((string) rand(1, 9999), 4, '0', STR_PAD_LEFT);
-            $studentId = $year.'-'.$number;
-        } while (Student::where('student_id', $studentId)->exists());
-
-        return $studentId;
-    }
 }

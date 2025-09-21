@@ -82,7 +82,7 @@ class UserSeeder extends Seeder
         $studentUser1->assignRole('student');
 
         $student1 = Student::create([
-            'student_id' => $this->generateStudentId(),
+            'student_id' => Student::generateStudentId(),
             'first_name' => 'Juan',
             'middle_name' => 'Garcia',
             'last_name' => 'Santos',
@@ -104,7 +104,7 @@ class UserSeeder extends Seeder
 
         // Create second child without login account
         $student2 = Student::create([
-            'student_id' => $this->generateStudentId(),
+            'student_id' => Student::generateStudentId(),
             'first_name' => 'Ana',
             'middle_name' => 'Garcia',
             'last_name' => 'Santos',
@@ -125,17 +125,4 @@ class UserSeeder extends Seeder
         ]);
     }
 
-    /**
-     * Generate a unique student ID
-     */
-    private function generateStudentId(): string
-    {
-        do {
-            $year = date('Y');
-            $number = str_pad((string) rand(1, 9999), 4, '0', STR_PAD_LEFT);
-            $studentId = $year.'-'.$number;
-        } while (Student::where('student_id', $studentId)->exists());
-
-        return $studentId;
-    }
 }
