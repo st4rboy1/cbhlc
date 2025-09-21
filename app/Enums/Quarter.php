@@ -2,11 +2,12 @@
 
 namespace App\Enums;
 
-enum Semester: string
+enum Quarter: string
 {
     case FIRST = 'First';
     case SECOND = 'Second';
-    case SUMMER = 'Summer';
+    case THIRD = 'Third';
+    case FOURTH = 'Fourth';
 
     public static function values(): array
     {
@@ -16,9 +17,10 @@ enum Semester: string
     public function label(): string
     {
         return match ($this) {
-            self::FIRST => 'First Semester',
-            self::SECOND => 'Second Semester',
-            self::SUMMER => 'Summer',
+            self::FIRST => '1st Quarter',
+            self::SECOND => '2nd Quarter',
+            self::THIRD => '3rd Quarter',
+            self::FOURTH => '4th Quarter',
         };
     }
 }
