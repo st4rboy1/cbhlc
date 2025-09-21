@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\BillingController;
-use App\Http\Controllers\Parent\StudentController;
+use App\Http\Controllers\Guardian\StudentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -52,18 +52,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('registrar/dashboard');
     })->middleware('role:registrar')->name('registrar.dashboard');
 
-    // Parent dashboard
-    Route::get('parent/dashboard', function () {
-        return Inertia::render('parent/dashboard');
-    })->middleware('role:parent')->name('parent.dashboard');
+    // Guardian dashboard
+    Route::get('guardian/dashboard', function () {
+        return Inertia::render('guardian/dashboard');
+    })->middleware('role:guardian')->name('guardian.dashboard');
 
     // Student dashboard
     Route::get('student/dashboard', function () {
         return Inertia::render('student/dashboard');
     })->middleware('role:student')->name('student.dashboard');
 
-    // Parent routes for managing students
-    Route::middleware('role:parent')->prefix('parent')->name('parent.')->group(function () {
+    // Guardian routes for managing students
+    Route::middleware('role:guardian')->prefix('guardian')->name('guardian.')->group(function () {
         Route::resource('students', StudentController::class);
         Route::post('students/{student}/create-login', [StudentController::class, 'createLogin'])
             ->name('students.create-login');
