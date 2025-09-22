@@ -153,7 +153,7 @@ class EnrollmentController extends Controller
         if ($user->hasRole('guardian')) {
             // Guardian can only update pending enrollments for their children
             if ($enrollment->guardian_id !== $user->id ||
-                $enrollment->enrollment_status !== EnrollmentStatus::PENDING) {
+                $enrollment->status !== EnrollmentStatus::PENDING) {
                 abort(403, 'Unauthorized');
             }
         }
@@ -180,7 +180,7 @@ class EnrollmentController extends Controller
         if ($user->hasRole('guardian')) {
             // Guardian can only delete pending enrollments for their children
             if ($enrollment->guardian_id !== $user->id ||
-                $enrollment->enrollment_status !== EnrollmentStatus::PENDING) {
+                $enrollment->status !== EnrollmentStatus::PENDING) {
                 abort(403, 'Unauthorized');
             }
         }

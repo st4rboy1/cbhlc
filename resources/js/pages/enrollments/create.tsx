@@ -32,7 +32,15 @@ export default function EnrollmentCreate({ students, quarters, currentSchoolYear
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post('/enrollments');
+        post('/enrollments', {
+            preserveScroll: false,
+            onSuccess: () => {
+                // The redirect is handled by the server
+            },
+            onError: (errors) => {
+                console.error('Submission errors:', errors);
+            },
+        });
     };
 
     return (
