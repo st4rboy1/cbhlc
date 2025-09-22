@@ -41,7 +41,7 @@ describe('invoice controller', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($admin)->get('/invoices/'.$enrollment->id);
+        $response = $this->actingAs($admin)->get(route('invoices.show', $enrollment));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -111,7 +111,7 @@ describe('invoice controller', function () {
         ]);
 
         // Guardian can view own child's invoice
-        $response = $this->actingAs($guardian)->get('/invoices/'.$ownEnrollment->id);
+        $response = $this->actingAs($guardian)->get(route('invoices.show', $ownEnrollment));
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('invoice')
@@ -119,7 +119,7 @@ describe('invoice controller', function () {
         );
 
         // Guardian cannot view other child's invoice
-        $response = $this->actingAs($guardian)->get('/invoices/'.$otherEnrollment->id);
+        $response = $this->actingAs($guardian)->get(route('invoices.show', $otherEnrollment));
         $response->assertStatus(404);
     });
 
@@ -185,7 +185,7 @@ describe('invoice controller', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($guardian)->get('/invoices');
+        $response = $this->actingAs($guardian)->get(route('invoices.index'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -199,7 +199,7 @@ describe('invoice controller', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
 
-        $response = $this->actingAs($admin)->get('/invoice/99999');
+        $response = $this->actingAs($admin)->get(route('invoices.show', 99999));
         $response->assertStatus(404);
     });
 });

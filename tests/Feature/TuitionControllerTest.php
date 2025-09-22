@@ -63,7 +63,7 @@ describe('tuition controller', function () {
             'is_active' => true,
         ]);
 
-        $response = $this->actingAs($admin)->get('/tuition');
+        $response = $this->actingAs($admin)->get(route('tuition'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -134,7 +134,7 @@ describe('tuition controller', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($guardian)->get('/tuition');
+        $response = $this->actingAs($guardian)->get(route('tuition'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -166,7 +166,7 @@ describe('tuition controller', function () {
             ]);
         });
 
-        $response = $this->actingAs($registrar)->get('/tuition');
+        $response = $this->actingAs($registrar)->get(route('tuition'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
