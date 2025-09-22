@@ -50,7 +50,7 @@ class StudentController extends Controller
                 ];
             });
 
-        return Inertia::render('students/index', [
+        return Inertia::render('guardian/students/index', [
             'students' => $students,
         ]);
     }
@@ -71,7 +71,7 @@ class StudentController extends Controller
 
         $student->load('enrollments');
 
-        return Inertia::render('students/show', [
+        return Inertia::render('guardian/students/show', [
             'student' => [
                 'id' => $student->id,
                 'student_id' => $student->student_id,
@@ -105,7 +105,7 @@ class StudentController extends Controller
      */
     public function create()
     {
-        return Inertia::render('students/create');
+        return Inertia::render('guardian/students/create');
     }
 
     /**
@@ -154,7 +154,7 @@ class StudentController extends Controller
             abort(403, 'You do not have access to edit this student.');
         }
 
-        return Inertia::render('students/edit', [
+        return Inertia::render('guardian/students/edit', [
             'student' => $student,
         ]);
     }

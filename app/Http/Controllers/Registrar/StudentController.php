@@ -43,7 +43,7 @@ class StudentController extends Controller
 
         $students = $query->paginate(20);
 
-        return Inertia::render('students/index', [
+        return Inertia::render('registrar/students/index', [
             'students' => $students,
             'filters' => $request->only(['search', 'grade_level', 'section']),
             'gradeLevels' => GradeLevel::values(),
@@ -57,7 +57,7 @@ class StudentController extends Controller
     {
         $student->load(['enrollments.guardian', 'guardianStudents.guardian']);
 
-        return Inertia::render('students/show', [
+        return Inertia::render('registrar/students/show', [
             'student' => [
                 'id' => $student->id,
                 'student_id' => $student->student_id,
@@ -104,7 +104,7 @@ class StudentController extends Controller
      */
     public function create()
     {
-        return Inertia::render('students/create', [
+        return Inertia::render('registrar/students/create', [
             'gradeLevels' => GradeLevel::values(),
         ]);
     }
@@ -141,7 +141,7 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        return Inertia::render('students/edit', [
+        return Inertia::render('registrar/students/edit', [
             'student' => $student,
             'gradeLevels' => GradeLevel::values(),
         ]);

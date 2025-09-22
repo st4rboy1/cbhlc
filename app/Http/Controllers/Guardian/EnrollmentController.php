@@ -32,7 +32,7 @@ class EnrollmentController extends Controller
             ->latest('created_at')
             ->paginate(10);
 
-        return Inertia::render('enrollments/index', [
+        return Inertia::render('guardian/enrollments/index', [
             'enrollments' => $enrollments,
         ]);
     }
@@ -67,7 +67,7 @@ class EnrollmentController extends Controller
             ];
         });
 
-        return Inertia::render('enrollments/create', [
+        return Inertia::render('guardian/enrollments/create', [
             'students' => $students,
             'gradeLevels' => GradeLevel::values(),
             'quarters' => Quarter::values(),
@@ -166,7 +166,7 @@ class EnrollmentController extends Controller
 
         $enrollment->load(['student', 'guardian']);
 
-        return Inertia::render('enrollments/show', [
+        return Inertia::render('guardian/enrollments/show', [
             'enrollment' => $enrollment,
         ]);
     }
@@ -193,7 +193,7 @@ class EnrollmentController extends Controller
 
         $enrollment->load(['student']);
 
-        return Inertia::render('enrollments/edit', [
+        return Inertia::render('guardian/enrollments/edit', [
             'enrollment' => $enrollment,
             'gradeLevels' => GradeLevel::values(),
             'quarters' => Quarter::values(),

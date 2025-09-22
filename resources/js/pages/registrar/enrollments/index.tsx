@@ -1,11 +1,11 @@
 import { Head } from '@inertiajs/react'
 
-export default function GuardianStudentsIndex(props: any) {
+export default function RegistrarEnrollmentsIndex(props: any) {
     return (
         <>
-            <Head title="Students Index" />
+            <Head title="Enrollments Index" />
             <div className="container mx-auto py-6">
-                <h1 className="text-3xl font-bold mb-6">Students Index</h1>
+                <h1 className="text-3xl font-bold mb-6">Enrollments Index</h1>
                 <pre>{JSON.stringify(props, null, 2)}</pre>
             </div>
         </>
