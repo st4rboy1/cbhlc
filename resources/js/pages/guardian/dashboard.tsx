@@ -5,59 +5,37 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { Bell, Book, Calendar, CreditCard, FileText, GraduationCap, MessageSquare, User } from 'lucide-react';
+import { Bell, Book, Calendar, CreditCard, FileText, GraduationCap, MessageSquare, Plus, User } from 'lucide-react';
 
-export default function GuardianDashboard() {
+interface Child {
+    id: number;
+    name: string;
+    grade: string;
+    enrollmentStatus: string;
+    photo: string | null;
+}
+
+interface Announcement {
+    id: number;
+    title: string;
+    message: string;
+    date: string;
+    type: string;
+}
+
+interface UpcomingEvent {
+    date: string;
+    event: string;
+}
+
+interface GuardianDashboardProps {
+    children: Child[];
+    announcements: Announcement[];
+    upcomingEvents: UpcomingEvent[];
+}
+
+export default function GuardianDashboard({ children, announcements, upcomingEvents }: GuardianDashboardProps) {
     const { auth } = usePage<SharedData>().props;
-
-    // Mock data - replace with real data from backend
-    const children = [
-        {
-            id: 1,
-            name: 'Maria Rodriguez',
-            grade: 'Grade 6-A',
-            enrollmentStatus: 'Enrolled',
-            photo: null,
-        },
-        {
-            id: 2,
-            name: 'Juan Rodriguez',
-            grade: 'Grade 4-B',
-            enrollmentStatus: 'Enrolled',
-            photo: null,
-        },
-    ];
-
-    const announcements = [
-        {
-            id: 1,
-            title: 'Parent-Teacher Conference',
-            message: 'Scheduled for October 15, 2025. Please confirm your attendance.',
-            date: '2025-09-15',
-            type: 'event',
-        },
-        {
-            id: 2,
-            title: 'School Holiday',
-            message: 'No classes on September 21, 2025 - National Holiday',
-            date: '2025-09-14',
-            type: 'holiday',
-        },
-        {
-            id: 3,
-            title: 'Tuition Payment Reminder',
-            message: 'Monthly tuition fee due on September 30, 2025',
-            date: '2025-09-13',
-            type: 'payment',
-        },
-    ];
-
-    const upcomingEvents = [
-        { date: '2025-10-01', event: 'Foundation Day Celebration' },
-        { date: '2025-10-15', event: 'Parent-Teacher Conference' },
-        { date: '2025-10-30', event: 'Halloween Program' },
-        { date: '2025-11-01', event: 'All Saints Day - No Classes' },
-    ];
 
     return (
         <>
@@ -108,6 +86,20 @@ export default function GuardianDashboard() {
                                 </CardContent>
                             </Card>
                         ))}
+
+                        {/* Add Student Card */}
+                        <Card className="cursor-pointer border-dashed transition-colors hover:border-primary hover:bg-primary/5">
+                            <Link href={route('guardian.students.create')} className="block h-full">
+                                <CardContent className="flex h-full min-h-[280px] items-center justify-center p-6">
+                                    <div className="text-center">
+                                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                                            <Plus className="h-8 w-8 text-primary" />
+                                        </div>
+                                        <p className="mt-4 text-sm font-medium text-muted-foreground">Add New Student</p>
+                                    </div>
+                                </CardContent>
+                            </Link>
+                        </Card>
                     </div>
                 </div>
 
