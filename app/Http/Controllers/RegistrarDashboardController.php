@@ -119,8 +119,8 @@ class RegistrarDashboardController extends Controller
 
         $enrollment->update([
             'status' => EnrollmentStatus::ENROLLED,
-            'approval_date' => now(),
-            'reviewer_id' => auth()->id(),
+            'approved_at' => now(),
+            'approved_by' => auth()->id(),
         ]);
 
         return back()->with('success', 'Enrollment application approved successfully.');
@@ -143,9 +143,9 @@ class RegistrarDashboardController extends Controller
 
         $enrollment->update([
             'status' => EnrollmentStatus::REJECTED,
-            'review_date' => now(),
-            'reviewer_id' => auth()->id(),
-            'notes' => $validated['reason'],
+            'approved_at' => now(),
+            'approved_by' => auth()->id(),
+            'remarks' => $validated['reason'],
         ]);
 
         return back()->with('success', 'Enrollment application rejected.');
