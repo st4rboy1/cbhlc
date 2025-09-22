@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { logout } from '@/routes';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronDown, CreditCard, FileText, GraduationCap, Home, LogOut, UserCircle, Users } from 'lucide-react';
+import { ChevronDown, CreditCard, FileText, GraduationCap, Home, LogOut, Plus, UserCircle, Users } from 'lucide-react';
 import { useState } from 'react';
 
 interface SidebarProps {
@@ -64,6 +64,20 @@ export default function Sidebar({ currentPage = '' }: SidebarProps) {
                         Enrollment
                     </Link>
                 </Button>
+
+                {/* Show Add Student link only for guardians */}
+                {auth.user?.roles?.some((role) => role.name === 'guardian') && (
+                    <Button
+                        variant={isActive('guardian.students.create') ? 'secondary' : 'ghost'}
+                        className={cn('w-full justify-start gap-3', isActive('guardian.students.create') && 'bg-accent')}
+                        asChild
+                    >
+                        <Link href="/guardian/students/create">
+                            <Plus className="h-4 w-4" />
+                            Add Student
+                        </Link>
+                    </Button>
+                )}
                 <Collapsible open={billingOpen} onOpenChange={setBillingOpen}>
                     <CollapsibleTrigger asChild>
                         <Button variant="ghost" className="w-full justify-between gap-3">
