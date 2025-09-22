@@ -21,7 +21,7 @@ class Student extends Model
         'birthdate',
         'gender',
         'address',
-        'phone',
+        'contact_number',
         'grade_level',
         'user_id',
     ];

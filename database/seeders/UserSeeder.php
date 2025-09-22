@@ -87,7 +87,7 @@ class UserSeeder extends Seeder
                 'first_name' => 'Maria',
                 'middle_name' => 'Cruz',
                 'last_name' => 'Santos',
-                'phone' => '+63987654321',
+                'contact_number' => '+63987654321',
                 'address' => '123 Rizal Street, Pasig City',
                 'occupation' => 'Teacher',
                 'employer' => 'Department of Education',

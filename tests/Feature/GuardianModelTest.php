@@ -21,7 +21,7 @@ test('guardian model can be created', function () {
         'first_name' => 'John',
         'middle_name' => 'Michael',
         'last_name' => 'Doe',
-        'phone' => '09123456789',
+        'contact_number' => '09123456789',
         'address' => '123 Test Street',
         'occupation' => 'Teacher',
         'employer' => 'Test School',
@@ -34,7 +34,7 @@ test('guardian model can be created', function () {
     expect($guardian->first_name)->toBe('John');
     expect($guardian->middle_name)->toBe('Michael');
     expect($guardian->last_name)->toBe('Doe');
-    expect($guardian->phone)->toBe('09123456789');
+    expect($guardian->contact_number)->toBe('09123456789');
     expect($guardian->address)->toBe('123 Test Street');
     expect($guardian->occupation)->toBe('Teacher');
     expect($guardian->employer)->toBe('Test School');
@@ -51,7 +51,7 @@ test('guardian belongs to user', function () {
         'user_id' => $user->id,
         'first_name' => 'John',
         'last_name' => 'Doe',
-        'phone' => '09123456789',
+        'contact_number' => '09123456789',
         'address' => '123 Test Street',
     ]);
 
@@ -67,7 +67,7 @@ test('guardian can have many children', function () {
         'user_id' => $user->id,
         'first_name' => 'John',
         'last_name' => 'Doe',
-        'phone' => '09123456789',
+        'contact_number' => '09123456789',
         'address' => '123 Test Street',
     ]);
 
@@ -103,7 +103,7 @@ test('guardian children relationship includes pivot data', function () {
         'user_id' => $user->id,
         'first_name' => 'Jane',
         'last_name' => 'Smith',
-        'phone' => '09123456789',
+        'contact_number' => '09123456789',
         'address' => '456 Test Avenue',
     ]);
 
@@ -131,7 +131,7 @@ test('guardian model fillable attributes work correctly', function () {
         'first_name' => 'Test',
         'middle_name' => 'Middle',
         'last_name' => 'Guardian',
-        'phone' => '09111111111',
+        'contact_number' => '09111111111',
         'address' => '789 Test Boulevard',
         'occupation' => 'Engineer',
         'employer' => 'Tech Company',

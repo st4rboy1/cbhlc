@@ -25,7 +25,7 @@ class GuardianFactory extends Factory
             'first_name' => fake()->firstName(),
             'middle_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
-            'phone' => fake()->phoneNumber(),
+            'contact_number' => fake()->phoneNumber(),
             'address' => fake()->address(),
             'occupation' => fake()->jobTitle(),
             'employer' => fake()->company(),
