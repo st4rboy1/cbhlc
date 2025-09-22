@@ -1,339 +1,149 @@
 import PageLayout from '@/components/PageLayout';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Head } from '@inertiajs/react';
-import { Upload } from 'lucide-react';
-import { useState } from 'react';
+import { Head, useForm } from '@inertiajs/react';
+import { AlertCircle } from 'lucide-react';
+import { FormEventHandler } from 'react';
 
-export default function Enrollment() {
-    const [activeTab, setActiveTab] = useState('student-info');
-    const [uploadedFiles, setUploadedFiles] = useState<{ [key: string]: File | null }>({
-        birthCertificate: null,
-        reportCard: null,
-        form138: null,
-        goodMoral: null,
+interface Student {
+    id: number;
+    first_name: string;
+    middle_name?: string;
+    last_name: string;
+    student_id: string;
+}
+
+interface Props {
+    students: Student[];
+    gradeLevels: string[];
+    quarters: string[];
+    currentSchoolYear: string;
+}
+
+export default function EnrollmentCreate({ students, quarters, currentSchoolYear }: Props) {
+    const { data, setData, post, processing, errors } = useForm({
+        student_id: '',
+        school_year: currentSchoolYear,
+        quarter: '',
     });
 
-    const handleFileUpload = (fileType: string, file: File | null) => {
-        setUploadedFiles((prev) => ({
-            ...prev,
-            [fileType]: file,
-        }));
+    const submit: FormEventHandler = (e) => {
+        e.preventDefault();
+        post('/enrollments');
     };
 
     return (
         <>
             <Head title="New Enrollment" />
             <PageLayout title="NEW ENROLLMENT" currentPage="enrollments">
-                <div className="space-y-6">
-                    {/* Progress Indicator */}
+                <div className="mx-auto max-w-2xl space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Enrollment Progress</CardTitle>
-                            <CardDescription>Complete all sections to submit your enrollment</CardDescription>
+                            <CardTitle>Enrollment Application</CardTitle>
+                            <CardDescription>Submit an enrollment application for the {currentSchoolYear} school year</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="flex items-center gap-2">
-                                <Badge variant={activeTab === 'student-info' ? 'default' : 'secondary'}>1. Student Information</Badge>
-                                <Separator className="w-8" />
-                                <Badge variant={activeTab === 'guardian-info' ? 'default' : 'secondary'}>2. Guardian Information</Badge>
-                                <Separator className="w-8" />
-                                <Badge variant={activeTab === 'academic' ? 'default' : 'secondary'}>3. Academic Details</Badge>
-                                <Separator className="w-8" />
-                                <Badge variant={activeTab === 'documents' ? 'default' : 'secondary'}>4. Documents</Badge>
-                            </div>
+                            <form onSubmit={submit} className="space-y-6">
+                                {/* Student Selection */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="student_id">Select Student</Label>
+                                    <Select value={data.student_id} onValueChange={(value) => setData('student_id', value)}>
+                                        <SelectTrigger id="student_id" className={errors.student_id ? 'border-red-500' : ''}>
+                                            <SelectValue placeholder="Select a student to enroll" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {students.length > 0 ? (
+                                                students.map((student) => (
+                                                    <SelectItem key={student.id} value={student.id.toString()}>
+                                                        {student.first_name} {student.middle_name} {student.last_name} - {student.student_id}
+                                                    </SelectItem>
+                                                ))
+                                            ) : (
+                                                <div className="p-2 text-sm text-muted-foreground">
+                                                    No students found. Please add a student first.
+                                                </div>
+                                            )}
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.student_id && <p className="text-sm text-red-500">{errors.student_id}</p>}
+                                </div>
+
+                                {/* School Year (Read-only) */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="school_year">School Year</Label>
+                                    <div className="rounded-md border bg-muted px-3 py-2 text-sm">{data.school_year}</div>
+                                </div>
+
+                                {/* Quarter Selection */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="quarter">Quarter</Label>
+                                    <Select value={data.quarter} onValueChange={(value) => setData('quarter', value)}>
+                                        <SelectTrigger id="quarter" className={errors.quarter ? 'border-red-500' : ''}>
+                                            <SelectValue placeholder="Select quarter" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {quarters.map((quarter) => (
+                                                <SelectItem key={quarter} value={quarter}>
+                                                    {quarter}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    {errors.quarter && <p className="text-sm text-red-500">{errors.quarter}</p>}
+                                </div>
+
+                                {/* No Students Alert */}
+                                {students.length === 0 && (
+                                    <Alert>
+                                        <AlertCircle className="h-4 w-4" />
+                                        <AlertDescription>
+                                            You need to add a student before creating an enrollment. Please go to the "Add Student" section first.
+                                        </AlertDescription>
+                                    </Alert>
+                                )}
+
+                                {/* Submit Button */}
+                                <div className="flex justify-end gap-2">
+                                    <Button type="button" variant="outline" onClick={() => window.history.back()}>
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit" disabled={processing || students.length === 0}>
+                                        {processing ? 'Submitting...' : 'Submit Enrollment Application'}
+                                    </Button>
+                                </div>
+                            </form>
                         </CardContent>
                     </Card>
 
-                    {/* Main Enrollment Form */}
+                    {/* Information Card */}
                     <Card>
-                        <CardContent className="p-6">
-                            <Tabs value={activeTab} onValueChange={setActiveTab}>
-                                <TabsList className="grid w-full grid-cols-4">
-                                    <TabsTrigger value="student-info">Student Info</TabsTrigger>
-                                    <TabsTrigger value="guardian-info">Guardian Info</TabsTrigger>
-                                    <TabsTrigger value="academic">Academic</TabsTrigger>
-                                    <TabsTrigger value="documents">Documents</TabsTrigger>
-                                </TabsList>
-
-                                {/* Student Information Tab */}
-                                <TabsContent value="student-info" className="space-y-4">
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="firstName">First Name</Label>
-                                            <Input id="firstName" placeholder="Enter first name" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="lastName">Last Name</Label>
-                                            <Input id="lastName" placeholder="Enter last name" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="middleName">Middle Name</Label>
-                                            <Input id="middleName" placeholder="Enter middle name" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="birthDate">Birth Date</Label>
-                                            <Input id="birthDate" type="date" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="gender">Gender</Label>
-                                            <Select>
-                                                <SelectTrigger id="gender">
-                                                    <SelectValue placeholder="Select gender" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="male">Male</SelectItem>
-                                                    <SelectItem value="female">Female</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="nationality">Nationality</Label>
-                                            <Input id="nationality" placeholder="Enter nationality" />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="address">Complete Address</Label>
-                                        <Input id="address" placeholder="Enter complete address" />
-                                    </div>
-
-                                    <div className="flex justify-end">
-                                        <Button onClick={() => setActiveTab('guardian-info')}>Next: Guardian Information</Button>
-                                    </div>
-                                </TabsContent>
-
-                                {/* Guardian Information Tab */}
-                                <TabsContent value="guardian-info" className="space-y-4">
-                                    <div className="space-y-4">
-                                        <h3 className="text-lg font-semibold">Father's Information</h3>
-                                        <div className="grid gap-4 md:grid-cols-2">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="fatherName">Full Name</Label>
-                                                <Input id="fatherName" placeholder="Enter father's name" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="fatherOccupation">Occupation</Label>
-                                                <Input id="fatherOccupation" placeholder="Enter occupation" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="fatherPhone">Contact Number</Label>
-                                                <Input id="fatherPhone" type="tel" placeholder="Enter phone number" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="fatherEmail">Email Address</Label>
-                                                <Input id="fatherEmail" type="email" placeholder="Enter email" />
-                                            </div>
-                                        </div>
-
-                                        <Separator className="my-4" />
-
-                                        <h3 className="text-lg font-semibold">Mother's Information</h3>
-                                        <div className="grid gap-4 md:grid-cols-2">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="motherName">Full Name</Label>
-                                                <Input id="motherName" placeholder="Enter mother's name" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="motherOccupation">Occupation</Label>
-                                                <Input id="motherOccupation" placeholder="Enter occupation" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="motherPhone">Contact Number</Label>
-                                                <Input id="motherPhone" type="tel" placeholder="Enter phone number" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="motherEmail">Email Address</Label>
-                                                <Input id="motherEmail" type="email" placeholder="Enter email" />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex justify-between">
-                                        <Button variant="outline" onClick={() => setActiveTab('student-info')}>
-                                            Previous
-                                        </Button>
-                                        <Button onClick={() => setActiveTab('academic')}>Next: Academic Details</Button>
-                                    </div>
-                                </TabsContent>
-
-                                {/* Academic Information Tab */}
-                                <TabsContent value="academic" className="space-y-4">
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="gradeLevel">Grade Level</Label>
-                                            <Select>
-                                                <SelectTrigger id="gradeLevel">
-                                                    <SelectValue placeholder="Select grade level" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="kindergarten">Kindergarten</SelectItem>
-                                                    <SelectItem value="grade1">Grade 1</SelectItem>
-                                                    <SelectItem value="grade2">Grade 2</SelectItem>
-                                                    <SelectItem value="grade3">Grade 3</SelectItem>
-                                                    <SelectItem value="grade4">Grade 4</SelectItem>
-                                                    <SelectItem value="grade5">Grade 5</SelectItem>
-                                                    <SelectItem value="grade6">Grade 6</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="schoolYear">School Year</Label>
-                                            <Input id="schoolYear" placeholder="e.g., 2024-2025" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="previousSchool">Previous School</Label>
-                                            <Input id="previousSchool" placeholder="Enter previous school name" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="previousGrade">Previous Grade Level</Label>
-                                            <Input id="previousGrade" placeholder="Enter previous grade level" />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex justify-between">
-                                        <Button variant="outline" onClick={() => setActiveTab('guardian-info')}>
-                                            Previous
-                                        </Button>
-                                        <Button onClick={() => setActiveTab('documents')}>Next: Upload Documents</Button>
-                                    </div>
-                                </TabsContent>
-
-                                {/* Documents Tab */}
-                                <TabsContent value="documents" className="space-y-4">
-                                    <Alert>
-                                        <AlertDescription>
-                                            Please upload clear, readable copies of the required documents in JPEG or PNG format (max 50MB per file).
-                                        </AlertDescription>
-                                    </Alert>
-
-                                    <div className="grid gap-4 md:grid-cols-2">
-                                        <Card>
-                                            <CardHeader className="pb-3">
-                                                <CardTitle className="text-base">Birth Certificate</CardTitle>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="birthCert" className="cursor-pointer">
-                                                        <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 hover:border-muted-foreground/50">
-                                                            <div className="text-center">
-                                                                <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
-                                                                <p className="mt-2 text-sm text-muted-foreground">
-                                                                    {uploadedFiles.birthCertificate
-                                                                        ? uploadedFiles.birthCertificate.name
-                                                                        : 'Click to upload'}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </Label>
-                                                    <Input
-                                                        id="birthCert"
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept=".jpg,.jpeg,.png"
-                                                        onChange={(e) => handleFileUpload('birthCertificate', e.target.files?.[0] || null)}
-                                                    />
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-
-                                        <Card>
-                                            <CardHeader className="pb-3">
-                                                <CardTitle className="text-base">Report Card</CardTitle>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="reportCard" className="cursor-pointer">
-                                                        <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 hover:border-muted-foreground/50">
-                                                            <div className="text-center">
-                                                                <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
-                                                                <p className="mt-2 text-sm text-muted-foreground">
-                                                                    {uploadedFiles.reportCard ? uploadedFiles.reportCard.name : 'Click to upload'}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </Label>
-                                                    <Input
-                                                        id="reportCard"
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept=".jpg,.jpeg,.png"
-                                                        onChange={(e) => handleFileUpload('reportCard', e.target.files?.[0] || null)}
-                                                    />
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-
-                                        <Card>
-                                            <CardHeader className="pb-3">
-                                                <CardTitle className="text-base">Form 138</CardTitle>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="form138" className="cursor-pointer">
-                                                        <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 hover:border-muted-foreground/50">
-                                                            <div className="text-center">
-                                                                <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
-                                                                <p className="mt-2 text-sm text-muted-foreground">
-                                                                    {uploadedFiles.form138 ? uploadedFiles.form138.name : 'Click to upload'}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </Label>
-                                                    <Input
-                                                        id="form138"
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept=".jpg,.jpeg,.png"
-                                                        onChange={(e) => handleFileUpload('form138', e.target.files?.[0] || null)}
-                                                    />
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-
-                                        <Card>
-                                            <CardHeader className="pb-3">
-                                                <CardTitle className="text-base">Good Moral Certificate</CardTitle>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <div className="space-y-2">
-                                                    <Label htmlFor="goodMoral" className="cursor-pointer">
-                                                        <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-6 hover:border-muted-foreground/50">
-                                                            <div className="text-center">
-                                                                <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
-                                                                <p className="mt-2 text-sm text-muted-foreground">
-                                                                    {uploadedFiles.goodMoral ? uploadedFiles.goodMoral.name : 'Click to upload'}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    </Label>
-                                                    <Input
-                                                        id="goodMoral"
-                                                        type="file"
-                                                        className="hidden"
-                                                        accept=".jpg,.jpeg,.png"
-                                                        onChange={(e) => handleFileUpload('goodMoral', e.target.files?.[0] || null)}
-                                                    />
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </div>
-
-                                    <div className="flex justify-between">
-                                        <Button variant="outline" onClick={() => setActiveTab('academic')}>
-                                            Previous
-                                        </Button>
-                                        <Button>Submit Enrollment Application</Button>
-                                    </div>
-                                </TabsContent>
-                            </Tabs>
+                        <CardHeader>
+                            <CardTitle>Important Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div>
+                                <h4 className="font-semibold">What happens next?</h4>
+                                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
+                                    <li>Your enrollment application will be reviewed by the registrar</li>
+                                    <li>You will receive a notification once your application is processed</li>
+                                    <li>Upon approval, you can proceed with payment and document submission</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold">Required Documents</h4>
+                                <p className="mt-2 text-sm text-muted-foreground">
+                                    The following documents will be required during the enrollment process:
+                                </p>
+                                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
+                                    <li>Birth Certificate</li>
+                                    <li>Previous Report Card</li>
+                                    <li>Form 138 (for transferees)</li>
+                                    <li>Good Moral Certificate</li>
+                                </ul>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
