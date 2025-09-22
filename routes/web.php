@@ -4,6 +4,7 @@ use App\Http\Controllers\BillingController;
 use App\Http\Controllers\GuardianDashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentReportController;
 use App\Http\Controllers\TuitionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -73,9 +74,8 @@ Route::middleware(['auth'])->group(function () {
     | Academic Reports
     |--------------------------------------------------------------------------
     */
-    Route::get('/studentreport', function () {
-        return Inertia::render('studentreport');
-    })->name('studentreport');
+    Route::get('/students/{student}/report', [StudentReportController::class, 'show'])
+        ->name('students.report');
 });
 
 /*
