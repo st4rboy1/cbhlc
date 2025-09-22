@@ -92,9 +92,9 @@ class RegistrarDashboardController extends Controller
             ->map(function ($item) {
                 return [
                     'grade' => $item->grade_level,
-                    'count' => $item->count,
+                    'count' => (int) $item->count,
                 ];
-            });
+            })->toArray();
 
         return Inertia::render('registrar/dashboard', [
             'enrollmentStats' => $enrollmentStats,
