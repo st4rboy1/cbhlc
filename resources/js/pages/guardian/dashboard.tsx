@@ -71,7 +71,7 @@ export default function GuardianDashboard({ children, announcements, upcomingEve
                                     </div>
                                     <div className="space-y-2">
                                         <Button variant="outline" size="sm" className="w-full" asChild>
-                                            <Link href={`/studentreport`}>
+                                            <Link href={`/students/${child.id}/report`}>
                                                 <FileText className="mr-2 h-3 w-3" />
                                                 View Report
                                             </Link>
