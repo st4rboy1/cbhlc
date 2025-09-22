@@ -13,25 +13,33 @@ beforeEach(function () {
 });
 
 test('guardian can have children through guardian_students pivot table', function () {
-    $guardian = User::factory()->create();
-    $guardian->assignRole('guardian');
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+
+    $guardian = \App\Models\Guardian::create([
+        'user_id' => $user->id,
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'phone' => '09123456789',
+        'address' => '123 Test St',
+    ]);
 
     $student = Student::factory()->create();
 
     // Create the relationship
     GuardianStudent::create([
-        'guardian_id' => $guardian->id,
+        'guardian_id' => $user->id,
         'student_id' => $student->id,
         'relationship_type' => RelationshipType::MOTHER->value,
         'is_primary_contact' => true,
     ]);
 
-    $children = $guardian->children;
+    $children = $guardian->children()->get();
 
     expect($children)->toHaveCount(1);
     expect($children->first()->id)->toBe($student->id);
-    expect($children->first()->pivot->relationship_type)->toBe('mother');
-    expect($children->first()->pivot->is_primary_contact)->toBe(1);
+    expect($children->first()->relationship_type)->toBe('mother');
+    expect($children->first()->is_primary_contact)->toBe(1);
 });
 
 test('student can have multiple guardians', function () {
@@ -58,7 +66,7 @@ test('student can have multiple guardians', function () {
         'is_primary_contact' => false,
     ]);
 
-    $parents = $student->parents;
+    $parents = $student->guardians()->get();
 
     expect($parents)->toHaveCount(2);
 
@@ -72,28 +80,36 @@ test('student can have multiple guardians', function () {
 });
 
 test('guardian can have multiple children', function () {
-    $guardian = User::factory()->create();
-    $guardian->assignRole('guardian');
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+
+    $guardian = \App\Models\Guardian::create([
+        'user_id' => $user->id,
+        'first_name' => 'John',
+        'last_name' => 'Smith',
+        'phone' => '09123456789',
+        'address' => '456 Test Ave',
+    ]);
 
     $child1 = Student::factory()->create();
     $child2 = Student::factory()->create();
 
     // Create relationships
     GuardianStudent::create([
-        'guardian_id' => $guardian->id,
+        'guardian_id' => $user->id,
         'student_id' => $child1->id,
         'relationship_type' => RelationshipType::GUARDIAN->value,
         'is_primary_contact' => true,
     ]);
 
     GuardianStudent::create([
-        'guardian_id' => $guardian->id,
+        'guardian_id' => $user->id,
         'student_id' => $child2->id,
         'relationship_type' => RelationshipType::GUARDIAN->value,
         'is_primary_contact' => false,
     ]);
 
-    $children = $guardian->children;
+    $children = $guardian->children()->get();
 
     expect($children)->toHaveCount(2);
     expect($children->pluck('id')->toArray())->toContain($child1->id, $child2->id);
