@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Registrar;
 
 use App\Enums\EnrollmentStatus;
 use App\Enums\PaymentStatus;
+use App\Http\Controllers\Controller;
 use App\Models\Enrollment;
 use App\Models\Student;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class RegistrarDashboardController extends Controller
+class DashboardController extends Controller
 {
     /**
      * Display the registrar dashboard.
