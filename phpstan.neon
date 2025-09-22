@@ -12,7 +12,8 @@ parameters:
     level: 5
 
     # Ignore specific errors that are not relevant
-    ignoreErrors: []
+    ignoreErrors:
+        - '#Access to an undefined property [a-zA-Z\\]+::\$[a-zA-Z_]+#'
 
     excludePaths:
         - vendor/

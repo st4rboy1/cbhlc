@@ -43,12 +43,12 @@ test('registrar sees limited menu items', function () {
     });
 });
 
-test('parent sees enrollment-related menu items only', function () {
-    $parent = User::factory()->parent()->create();
+test('guardian sees enrollment-related menu items only', function () {
+    $guardian = User::factory()->guardian()->create();
 
-    $this->browse(function (Browser $browser) use ($parent) {
-        $browser->loginAs($parent)
-            ->visit('/parent/dashboard')
+    $this->browse(function (Browser $browser) use ($guardian) {
+        $browser->loginAs($guardian)
+            ->visit('/guardian/dashboard')
             ->assertSeeLink('Dashboard')
             ->assertSeeLink('My Applications')
             ->assertSeeLink('Documents')
@@ -77,7 +77,7 @@ test('student sees minimal menu items', function () {
 
 test('enrollment approval button only visible to authorized users', function () {
     $registrar = User::factory()->registrar()->create();
-    $parent = User::factory()->parent()->create();
+    $guardian = User::factory()->guardian()->create();
 
     // Registrar should see approval button
     $this->browse(function (Browser $browser) use ($registrar) {
@@ -89,8 +89,8 @@ test('enrollment approval button only visible to authorized users', function () 
     });
 
     // Parent should not see approval buttons
-    $this->browse(function (Browser $browser) use ($parent) {
-        $browser->loginAs($parent)
+    $this->browse(function (Browser $browser) use ($guardian) {
+        $browser->loginAs($guardian)
             ->visit('/enrollments')
             ->assertMissing('[data-testid="approve-button"]')
             ->assertMissing('[data-testid="reject-button"]');
@@ -99,7 +99,7 @@ test('enrollment approval button only visible to authorized users', function () 
 
 test('document verification only available to authorized users', function () {
     $registrar = User::factory()->registrar()->create();
-    $parent = User::factory()->parent()->create();
+    $guardian = User::factory()->guardian()->create();
 
     // Registrar can verify documents
     $this->browse(function (Browser $browser) use ($registrar) {
@@ -110,8 +110,8 @@ test('document verification only available to authorized users', function () {
     });
 
     // Parent cannot verify documents
-    $this->browse(function (Browser $browser) use ($parent) {
-        $browser->loginAs($parent)
+    $this->browse(function (Browser $browser) use ($guardian) {
+        $browser->loginAs($guardian)
             ->visit('/documents')
             ->assertMissing('[data-testid="verify-document-button"]');
     });
@@ -163,7 +163,7 @@ test('system settings only accessible to super admin', function () {
 
 test('report generation restricted by role', function () {
     $registrar = User::factory()->registrar()->create();
-    $parent = User::factory()->parent()->create();
+    $guardian = User::factory()->guardian()->create();
 
     // Registrar can generate reports
     $this->browse(function (Browser $browser) use ($registrar) {
@@ -174,8 +174,8 @@ test('report generation restricted by role', function () {
     });
 
     // Parent cannot generate reports
-    $this->browse(function (Browser $browser) use ($parent) {
-        $browser->loginAs($parent)
+    $this->browse(function (Browser $browser) use ($guardian) {
+        $browser->loginAs($guardian)
             ->visit('/reports')
             ->assertPathIsNot('/reports')
             ->assertSee('403');
