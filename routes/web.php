@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\GuardianDashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\StudentController;
@@ -22,10 +23,6 @@ Route::get('/', function () {
 Route::get('/about', function () {
     return Inertia::render('about');
 })->name('about');
-
-Route::get('/enrollment', function () {
-    return Inertia::render('enrollment');
-})->name('enrollment');
 
 Route::get('/application', function () {
     return Inertia::render('application');
@@ -52,6 +49,14 @@ Route::middleware(['auth'])->group(function () {
             return Inertia::render('profilesettings');
         })->name('settings');
     });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Enrollment Management
+    |--------------------------------------------------------------------------
+    */
+    // Enrollment Routes - Full resource controller
+    Route::resource('enrollments', EnrollmentController::class);
 
     /*
     |--------------------------------------------------------------------------

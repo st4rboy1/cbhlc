@@ -30,8 +30,8 @@ export default function Enrollment() {
 
     return (
         <>
-            <Head title="Enrollment" />
-            <PageLayout title="ENROLLMENT" currentPage="enrollment">
+            <Head title="New Enrollment" />
+            <PageLayout title="NEW ENROLLMENT" currentPage="enrollments">
                 <div className="space-y-6">
                     {/* Progress Indicator */}
                     <Card>

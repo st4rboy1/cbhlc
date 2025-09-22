@@ -55,13 +55,13 @@ export default function Sidebar({ currentPage = '' }: SidebarProps) {
                 </Button>
 
                 <Button
-                    variant={isActive('enrollment') ? 'secondary' : 'ghost'}
-                    className={cn('w-full justify-start gap-3', isActive('enrollment') && 'bg-accent')}
+                    variant={isActive('enrollments') ? 'secondary' : 'ghost'}
+                    className={cn('w-full justify-start gap-3', isActive('enrollments') && 'bg-accent')}
                     asChild
                 >
-                    <Link href="/enrollment">
+                    <Link href="/enrollments">
                         <Users className="h-4 w-4" />
-                        Enrollment
+                        Enrollments
                     </Link>
                 </Button>
 
