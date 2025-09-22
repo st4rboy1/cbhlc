@@ -26,12 +26,25 @@ class Enrollment extends Model
 {
     use HasFactory;
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($enrollment) {
+            if (empty($enrollment->enrollment_id)) {
+                $count = static::count() + 1;
+                $enrollment->enrollment_id = 'ENR-'.str_pad((string) $count, 4, '0', STR_PAD_LEFT);
+            }
+        });
+    }
+
     protected $fillable = [
         'enrollment_id',
         'student_id',
         'guardian_id',
         'school_year',
         'quarter',
+        'grade_level',
         'status',
         'tuition_fee_cents',
         'miscellaneous_fee_cents',
@@ -54,6 +67,7 @@ class Enrollment extends Model
         'approved_at' => 'datetime',
         'payment_due_date' => 'date',
         'quarter' => Quarter::class,
+        'grade_level' => \App\Enums\GradeLevel::class,
         'status' => EnrollmentStatus::class,
         'payment_status' => PaymentStatus::class,
     ];

@@ -1,0 +1,490 @@
+<?php
+
+use App\Enums\EnrollmentStatus;
+use App\Enums\PaymentStatus;
+use App\Enums\Quarter;
+use App\Models\Enrollment;
+use App\Models\Guardian;
+use App\Models\GuardianStudent;
+use App\Models\Student;
+use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Inertia\Testing\AssertableInertia;
+
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+
+beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
+});
+
+describe('enrollment controller', function () {
+    test('admin can view list of all enrollments at /enrollments', function () {
+        $admin = User::factory()->create();
+        $admin->assignRole('administrator');
+
+        // Create some enrollments
+        Student::factory()->count(3)->create()->each(function ($student) {
+            Enrollment::factory()->create(['student_id' => $student->id]);
+        });
+
+        $response = $this->actingAs($admin)->get(route('enrollments.index'));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('enrollments/index')
+            ->has('enrollments.data', 3)
+        );
+    });
+
+    test('guardian can only view their children enrollments at /enrollments', function () {
+        $guardian = User::factory()->create();
+        $guardian->assignRole('guardian');
+
+        // Create guardian's children with enrollments
+        $ownStudent = Student::factory()->create();
+        \App\Models\GuardianStudent::create([
+            'guardian_id' => $guardian->id,
+            'student_id' => $ownStudent->id,
+            'relationship_type' => 'father',
+            'is_primary_contact' => true,
+        ]);
+        Enrollment::factory()->create([
+            'student_id' => $ownStudent->id,
+            'guardian_id' => $guardian->id,
+        ]);
+
+        // Create other student's enrollment
+        $otherStudent = Student::factory()->create();
+        Enrollment::factory()->create(['student_id' => $otherStudent->id]);
+
+        $response = $this->actingAs($guardian)->get(route('enrollments.index'));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('enrollments/index')
+            ->has('enrollments.data', 1) // Only guardian's child enrollment
+        );
+    });
+
+    test('users can access enrollment creation form at /enrollments/create', function () {
+        $user = User::factory()->create();
+        $user->assignRole('guardian');
+
+        $response = $this->actingAs($user)->get(route('enrollments.create'));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('enrollments/create')
+        );
+    });
+
+    test('can store new enrollment', function () {
+        $guardian = User::factory()->create();
+        $guardian->assignRole('guardian');
+
+        $student = Student::factory()->create();
+
+        $enrollmentData = [
+            'student_id' => $student->id,
+            'school_year' => '2024-2025',
+            'quarter' => 'First',
+            'grade_level' => 'Grade 1',
+        ];
+
+        $response = $this->actingAs($guardian)->post(route('enrollments.store'), $enrollmentData);
+
+        $response->assertRedirect(route('enrollments.index'));
+        $this->assertDatabaseHas('enrollments', [
+            'student_id' => $student->id,
+            'school_year' => '2024-2025',
+            'grade_level' => 'Grade 1',
+        ]);
+    });
+
+    test('can view single enrollment details at /enrollments/{enrollment}', function () {
+        $admin = User::factory()->create();
+        $admin->assignRole('administrator');
+
+        $enrollment = Enrollment::factory()->create();
+
+        $response = $this->actingAs($admin)->get(route('enrollments.show', $enrollment));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('enrollments/show')
+            ->has('enrollment')
+        );
+    });
+
+    test('old /enrollment route no longer exists', function () {
+        $user = User::factory()->create();
+        $user->assignRole('guardian');
+
+        $response = $this->actingAs($user)->get('/enrollment');
+
+        $response->assertStatus(404);
+    });
+
+    test('prevents duplicate enrollment for same student and school year', function () {
+        $guardian = User::factory()->create();
+        $guardian->assignRole('guardian');
+
+        $guardianModel = Guardian::create([
+            'user_id' => $guardian->id,
+            'first_name' => 'Jane',
+            'last_name' => 'Smith',
+            'contact_number' => '09123456789',
+            'address' => '456 Test Ave',
+        ]);
+
+        $student = Student::factory()->create();
+
+        GuardianStudent::create([
+            'guardian_id' => $guardian->id,
+            'student_id' => $student->id,
+            'relationship_type' => 'mother',
+            'is_primary_contact' => true,
+        ]);
+
+        // Create first enrollment
+        $firstEnrollment = Enrollment::create([
+            'student_id' => $student->id,
+            'guardian_id' => $guardian->id,
+            'school_year' => '2024-2025',
+            'quarter' => Quarter::FIRST,
+            'grade_level' => 'Grade 1',
+            'status' => EnrollmentStatus::PENDING,
+            'tuition_fee_cents' => 0,
+            'miscellaneous_fee_cents' => 0,
+            'laboratory_fee_cents' => 0,
+            'total_amount_cents' => 0,
+            'net_amount_cents' => 0,
+            'amount_paid_cents' => 0,
+            'balance_cents' => 0,
+            'payment_status' => PaymentStatus::PENDING,
+        ]);
+
+        // Attempt to create duplicate enrollment for same student and school year
+        $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+            'student_id' => $student->id,
+            'school_year' => '2024-2025',
+            'quarter' => Quarter::SECOND->value,
+            'grade_level' => 'Grade 2',
+        ]);
+
+        $response->assertSessionHasErrors(['student_id']);
+        $response->assertRedirect();
+
+        // Verify only one enrollment exists for this student and school year
+        $enrollmentCount = Enrollment::where('student_id', $student->id)
+            ->where('school_year', '2024-2025')
+            ->count();
+
+        expect($enrollmentCount)->toBe(1);
+    });
+
+    test('allows enrollment for same student in different school year', function () {
+        $guardian = User::factory()->create();
+        $guardian->assignRole('guardian');
+
+        $guardianModel = Guardian::create([
+            'user_id' => $guardian->id,
+            'first_name' => 'Bob',
+            'last_name' => 'Johnson',
+            'contact_number' => '09123456789',
+            'address' => '789 Test Blvd',
+        ]);
+
+        $student = Student::factory()->create();
+
+        GuardianStudent::create([
+            'guardian_id' => $guardian->id,
+            'student_id' => $student->id,
+            'relationship_type' => 'father',
+            'is_primary_contact' => true,
+        ]);
+
+        // Create first enrollment for 2024-2025
+        Enrollment::create([
+            'student_id' => $student->id,
+            'guardian_id' => $guardian->id,
+            'school_year' => '2024-2025',
+            'quarter' => Quarter::FIRST,
+            'grade_level' => 'Kinder',
+            'status' => EnrollmentStatus::APPROVED, // Make sure they passed
+            'tuition_fee_cents' => 0,
+            'miscellaneous_fee_cents' => 0,
+            'laboratory_fee_cents' => 0,
+            'total_amount_cents' => 0,
+            'net_amount_cents' => 0,
+            'amount_paid_cents' => 0,
+            'balance_cents' => 0,
+            'payment_status' => PaymentStatus::PENDING,
+        ]);
+
+        // Create enrollment for different school year - should succeed (progression from Kinder to Grade 1)
+        $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+            'student_id' => $student->id,
+            'school_year' => '2025-2026',
+            'quarter' => Quarter::FIRST->value,
+            'grade_level' => 'Grade 1',
+        ]);
+
+        $response->assertRedirect(route('enrollments.index'));
+        $response->assertSessionHas('success');
+
+        // Verify both enrollments exist
+        $enrollmentCount = Enrollment::where('student_id', $student->id)->count();
+        expect($enrollmentCount)->toBe(2);
+    });
+
+    describe('quarter selection business rules', function () {
+        test('new students can select any quarter', function () {
+            $guardian = User::factory()->create();
+            $guardian->assignRole('guardian');
+
+            $student = Student::factory()->create();
+
+            GuardianStudent::create([
+                'guardian_id' => $guardian->id,
+                'student_id' => $student->id,
+                'relationship_type' => 'father',
+                'is_primary_contact' => true,
+            ]);
+
+            // New student should be able to select any quarter
+            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+                'student_id' => $student->id,
+                'school_year' => '2024-2025',
+                'quarter' => Quarter::SECOND->value,
+                'grade_level' => 'Kinder',
+            ]);
+
+            $response->assertRedirect(route('enrollments.index'));
+            $this->assertDatabaseHas('enrollments', [
+                'student_id' => $student->id,
+                'quarter' => Quarter::SECOND,
+            ]);
+        });
+
+        test('existing students are automatically enrolled in first quarter', function () {
+            $guardian = User::factory()->create();
+            $guardian->assignRole('guardian');
+
+            $student = Student::factory()->create();
+
+            GuardianStudent::create([
+                'guardian_id' => $guardian->id,
+                'student_id' => $student->id,
+                'relationship_type' => 'mother',
+                'is_primary_contact' => true,
+            ]);
+
+            // Create previous enrollment to make student "existing"
+            Enrollment::create([
+                'student_id' => $student->id,
+                'guardian_id' => $guardian->id,
+                'school_year' => '2023-2024',
+                'quarter' => Quarter::FIRST,
+                'grade_level' => 'Kinder',
+                'status' => EnrollmentStatus::APPROVED,
+                'tuition_fee_cents' => 0,
+                'miscellaneous_fee_cents' => 0,
+                'laboratory_fee_cents' => 0,
+                'total_amount_cents' => 0,
+                'net_amount_cents' => 0,
+                'amount_paid_cents' => 0,
+                'balance_cents' => 0,
+                'payment_status' => PaymentStatus::PENDING,
+            ]);
+
+            // Try to enroll in second quarter - should be overridden to first quarter
+            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+                'student_id' => $student->id,
+                'school_year' => '2024-2025',
+                'quarter' => Quarter::SECOND->value,
+                'grade_level' => 'Grade 1',
+            ]);
+
+            $response->assertRedirect(route('enrollments.index'));
+            $this->assertDatabaseHas('enrollments', [
+                'student_id' => $student->id,
+                'school_year' => '2024-2025',
+                'quarter' => Quarter::FIRST, // Should be overridden to First
+            ]);
+        });
+    });
+
+    describe('grade progression business rules', function () {
+        test('new students can enroll in any grade level', function () {
+            $guardian = User::factory()->create();
+            $guardian->assignRole('guardian');
+
+            $student = Student::factory()->create();
+
+            GuardianStudent::create([
+                'guardian_id' => $guardian->id,
+                'student_id' => $student->id,
+                'relationship_type' => 'father',
+                'is_primary_contact' => true,
+            ]);
+
+            // New student should be able to enroll in any grade
+            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+                'student_id' => $student->id,
+                'school_year' => '2024-2025',
+                'quarter' => Quarter::FIRST->value,
+                'grade_level' => 'Grade 3',
+            ]);
+
+            $response->assertRedirect(route('enrollments.index'));
+            $this->assertDatabaseHas('enrollments', [
+                'student_id' => $student->id,
+                'grade_level' => 'Grade 3',
+            ]);
+        });
+
+        test('existing students cannot apply to grades lower than current grade', function () {
+            $guardian = User::factory()->create();
+            $guardian->assignRole('guardian');
+
+            $student = Student::factory()->create([
+                'grade_level' => 'Grade 3',
+            ]);
+
+            GuardianStudent::create([
+                'guardian_id' => $guardian->id,
+                'student_id' => $student->id,
+                'relationship_type' => 'mother',
+                'is_primary_contact' => true,
+            ]);
+
+            // Create previous enrollment to establish current grade
+            Enrollment::create([
+                'student_id' => $student->id,
+                'guardian_id' => $guardian->id,
+                'school_year' => '2023-2024',
+                'quarter' => Quarter::FIRST,
+                'grade_level' => 'Grade 3',
+                'status' => EnrollmentStatus::APPROVED,
+                'tuition_fee_cents' => 0,
+                'miscellaneous_fee_cents' => 0,
+                'laboratory_fee_cents' => 0,
+                'total_amount_cents' => 0,
+                'net_amount_cents' => 0,
+                'amount_paid_cents' => 0,
+                'balance_cents' => 0,
+                'payment_status' => PaymentStatus::PENDING,
+            ]);
+
+            // Try to enroll in lower grade - should fail
+            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+                'student_id' => $student->id,
+                'school_year' => '2024-2025',
+                'quarter' => Quarter::FIRST->value,
+                'grade_level' => 'Grade 2', // Lower than current Grade 3
+            ]);
+
+            $response->assertSessionHasErrors(['grade_level']);
+            $response->assertRedirect();
+        });
+
+        test('students can progress to same or higher grade', function () {
+            $guardian = User::factory()->create();
+            $guardian->assignRole('guardian');
+
+            $student = Student::factory()->create([
+                'grade_level' => 'Grade 2',
+            ]);
+
+            GuardianStudent::create([
+                'guardian_id' => $guardian->id,
+                'student_id' => $student->id,
+                'relationship_type' => 'father',
+                'is_primary_contact' => true,
+            ]);
+
+            // Create previous enrollment to establish current grade
+            Enrollment::create([
+                'student_id' => $student->id,
+                'guardian_id' => $guardian->id,
+                'school_year' => '2023-2024',
+                'quarter' => Quarter::FIRST,
+                'grade_level' => 'Grade 2',
+                'status' => EnrollmentStatus::APPROVED,
+                'tuition_fee_cents' => 0,
+                'miscellaneous_fee_cents' => 0,
+                'laboratory_fee_cents' => 0,
+                'total_amount_cents' => 0,
+                'net_amount_cents' => 0,
+                'amount_paid_cents' => 0,
+                'balance_cents' => 0,
+                'payment_status' => PaymentStatus::PENDING,
+            ]);
+
+            // Enroll in next grade level - should succeed
+            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+                'student_id' => $student->id,
+                'school_year' => '2024-2025',
+                'quarter' => Quarter::FIRST->value,
+                'grade_level' => 'Grade 3',
+            ]);
+
+            $response->assertRedirect(route('enrollments.index'));
+            $this->assertDatabaseHas('enrollments', [
+                'student_id' => $student->id,
+                'school_year' => '2024-2025',
+                'grade_level' => 'Grade 3',
+            ]);
+        });
+
+        test('students can apply for accelerated progression beyond next grade', function () {
+            $guardian = User::factory()->create();
+            $guardian->assignRole('guardian');
+
+            $student = Student::factory()->create([
+                'grade_level' => 'Grade 1',
+            ]);
+
+            GuardianStudent::create([
+                'guardian_id' => $guardian->id,
+                'student_id' => $student->id,
+                'relationship_type' => 'mother',
+                'is_primary_contact' => true,
+            ]);
+
+            // Create previous enrollment to establish current grade
+            Enrollment::create([
+                'student_id' => $student->id,
+                'guardian_id' => $guardian->id,
+                'school_year' => '2023-2024',
+                'quarter' => Quarter::FIRST,
+                'grade_level' => 'Grade 1',
+                'status' => EnrollmentStatus::APPROVED,
+                'tuition_fee_cents' => 0,
+                'miscellaneous_fee_cents' => 0,
+                'laboratory_fee_cents' => 0,
+                'total_amount_cents' => 0,
+                'net_amount_cents' => 0,
+                'amount_paid_cents' => 0,
+                'balance_cents' => 0,
+                'payment_status' => PaymentStatus::PENDING,
+            ]);
+
+            // Enroll in grade level beyond next (accelerated) - should succeed
+            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+                'student_id' => $student->id,
+                'school_year' => '2024-2025',
+                'quarter' => Quarter::FIRST->value,
+                'grade_level' => 'Grade 4', // Skipping Grade 2 and 3
+            ]);
+
+            $response->assertRedirect(route('enrollments.index'));
+            $this->assertDatabaseHas('enrollments', [
+                'student_id' => $student->id,
+                'school_year' => '2024-2025',
+                'grade_level' => 'Grade 4',
+            ]);
+        });
+    });
+});
