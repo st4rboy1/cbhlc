@@ -129,13 +129,9 @@ class UserSeeder extends Seeder
                 'student_id' => Student::generateStudentId(),
                 'middle_name' => 'Garcia',
                 'gender' => 'Male',
-                'age' => 12,
                 'grade_level' => GradeLevel::GRADE_6->value,
                 'address' => '123 Rizal Street, Pasig City',
                 'contact_number' => '+63912345678',
-                'guardian_name' => 'Maria Santos',
-                'guardian_contact' => '+63987654321',
-                'guardian_email' => 'maria.santos@example.com',
                 'user_id' => $studentUser1->id,
             ]
         );
@@ -168,13 +164,9 @@ class UserSeeder extends Seeder
                 'student_id' => Student::generateStudentId(),
                 'middle_name' => 'Garcia',
                 'gender' => 'Female',
-                'age' => 9,
                 'grade_level' => GradeLevel::GRADE_3->value,
                 'address' => '123 Rizal Street, Pasig City',
                 'contact_number' => '+63912345678',
-                'guardian_name' => 'Maria Santos',
-                'guardian_contact' => '+63987654321',
-                'guardian_email' => 'maria.santos@example.com',
                 'user_id' => $studentUser2->id,
             ]
         );

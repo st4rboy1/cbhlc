@@ -38,8 +38,8 @@ test('guardian can have children through guardian_students pivot table', functio
 
     expect($children)->toHaveCount(1);
     expect($children->first()->id)->toBe($student->id);
-    expect($children->first()->relationship_type)->toBe('mother');
-    expect($children->first()->is_primary_contact)->toBe(1);
+    expect($children->first()->pivot->relationship_type)->toBe('mother');
+    expect($children->first()->pivot->is_primary_contact)->toBe(1);
 });
 
 test('student can have multiple guardians', function () {

@@ -25,9 +25,11 @@ class StudentController extends Controller
         $user = auth()->user();
         $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
 
-        $children = $guardian ? $guardian->children()
-            ->get()
-            ->map(function ($student) {
+        $children = collect();
+        if ($guardian) {
+            $childrenData = $guardian->children()->get();
+            /** @phpstan-ignore-next-line */
+            $children = $childrenData->map(function ($student) {
                 return [
                     'id' => $student->id,
                     'student_id' => $student->student_id,
@@ -44,7 +46,8 @@ class StudentController extends Controller
                         'email' => $student->user->email,
                     ] : null,
                 ];
-            }) : collect();
+            });
+        }
 
         return Inertia::render('guardian/students/index', [
             'children' => $children,
