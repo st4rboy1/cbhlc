@@ -32,7 +32,6 @@ class EnrollmentFactory extends Factory
         $balance = $totalAmount - $amountPaid;
 
         return [
-            'enrollment_id' => 'ENR-'.str_pad($this->faker->unique()->numberBetween(1, 9999), 4, '0', STR_PAD_LEFT),
             'student_id' => Student::factory(),
             'guardian_id' => function (array $attributes) {
                 // Get a guardian user or create one
