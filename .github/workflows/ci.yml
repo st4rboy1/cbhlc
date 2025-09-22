@@ -68,9 +68,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
-          extensions: mbstring, dom, fileinfo, mysql, iconv, sqlite3
+          extensions: mbstring, dom, fileinfo, mysql, iconv, sqlite3, pcov
           tools: composer:v2
-          coverage: none # Disable coverage for speed (can be enabled on main branch only)
+          coverage: pcov # Use PCOV for fast coverage (faster than xdebug)
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -102,64 +102,11 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
-      # Run tests with SQLite instead of MySQL for speed
-      - name: Run Tests (SQLite - Fast)
+      # Run tests with SQLite and coverage (fast with PCOV)
+      - name: Run Tests with Coverage (SQLite + PCOV)
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: ':memory:'
         run: |
-          # Install parallel package if not present
-          composer require --dev brianium/paratest --no-interaction --no-scripts 2>/dev/null || true
-          # Run tests (parallel if available, otherwise normal)
-          ./vendor/bin/pest --parallel --no-coverage || ./vendor/bin/pest --no-coverage
-
-  # Optional: Run coverage only on main branch merges
-  coverage:
-    name: Test Coverage
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup PHP with Coverage
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.4
-          extensions: mbstring, dom, fileinfo, mysql, iconv, sqlite3
-          tools: composer:v2
-          coverage: xdebug
-
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv --no-scripts
-
-      - name: Copy Environment File
-        run: cp .env.example .env
-
-      - name: Generate Application Key
-        run: php artisan key:generate
-
-      # Run tests with coverage
-      - name: Run Tests with Coverage
-        env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: ':memory:'
-          XDEBUG_MODE: coverage
-        run: ./vendor/bin/pest --coverage --min=60 --coverage-html=coverage --coverage-clover=coverage.xml
-
-      # Upload coverage reports
-      - name: Upload Coverage Reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage-report
-          path: coverage/
+          # Run tests with coverage using PCOV (much faster than xdebug)
+          ./vendor/bin/pest --parallel --coverage --min=60
