@@ -60,55 +60,6 @@ class BillingController extends Controller
     }
 
     /**
-     * Display the invoice for a specific enrollment
-     */
-    public function invoice(Request $request, $enrollmentId = null)
-    {
-        $user = $request->user();
-        $enrollment = null;
-
-        if ($enrollmentId) {
-            $query = Enrollment::with(['student', 'guardian']);
-
-            // Check permissions
-            if ($user->hasRole(['super_admin', 'administrator', 'registrar'])) {
-                // Admin users can see any invoice
-                $enrollment = $query->find($enrollmentId);
-            } elseif ($user->hasRole('guardian')) {
-                // Guardians can only see their children's invoices
-                $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
-                if ($guardian) {
-                    $studentIds = $guardian->children()->pluck('students.id');
-                    $enrollment = $query->whereIn('student_id', $studentIds)
-                        ->find($enrollmentId);
-                }
-            }
-
-            if (! $enrollment) {
-                abort(404, 'Enrollment not found or you do not have permission to view this invoice.');
-            }
-        } else {
-            // Get the latest enrollment for the user if no ID specified
-            if ($user->hasRole('guardian')) {
-                $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
-                if ($guardian) {
-                    $studentIds = $guardian->children()->pluck('students.id');
-                    $enrollment = Enrollment::with(['student', 'guardian'])
-                        ->whereIn('student_id', $studentIds)
-                        ->latest()
-                        ->first();
-                }
-            }
-        }
-
-        return Inertia::render('invoice', [
-            'enrollment' => $enrollment,
-            'invoiceNumber' => $enrollment->enrollment_id ?? 'No Invoice Available',
-            'currentDate' => now()->format('F d, Y'),
-        ]);
-    }
-
-    /**
      * Update payment status for an enrollment
      */
     public function updatePayment(Request $request, $enrollmentId)

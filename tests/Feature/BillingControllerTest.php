@@ -172,7 +172,7 @@ describe('tuition method', function () {
     });
 });
 
-describe('invoice method', function () {
+describe('invoice controller', function () {
     test('admin can view any enrollment invoice', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
@@ -347,7 +347,7 @@ describe('invoice method', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
 
-        $response = $this->actingAs($admin)->get('/billing/invoice/99999');
+        $response = $this->actingAs($admin)->get('/invoice/99999');
         $response->assertStatus(404);
     });
 });
