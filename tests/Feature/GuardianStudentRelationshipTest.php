@@ -20,7 +20,7 @@ test('guardian can have children through guardian_students pivot table', functio
         'user_id' => $user->id,
         'first_name' => 'Jane',
         'last_name' => 'Doe',
-        'phone' => '09123456789',
+        'contact_number' => '09123456789',
         'address' => '123 Test St',
     ]);
 
@@ -87,7 +87,7 @@ test('guardian can have multiple children', function () {
         'user_id' => $user->id,
         'first_name' => 'John',
         'last_name' => 'Smith',
-        'phone' => '09123456789',
+        'contact_number' => '09123456789',
         'address' => '456 Test Ave',
     ]);
 
