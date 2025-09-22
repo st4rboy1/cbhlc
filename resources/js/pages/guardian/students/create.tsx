@@ -24,7 +24,7 @@ export default function CreateStudent({ gradeLevels, relationshipTypes }: Create
         grade_level: '',
         gender: '',
         address: '',
-        phone: '',
+        contact_number: '',
         relationship_type: '',
         is_primary_contact: false,
         email: '',
@@ -184,13 +184,13 @@ export default function CreateStudent({ gradeLevels, relationshipTypes }: Create
                                     <div>
                                         <Label htmlFor="phone">Phone Number</Label>
                                         <Input
-                                            id="phone"
-                                            value={data.phone}
-                                            onChange={(e) => setData('phone', e.target.value)}
-                                            className={errors.phone ? 'border-red-500' : ''}
+                                            id="contact_number"
+                                            value={data.contact_number}
+                                            onChange={(e) => setData('contact_number', e.target.value)}
+                                            className={errors.contact_number ? 'border-red-500' : ''}
                                             placeholder="09XXXXXXXXX"
                                         />
-                                        {errors.phone && <p className="mt-1 text-sm text-red-500">{errors.phone}</p>}
+                                        {errors.contact_number && <p className="mt-1 text-sm text-red-500">{errors.contact_number}</p>}
                                     </div>
                                 </div>
 
