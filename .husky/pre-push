@@ -6,14 +6,26 @@ echo ""
 # Run the local test script
 ./scripts/test-local.sh
 
-# If all checks pass, allow the push
-if [ $? -eq 0 ]; then
-    echo "✅ Pre-push checks completed successfully!"
-    exit 0
-else
+# Check if the local test script passed
+if [ $? -ne 0 ]; then
     echo ""
     echo "❌ Pre-push checks failed! Fix the issues before pushing."
     echo ""
     echo "Tip: You can bypass this check with 'git push --no-verify' (not recommended)"
     exit 1
 fi
+
+# Run tests with coverage
+echo ""
+echo "🧪 Running tests with coverage check..."
+./vendor/bin/sail pest --coverage --min=60 --coverage-html=coverage --coverage-clover=coverage.xml
+
+# Check the exit status
+if [ $? -ne 0 ]; then
+    echo "❌ Tests failed or coverage below 60%. Push aborted."
+    exit 1
+fi
+
+echo "✅ All tests passed with minimum 60% coverage!"
+echo "✅ Pre-push checks completed successfully!"
+exit 0
