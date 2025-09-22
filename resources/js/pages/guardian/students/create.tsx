@@ -32,7 +32,7 @@ export default function CreateStudent({ gradeLevels, relationshipTypes }: Create
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        post(route('guardian.students.store'), {
+        post('/guardian/students', {
             onSuccess: () => reset(),
         });
     };
@@ -45,7 +45,7 @@ export default function CreateStudent({ gradeLevels, relationshipTypes }: Create
                     {/* Back Button */}
                     <div className="mb-6">
                         <Button variant="ghost" asChild>
-                            <Link href={route('guardian.dashboard')}>
+                            <Link href="/guardian/dashboard">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to Dashboard
                             </Link>
@@ -283,7 +283,7 @@ export default function CreateStudent({ gradeLevels, relationshipTypes }: Create
                                 {/* Submit Buttons */}
                                 <div className="flex justify-end space-x-4">
                                     <Button type="button" variant="outline" asChild>
-                                        <Link href={route('guardian.dashboard')}>Cancel</Link>
+                                        <Link href="/guardian/dashboard">Cancel</Link>
                                     </Button>
                                     <Button type="submit" disabled={processing}>
                                         {processing ? 'Adding Student...' : 'Add Student'}
