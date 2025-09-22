@@ -79,9 +79,9 @@ class BillingController extends Controller
 
         $enrollment = Enrollment::findOrFail($enrollmentId);
 
-        $enrollment->amount_paid = $validated['amount_paid'];
+        $enrollment->amount_paid_cents = $validated['amount_paid'];
         $enrollment->payment_status = PaymentStatus::from($validated['payment_status']);
-        $enrollment->balance = $enrollment->net_amount - $validated['amount_paid'];
+        $enrollment->balance_cents = $enrollment->net_amount_cents - $validated['amount_paid'];
 
         if ($validated['remarks']) {
             $enrollment->remarks = $validated['remarks'];
