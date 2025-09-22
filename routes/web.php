@@ -18,13 +18,13 @@ Route::get('/enrollment', function () {
     return Inertia::render('enrollment');
 })->name('enrollment');
 
-Route::get('/invoice/{invoice}', [InvoiceController::class, 'show'])
-    ->middleware('auth')
-    ->name('invoice.show');
-
 Route::get('/invoice', [InvoiceController::class, 'latest'])
     ->middleware('auth')
     ->name('invoice');
+
+Route::get('/invoice/{invoice}', [InvoiceController::class, 'show'])
+    ->middleware('auth')
+    ->name('invoice.show');
 
 Route::get('/profilesettings', function () {
     return Inertia::render('profilesettings');
