@@ -7,6 +7,7 @@ enum PaymentStatus: string
     case PENDING = 'pending';
     case PARTIAL = 'partial';
     case PAID = 'paid';
+    case OVERDUE = 'overdue';
 
     public static function values(): array
     {
@@ -19,6 +20,7 @@ enum PaymentStatus: string
             self::PENDING => 'Pending',
             self::PARTIAL => 'Partial Payment',
             self::PAID => 'Paid',
+            self::OVERDUE => 'Overdue',
         };
     }
 
@@ -28,6 +30,7 @@ enum PaymentStatus: string
             self::PENDING => 'red',
             self::PARTIAL => 'yellow',
             self::PAID => 'green',
+            self::OVERDUE => 'orange',
         };
     }
 }

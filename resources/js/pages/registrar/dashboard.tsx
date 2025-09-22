@@ -2,162 +2,414 @@ import PageLayout from '@/components/PageLayout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { type SharedData } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
-import { CheckCircle, Clock, FileText, Search, UserPlus, XCircle } from 'lucide-react';
+import { Head, router } from '@inertiajs/react';
+import { AlertCircle, Calendar, CheckCircle, Clock, DollarSign, FileText, GraduationCap, Users, XCircle } from 'lucide-react';
 
-export default function RegistrarDashboard() {
-    const { auth } = usePage<SharedData>().props;
+interface EnrollmentStats {
+    pending: number;
+    approved: number;
+    rejected: number;
+    total: number;
+}
 
-    // Mock data - replace with real data from backend
-    const enrollmentStats = {
-        pending: 8,
-        approved: 24,
-        rejected: 3,
-        total: 35,
+interface StudentStats {
+    total_students: number;
+    new_students: number;
+    enrolled_students: number;
+}
+
+interface PaymentStats {
+    pending: number;
+    partial: number;
+    paid: number;
+    overdue: number;
+}
+
+interface RecentApplication {
+    id: number;
+    student_name: string;
+    grade_level: string;
+    status: string;
+    submission_date: string;
+    payment_status: string;
+}
+
+interface Deadline {
+    title: string;
+    date: string;
+    daysLeft: number;
+}
+
+interface GradeDistribution {
+    grade: string;
+    count: number;
+}
+
+interface Props {
+    enrollmentStats: EnrollmentStats;
+    recentApplications: RecentApplication[];
+    studentStats: StudentStats;
+    paymentStats: PaymentStats;
+    upcomingDeadlines: Deadline[];
+    gradeLevelDistribution: GradeDistribution[];
+}
+
+export default function RegistrarDashboard({
+    enrollmentStats,
+    recentApplications,
+    studentStats,
+    paymentStats,
+    upcomingDeadlines,
+    gradeLevelDistribution,
+}: Props) {
+    const handleQuickApprove = (enrollmentId: number) => {
+        if (confirm('Are you sure you want to approve this enrollment application?')) {
+            router.post(
+                `/registrar/enrollments/${enrollmentId}/quick-approve`,
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        // The page will be refreshed with updated data
+                    },
+                },
+            );
+        }
     };
 
-    const recentApplications = [
-        { id: 1, name: 'John Michael Doe', grade: 'Grade 6', status: 'pending', date: '2025-09-15' },
-        { id: 2, name: 'Maria Santos', grade: 'Grade 4', status: 'approved', date: '2025-09-14' },
-        { id: 3, name: 'Pedro Cruz', grade: 'Grade 5', status: 'pending', date: '2025-09-13' },
-        { id: 4, name: 'Ana Reyes', grade: 'Grade 3', status: 'approved', date: '2025-09-12' },
-        { id: 5, name: 'Luis Garcia', grade: 'Grade 6', status: 'rejected', date: '2025-09-11' },
-    ];
+    const handleQuickReject = (enrollmentId: number) => {
+        const reason = prompt('Please provide a reason for rejection:');
+        if (reason) {
+            router.post(
+                `/registrar/enrollments/${enrollmentId}/quick-reject`,
+                { reason },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        // The page will be refreshed with updated data
+                    },
+                },
+            );
+        }
+    };
 
     const getStatusBadge = (status: string) => {
-        switch (status) {
+        switch (status.toLowerCase()) {
             case 'pending':
-                return <Badge variant="secondary">Pending</Badge>;
+                return (
+                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+                        Pending
+                    </Badge>
+                );
+            case 'enrolled':
             case 'approved':
-                return <Badge variant="default">Approved</Badge>;
+                return (
+                    <Badge variant="secondary" className="bg-green-100 text-green-800">
+                        Enrolled
+                    </Badge>
+                );
             case 'rejected':
                 return <Badge variant="destructive">Rejected</Badge>;
+            case 'completed':
+                return (
+                    <Badge variant="default" className="bg-blue-100 text-blue-800">
+                        Completed
+                    </Badge>
+                );
             default:
-                return null;
+                return <Badge variant="outline">{status}</Badge>;
         }
+    };
+
+    const getPaymentStatusBadge = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'pending':
+                return (
+                    <Badge variant="outline" className="border-orange-500 text-orange-700">
+                        Pending
+                    </Badge>
+                );
+            case 'partial':
+                return (
+                    <Badge variant="outline" className="border-blue-500 text-blue-700">
+                        Partial
+                    </Badge>
+                );
+            case 'paid':
+                return (
+                    <Badge variant="outline" className="border-green-500 text-green-700">
+                        Paid
+                    </Badge>
+                );
+            case 'overdue':
+                return (
+                    <Badge variant="outline" className="border-red-500 text-red-700">
+                        Overdue
+                    </Badge>
+                );
+            default:
+                return <Badge variant="outline">{status}</Badge>;
+        }
+    };
+
+    const getDeadlineColor = (daysLeft: number) => {
+        if (daysLeft < 0) return 'text-gray-500';
+        if (daysLeft <= 7) return 'text-red-600';
+        if (daysLeft <= 14) return 'text-orange-600';
+        return 'text-green-600';
+    };
+
+    const formatDeadlineDays = (daysLeft: number) => {
+        if (daysLeft < 0) return `${Math.abs(daysLeft)} days ago`;
+        if (daysLeft === 0) return 'Today';
+        if (daysLeft === 1) return '1 day left';
+        return `${daysLeft} days left`;
     };
 
     return (
         <>
             <Head title="Registrar Dashboard" />
             <PageLayout title="REGISTRAR DASHBOARD" currentPage="registrar.dashboard">
-                {/* Welcome Section */}
-                <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-foreground">Welcome, {auth.user?.name}!</h2>
-                    <p className="text-muted-foreground">Manage enrollment applications and student records</p>
-                </div>
+                <div className="space-y-6">
+                    {/* Overview Cards */}
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Total Enrollments</CardTitle>
+                                <FileText className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{enrollmentStats.total}</div>
+                                <p className="text-xs text-muted-foreground">All time enrollment applications</p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Pending Applications</CardTitle>
+                                <Clock className="h-4 w-4 text-yellow-600" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{enrollmentStats.pending}</div>
+                                <p className="text-xs text-muted-foreground">Awaiting review</p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Approved</CardTitle>
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{enrollmentStats.approved}</div>
+                                <p className="text-xs text-muted-foreground">Successfully enrolled</p>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Rejected</CardTitle>
+                                <XCircle className="h-4 w-4 text-red-600" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{enrollmentStats.rejected}</div>
+                                <p className="text-xs text-muted-foreground">Applications rejected</p>
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                {/* Enrollment Statistics */}
-                <div className="mb-6 grid gap-6 md:grid-cols-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
-                            <Clock className="h-4 w-4 text-yellow-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{enrollmentStats.pending}</div>
-                            <p className="text-xs text-muted-foreground">Applications waiting</p>
-                        </CardContent>
-                    </Card>
+                    {/* Secondary Stats Row */}
+                    <div className="grid gap-4 md:grid-cols-3">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Student Statistics</CardTitle>
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">Total Students</span>
+                                    <span className="font-semibold">{studentStats.total_students}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">New Students</span>
+                                    <span className="font-semibold">{studentStats.new_students}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">Enrolled</span>
+                                    <span className="font-semibold">{studentStats.enrolled_students}</span>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">Approved</CardTitle>
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{enrollmentStats.approved}</div>
-                            <p className="text-xs text-muted-foreground">This month</p>
-                        </CardContent>
-                    </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Payment Overview</CardTitle>
+                                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">Pending</span>
+                                    <span className="font-semibold text-orange-600">{paymentStats.pending}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">Partial</span>
+                                    <span className="font-semibold text-blue-600">{paymentStats.partial}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">Paid</span>
+                                    <span className="font-semibold text-green-600">{paymentStats.paid}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-sm text-muted-foreground">Overdue</span>
+                                    <span className="font-semibold text-red-600">{paymentStats.overdue}</span>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">Rejected</CardTitle>
-                            <XCircle className="h-4 w-4 text-red-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{enrollmentStats.rejected}</div>
-                            <p className="text-xs text-muted-foreground">This month</p>
-                        </CardContent>
-                    </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">Upcoming Deadlines</CardTitle>
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                {upcomingDeadlines.map((deadline, index) => (
+                                    <div key={index} className="flex flex-col space-y-1">
+                                        <div className="flex justify-between">
+                                            <span className="text-sm font-medium">{deadline.title}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-xs text-muted-foreground">{deadline.date}</span>
+                                            <span className={`text-xs font-semibold ${getDeadlineColor(deadline.daysLeft)}`}>
+                                                {formatDeadlineDays(deadline.daysLeft)}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium">Total Applications</CardTitle>
-                            <FileText className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{enrollmentStats.total}</div>
-                            <p className="text-xs text-muted-foreground">This school year</p>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <div className="grid gap-6 lg:grid-cols-3">
-                    {/* Quick Actions */}
-                    <Card className="lg:col-span-1">
-                        <CardHeader>
-                            <CardTitle>Quick Actions</CardTitle>
-                            <CardDescription>Common registrar tasks</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <Button variant="default" className="w-full" asChild>
-                                <Link href="/enrollment">
-                                    <UserPlus className="mr-2 h-4 w-4" />
-                                    Review Applications
-                                </Link>
-                            </Button>
-                            <Button variant="outline" className="w-full" asChild>
-                                <Link href="/registrar">
-                                    <Search className="mr-2 h-4 w-4" />
-                                    Search Students
-                                </Link>
-                            </Button>
-                            <Button variant="outline" className="w-full" asChild>
-                                <Link href="/documents">
-                                    <FileText className="mr-2 h-4 w-4" />
-                                    Verify Documents
-                                </Link>
-                            </Button>
-                        </CardContent>
-                    </Card>
+                    {/* Grade Level Distribution */}
+                    {gradeLevelDistribution.length > 0 && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-sm font-medium">Grade Level Distribution</CardTitle>
+                                <CardDescription>Current enrollment by grade level</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-2">
+                                    {gradeLevelDistribution.map((item) => (
+                                        <div key={item.grade} className="flex items-center gap-2">
+                                            <div className="w-24 text-sm">{item.grade}</div>
+                                            <div className="flex-1">
+                                                <Progress
+                                                    value={(item.count / Math.max(...gradeLevelDistribution.map((g) => g.count))) * 100}
+                                                    className="h-2"
+                                                />
+                                            </div>
+                                            <div className="w-12 text-right text-sm">{item.count}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    )}
 
                     {/* Recent Applications */}
-                    <Card className="lg:col-span-2">
+                    <Card>
                         <CardHeader>
                             <CardTitle>Recent Applications</CardTitle>
-                            <CardDescription>Latest enrollment submissions</CardDescription>
+                            <CardDescription>Latest enrollment applications requiring attention</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
                                         <TableHead>Student Name</TableHead>
-                                        <TableHead>Grade</TableHead>
-                                        <TableHead>Date</TableHead>
+                                        <TableHead>Grade Level</TableHead>
                                         <TableHead>Status</TableHead>
-                                        <TableHead>Action</TableHead>
+                                        <TableHead>Payment</TableHead>
+                                        <TableHead>Submission Date</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {recentApplications.map((application) => (
-                                        <TableRow key={application.id}>
-                                            <TableCell className="font-medium">{application.name}</TableCell>
-                                            <TableCell>{application.grade}</TableCell>
-                                            <TableCell>{application.date}</TableCell>
-                                            <TableCell>{getStatusBadge(application.status)}</TableCell>
-                                            <TableCell>
-                                                <Button variant="ghost" size="sm" asChild>
-                                                    <Link href={`/enrollment/${application.id}`}>View</Link>
-                                                </Button>
+                                    {recentApplications.length > 0 ? (
+                                        recentApplications.map((application) => (
+                                            <TableRow key={application.id}>
+                                                <TableCell className="font-medium">{application.student_name}</TableCell>
+                                                <TableCell>{application.grade_level}</TableCell>
+                                                <TableCell>{getStatusBadge(application.status)}</TableCell>
+                                                <TableCell>{getPaymentStatusBadge(application.payment_status)}</TableCell>
+                                                <TableCell>{application.submission_date}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            onClick={() => router.visit(`/enrollments/${application.id}`)}
+                                                        >
+                                                            View
+                                                        </Button>
+                                                        {application.status.toLowerCase() === 'pending' && (
+                                                            <>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="default"
+                                                                    className="bg-green-600 hover:bg-green-700"
+                                                                    onClick={() => handleQuickApprove(application.id)}
+                                                                >
+                                                                    Approve
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="destructive"
+                                                                    onClick={() => handleQuickReject(application.id)}
+                                                                >
+                                                                    Reject
+                                                                </Button>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="text-center text-muted-foreground">
+                                                No enrollment applications found
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    )}
                                 </TableBody>
                             </Table>
+                        </CardContent>
+                    </Card>
+
+                    {/* Quick Actions */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Quick Actions</CardTitle>
+                            <CardDescription>Frequently used registrar functions</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid gap-2 md:grid-cols-4">
+                                <Button variant="outline" className="w-full" onClick={() => router.visit('/enrollments')}>
+                                    <FileText className="mr-2 h-4 w-4" />
+                                    View All Enrollments
+                                </Button>
+                                <Button variant="outline" className="w-full" onClick={() => router.visit('/students')}>
+                                    <Users className="mr-2 h-4 w-4" />
+                                    Manage Students
+                                </Button>
+                                <Button variant="outline" className="w-full" onClick={() => router.visit('/reports')}>
+                                    <AlertCircle className="mr-2 h-4 w-4" />
+                                    Generate Reports
+                                </Button>
+                                <Button variant="outline" className="w-full" onClick={() => router.visit('/settings')}>
+                                    <GraduationCap className="mr-2 h-4 w-4" />
+                                    Academic Settings
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
