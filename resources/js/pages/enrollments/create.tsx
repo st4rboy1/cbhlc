@@ -29,11 +29,19 @@ interface Props {
 
 export default function EnrollmentCreate({ students, quarters, currentSchoolYear, selectedStudentId }: Props) {
     const { data, setData, post, processing, errors } = useForm({
-        student_id: selectedStudentId ? String(selectedStudentId) : '',
+        student_id: '',
         school_year: currentSchoolYear,
         quarter: '',
         grade_level: '',
     });
+
+    // Set the initial student_id when component mounts or selectedStudentId changes
+    React.useEffect(() => {
+        if (selectedStudentId) {
+            // Ensure we're setting it as a string to match SelectItem value
+            setData('student_id', String(selectedStudentId));
+        }
+    }, [selectedStudentId]);
 
     const selectedStudent = students.find((s) => s.id.toString() === data.student_id);
     const canSelectQuarter = selectedStudent?.is_new_student ?? false;
