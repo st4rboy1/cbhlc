@@ -66,16 +66,16 @@ test('registrar redirects to registrar dashboard after login', function () {
     $response->assertRedirect(route('registrar.dashboard'));
 });
 
-test('parent redirects to parent dashboard after login', function () {
-    $parent = User::factory()->parent()->create();
+test('guardian redirects to guardian dashboard after login', function () {
+    $guardian = User::factory()->guardian()->create();
 
     $response = $this->post(route('login.store'), [
-        'email' => $parent->email,
+        'email' => $guardian->email,
         'password' => 'password',
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('parent.dashboard'));
+    $response->assertRedirect(route('guardian.dashboard'));
 });
 
 test('student redirects to student dashboard after login', function () {

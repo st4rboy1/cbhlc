@@ -77,9 +77,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'reports.generate',
         ]);
 
-        // Parent/Guardian - Enrollment form submission, status tracking, billing access
-        $parent = Role::firstOrCreate(['name' => 'parent', 'guard_name' => 'web']);
-        $parent->syncPermissions([
+        // Guardian - Enrollment form submission, status tracking, billing access
+        $guardian = Role::firstOrCreate(['name' => 'guardian', 'guard_name' => 'web']);
+        $guardian->syncPermissions([
             'enrollment.view',
             'enrollment.create',
             'enrollment.update',

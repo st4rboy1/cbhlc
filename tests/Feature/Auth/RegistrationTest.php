@@ -13,23 +13,23 @@ test('registration route redirects to home', function () {
     $response->assertRedirect('/');
 });
 
-test('new parent users can register', function () {
+test('new guardian users can register', function () {
     $response = $this->post(route('register.store'), [
         'name' => 'Test Parent',
-        'email' => 'parent@example.com',
+        'email' => 'guardian@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
-        'role' => 'parent',
+        'role' => 'guardian',
     ]);
 
     // Check if user was created and has role first
-    $user = \App\Models\User::where('email', 'parent@example.com')->first();
+    $user = \App\Models\User::where('email', 'guardian@example.com')->first();
     expect($user)->not->toBeNull();
-    expect($user->hasRole('parent'))->toBeTrue();
+    expect($user->hasRole('guardian'))->toBeTrue();
 
     $this->assertAuthenticated();
-    // Parent users get redirected to parent dashboard
-    $response->assertRedirect(route('parent.dashboard', absolute: false));
+    // Parent users get redirected to guardian dashboard
+    $response->assertRedirect(route('guardian.dashboard', absolute: false));
 });
 
 test('new student users can register', function () {
@@ -69,7 +69,7 @@ test('registration only accepts valid roles', function () {
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
-        'role' => 'admin', // Invalid role - only parent and student allowed
+        'role' => 'admin', // Invalid role - only guardian and student allowed
     ]);
 
     $response->assertSessionHasErrors('role');

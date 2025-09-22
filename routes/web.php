@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\BillingController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,9 +18,13 @@ Route::get('/enrollment', function () {
     return Inertia::render('enrollment');
 })->name('enrollment');
 
-Route::get('/invoice', function () {
-    return Inertia::render('invoice');
-})->name('invoice');
+Route::get('/invoice', [InvoiceController::class, 'latest'])
+    ->middleware('auth')
+    ->name('invoice');
+
+Route::get('/invoice/{invoice}', [InvoiceController::class, 'show'])
+    ->middleware('auth')
+    ->name('invoice.show');
 
 Route::get('/profilesettings', function () {
     return Inertia::render('profilesettings');
@@ -35,9 +42,13 @@ Route::get('/studentreport', function () {
     return Inertia::render('studentreport');
 })->name('studentreport');
 
-Route::get('/tuition', function () {
-    return Inertia::render('tuition');
-})->name('tuition');
+Route::get('/tuition', [BillingController::class, 'tuition'])
+    ->middleware('auth')
+    ->name('tuition');
+
+Route::put('/billing/payment/{enrollmentId}', [BillingController::class, 'updatePayment'])
+    ->middleware('auth')
+    ->name('billing.updatePayment');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Admin dashboards (for super_admin and administrator roles)
@@ -50,15 +61,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('registrar/dashboard');
     })->middleware('role:registrar')->name('registrar.dashboard');
 
-    // Parent dashboard
-    Route::get('parent/dashboard', function () {
-        return Inertia::render('parent/dashboard');
-    })->middleware('role:parent')->name('parent.dashboard');
+    // Guardian dashboard
+    Route::get('guardian/dashboard', function () {
+        return Inertia::render('guardian/dashboard');
+    })->middleware('role:guardian')->name('guardian.dashboard');
 
     // Student dashboard
     Route::get('student/dashboard', function () {
         return Inertia::render('student/dashboard');
     })->middleware('role:student')->name('student.dashboard');
+
+    // Guardian routes for managing students
+    Route::middleware('role:guardian')->prefix('guardian')->name('guardian.')->group(function () {
+        Route::resource('students', StudentController::class);
+    });
 });
 
 require __DIR__.'/settings.php';
