@@ -74,6 +74,17 @@ class EnrollmentController extends Controller
             'quarter' => 'required|string',
         ]);
 
+        // Check if student already has an enrollment for this school year
+        $existingEnrollment = Enrollment::where('student_id', $validated['student_id'])
+            ->where('school_year', $validated['school_year'])
+            ->first();
+
+        if ($existingEnrollment) {
+            return redirect()->back()
+                ->withErrors(['student_id' => 'This student already has an enrollment for the '.$validated['school_year'].' school year.'])
+                ->withInput();
+        }
+
         Enrollment::create([
             'student_id' => $validated['student_id'],
             'guardian_id' => Auth::id(),
