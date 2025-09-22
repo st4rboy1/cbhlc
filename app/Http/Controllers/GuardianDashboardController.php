@@ -34,7 +34,7 @@ class GuardianDashboardController extends Controller
                         'name' => trim($student->first_name.' '.$student->last_name),
                         'grade' => $student->grade_level->value ?? 'Not Enrolled',
                         'enrollmentStatus' => $latestEnrollment
-                            ? ucfirst($latestEnrollment->enrollment_status->value)
+                            ? ucfirst($latestEnrollment->status->value)
                             : 'Not Enrolled',
                         'photo' => null,
                     ];
