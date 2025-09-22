@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('guardian_id')->constrained('users')->onDelete('cascade'); // guardian who enrolled
             $table->string('school_year');
             $table->string('quarter')->nullable(); // Will use Quarter enum in model
+            $table->string('grade_level'); // Grade level for this enrollment
             $table->string('status')->default('pending'); // Will use EnrollmentStatus enum in model
 
             // Billing Information (stored in cents for precision)
