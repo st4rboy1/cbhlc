@@ -45,7 +45,18 @@ class EnrollmentController extends Controller
      */
     public function create()
     {
+        $user = Auth::user();
+        $students = [];
+
+        // If user is a guardian, get their students
+        if ($user->hasRole('guardian')) {
+            $studentIds = GuardianStudent::where('guardian_id', $user->id)
+                ->pluck('student_id');
+            $students = Student::whereIn('id', $studentIds)->get();
+        }
+
         return Inertia::render('enrollments/create', [
+            'students' => $students,
             'gradeLevels' => GradeLevel::values(),
             'quarters' => Quarter::values(),
             'currentSchoolYear' => date('Y').'-'.(date('Y') + 1),
