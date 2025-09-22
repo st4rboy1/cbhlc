@@ -19,7 +19,6 @@ class StudentFactory extends Factory
     public function definition(): array
     {
         $birthdate = $this->faker->dateTimeBetween('-18 years', '-6 years');
-        $age = now()->diffInYears($birthdate);
 
         return [
             'student_id' => Student::generateStudentId(),
@@ -28,13 +27,9 @@ class StudentFactory extends Factory
             'middle_name' => $this->faker->optional()->firstName(),
             'birthdate' => $birthdate->format('Y-m-d'),
             'gender' => $this->faker->randomElement(['Male', 'Female']),
-            'age' => $age,
             'address' => $this->faker->address(),
             'contact_number' => $this->faker->optional()->phoneNumber(),
             'email' => $this->faker->optional()->email(),
-            'guardian_name' => $this->faker->name(),
-            'guardian_contact' => $this->faker->phoneNumber(),
-            'guardian_email' => $this->faker->optional()->email(),
             'grade_level' => $this->faker->randomElement(GradeLevel::cases())->value,
             'section' => $this->faker->optional()->word(),
             'user_id' => null, // Can be set explicitly when needed

@@ -32,6 +32,14 @@ class Student extends Model
     ];
 
     /**
+     * Calculate age from birthdate
+     */
+    public function getAgeAttribute(): int
+    {
+        return $this->birthdate->age;
+    }
+
+    /**
      * Get the user associated with the student (if any)
      */
     public function user(): BelongsTo

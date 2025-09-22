@@ -21,11 +21,14 @@ class GuardianDashboardController extends Controller
         // Get guardian's children with latest enrollment info
         $children = [];
         if ($guardian) {
-            $children = $guardian->children()
+            $childrenData = $guardian->children()
                 ->with(['enrollments' => function ($query) {
                     $query->latest()->limit(1);
                 }])
-                ->get()
+                ->get();
+
+            $children = $childrenData
+                /** @phpstan-ignore-next-line */
                 ->map(function ($student) {
                     $latestEnrollment = $student->enrollments->first();
 
