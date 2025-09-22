@@ -89,7 +89,7 @@ export default function GuardianDashboard({ children, announcements, upcomingEve
 
                         {/* Add Student Card */}
                         <Card className="cursor-pointer border-dashed transition-colors hover:border-primary hover:bg-primary/5">
-                            <Link href={route('guardian.students.create')} className="block h-full">
+                            <Link href="/guardian/students/create" className="block h-full">
                                 <CardContent className="flex h-full min-h-[280px] items-center justify-center p-6">
                                     <div className="text-center">
                                         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
