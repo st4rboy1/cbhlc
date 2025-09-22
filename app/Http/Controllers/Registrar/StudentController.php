@@ -128,7 +128,7 @@ class StudentController extends Controller
         ]);
 
         // Generate student ID
-        $validated['student_id'] = 'CBHLC'.date('Y').str_pad(Student::count() + 1, 4, '0', STR_PAD_LEFT);
+        $validated['student_id'] = 'CBHLC'.date('Y').str_pad((string) (Student::count() + 1), 4, '0', STR_PAD_LEFT);
 
         $student = Student::create($validated);
 

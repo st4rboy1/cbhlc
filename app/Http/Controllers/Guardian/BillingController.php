@@ -31,22 +31,18 @@ class BillingController extends Controller
             ->pluck('student_id');
 
         // Get enrollments with billing information
-        $enrollments = Enrollment::with(['student', 'gradeLevelFee'])
+        $enrollments = Enrollment::with(['student'])
             ->whereIn('student_id', $studentIds)
             ->where('status', '!=', 'rejected')
             ->get()
             ->map(function ($enrollment) {
-                $fee = $enrollment->gradeLevelFee;
+                // Find the fee for the enrollment's grade level
+                $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)
+                    ->where('school_year', $enrollment->school_year)
+                    ->first();
 
-                if (! $fee) {
-                    // If no specific fee exists, try to find default fee for the grade level
-                    $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)
-                        ->where('school_year', $enrollment->school_year)
-                        ->first();
-                }
-
-                $tuitionFee = $fee?->tuition_fee ?? 0;
-                $miscFee = $fee?->miscellaneous_fee ?? 0;
+                $tuitionFee = $fee ? $fee->tuition_fee : 0;
+                $miscFee = $fee ? $fee->miscellaneous_fee : 0;
                 $totalFee = $tuitionFee + $miscFee;
 
                 return [
@@ -120,17 +116,14 @@ class BillingController extends Controller
             abort(403, 'You do not have access to view this billing information.');
         }
 
-        $enrollment->load(['student', 'gradeLevelFee']);
+        $enrollment->load(['student']);
 
-        $fee = $enrollment->gradeLevelFee;
-        if (! $fee) {
-            $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)
-                ->where('school_year', $enrollment->school_year)
-                ->first();
-        }
+        $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)
+            ->where('school_year', $enrollment->school_year)
+            ->first();
 
-        $tuitionFee = $fee?->tuition_fee ?? 0;
-        $miscFee = $fee?->miscellaneous_fee ?? 0;
+        $tuitionFee = $fee ? $fee->tuition_fee : 0;
+        $miscFee = $fee ? $fee->miscellaneous_fee : 0;
         $totalFee = $tuitionFee + $miscFee;
 
         // Calculate payment schedule based on quarterly plan (default)
