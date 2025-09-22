@@ -24,11 +24,12 @@ interface Props {
     gradeLevels: string[];
     quarters: string[];
     currentSchoolYear: string;
+    selectedStudentId?: string | null;
 }
 
-export default function EnrollmentCreate({ students, quarters, currentSchoolYear }: Props) {
+export default function EnrollmentCreate({ students, quarters, currentSchoolYear, selectedStudentId }: Props) {
     const { data, setData, post, processing, errors } = useForm({
-        student_id: '',
+        student_id: selectedStudentId ? String(selectedStudentId) : '',
         school_year: currentSchoolYear,
         quarter: '',
         grade_level: '',
