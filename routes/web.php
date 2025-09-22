@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\GuardianDashboardController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TuitionController;
@@ -90,9 +91,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Guardian routes
     Route::prefix('guardian')->name('guardian.')->middleware('role:guardian')->group(function () {
-        Route::get('/dashboard', function () {
-            return Inertia::render('guardian/dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [GuardianDashboardController::class, 'index'])->name('dashboard');
 
         // Guardian resource routes for managing students
         Route::resource('students', StudentController::class);
