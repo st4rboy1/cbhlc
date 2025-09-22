@@ -83,7 +83,7 @@ class BillingController extends Controller
         $enrollment->payment_status = PaymentStatus::from($validated['payment_status']);
         $enrollment->balance_cents = $enrollment->net_amount_cents - $validated['amount_paid'];
 
-        if ($validated['remarks']) {
+        if (isset($validated['remarks']) && $validated['remarks']) {
             $enrollment->remarks = $validated['remarks'];
         }
 
