@@ -3,8 +3,15 @@
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\TuitionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return Inertia::render('landing');
@@ -18,64 +25,92 @@ Route::get('/enrollment', function () {
     return Inertia::render('enrollment');
 })->name('enrollment');
 
-Route::get('/invoice', [InvoiceController::class, 'latest'])
-    ->middleware('auth')
-    ->name('invoice');
-
-Route::get('/invoice/{invoice}', [InvoiceController::class, 'show'])
-    ->middleware('auth')
-    ->name('invoice.show');
-
-Route::get('/profilesettings', function () {
-    return Inertia::render('profilesettings');
-})->name('profilesettings');
+Route::get('/application', function () {
+    return Inertia::render('application');
+})->name('application');
 
 Route::get('/registrar', function () {
     return Inertia::render('registrar');
 })->name('registrar');
 
-Route::get('/application', function () {
-    return Inertia::render('application');
-})->name('application');
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
 
-Route::get('/studentreport', function () {
-    return Inertia::render('studentreport');
-})->name('studentreport');
+Route::middleware(['auth'])->group(function () {
+    // Profile Routes
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/settings', function () {
+            return Inertia::render('profilesettings');
+        })->name('settings');
+    });
 
-Route::get('/tuition', [BillingController::class, 'tuition'])
-    ->middleware('auth')
-    ->name('tuition');
+    // Invoice Routes
+    Route::prefix('invoice')->name('invoice.')->group(function () {
+        Route::get('/', [InvoiceController::class, 'latest'])->name('index');
+        Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('show');
+    });
 
-Route::put('/billing/payment/{enrollmentId}', [BillingController::class, 'updatePayment'])
-    ->middleware('auth')
-    ->name('billing.updatePayment');
+    // Tuition Routes
+    Route::get('/tuition', [TuitionController::class, 'index'])->name('tuition');
+
+    // Billing Routes
+    Route::prefix('billing')->name('billing.')->group(function () {
+        Route::put('/payment/{enrollmentId}', [BillingController::class, 'updatePayment'])->name('updatePayment');
+    });
+
+    // Reports
+    Route::get('/studentreport', function () {
+        return Inertia::render('studentreport');
+    })->name('studentreport');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Dashboard Routes (Authenticated + Verified)
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware(['auth', 'verified'])->group(function () {
     // Admin dashboards (for super_admin and administrator roles)
-    Route::get('admin/dashboard', function () {
-        return Inertia::render('admin/dashboard');
-    })->middleware('role:super_admin|administrator')->name('admin.dashboard');
+    Route::prefix('admin')->name('admin.')->middleware('role:super_admin|administrator')->group(function () {
+        Route::get('/dashboard', function () {
+            return Inertia::render('admin/dashboard');
+        })->name('dashboard');
+    });
 
     // Registrar dashboard
-    Route::get('registrar/dashboard', function () {
-        return Inertia::render('registrar/dashboard');
-    })->middleware('role:registrar')->name('registrar.dashboard');
+    Route::prefix('registrar')->name('registrar.')->middleware('role:registrar')->group(function () {
+        Route::get('/dashboard', function () {
+            return Inertia::render('registrar/dashboard');
+        })->name('dashboard');
+    });
 
-    // Guardian dashboard
-    Route::get('guardian/dashboard', function () {
-        return Inertia::render('guardian/dashboard');
-    })->middleware('role:guardian')->name('guardian.dashboard');
+    // Guardian routes
+    Route::prefix('guardian')->name('guardian.')->middleware('role:guardian')->group(function () {
+        Route::get('/dashboard', function () {
+            return Inertia::render('guardian/dashboard');
+        })->name('dashboard');
 
-    // Student dashboard
-    Route::get('student/dashboard', function () {
-        return Inertia::render('student/dashboard');
-    })->middleware('role:student')->name('student.dashboard');
-
-    // Guardian routes for managing students
-    Route::middleware('role:guardian')->prefix('guardian')->name('guardian.')->group(function () {
+        // Guardian resource routes for managing students
         Route::resource('students', StudentController::class);
     });
+
+    // Student dashboard
+    Route::prefix('student')->name('student.')->middleware('role:student')->group(function () {
+        Route::get('/dashboard', function () {
+            return Inertia::render('student/dashboard');
+        })->name('dashboard');
+    });
 });
+
+/*
+|--------------------------------------------------------------------------
+| Include other route files
+|--------------------------------------------------------------------------
+*/
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
