@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Guardian;
+namespace App\Http\Controllers;
 
 use App\Enums\GradeLevel;
 use App\Enums\RelationshipType;
-use App\Http\Controllers\Controller;
 use App\Models\GuardianStudent;
 use App\Models\Student;
 use App\Models\User;

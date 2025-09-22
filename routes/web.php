@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\BillingController;
-use App\Http\Controllers\Guardian\StudentController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -17,7 +18,11 @@ Route::get('/enrollment', function () {
     return Inertia::render('enrollment');
 })->name('enrollment');
 
-Route::get('/invoice/{enrollmentId?}', [BillingController::class, 'invoice'])
+Route::get('/invoice/{invoice}', [InvoiceController::class, 'show'])
+    ->middleware('auth')
+    ->name('invoice.show');
+
+Route::get('/invoice', [InvoiceController::class, 'latest'])
     ->middleware('auth')
     ->name('invoice');
 
