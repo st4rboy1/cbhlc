@@ -8,6 +8,7 @@ enum EnrollmentStatus: string
     case APPROVED = 'approved';
     case REJECTED = 'rejected';
     case ENROLLED = 'enrolled';
+    case COMPLETED = 'completed';
 
     /**
      * Get the display label for the status
@@ -19,6 +20,7 @@ enum EnrollmentStatus: string
             self::APPROVED => 'Approved',
             self::REJECTED => 'Rejected',
             self::ENROLLED => 'Enrolled',
+            self::COMPLETED => 'Completed',
         };
     }
 
@@ -32,6 +34,7 @@ enum EnrollmentStatus: string
             self::APPROVED => 'success',
             self::REJECTED => 'destructive',
             self::ENROLLED => 'primary',
+            self::COMPLETED => 'muted',
         };
     }
 
@@ -44,11 +47,19 @@ enum EnrollmentStatus: string
     }
 
     /**
-     * Check if the status is approved (either approved or enrolled)
+     * Check if the status is approved (either approved, enrolled, or completed)
      */
     public function isApproved(): bool
     {
-        return in_array($this, [self::APPROVED, self::ENROLLED]);
+        return in_array($this, [self::APPROVED, self::ENROLLED, self::COMPLETED]);
+    }
+
+    /**
+     * Check if the enrollment is completed (student passed the year)
+     */
+    public function isCompleted(): bool
+    {
+        return $this === self::COMPLETED;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\EnrollmentStatus;
+use App\Enums\GradeLevel;
 use App\Enums\PaymentStatus;
 use App\Enums\Quarter;
 use App\Models\Enrollment;
@@ -57,6 +58,7 @@ class EnrollmentFactory extends Factory
             },
             'school_year' => $this->faker->randomElement(['2023-2024', '2024-2025', '2025-2026']),
             'quarter' => $this->faker->randomElement(Quarter::values()),
+            'grade_level' => $this->faker->randomElement(GradeLevel::values()),
             'status' => $this->faker->randomElement(EnrollmentStatus::values()),
             'tuition_fee_cents' => $tuitionFee,
             'miscellaneous_fee_cents' => $miscFee,

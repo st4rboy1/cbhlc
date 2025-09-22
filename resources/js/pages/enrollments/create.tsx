@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Head, useForm } from '@inertiajs/react';
 import { AlertCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import React, { FormEventHandler } from 'react';
 
 interface Student {
     id: number;
@@ -14,6 +14,9 @@ interface Student {
     middle_name?: string;
     last_name: string;
     student_id: string;
+    is_new_student: boolean;
+    current_grade_level?: string;
+    available_grade_levels: string[];
 }
 
 interface Props {
@@ -28,7 +31,19 @@ export default function EnrollmentCreate({ students, quarters, currentSchoolYear
         student_id: '',
         school_year: currentSchoolYear,
         quarter: '',
+        grade_level: '',
     });
+
+    const selectedStudent = students.find((s) => s.id.toString() === data.student_id);
+    const canSelectQuarter = selectedStudent?.is_new_student ?? false;
+    const availableGrades = selectedStudent?.available_grade_levels ?? [];
+
+    // Auto-set quarter for existing students
+    React.useEffect(() => {
+        if (selectedStudent && !selectedStudent.is_new_student) {
+            setData('quarter', 'First');
+        }
+    }, [selectedStudent]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -85,23 +100,65 @@ export default function EnrollmentCreate({ students, quarters, currentSchoolYear
                                     <div className="rounded-md border bg-muted px-3 py-2 text-sm">{data.school_year}</div>
                                 </div>
 
+                                {/* Grade Level Selection */}
+                                {selectedStudent && (
+                                    <div className="space-y-2">
+                                        <Label htmlFor="grade_level">Grade Level</Label>
+                                        <Select value={data.grade_level} onValueChange={(value) => setData('grade_level', value)}>
+                                            <SelectTrigger id="grade_level" className={errors.grade_level ? 'border-red-500' : ''}>
+                                                <SelectValue placeholder="Select grade level" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {availableGrades.length > 0 ? (
+                                                    availableGrades.map((grade) => (
+                                                        <SelectItem key={grade} value={grade}>
+                                                            {grade}
+                                                        </SelectItem>
+                                                    ))
+                                                ) : (
+                                                    <div className="p-2 text-sm text-muted-foreground">
+                                                        No grade levels available for this student.
+                                                    </div>
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.grade_level && <p className="text-sm text-red-500">{errors.grade_level}</p>}
+                                        {selectedStudent.current_grade_level && (
+                                            <p className="text-sm text-muted-foreground">Current grade: {selectedStudent.current_grade_level}</p>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* Quarter Selection */}
-                                <div className="space-y-2">
-                                    <Label htmlFor="quarter">Quarter</Label>
-                                    <Select value={data.quarter} onValueChange={(value) => setData('quarter', value)}>
-                                        <SelectTrigger id="quarter" className={errors.quarter ? 'border-red-500' : ''}>
-                                            <SelectValue placeholder="Select quarter" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {quarters.map((quarter) => (
-                                                <SelectItem key={quarter} value={quarter}>
-                                                    {quarter}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.quarter && <p className="text-sm text-red-500">{errors.quarter}</p>}
-                                </div>
+                                {selectedStudent && (
+                                    <div className="space-y-2">
+                                        <Label htmlFor="quarter">Quarter</Label>
+                                        {canSelectQuarter ? (
+                                            <Select value={data.quarter} onValueChange={(value) => setData('quarter', value)}>
+                                                <SelectTrigger id="quarter" className={errors.quarter ? 'border-red-500' : ''}>
+                                                    <SelectValue placeholder="Select quarter" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {quarters.map((quarter) => (
+                                                        <SelectItem key={quarter} value={quarter}>
+                                                            {quarter}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <div className="rounded-md border bg-muted px-3 py-2 text-sm">
+                                                First (automatically set for existing students)
+                                            </div>
+                                        )}
+                                        {errors.quarter && <p className="text-sm text-red-500">{errors.quarter}</p>}
+                                        {!canSelectQuarter && (
+                                            <p className="text-sm text-muted-foreground">
+                                                Existing students are automatically enrolled in the First quarter.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
 
                                 {/* No Students Alert */}
                                 {students.length === 0 && (
@@ -118,11 +175,36 @@ export default function EnrollmentCreate({ students, quarters, currentSchoolYear
                                     <Button type="button" variant="outline" onClick={() => window.history.back()}>
                                         Cancel
                                     </Button>
-                                    <Button type="submit" disabled={processing || students.length === 0}>
+                                    <Button type="submit" disabled={processing || students.length === 0 || !selectedStudent || !data.grade_level}>
                                         {processing ? 'Submitting...' : 'Submit Enrollment Application'}
                                     </Button>
                                 </div>
                             </form>
+                        </CardContent>
+                    </Card>
+
+                    {/* Enrollment Rules Card */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Enrollment Rules</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div>
+                                <h4 className="font-semibold">Grade Level Progression</h4>
+                                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
+                                    <li>New students can enroll in any available grade level</li>
+                                    <li>Existing students cannot apply to grades lower than their current grade</li>
+                                    <li>Students can only progress to higher grades if they passed the previous school year</li>
+                                    <li>Accelerated students may apply beyond the next grade level (subject to registrar approval)</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold">Quarter Selection</h4>
+                                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-muted-foreground">
+                                    <li>New students can choose their starting quarter</li>
+                                    <li>Existing students are automatically enrolled in the First quarter</li>
+                                </ul>
+                            </div>
                         </CardContent>
                     </Card>
 

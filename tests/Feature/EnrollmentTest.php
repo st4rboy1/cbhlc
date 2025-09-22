@@ -103,6 +103,7 @@ test('enrollment model guardian relationship works', function () {
         'guardian_id' => $guardian->id,
         'school_year' => '2025-2026',
         'quarter' => 'First',
+        'grade_level' => 'Grade 1',
         'status' => EnrollmentStatus::PENDING,
         'tuition_fee_cents' => 1500000,
         'total_amount_cents' => 1500000,
