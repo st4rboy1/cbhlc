@@ -4,6 +4,7 @@ use App\Http\Controllers\BillingController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\GuardianDashboardController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\RegistrarDashboardController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentReportController;
 use App\Http\Controllers\TuitionController;
@@ -99,9 +100,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Registrar dashboard
     Route::prefix('registrar')->name('registrar.')->middleware('role:registrar')->group(function () {
-        Route::get('/dashboard', function () {
-            return Inertia::render('registrar/dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [RegistrarDashboardController::class, 'index'])->name('dashboard');
+        Route::post('/enrollments/{enrollment}/quick-approve', [RegistrarDashboardController::class, 'quickApprove'])->name('enrollments.quick-approve');
+        Route::post('/enrollments/{enrollment}/quick-reject', [RegistrarDashboardController::class, 'quickReject'])->name('enrollments.quick-reject');
     });
 
     // Guardian routes
