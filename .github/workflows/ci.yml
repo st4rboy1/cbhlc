@@ -11,6 +11,7 @@ on:
       - feature/*
 
 jobs:
+  # Run quality checks and tests in parallel instead of sequentially
   quality-checks:
     name: Code Quality Checks
     runs-on: ubuntu-latest
@@ -36,12 +37,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-php-
+            ${{ runner.os }}-composer-
 
       - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv --no-scripts
 
       # Code Quality Checks
       - name: Code Style Check (Laravel Pint)
@@ -56,21 +57,8 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
-    needs: quality-checks
-
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: testing
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+    # Run tests in parallel with quality checks instead of waiting
+    # needs: quality-checks  # REMOVED to run in parallel
 
     steps:
       - name: Checkout
@@ -80,9 +68,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
-          extensions: mbstring, dom, fileinfo, mysql, iconv
+          extensions: mbstring, dom, fileinfo, mysql, iconv, sqlite3, pcov
           tools: composer:v2
-          coverage: xdebug
+          coverage: pcov # Use PCOV for fast coverage (faster than xdebug)
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -95,15 +83,15 @@ jobs:
         uses: actions/cache@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-php-
+            ${{ runner.os }}-composer-
 
       - name: Install Node Dependencies
         run: npm ci
 
       - name: Install PHP Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv --no-scripts
 
       - name: Build Assets
         run: npm run build
@@ -114,41 +102,11 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
-      # Run tests with coverage
-      - name: Run Tests with Coverage
+      # Run tests with SQLite and coverage (fast with PCOV)
+      - name: Run Tests with Coverage (SQLite + PCOV)
         env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: testing
-          DB_USERNAME: root
-          DB_PASSWORD: password
-          XDEBUG_MODE: coverage
-        run: ./vendor/bin/pest --coverage --min=60 --coverage-html=coverage --coverage-clover=coverage.xml
-
-      # Upload coverage reports
-      - name: Upload Coverage Reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage-report
-          path: coverage/
-
-      # Comment PR with coverage (optional)
-      - name: Comment Coverage on PR
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const coverage = fs.existsSync('coverage/coverage.txt')
-              ? fs.readFileSync('coverage/coverage.txt', 'utf8')
-              : 'Coverage report not available';
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `### Test Coverage Report\n\`\`\`\n${coverage}\n\`\`\``
-            });
-        continue-on-error: true
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+        run: |
+          # Run tests with coverage using PCOV (much faster than xdebug)
+          ./vendor/bin/pest --parallel --coverage --min=60
