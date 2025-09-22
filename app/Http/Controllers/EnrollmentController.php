@@ -74,8 +74,7 @@ class EnrollmentController extends Controller
             'quarter' => 'required|string',
         ]);
 
-        $enrollment = Enrollment::create([
-            'enrollment_id' => 'ENR-'.str_pad((string) (Enrollment::count() + 1), 4, '0', STR_PAD_LEFT),
+        Enrollment::create([
             'student_id' => $validated['student_id'],
             'guardian_id' => Auth::id(),
             'school_year' => $validated['school_year'],

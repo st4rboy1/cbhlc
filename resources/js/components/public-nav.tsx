@@ -15,8 +15,8 @@ export function PublicNav({ currentPage }: PublicNavProps) {
     // Helper function to get dashboard URL based on user role
     const getDashboardUrl = () => {
         if (!auth.user) return '/login';
-        // The server will redirect to the correct dashboard after login
-        return '/admin/dashboard';
+        // Use the dashboard_route provided by the backend
+        return auth.user.dashboard_route || '/';
     };
 
     return (
