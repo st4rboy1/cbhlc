@@ -30,9 +30,6 @@ class StudentFactory extends Factory
             'address' => $this->faker->address(),
             'contact_number' => $this->faker->optional()->phoneNumber(),
             'email' => $this->faker->optional()->email(),
-            'guardian_name' => $this->faker->name(),
-            'guardian_contact' => $this->faker->phoneNumber(),
-            'guardian_email' => $this->faker->optional()->email(),
             'grade_level' => $this->faker->randomElement(GradeLevel::cases())->value,
             'section' => $this->faker->optional()->word(),
             'user_id' => null, // Can be set explicitly when needed
