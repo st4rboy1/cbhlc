@@ -83,7 +83,7 @@ describe('tuition controller', function () {
             'user_id' => $guardian->id,
             'first_name' => 'John',
             'last_name' => 'Doe',
-            'phone' => '09123456789',
+            'contact_number' => '09123456789',
             'address' => '123 Test St',
         ]);
 
