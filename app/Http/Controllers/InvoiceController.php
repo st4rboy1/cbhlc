@@ -25,7 +25,7 @@ class InvoiceController extends Controller
             if ($guardian) {
                 $studentIds = $guardian->children()->pluck('students.id');
                 if (! $studentIds->contains($invoice->student_id)) {
-                    abort(403, 'You do not have permission to view this invoice.');
+                    abort(404);  // Return 404 for security - don't reveal invoice exists
                 }
             } else {
                 abort(404, 'Guardian profile not found.');
