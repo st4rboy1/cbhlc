@@ -41,18 +41,24 @@ Route::get('/registrar', function () {
 */
 
 Route::middleware(['auth'])->group(function () {
-    // Profile Routes
+    /*
+    |--------------------------------------------------------------------------
+    | Profile Management
+    |--------------------------------------------------------------------------
+    */
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/settings', function () {
             return Inertia::render('profilesettings');
         })->name('settings');
     });
 
-    // Invoice Routes
-    Route::prefix('invoice')->name('invoice.')->group(function () {
-        Route::get('/', [InvoiceController::class, 'latest'])->name('index');
-        Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('show');
-    });
+    /*
+    |--------------------------------------------------------------------------
+    | Financial Management
+    |--------------------------------------------------------------------------
+    */
+    // Invoice Routes - Using resource controller (only index and show actions)
+    Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
 
     // Tuition Routes
     Route::get('/tuition', [TuitionController::class, 'index'])->name('tuition');
@@ -62,7 +68,11 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/payment/{enrollmentId}', [BillingController::class, 'updatePayment'])->name('updatePayment');
     });
 
-    // Reports
+    /*
+    |--------------------------------------------------------------------------
+    | Academic Reports
+    |--------------------------------------------------------------------------
+    */
     Route::get('/studentreport', function () {
         return Inertia::render('studentreport');
     })->name('studentreport');
