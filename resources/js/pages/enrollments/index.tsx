@@ -24,7 +24,7 @@ interface Enrollment {
     school_year: string;
     grade_level: string;
     quarter: string;
-    enrollment_status: string;
+    status: string;
     total_amount_cents: number;
     balance_cents: number;
     payment_status: string;
@@ -114,7 +114,7 @@ const EnrollmentIndex: FC<Props> = ({ enrollments }) => {
                                                 <TableCell>{enrollment.school_year}</TableCell>
                                                 <TableCell>{enrollment.grade_level}</TableCell>
                                                 <TableCell>{enrollment.quarter}</TableCell>
-                                                <TableCell>{getStatusBadge(enrollment.enrollment_status)}</TableCell>
+                                                <TableCell>{getStatusBadge(enrollment.status)}</TableCell>
                                                 <TableCell>{formatCurrency(enrollment.balance_cents / 100)}</TableCell>
                                                 <TableCell>{getPaymentBadge(enrollment.payment_status)}</TableCell>
                                                 <TableCell>
