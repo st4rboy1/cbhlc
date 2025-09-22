@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { logout } from '@/routes';
 import { type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronDown, CreditCard, FileText, GraduationCap, Home, LogOut, Plus, UserCircle, Users } from 'lucide-react';
+import { ChevronDown, CreditCard, GraduationCap, Home, LogOut, Plus, UserCircle, Users } from 'lucide-react';
 import { useState } from 'react';
 
 interface SidebarProps {
@@ -103,20 +103,10 @@ export default function Sidebar({ currentPage = '' }: SidebarProps) {
                             className={cn('w-full justify-start', isActive('invoice') && 'bg-accent')}
                             asChild
                         >
-                            <Link href="/invoice">Invoice</Link>
+                            <Link href="/invoices">Invoice</Link>
                         </Button>
                     </CollapsibleContent>
                 </Collapsible>
-                <Button
-                    variant={isActive('studentreport') ? 'secondary' : 'ghost'}
-                    className={cn('w-full justify-start gap-3', isActive('studentreport') && 'bg-accent')}
-                    asChild
-                >
-                    <Link href="/studentreport">
-                        <FileText className="h-4 w-4" />
-                        Student Report
-                    </Link>
-                </Button>
 
                 <Button
                     variant={isActive('registrar') ? 'secondary' : 'ghost'}
@@ -134,7 +124,7 @@ export default function Sidebar({ currentPage = '' }: SidebarProps) {
                     className={cn('w-full justify-start gap-3', isActive('profilesettings') && 'bg-accent')}
                     asChild
                 >
-                    <Link href="/profilesettings">
+                    <Link href="/profile/settings">
                         <UserCircle className="h-4 w-4" />
                         Profile Settings
                     </Link>
