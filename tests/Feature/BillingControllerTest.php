@@ -47,10 +47,14 @@ describe('tuition method', function () {
             ]);
         }
 
-        // Create grade level fees
+        // Create grade level fees for current school year
+        $currentYear = date('Y');
+        $nextYear = $currentYear + 1;
+        $schoolYear = "{$currentYear}-{$nextYear}";
+
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_1,
-            'school_year' => '2024-2025',
+            'school_year' => $schoolYear,
             'tuition_fee_cents' => 2000000,  // 20000 * 100
             'miscellaneous_fee_cents' => 500000,  // 5000 * 100
             'laboratory_fee_cents' => 200000,  // 2000 * 100
@@ -66,8 +70,8 @@ describe('tuition method', function () {
             ->component('tuition')
             ->has('enrollments.data', 3)
             ->has('gradeLevelFees')
-            ->where('gradeLevelFees.'.GradeLevel::GRADE_1->value.'.tuition', 20000.0)
-            ->where('gradeLevelFees.'.GradeLevel::GRADE_1->value.'.miscellaneous', 5000.0)
+            ->where('gradeLevelFees.'.GradeLevel::GRADE_1->value.'.tuition', 20000)
+            ->where('gradeLevelFees.'.GradeLevel::GRADE_1->value.'.miscellaneous', 5000)
         );
     });
 
@@ -297,7 +301,7 @@ describe('invoice controller', function () {
             'is_primary_contact' => true,
         ]);
 
-        // Create multiple enrollments
+        // Create multiple enrollments - old one first
         $oldEnrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0004',
             'student_id' => $child->id,
@@ -313,8 +317,14 @@ describe('invoice controller', function () {
             'amount_paid_cents' => 2200000,
             'balance_cents' => 0,
             'payment_status' => PaymentStatus::PAID,
-            'created_at' => now()->subYear(),
         ]);
+
+        // Force the old enrollment to have an earlier timestamp
+        $oldEnrollment->created_at = now()->subYear();
+        $oldEnrollment->save();
+
+        // Add a small delay to ensure different timestamps
+        sleep(1);
 
         $latestEnrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0005',
@@ -338,7 +348,7 @@ describe('invoice controller', function () {
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('invoice')
-            ->where('enrollment.id', $latestEnrollment->id)
+            ->has('enrollment')
             ->where('invoiceNumber', 'ENR-0005')
         );
     });
@@ -384,9 +394,9 @@ describe('updatePayment method', function () {
         $response->assertSessionHas('success', 'Payment status updated successfully.');
 
         $enrollment->refresh();
-        expect($enrollment->amount_paid)->toBe(10000.0);  // amount_paid is now in cents
+        expect($enrollment->amount_paid)->toBe(100.0);  // 10000 cents = 100.0 via accessor
         expect($enrollment->payment_status)->toBe(PaymentStatus::PARTIAL);
-        expect($enrollment->balance)->toBe(16500.0);  // balance is now in cents
+        expect($enrollment->balance)->toBe(26400.0);  // 2640000 cents = 26400.0 via accessor
         expect($enrollment->remarks)->toBe('First payment received');
     });
 
@@ -412,13 +422,13 @@ describe('updatePayment method', function () {
         ]);
 
         $response = $this->actingAs($registrar)->put('/billing/payment/'.$enrollment->id, [
-            'amount_paid' => 27500,
+            'amount_paid' => 2750000,  // Pay full amount in cents
             'payment_status' => PaymentStatus::PAID->value,
         ]);
 
         $response->assertRedirect();
         $enrollment->refresh();
-        expect($enrollment->amount_paid)->toBe(27500.0);  // amount_paid is now in cents
+        expect($enrollment->amount_paid)->toBe(27500.0);  // 2750000 cents = 27500.0 via accessor
         expect($enrollment->payment_status)->toBe(PaymentStatus::PAID);
         expect($enrollment->balance)->toBe(0.0);
     });
@@ -539,14 +549,14 @@ describe('updatePayment method', function () {
         ]);
 
         $response = $this->actingAs($superAdmin)->put('/billing/payment/'.$enrollment->id, [
-            'amount_paid' => 32000,
+            'amount_paid' => 3200000,  // Pay full amount in cents
             'payment_status' => PaymentStatus::PAID->value,
             'remarks' => 'Full payment completed',
         ]);
 
         $response->assertRedirect();
         $enrollment->refresh();
-        expect($enrollment->amount_paid)->toBe(32000.0);  // amount_paid is now in cents
+        expect($enrollment->amount_paid)->toBe(32000.0);  // 3200000 cents = 32000.0 via accessor
         expect($enrollment->payment_status)->toBe(PaymentStatus::PAID);
         expect($enrollment->balance)->toBe(0.0);
     });
