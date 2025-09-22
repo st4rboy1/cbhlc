@@ -43,11 +43,12 @@ class EnrollmentController extends Controller
     /**
      * Show the form for creating a new enrollment.
      */
-    public function create()
+    public function create(Request $request)
     {
         $user = Auth::user();
         $students = [];
         $currentSchoolYear = date('Y').'-'.(date('Y') + 1);
+        $selectedStudentId = $request->query('student_id');
 
         // If user is a guardian, get their students with enrollment info
         if ($user->hasRole('guardian')) {
@@ -77,6 +78,7 @@ class EnrollmentController extends Controller
             'gradeLevels' => GradeLevel::values(),
             'quarters' => Quarter::values(),
             'currentSchoolYear' => $currentSchoolYear,
+            'selectedStudentId' => $selectedStudentId,
         ]);
     }
 
