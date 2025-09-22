@@ -22,9 +22,6 @@ return new class extends Migration
             $table->string('address');
             $table->string('contact_number')->nullable();
             $table->string('email')->nullable();
-            $table->string('guardian_name');
-            $table->string('guardian_contact');
-            $table->string('guardian_email')->nullable();
             $table->string('grade_level'); // Will use GradeLevel enum in model
             $table->string('section')->nullable();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
