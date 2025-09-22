@@ -90,7 +90,7 @@ class BillingController extends Controller
             ],
         ];
 
-        return Inertia::render('billing/index', [
+        return Inertia::render('guardian/billing/index', [
             'enrollments' => $enrollments,
             'summary' => [
                 'total_due' => $this->currencyService->format($totalDue),
@@ -155,7 +155,7 @@ class BillingController extends Controller
             ],
         ];
 
-        return Inertia::render('billing/show', [
+        return Inertia::render('guardian/billing/show', [
             'enrollment' => [
                 'id' => $enrollment->id,
                 'student_name' => $enrollment->student->first_name.' '.

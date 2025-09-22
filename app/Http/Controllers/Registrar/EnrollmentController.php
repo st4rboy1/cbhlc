@@ -47,7 +47,7 @@ class EnrollmentController extends Controller
 
         $enrollments = $query->latest('created_at')->paginate(20);
 
-        return Inertia::render('enrollments/index', [
+        return Inertia::render('registrar/enrollments/index', [
             'enrollments' => $enrollments,
             'filters' => $request->only(['status', 'school_year', 'grade_level', 'payment_status', 'search']),
             'statuses' => EnrollmentStatus::values(),
@@ -62,7 +62,7 @@ class EnrollmentController extends Controller
     {
         $enrollment->load(['student', 'guardian']);
 
-        return Inertia::render('enrollments/show', [
+        return Inertia::render('registrar/enrollments/show', [
             'enrollment' => $enrollment,
             'statuses' => EnrollmentStatus::values(),
             'paymentStatuses' => PaymentStatus::values(),
