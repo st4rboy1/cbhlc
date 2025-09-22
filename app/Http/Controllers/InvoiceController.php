@@ -45,9 +45,10 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Display the latest invoice for the authenticated user
+     * Display a listing of invoices for the authenticated user
+     * For now, shows the latest invoice (can be expanded to show all invoices)
      */
-    public function latest(Request $request)
+    public function index(Request $request)
     {
         $user = $request->user();
         $enrollment = null;
