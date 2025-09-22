@@ -47,19 +47,36 @@ class EnrollmentController extends Controller
     {
         $user = Auth::user();
         $students = [];
+        $currentSchoolYear = date('Y').'-'.(date('Y') + 1);
 
-        // If user is a guardian, get their students
+        // If user is a guardian, get their students with enrollment info
         if ($user->hasRole('guardian')) {
             $studentIds = GuardianStudent::where('guardian_id', $user->id)
                 ->pluck('student_id');
-            $students = Student::whereIn('id', $studentIds)->get();
+            $studentsQuery = Student::whereIn('id', $studentIds)->get();
+
+            $students = $studentsQuery->map(function ($student) use ($currentSchoolYear) {
+                return [
+                    'id' => $student->id,
+                    'first_name' => $student->first_name,
+                    'middle_name' => $student->middle_name,
+                    'last_name' => $student->last_name,
+                    'student_id' => $student->student_id,
+                    'is_new_student' => $student->isNewStudent(),
+                    'current_grade_level' => $student->getCurrentGradeLevel()?->value,
+                    'available_grade_levels' => array_map(
+                        fn ($grade) => $grade->value,
+                        $student->getAvailableGradeLevels($currentSchoolYear)
+                    ),
+                ];
+            });
         }
 
         return Inertia::render('enrollments/create', [
             'students' => $students,
             'gradeLevels' => GradeLevel::values(),
             'quarters' => Quarter::values(),
-            'currentSchoolYear' => date('Y').'-'.(date('Y') + 1),
+            'currentSchoolYear' => $currentSchoolYear,
         ]);
     }
 
@@ -72,7 +89,10 @@ class EnrollmentController extends Controller
             'student_id' => 'required|exists:students,id',
             'school_year' => 'required|string',
             'quarter' => 'required|string',
+            'grade_level' => 'required|string',
         ]);
+
+        $student = Student::findOrFail($validated['student_id']);
 
         // Check if student already has an enrollment for this school year
         $existingEnrollment = Enrollment::where('student_id', $validated['student_id'])
@@ -85,11 +105,54 @@ class EnrollmentController extends Controller
                 ->withInput();
         }
 
+        // Check if student already has a pending enrollment
+        $pendingEnrollment = Enrollment::where('student_id', $validated['student_id'])
+            ->where('status', EnrollmentStatus::PENDING)
+            ->first();
+
+        if ($pendingEnrollment) {
+            return redirect()->back()
+                ->withErrors(['student_id' => 'This student already has a pending enrollment. Please wait for it to be processed before creating a new one.'])
+                ->withInput();
+        }
+
+        // Check if student has an active enrollment (enrolled status)
+        $activeEnrollment = Enrollment::where('student_id', $validated['student_id'])
+            ->where('status', EnrollmentStatus::ENROLLED)
+            ->first();
+
+        if ($activeEnrollment) {
+            return redirect()->back()
+                ->withErrors(['student_id' => 'This student is currently enrolled in '.$activeEnrollment->school_year.'. Please wait for the school year to be completed before enrolling for the next year.'])
+                ->withInput();
+        }
+
+        // Validate grade level progression
+        $requestedGrade = \App\Enums\GradeLevel::from($validated['grade_level']);
+        $availableGrades = $student->getAvailableGradeLevels($validated['school_year']);
+
+        if (! in_array($requestedGrade, $availableGrades)) {
+            $currentGrade = $student->getCurrentGradeLevel();
+            $errorMessage = $currentGrade
+                ? "Based on current grade ({$currentGrade->value}), this student cannot enroll in {$requestedGrade->value}."
+                : 'This grade level is not available for this student.';
+
+            return redirect()->back()
+                ->withErrors(['grade_level' => $errorMessage])
+                ->withInput();
+        }
+
+        // Set quarter logic: new students can choose, existing students default to First
+        $quarter = $student->isNewStudent()
+            ? $validated['quarter']
+            : Quarter::FIRST->value;
+
         Enrollment::create([
             'student_id' => $validated['student_id'],
             'guardian_id' => Auth::id(),
             'school_year' => $validated['school_year'],
-            'quarter' => $validated['quarter'],
+            'quarter' => $quarter,
+            'grade_level' => $validated['grade_level'],
             'status' => EnrollmentStatus::PENDING,
             'tuition_fee_cents' => 0,
             'miscellaneous_fee_cents' => 0,

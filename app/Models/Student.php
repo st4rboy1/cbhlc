@@ -70,4 +70,82 @@ class Student extends Model
 
         return $studentId;
     }
+
+    /**
+     * Check if this is a new student (no previous enrollments)
+     */
+    public function isNewStudent(): bool
+    {
+        return $this->enrollments()->count() === 0;
+    }
+
+    /**
+     * Get the current grade level based on latest approved enrollment
+     */
+    public function getCurrentGradeLevel(): ?GradeLevel
+    {
+        $latestEnrollment = $this->enrollments()
+            ->where('status', \App\Enums\EnrollmentStatus::APPROVED)
+            ->latest('created_at')
+            ->first();
+
+        if (! $latestEnrollment) {
+            return $this->grade_level; // Use student's base grade level if no enrollments
+        }
+
+        // Get the grade level from the enrollment, not the student record
+        // The student record grade_level might be outdated
+        return $latestEnrollment->grade_level ?? $this->grade_level;
+    }
+
+    /**
+     * Check if student passed the previous school year
+     */
+    public function passedPreviousYear(string $schoolYear): bool
+    {
+        // Get previous school year
+        $currentYearStart = (int) substr($schoolYear, 0, 4);
+        $previousYear = ($currentYearStart - 1).'-'.$currentYearStart;
+
+        $previousEnrollment = $this->enrollments()
+            ->where('school_year', $previousYear)
+            ->where('status', \App\Enums\EnrollmentStatus::APPROVED)
+            ->first();
+
+        if (! $previousEnrollment) {
+            // No previous enrollment means new student or first year
+            return true;
+        }
+
+        // Check if they completed the year
+        // COMPLETED status explicitly means they passed
+        // APPROVED/ENROLLED are also considered as passing for backward compatibility
+        return in_array($previousEnrollment->status, [
+            \App\Enums\EnrollmentStatus::APPROVED,
+            \App\Enums\EnrollmentStatus::ENROLLED,
+            \App\Enums\EnrollmentStatus::COMPLETED,
+        ]);
+    }
+
+    /**
+     * Get available grade levels for enrollment
+     */
+    public function getAvailableGradeLevels(string $schoolYear): array
+    {
+        $currentGrade = $this->getCurrentGradeLevel();
+
+        if ($this->isNewStudent()) {
+            // New students can start at any grade
+            return GradeLevel::getAvailableGradesFor(null);
+        }
+
+        // Existing students can only progress if they passed previous year
+        if (! $this->passedPreviousYear($schoolYear)) {
+            // Repeat current grade if didn't pass
+            return $currentGrade ? [$currentGrade] : [];
+        }
+
+        // Can progress to current grade or higher
+        return GradeLevel::getAvailableGradesFor($currentGrade);
+    }
 }

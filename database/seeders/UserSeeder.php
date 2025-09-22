@@ -2,7 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Enums\EnrollmentStatus;
 use App\Enums\GradeLevel;
+use App\Enums\PaymentStatus;
+use App\Enums\Quarter;
+use App\Models\Enrollment;
 use App\Models\Guardian;
 use App\Models\GuardianStudent;
 use App\Models\Student;
@@ -182,6 +186,78 @@ class UserSeeder extends Seeder
         ], [
             'relationship_type' => 'mother',
             'is_primary_contact' => false,
+        ]);
+
+        // Create enrollment history for Juan (old student)
+        $this->createEnrollmentHistory($student1, $guardian);
+
+        // Ana is a new student with no enrollment history
+    }
+
+    /**
+     * Create enrollment history to make a student an "old student"
+     */
+    private function createEnrollmentHistory(Student $student, User $guardian): void
+    {
+        // Create completed enrollments for previous years
+        // Juan was in Grade 4 in 2022-2023 (completed)
+        Enrollment::firstOrCreate([
+            'student_id' => $student->id,
+            'school_year' => '2022-2023',
+        ], [
+            'guardian_id' => $guardian->id,
+            'quarter' => Quarter::FIRST,
+            'grade_level' => GradeLevel::GRADE_4->value,
+            'status' => EnrollmentStatus::COMPLETED,
+            'tuition_fee_cents' => 2000000, // 20,000
+            'miscellaneous_fee_cents' => 500000, // 5,000
+            'laboratory_fee_cents' => 200000, // 2,000
+            'total_amount_cents' => 2700000,
+            'net_amount_cents' => 2700000,
+            'amount_paid_cents' => 2700000,
+            'balance_cents' => 0,
+            'payment_status' => PaymentStatus::PAID,
+            'approved_at' => now()->subYears(2),
+        ]);
+
+        // Juan was in Grade 5 in 2023-2024 (completed)
+        Enrollment::firstOrCreate([
+            'student_id' => $student->id,
+            'school_year' => '2023-2024',
+        ], [
+            'guardian_id' => $guardian->id,
+            'quarter' => Quarter::FIRST,
+            'grade_level' => GradeLevel::GRADE_5->value,
+            'status' => EnrollmentStatus::COMPLETED,
+            'tuition_fee_cents' => 2200000, // 22,000
+            'miscellaneous_fee_cents' => 500000, // 5,000
+            'laboratory_fee_cents' => 300000, // 3,000
+            'total_amount_cents' => 3000000,
+            'net_amount_cents' => 3000000,
+            'amount_paid_cents' => 3000000,
+            'balance_cents' => 0,
+            'payment_status' => PaymentStatus::PAID,
+            'approved_at' => now()->subYear(),
+        ]);
+
+        // Juan is currently enrolled in Grade 6 in 2024-2025
+        Enrollment::firstOrCreate([
+            'student_id' => $student->id,
+            'school_year' => '2024-2025',
+        ], [
+            'guardian_id' => $guardian->id,
+            'quarter' => Quarter::FIRST,
+            'grade_level' => GradeLevel::GRADE_6->value,
+            'status' => EnrollmentStatus::ENROLLED,
+            'tuition_fee_cents' => 2500000, // 25,000
+            'miscellaneous_fee_cents' => 600000, // 6,000
+            'laboratory_fee_cents' => 400000, // 4,000
+            'total_amount_cents' => 3500000,
+            'net_amount_cents' => 3500000,
+            'amount_paid_cents' => 1750000, // Partial payment
+            'balance_cents' => 1750000,
+            'payment_status' => PaymentStatus::PARTIAL,
+            'approved_at' => now()->subMonths(3),
         ]);
     }
 }

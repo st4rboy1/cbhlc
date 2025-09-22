@@ -44,6 +44,7 @@ class Enrollment extends Model
         'guardian_id',
         'school_year',
         'quarter',
+        'grade_level',
         'status',
         'tuition_fee_cents',
         'miscellaneous_fee_cents',
@@ -66,6 +67,7 @@ class Enrollment extends Model
         'approved_at' => 'datetime',
         'payment_due_date' => 'date',
         'quarter' => Quarter::class,
+        'grade_level' => \App\Enums\GradeLevel::class,
         'status' => EnrollmentStatus::class,
         'payment_status' => PaymentStatus::class,
     ];

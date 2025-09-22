@@ -7,6 +7,7 @@ test('enrollment status enum has correct values', function () {
     expect(EnrollmentStatus::APPROVED->value)->toBe('approved');
     expect(EnrollmentStatus::REJECTED->value)->toBe('rejected');
     expect(EnrollmentStatus::ENROLLED->value)->toBe('enrolled');
+    expect(EnrollmentStatus::COMPLETED->value)->toBe('completed');
 });
 
 test('enrollment status enum labels are correct', function () {
@@ -14,6 +15,7 @@ test('enrollment status enum labels are correct', function () {
     expect(EnrollmentStatus::APPROVED->label())->toBe('Approved');
     expect(EnrollmentStatus::REJECTED->label())->toBe('Rejected');
     expect(EnrollmentStatus::ENROLLED->label())->toBe('Enrolled');
+    expect(EnrollmentStatus::COMPLETED->label())->toBe('Completed');
 });
 
 test('enrollment status enum colors are correct', function () {
@@ -21,6 +23,7 @@ test('enrollment status enum colors are correct', function () {
     expect(EnrollmentStatus::APPROVED->color())->toBe('success');
     expect(EnrollmentStatus::REJECTED->color())->toBe('destructive');
     expect(EnrollmentStatus::ENROLLED->color())->toBe('primary');
+    expect(EnrollmentStatus::COMPLETED->color())->toBe('muted');
 });
 
 test('enrollment status isModifiable works correctly', function () {
@@ -28,6 +31,7 @@ test('enrollment status isModifiable works correctly', function () {
     expect(EnrollmentStatus::APPROVED->isModifiable())->toBeFalse();
     expect(EnrollmentStatus::REJECTED->isModifiable())->toBeFalse();
     expect(EnrollmentStatus::ENROLLED->isModifiable())->toBeFalse();
+    expect(EnrollmentStatus::COMPLETED->isModifiable())->toBeFalse();
 });
 
 test('enrollment status isApproved works correctly', function () {
@@ -35,6 +39,7 @@ test('enrollment status isApproved works correctly', function () {
     expect(EnrollmentStatus::APPROVED->isApproved())->toBeTrue();
     expect(EnrollmentStatus::REJECTED->isApproved())->toBeFalse();
     expect(EnrollmentStatus::ENROLLED->isApproved())->toBeTrue();
+    expect(EnrollmentStatus::COMPLETED->isApproved())->toBeTrue();
 });
 
 test('enrollment status values method returns correct array', function () {
@@ -44,7 +49,8 @@ test('enrollment status values method returns correct array', function () {
     expect($values)->toContain('approved');
     expect($values)->toContain('rejected');
     expect($values)->toContain('enrolled');
-    expect($values)->toHaveCount(4);
+    expect($values)->toContain('completed');
+    expect($values)->toHaveCount(5);
 });
 
 test('enrollment status enum can be created from string values', function () {
@@ -52,6 +58,7 @@ test('enrollment status enum can be created from string values', function () {
     expect(EnrollmentStatus::from('approved'))->toBe(EnrollmentStatus::APPROVED);
     expect(EnrollmentStatus::from('rejected'))->toBe(EnrollmentStatus::REJECTED);
     expect(EnrollmentStatus::from('enrolled'))->toBe(EnrollmentStatus::ENROLLED);
+    expect(EnrollmentStatus::from('completed'))->toBe(EnrollmentStatus::COMPLETED);
 });
 
 test('enrollment status enum throws exception for invalid values', function () {

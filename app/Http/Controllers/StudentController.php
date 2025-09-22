@@ -101,13 +101,13 @@ class StudentController extends Controller
             $student = Student::create([
                 'student_id' => Student::generateStudentId(),
                 'first_name' => $validated['first_name'],
-                'middle_name' => $validated['middle_name'],
+                'middle_name' => $validated['middle_name'] ?? null,
                 'last_name' => $validated['last_name'],
                 'birthdate' => $validated['birthdate'],
                 'grade_level' => GradeLevel::from($validated['grade_level']),
                 'gender' => $validated['gender'],
                 'address' => $validated['address'],
-                'contact_number' => $validated['contact_number'],
+                'contact_number' => $validated['contact_number'] ?? null,
             ]);
 
             // All students now get user accounts
