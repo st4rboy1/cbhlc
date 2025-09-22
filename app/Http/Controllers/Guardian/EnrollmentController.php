@@ -113,8 +113,8 @@ class EnrollmentController extends Controller
             ->where('school_year', $validated['school_year'])
             ->first();
 
-        $tuitionFeeCents = ($gradeLevelFee?->tuition_fee ?? 0) * 100;
-        $miscFeeCents = ($gradeLevelFee?->miscellaneous_fee ?? 0) * 100;
+        $tuitionFeeCents = ($gradeLevelFee ? $gradeLevelFee->tuition_fee : 0) * 100;
+        $miscFeeCents = ($gradeLevelFee ? $gradeLevelFee->miscellaneous_fee : 0) * 100;
         $laboratoryFeeCents = 0;
         $libraryFeeCents = 0;
         $sportsFeeCents = 0;
