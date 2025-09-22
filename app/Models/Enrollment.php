@@ -152,7 +152,7 @@ class Enrollment extends Model
     protected function amountPaid(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->amount_paid_cents / 100,
+            get: fn () => (float) ($this->amount_paid_cents / 100),
             set: fn (float $value) => ['amount_paid_cents' => (int) ($value * 100)]
         );
     }
@@ -160,7 +160,7 @@ class Enrollment extends Model
     protected function balance(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->balance_cents / 100,
+            get: fn () => (float) ($this->balance_cents / 100),
             set: fn (float $value) => ['balance_cents' => (int) ($value * 100)]
         );
     }
