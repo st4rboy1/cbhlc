@@ -35,7 +35,7 @@ class BillingController extends Controller
             ->whereIn('student_id', $studentIds)
             ->where('status', '!=', 'rejected')
             ->get()
-            ->map(function ($enrollment) {
+            ->map(function (Enrollment $enrollment) {
                 // Find the fee for the enrollment's grade level
                 $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)
                     ->where('school_year', $enrollment->school_year)
@@ -90,7 +90,7 @@ class BillingController extends Controller
             ],
         ];
 
-        return Inertia::render('guardian/billing/index', [
+        return Inertia::render('billing/index', [
             'enrollments' => $enrollments,
             'summary' => [
                 'total_due' => $this->currencyService->format($totalDue),
@@ -155,7 +155,7 @@ class BillingController extends Controller
             ],
         ];
 
-        return Inertia::render('guardian/billing/show', [
+        return Inertia::render('billing/show', [
             'enrollment' => [
                 'id' => $enrollment->id,
                 'student_name' => $enrollment->student->first_name.' '.

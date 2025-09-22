@@ -27,7 +27,7 @@ class StudentController extends Controller
         }])
             ->whereIn('id', $studentIds)
             ->get()
-            ->map(function ($student) {
+            ->map(function (Student $student) {
                 $latestEnrollment = $student->enrollments->first();
 
                 return [
@@ -50,7 +50,7 @@ class StudentController extends Controller
                 ];
             });
 
-        return Inertia::render('guardian/students/index', [
+        return Inertia::render('students/index', [
             'students' => $students,
         ]);
     }
@@ -71,7 +71,7 @@ class StudentController extends Controller
 
         $student->load('enrollments');
 
-        return Inertia::render('guardian/students/show', [
+        return Inertia::render('students/show', [
             'student' => [
                 'id' => $student->id,
                 'student_id' => $student->student_id,
@@ -85,7 +85,7 @@ class StudentController extends Controller
                 'email' => $student->email,
                 'grade_level' => $student->grade_level,
                 'section' => $student->section,
-                'enrollments' => $student->enrollments->map(function ($enrollment) {
+                'enrollments' => $student->enrollments->map(function (\App\Models\Enrollment $enrollment) {
                     return [
                         'id' => $enrollment->id,
                         'school_year' => $enrollment->school_year,
@@ -105,7 +105,7 @@ class StudentController extends Controller
      */
     public function create()
     {
-        return Inertia::render('guardian/students/create');
+        return Inertia::render('students/create');
     }
 
     /**
@@ -154,7 +154,7 @@ class StudentController extends Controller
             abort(403, 'You do not have access to edit this student.');
         }
 
-        return Inertia::render('guardian/students/edit', [
+        return Inertia::render('students/edit', [
             'student' => $student,
         ]);
     }
