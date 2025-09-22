@@ -15,7 +15,7 @@ class Guardian extends Model
         'first_name',
         'middle_name',
         'last_name',
-        'phone',
+        'contact_number',
         'address',
         'occupation',
         'employer',

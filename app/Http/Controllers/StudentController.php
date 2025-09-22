@@ -88,7 +88,7 @@ class StudentController extends Controller
             'grade_level' => 'required|in:'.implode(',', array_column(GradeLevel::cases(), 'value')),
             'gender' => 'required|in:male,female',
             'address' => 'required|string|max:500',
-            'phone' => 'nullable|string|max:20',
+            'contact_number' => 'nullable|string|max:20',
             'relationship_type' => 'required|in:'.implode(',', RelationshipType::values()),
             'is_primary_contact' => 'boolean',
             // All students now require login accounts
@@ -107,7 +107,7 @@ class StudentController extends Controller
                 'grade_level' => GradeLevel::from($validated['grade_level']),
                 'gender' => $validated['gender'],
                 'address' => $validated['address'],
-                'phone' => $validated['phone'],
+                'contact_number' => $validated['contact_number'],
             ]);
 
             // All students now get user accounts
@@ -161,7 +161,7 @@ class StudentController extends Controller
             'grade_level' => $student->grade_level,
             'gender' => $student->gender,
             'address' => $student->address,
-            'phone' => $student->phone,
+            'contact_number' => $student->contact_number,
             'user' => $student->user ? [
                 'id' => $student->user->id,
                 'email' => $student->user->email,
@@ -211,7 +211,7 @@ class StudentController extends Controller
             'grade_level' => 'required|in:'.implode(',', array_column(GradeLevel::cases(), 'value')),
             'gender' => 'required|in:male,female',
             'address' => 'required|string|max:500',
-            'phone' => 'nullable|string|max:20',
+            'contact_number' => 'nullable|string|max:20',
             'relationship_type' => 'required|in:'.implode(',', RelationshipType::values()),
             'is_primary_contact' => 'boolean',
         ]);
@@ -226,7 +226,7 @@ class StudentController extends Controller
                 'grade_level' => GradeLevel::from($validated['grade_level']),
                 'gender' => $validated['gender'],
                 'address' => $validated['address'],
-                'phone' => $validated['phone'],
+                'contact_number' => $validated['contact_number'],
             ]);
 
             // Update relationship

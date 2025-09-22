@@ -61,7 +61,7 @@ describe('invoice controller', function () {
             'user_id' => $guardian->id,
             'first_name' => 'Jane',
             'last_name' => 'Smith',
-            'phone' => '09123456789',
+            'contact_number' => '09123456789',
             'address' => '456 Test Ave',
         ]);
 
@@ -131,7 +131,7 @@ describe('invoice controller', function () {
             'user_id' => $guardian->id,
             'first_name' => 'Bob',
             'last_name' => 'Johnson',
-            'phone' => '09123456789',
+            'contact_number' => '09123456789',
             'address' => '789 Test Blvd',
         ]);
 
