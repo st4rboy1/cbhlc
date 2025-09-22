@@ -1,6 +1,8 @@
 import PageLayout from '@/components/PageLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -111,13 +113,12 @@ export default function CreateStudent({ gradeLevels, relationshipTypes }: Create
                                             <Label htmlFor="birthdate">
                                                 Date of Birth <span className="text-red-500">*</span>
                                             </Label>
-                                            <Input
+                                            <DatePicker
                                                 id="birthdate"
-                                                type="date"
-                                                value={data.birthdate}
-                                                onChange={(e) => setData('birthdate', e.target.value)}
-                                                className={errors.birthdate ? 'border-red-500' : ''}
-                                                required
+                                                value={data.birthdate ? new Date(data.birthdate) : undefined}
+                                                onChange={(date) => setData('birthdate', date ? date.toISOString().split('T')[0] : '')}
+                                                placeholder="Select date of birth"
+                                                error={!!errors.birthdate}
                                             />
                                             {errors.birthdate && <p className="mt-1 text-sm text-red-500">{errors.birthdate}</p>}
                                         </div>
@@ -217,14 +218,17 @@ export default function CreateStudent({ gradeLevels, relationshipTypes }: Create
                                         </div>
 
                                         <div className="flex items-center space-x-2">
-                                            <input
-                                                type="checkbox"
+                                            <Checkbox
                                                 id="is_primary_contact"
                                                 checked={data.is_primary_contact}
-                                                onChange={(e) => setData('is_primary_contact', e.target.checked)}
-                                                className="rounded border-gray-300"
+                                                onCheckedChange={(checked) => setData('is_primary_contact', checked as boolean)}
                                             />
-                                            <Label htmlFor="is_primary_contact">Primary Contact</Label>
+                                            <Label
+                                                htmlFor="is_primary_contact"
+                                                className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                            >
+                                                Primary Contact
+                                            </Label>
                                         </div>
                                     </div>
                                 </div>
