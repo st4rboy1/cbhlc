@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enums\GradeLevel;
+use App\Models\Guardian;
 use App\Models\GuardianStudent;
 use App\Models\Student;
 use App\Models\User;
@@ -67,7 +68,7 @@ class UserSeeder extends Seeder
         }
 
         // Guardian with children
-        $guardian = User::firstOrCreate(
+        $guardianUser = User::firstOrCreate(
             ['email' => 'maria.santos@example.com'],
             [
                 'name' => 'Maria Santos',
@@ -75,12 +76,29 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('password'),
             ]
         );
-        if (! $guardian->hasRole('guardian')) {
-            $guardian->assignRole('guardian');
+        if (! $guardianUser->hasRole('guardian')) {
+            $guardianUser->assignRole('guardian');
         }
 
+        // Create Guardian profile record
+        Guardian::firstOrCreate(
+            ['user_id' => $guardianUser->id],
+            [
+                'first_name' => 'Maria',
+                'middle_name' => 'Cruz',
+                'last_name' => 'Santos',
+                'phone' => '+63987654321',
+                'address' => '123 Rizal Street, Pasig City',
+                'occupation' => 'Teacher',
+                'employer' => 'Department of Education',
+                'emergency_contact_name' => 'Juan Santos',
+                'emergency_contact_phone' => '+63912345678',
+                'emergency_contact_relationship' => 'Spouse',
+            ]
+        );
+
         // Create students linked to the guardian
-        $this->createStudentsForGuardian($guardian);
+        $this->createStudentsForGuardian($guardianUser);
     }
 
     /**
