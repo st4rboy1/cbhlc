@@ -107,7 +107,11 @@ jobs:
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: ':memory:'
-        run: ./vendor/bin/pest --parallel
+        run: |
+          # Install parallel package if not present
+          composer require --dev brianium/paratest --no-interaction --no-scripts 2>/dev/null || true
+          # Run tests (parallel if available, otherwise normal)
+          ./vendor/bin/pest --parallel --no-coverage || ./vendor/bin/pest --no-coverage
 
   # Optional: Run coverage only on main branch merges
   coverage:
