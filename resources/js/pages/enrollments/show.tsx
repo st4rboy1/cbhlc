@@ -31,7 +31,7 @@ interface Props {
         school_year: string;
         grade_level: string;
         quarter: string;
-        enrollment_status: string;
+        status: string;
         tuition_fee_cents: number;
         miscellaneous_fee_cents: number;
         laboratory_fee_cents: number;
@@ -82,7 +82,7 @@ const EnrollmentShow: FC<Props> = ({ enrollment }) => {
                                 Back to Enrollments
                             </Link>
                         </Button>
-                        {enrollment.enrollment_status === 'pending' && (
+                        {enrollment.status === 'pending' && (
                             <Button asChild>
                                 <Link href={`/enrollments/${enrollment.id}/edit`}>
                                     <Edit className="mr-2 h-4 w-4" />
@@ -101,7 +101,7 @@ const EnrollmentShow: FC<Props> = ({ enrollment }) => {
                                     <CardDescription>School Year {enrollment.school_year}</CardDescription>
                                 </div>
                                 <div className="flex gap-2">
-                                    {getStatusBadge(enrollment.enrollment_status)}
+                                    {getStatusBadge(enrollment.status)}
                                     {getPaymentBadge(enrollment.payment_status)}
                                 </div>
                             </div>
