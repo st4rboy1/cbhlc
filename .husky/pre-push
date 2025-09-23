@@ -20,14 +20,14 @@ echo ""
 echo "🧪 Running tests with coverage check (optimized with SQLite)..."
 
 # Use SQLite for much faster tests (5s vs 13s)
-./vendor/bin/sail exec -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: laravel.test ./vendor/bin/pest --parallel --coverage --min=50 --coverage-text
+./vendor/bin/sail exec -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: laravel.test ./vendor/bin/pest --parallel --coverage --min=60 --coverage-text
 
 # Check the exit status
 if [ $? -ne 0 ]; then
-    echo "❌ Tests failed or coverage below 50%. Push aborted."
+    echo "❌ Tests failed or coverage below 60%. Push aborted."
     exit 1
 fi
 
-echo "✅ All tests passed with minimum 50% coverage!"
+echo "✅ All tests passed with minimum 60% coverage!"
 echo "✅ Pre-push checks completed successfully!"
 exit 0
