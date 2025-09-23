@@ -182,6 +182,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
      */
     public function findWithRelations(int $id): Enrollment
     {
+        /** @var Enrollment $enrollment */
         $enrollment = $this->model->with(['student', 'invoices', 'payments'])
             ->findOrFail($id);
 
@@ -396,7 +397,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
     protected function generateEnrollmentId(): string
     {
         do {
-            $id = 'ENR-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            $id = 'ENR-'.str_pad((string) rand(1, 9999), 4, '0', STR_PAD_LEFT);
         } while ($this->model->where('enrollment_id', $id)->exists());
 
         return $id;
