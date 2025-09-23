@@ -3,7 +3,6 @@
 namespace App\Contracts\Services;
 
 use App\Models\Enrollment;
-use Illuminate\Support\Collection;
 
 interface BillingServiceInterface
 {
