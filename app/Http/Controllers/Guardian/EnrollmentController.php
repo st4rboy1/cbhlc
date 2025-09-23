@@ -138,9 +138,11 @@ class EnrollmentController extends Controller
             // Business Rule 2: Students cannot enroll in a lower grade than their previous enrollment
             try {
                 // Get the previous grade level as enum
-                $previousGradeEnum = is_string($previousEnrollments->grade_level)
-                    ? GradeLevel::from($previousEnrollments->grade_level)
-                    : $previousEnrollments->grade_level;
+                /** @var GradeLevel|string $previousGradeLevel */
+                $previousGradeLevel = $previousEnrollments->grade_level;
+                $previousGradeEnum = is_string($previousGradeLevel)
+                    ? GradeLevel::from($previousGradeLevel)
+                    : $previousGradeLevel;
 
                 // Get the new grade level as enum
                 $newGradeEnum = GradeLevel::from($validated['grade_level']);
