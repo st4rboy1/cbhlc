@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Registrar;
 
 use App\Enums\GradeLevel;
 use App\Http\Controllers\Controller;
+use App\Models\Guardian;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -89,11 +90,16 @@ class StudentController extends Controller
                     ];
                 }),
                 'guardians' => $student->guardianStudents->map(function ($gs) {
+                    $guardianUser = $gs->guardian;
+                    $guardianModel = Guardian::where('user_id', $guardianUser->id)->first();
                     return [
-                        'id' => $gs->guardian->id,
-                        'name' => $gs->guardian->first_name.' '.$gs->guardian->last_name,
-                        'email' => $gs->guardian->email,
-                        'is_primary' => $gs->is_primary,
+                        'id' => $guardianUser->id,
+                        'name' => $guardianModel ?
+                            $guardianModel->first_name.' '.$guardianModel->last_name :
+                            $guardianUser->name,
+                        'email' => $guardianUser->email,
+                        'relationship_type' => $gs->relationship_type,
+                        'is_primary_contact' => $gs->is_primary_contact,
                     ];
                 }),
             ],
