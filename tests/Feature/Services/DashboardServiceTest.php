@@ -79,7 +79,7 @@ test('getParentDashboardData returns parent-specific data', function () {
         'paid_amount' => 20000,
     ]);
 
-    $result = $this->service->getParentDashboardData($student->guardian_id);
+    $result = $this->service->getParentDashboardData($enrollment->guardian_id);
 
     expect($result)->toHaveKeys([
         'students',
@@ -111,7 +111,7 @@ test('getStudentDashboardData returns student-specific data', function () {
     ]);
     expect($result['profile']['id'])->toBe($student->id);
     expect($result['enrollment_status'])->toBe(EnrollmentStatus::APPROVED->label());
-    expect($result['current_grade'])->toBe('Grade 5');
+    expect($result['current_grade']->value)->toBe('Grade 5');
     expect($result['school_year'])->toBe('2024-2025');
 });
 
@@ -216,7 +216,7 @@ test('getPendingTasks returns tasks requiring action', function () {
         'status' => InvoiceStatus::SENT,
     ]);
 
-    $result = $this->service->getPendingTasks();
+    $result = $this->service->getPendingTasks('registrar');
 
     expect($result)->toHaveKeys(['pending_enrollments', 'overdue_invoices']);
     expect($result['pending_enrollments'])->toBe(3);

@@ -148,7 +148,7 @@ test('rejectEnrollment updates status with reason', function () {
 
     expect($result->status)->toBe(EnrollmentStatus::REJECTED);
     expect($result->remarks)->toBe($reason);
-    expect($result->approved_at)->not->toBeNull();
+    expect($result->rejected_at)->not->toBeNull();
 });
 
 test('rejectEnrollment throws exception for non-pending enrollment', function () {
