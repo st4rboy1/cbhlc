@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Guardian;
 
+use App\Enums\EnrollmentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
@@ -31,10 +32,12 @@ class BillingController extends Controller
             ->pluck('student_id');
 
         // Get enrollments with billing information
+        /** @var \Illuminate\Support\Collection<int, array<string, mixed>> $enrollments */
         $enrollments = Enrollment::with(['student'])
             ->whereIn('student_id', $studentIds)
-            ->where('status', '!=', 'rejected')
+            ->where('status', '!=', EnrollmentStatus::REJECTED)
             ->get()
+            /** @phpstan-ignore-next-line */
             ->map(function (Enrollment $enrollment) {
                 // Find the fee for the enrollment's grade level
                 $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)
@@ -90,7 +93,7 @@ class BillingController extends Controller
             ],
         ];
 
-        return Inertia::render('billing/index', [
+        return Inertia::render('guardian/billing/index', [
             'enrollments' => $enrollments,
             'summary' => [
                 'total_due' => $this->currencyService->format($totalDue),
@@ -155,7 +158,7 @@ class BillingController extends Controller
             ],
         ];
 
-        return Inertia::render('billing/show', [
+        return Inertia::render('guardian/billing/show', [
             'enrollment' => [
                 'id' => $enrollment->id,
                 'student_name' => $enrollment->student->first_name.' '.

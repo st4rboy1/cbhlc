@@ -92,13 +92,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Registrar Routes
-    Route::prefix('registrar')->name('registrar.')->middleware('role:registrar')->group(function () {
+    Route::prefix('registrar')->name('registrar.')->middleware('role:registrar|administrator|super_admin')->group(function () {
         // Dashboard
         Route::get('/dashboard', [RegistrarDashboardController::class, 'index'])->name('dashboard');
 
         // Students Management
-        Route::resource('students', RegistrarStudentController::class);
         Route::get('/students/export', [RegistrarStudentController::class, 'export'])->name('students.export');
+        Route::resource('students', RegistrarStudentController::class);
 
         // Enrollments Management
         Route::resource('enrollments', RegistrarEnrollmentController::class)->only(['index', 'show']);

@@ -18,7 +18,7 @@ beforeEach(function () {
 });
 
 describe('enrollment controller', function () {
-    test('admin can view list of all enrollments at /enrollments', function () {
+    test('admin can view list of all enrollments at registrar/enrollments', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
 
@@ -27,11 +27,11 @@ describe('enrollment controller', function () {
             Enrollment::factory()->create(['student_id' => $student->id]);
         });
 
-        $response = $this->actingAs($admin)->get(route('enrollments.index'));
+        $response = $this->actingAs($admin)->get(route('registrar.enrollments.index'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('enrollments/index')
+            ->component('registrar/enrollments/index')
             ->has('enrollments.data', 3)
         );
     });
@@ -61,7 +61,7 @@ describe('enrollment controller', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('enrollments/index')
+            ->component('guardian/enrollments/index')
             ->has('enrollments.data', 1) // Only guardian's child enrollment
         );
     });
@@ -74,7 +74,7 @@ describe('enrollment controller', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('enrollments/create')
+            ->component('guardian/enrollments/create')
         );
     });
 
@@ -91,9 +91,17 @@ describe('enrollment controller', function () {
             'grade_level' => 'Grade 1',
         ];
 
+        // Need to create guardian-student relationship first
+        GuardianStudent::create([
+            'guardian_id' => $guardian->id,
+            'student_id' => $student->id,
+            'relationship_type' => 'father',
+            'is_primary_contact' => true,
+        ]);
+
         $response = $this->actingAs($guardian)->post(route('enrollments.store'), $enrollmentData);
 
-        $response->assertRedirect(route('enrollments.index'));
+        $response->assertRedirect(route('guardian.enrollments.index'));
         $this->assertDatabaseHas('enrollments', [
             'student_id' => $student->id,
             'school_year' => '2024-2025',
@@ -101,17 +109,17 @@ describe('enrollment controller', function () {
         ]);
     });
 
-    test('can view single enrollment details at /enrollments/{enrollment}', function () {
+    test('can view single enrollment details at registrar/enrollments/{enrollment}', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
 
         $enrollment = Enrollment::factory()->create();
 
-        $response = $this->actingAs($admin)->get(route('enrollments.show', $enrollment));
+        $response = $this->actingAs($admin)->get(route('registrar.enrollments.show', $enrollment));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('enrollments/show')
+            ->component('registrar/enrollments/show')
             ->has('enrollment')
         );
     });
@@ -230,7 +238,7 @@ describe('enrollment controller', function () {
             'grade_level' => 'Grade 1',
         ]);
 
-        $response->assertRedirect(route('enrollments.index'));
+        $response->assertRedirect(route('guardian.enrollments.index'));
         $response->assertSessionHas('success');
 
         // Verify both enrollments exist
@@ -260,7 +268,7 @@ describe('enrollment controller', function () {
                 'grade_level' => 'Kinder',
             ]);
 
-            $response->assertRedirect(route('enrollments.index'));
+            $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
                 'quarter' => Quarter::SECOND,
@@ -306,7 +314,7 @@ describe('enrollment controller', function () {
                 'grade_level' => 'Grade 1',
             ]);
 
-            $response->assertRedirect(route('enrollments.index'));
+            $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',
@@ -337,7 +345,7 @@ describe('enrollment controller', function () {
                 'grade_level' => 'Grade 3',
             ]);
 
-            $response->assertRedirect(route('enrollments.index'));
+            $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
                 'grade_level' => 'Grade 3',
@@ -430,7 +438,7 @@ describe('enrollment controller', function () {
                 'grade_level' => 'Grade 3',
             ]);
 
-            $response->assertRedirect(route('enrollments.index'));
+            $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',
@@ -479,7 +487,7 @@ describe('enrollment controller', function () {
                 'grade_level' => 'Grade 4', // Skipping Grade 2 and 3
             ]);
 
-            $response->assertRedirect(route('enrollments.index'));
+            $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',

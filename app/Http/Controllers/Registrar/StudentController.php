@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Registrar;
 
 use App\Enums\GradeLevel;
 use App\Http\Controllers\Controller;
+use App\Models\Guardian;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -43,7 +44,7 @@ class StudentController extends Controller
 
         $students = $query->paginate(20);
 
-        return Inertia::render('students/index', [
+        return Inertia::render('registrar/students/index', [
             'students' => $students,
             'filters' => $request->only(['search', 'grade_level', 'section']),
             'gradeLevels' => GradeLevel::values(),
@@ -57,7 +58,7 @@ class StudentController extends Controller
     {
         $student->load(['enrollments.guardian', 'guardianStudents.guardian']);
 
-        return Inertia::render('students/show', [
+        return Inertia::render('registrar/students/show', [
             'student' => [
                 'id' => $student->id,
                 'student_id' => $student->student_id,
@@ -73,6 +74,7 @@ class StudentController extends Controller
                 'section' => $student->section,
                 'created_at' => $student->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $student->updated_at->format('Y-m-d H:i:s'),
+                /** @phpstan-ignore-next-line */
                 'enrollments' => $student->enrollments->map(function (\App\Models\Enrollment $enrollment) {
                     return [
                         'id' => $enrollment->id,
@@ -87,12 +89,19 @@ class StudentController extends Controller
                         'approved_at' => $enrollment->approved_at?->format('Y-m-d'),
                     ];
                 }),
+                /** @phpstan-ignore-next-line */
                 'guardians' => $student->guardianStudents->map(function ($gs) {
+                    $guardianUser = $gs->guardian;
+                    $guardianModel = Guardian::where('user_id', $guardianUser->id)->first();
+
                     return [
-                        'id' => $gs->guardian->id,
-                        'name' => $gs->guardian->first_name.' '.$gs->guardian->last_name,
-                        'email' => $gs->guardian->email,
-                        'is_primary' => $gs->is_primary,
+                        'id' => $guardianUser->id,
+                        'name' => $guardianModel ?
+                            $guardianModel->first_name.' '.$guardianModel->last_name :
+                            $guardianUser->name,
+                        'email' => $guardianUser->email,
+                        'relationship_type' => $gs->relationship_type,
+                        'is_primary_contact' => $gs->is_primary_contact,
                     ];
                 }),
             ],
@@ -104,7 +113,7 @@ class StudentController extends Controller
      */
     public function create()
     {
-        return Inertia::render('students/create', [
+        return Inertia::render('registrar/students/create', [
             'gradeLevels' => GradeLevel::values(),
         ]);
     }
@@ -141,7 +150,7 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        return Inertia::render('students/edit', [
+        return Inertia::render('registrar/students/edit', [
             'student' => $student,
             'gradeLevels' => GradeLevel::values(),
         ]);

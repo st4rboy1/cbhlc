@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 
-export default function GuardianStudentsIndex(props: unknown) {
+export default function RegistrarStudentsIndex(props: unknown) {
     return (
         <>
             <Head title="Students Index" />
