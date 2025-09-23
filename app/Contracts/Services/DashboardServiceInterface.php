@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Services;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 interface DashboardServiceInterface
 {
@@ -24,17 +24,17 @@ interface DashboardServiceInterface
     /**
      * Get recent activities
      */
-    public function getRecentActivities(int $limit = 10): Collection;
+    public function getRecentActivities(int $limit = 10): \Illuminate\Support\Collection;
 
     /**
      * Get pending tasks
      */
-    public function getPendingTasks(string $role): Collection;
+    public function getPendingTasks(string $role): \Illuminate\Support\Collection;
 
     /**
      * Get system announcements
      */
-    public function getAnnouncements(bool $activeOnly = true): Collection;
+    public function getAnnouncements(bool $activeOnly = true): \Illuminate\Support\Collection;
 
     /**
      * Get quick stats

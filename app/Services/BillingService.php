@@ -37,21 +37,21 @@ class BillingService implements BillingServiceInterface
                 'grade_level' => $enrollment->grade_level,
             ],
             'fees' => [
-                'tuition' => $this->currencyService->formatFromCents($enrollment->tuition_fee_cents),
-                'miscellaneous' => $this->currencyService->formatFromCents($enrollment->miscellaneous_fee_cents),
-                'laboratory' => $this->currencyService->formatFromCents($enrollment->laboratory_fee_cents),
-                'total' => $this->currencyService->formatFromCents($enrollment->total_amount_cents),
-                'discount' => $this->currencyService->formatFromCents(
+                'tuition' => $this->currencyService->formatCents($enrollment->tuition_fee_cents),
+                'miscellaneous' => $this->currencyService->formatCents($enrollment->miscellaneous_fee_cents),
+                'laboratory' => $this->currencyService->formatCents($enrollment->laboratory_fee_cents),
+                'total' => $this->currencyService->formatCents($enrollment->total_amount_cents),
+                'discount' => $this->currencyService->formatCents(
                     $enrollment->total_amount_cents - $enrollment->net_amount_cents
                 ),
-                'net_total' => $this->currencyService->formatFromCents($enrollment->net_amount_cents),
+                'net_total' => $this->currencyService->formatCents($enrollment->net_amount_cents),
             ],
             'payment' => [
-                'paid' => $this->currencyService->formatFromCents($enrollment->amount_paid_cents),
-                'balance' => $this->currencyService->formatFromCents($enrollment->balance_cents),
+                'paid' => $this->currencyService->formatCents($enrollment->amount_paid_cents),
+                'balance' => $this->currencyService->formatCents($enrollment->balance_cents),
                 'status' => $enrollment->payment_status,
-                'status_label' => $enrollment->payment_status?->label(),
-                'status_color' => $enrollment->payment_status?->color(),
+                'status_label' => $enrollment->payment_status->label(),
+                'status_color' => $enrollment->payment_status->color(),
             ],
             'payment_plan' => $enrollment->payment_plan ?? 'full',
             'due_dates' => $this->calculateDueDates($enrollment),
@@ -61,7 +61,7 @@ class BillingService implements BillingServiceInterface
     /**
      * Get billing summary for guardian's students
      */
-    public function getGuardianBillingSummary(int $guardianId): Collection
+    public function getGuardianBillingSummary(int $guardianId): \Illuminate\Support\Collection
     {
         $enrollments = Enrollment::where('guardian_id', $guardianId)
             ->whereIn('status', ['enrolled', 'completed'])
@@ -206,7 +206,7 @@ class BillingService implements BillingServiceInterface
         $billing = $this->getBillingDetails($enrollment);
 
         return [
-            'invoice_number' => 'INV-'.str_pad($enrollment->id, 8, '0', STR_PAD_LEFT),
+            'invoice_number' => 'INV-'.str_pad((string) $enrollment->id, 8, '0', STR_PAD_LEFT),
             'date' => now()->format('Y-m-d'),
             'due_date' => now()->addDays(30)->format('Y-m-d'),
             'student' => $billing['student'],
@@ -241,7 +241,7 @@ class BillingService implements BillingServiceInterface
     /**
      * Get payment history
      */
-    public function getPaymentHistory(Enrollment $enrollment): Collection
+    public function getPaymentHistory(Enrollment $enrollment): \Illuminate\Support\Collection
     {
         // This would fetch from a payments table if available
         // For now, returning a mock collection
@@ -250,7 +250,7 @@ class BillingService implements BillingServiceInterface
                 'date' => $enrollment->created_at->format('Y-m-d'),
                 'description' => 'Initial enrollment',
                 'amount' => 0,
-                'balance' => $this->currencyService->formatFromCents($enrollment->net_amount_cents),
+                'balance' => $this->currencyService->formatCents($enrollment->net_amount_cents),
             ],
         ]);
     }
@@ -331,9 +331,9 @@ class BillingService implements BillingServiceInterface
 
         return [
             'grade_level' => $gradeLevel,
-            'tuition_fee' => $this->currencyService->formatFromCents($gradeLevelFee->tuition_fee),
-            'miscellaneous_fee' => $this->currencyService->formatFromCents($gradeLevelFee->miscellaneous_fee),
-            'laboratory_fee' => $this->currencyService->formatFromCents($gradeLevelFee->laboratory_fee),
+            'tuition_fee' => $this->currencyService->formatCents((int) $gradeLevelFee->tuition_fee),
+            'miscellaneous_fee' => $this->currencyService->formatCents((int) $gradeLevelFee->miscellaneous_fee),
+            'laboratory_fee' => $this->currencyService->formatCents((int) $gradeLevelFee->laboratory_fee),
             'total' => $this->currencyService->format($total),
             'payment_plans' => [
                 'full' => $this->calculatePaymentPlan($total, 'full'),
