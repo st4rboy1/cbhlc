@@ -46,7 +46,7 @@ test('paginate applies filters correctly', function () {
     $result = $this->service->paginate(['grade_level' => 'Grade 1'], 10);
 
     expect($result->count())->toBe(1);
-    expect($result->first()->grade_level)->toBe('Grade 1');
+    expect($result->first()->grade_level->value)->toBe('Grade 1');
 });
 
 test('paginate applies array filters with whereIn', function () {
@@ -83,6 +83,7 @@ test('create creates new record', function () {
         'birthdate' => '2010-01-01',
         'gender' => 'Male',
         'grade_level' => 'Grade 1',
+        'address' => '123 Test Street',
     ];
 
     $result = $this->service->create($data);
@@ -101,6 +102,7 @@ test('create uses database transaction', function () {
         'birthdate' => '2010-01-01',
         'gender' => 'Female',
         'grade_level' => 'Grade 2',
+        'address' => '456 Test Avenue',
     ];
 
     DB::shouldReceive('transaction')

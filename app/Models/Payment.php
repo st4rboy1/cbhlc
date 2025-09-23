@@ -31,8 +31,11 @@ class Payment extends Model
         return $this->belongsTo(Invoice::class);
     }
 
-    public function enrollment(): BelongsTo
+    /**
+     * Get the enrollment through the invoice
+     */
+    public function enrollment(): ?Enrollment
     {
-        return $this->belongsTo(Enrollment::class)->through('invoice');
+        return $this->invoice?->enrollment;
     }
 }

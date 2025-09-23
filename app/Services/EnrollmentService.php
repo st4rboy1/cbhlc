@@ -28,7 +28,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
     public function getPaginatedEnrollments(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
         $query = $this->model->newQuery()
-            ->with(['student', 'guardian', 'approvedBy']);
+            ->with(['student', 'guardian', 'approver']);
 
         // Apply status filter
         if (! empty($filters['status'])) {
@@ -43,6 +43,20 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
         // Apply grade level filter
         if (! empty($filters['grade_level'])) {
             $query->where('grade_level', $filters['grade_level']);
+        }
+
+        // Apply student filter
+        if (! empty($filters['student_id'])) {
+            $query->where('student_id', $filters['student_id']);
+        }
+
+        // Apply date range filters
+        if (! empty($filters['date_from'])) {
+            $query->whereDate('created_at', '>=', $filters['date_from']);
+        }
+
+        if (! empty($filters['date_to'])) {
+            $query->whereDate('created_at', '<=', $filters['date_to']);
         }
 
         // Apply search filter
@@ -73,7 +87,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
         $this->logActivity('getEnrollmentsByGuardian', ['guardian_id' => $guardianId]);
 
         return $this->model->where('guardian_id', $guardianId)
-            ->with(['student', 'approvedBy'])
+            ->with(['student', 'approver'])
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -86,7 +100,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
         $this->logActivity('getEnrollmentsByStudent', ['student_id' => $studentId]);
 
         return $this->model->where('student_id', $studentId)
-            ->with(['guardian', 'approvedBy'])
+            ->with(['guardian', 'approver'])
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -106,17 +120,21 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
             // Calculate fees
             $fees = $this->calculateFees($data['grade_level']);
 
+            // Generate enrollment ID
+            $enrollmentId = $this->generateEnrollmentId();
+
             // Prepare enrollment data
             $enrollmentData = array_merge($data, [
+                'enrollment_id' => $enrollmentId,
                 'status' => EnrollmentStatus::PENDING,
                 'payment_status' => PaymentStatus::PENDING,
-                'tuition_fee_cents' => $fees['tuition_fee'] * 100,
-                'miscellaneous_fee_cents' => $fees['miscellaneous_fee'] * 100,
-                'laboratory_fee_cents' => $fees['laboratory_fee'] * 100,
-                'total_amount_cents' => $fees['total_amount'] * 100,
-                'net_amount_cents' => $fees['total_amount'] * 100,
+                'tuition_fee_cents' => $fees['tuition'] * 100,
+                'miscellaneous_fee_cents' => $fees['miscellaneous'] * 100,
+                'laboratory_fee_cents' => 0, // Not included in calculateFees but needed for database
+                'total_amount_cents' => $fees['total'] * 100,
+                'net_amount_cents' => $fees['total'] * 100,
                 'amount_paid_cents' => 0,
-                'balance_cents' => $fees['total_amount'] * 100,
+                'balance_cents' => $fees['total'] * 100,
             ]);
 
             // Create enrollment
@@ -155,14 +173,27 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
 
             $this->logActivity('approveEnrollment', ['enrollment_id' => $enrollment->id]);
 
-            return $enrollment->fresh(['student', 'guardian', 'approvedBy']);
+            return $enrollment->fresh(['student', 'guardian', 'approver']);
         });
+    }
+
+    /**
+     * Find enrollment with relationships
+     */
+    public function findWithRelations(int $id): Enrollment
+    {
+        $enrollment = $this->model->with(['student', 'invoices', 'payments'])
+            ->findOrFail($id);
+
+        $this->logActivity('findWithRelations', ['enrollment_id' => $id]);
+
+        return $enrollment;
     }
 
     /**
      * Reject enrollment
      */
-    public function rejectEnrollment(Enrollment $enrollment, string $reason): Enrollment
+    public function rejectEnrollment(Enrollment $enrollment, string $reason = null): Enrollment
     {
         return DB::transaction(function () use ($enrollment, $reason) {
             if ($enrollment->status !== EnrollmentStatus::PENDING) {
@@ -181,7 +212,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 'reason' => $reason,
             ]);
 
-            return $enrollment->fresh(['student', 'guardian', 'approvedBy']);
+            return $enrollment->fresh(['student', 'guardian', 'approver']);
         });
     }
 
@@ -200,8 +231,20 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
 
             foreach ($enrollments as $enrollment) {
                 /** @var Enrollment $enrollment */
-                $this->approveEnrollment($enrollment);
-                $count++;
+                if ($enrollment->status === EnrollmentStatus::PENDING) {
+                    $enrollment->update([
+                        'status' => EnrollmentStatus::ENROLLED,
+                        'approved_by' => auth()->id(),
+                        'approved_at' => now(),
+                    ]);
+
+                    // Update student's current grade level
+                    $enrollment->student->update([
+                        'grade_level' => $enrollment->grade_level,
+                    ]);
+
+                    $count++;
+                }
             }
 
             $this->logActivity('bulkApproveEnrollments', [
@@ -216,7 +259,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
     /**
      * Update payment status
      */
-    public function updatePaymentStatus(Enrollment $enrollment, string $status, ?float $amount = null): Enrollment
+    public function updatePaymentStatus(Enrollment $enrollment, PaymentStatus|string $status, ?float $amount = null): Enrollment
     {
         return DB::transaction(function () use ($enrollment, $status, $amount) {
             $updateData = ['payment_status' => $status];
@@ -251,34 +294,35 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
      */
     public function calculateFees(string $gradeLevel, array $options = []): array
     {
-        $gradeLevelFee = GradeLevelFee::where('grade_level', $gradeLevel)->first();
+        $gradeLevelFee = GradeLevelFee::where('grade_level', $gradeLevel)
+            ->where('school_year', date('Y').'-'.(date('Y') + 1))
+            ->first();
 
         if (! $gradeLevelFee) {
             // Default fees if not configured
             return [
-                'tuition_fee' => 0,
-                'miscellaneous_fee' => 0,
-                'laboratory_fee' => 0,
-                'total_amount' => 0,
+                'tuition' => 0.0,
+                'registration' => 0.0,
+                'miscellaneous' => 0.0,
+                'total' => 0.0,
             ];
         }
 
-        $tuitionFee = $gradeLevelFee->tuition_fee / 100; // Convert from cents
-        $miscellaneousFee = $gradeLevelFee->miscellaneous_fee / 100;
-        $laboratoryFee = $gradeLevelFee->laboratory_fee / 100;
+        $tuition = $gradeLevelFee->tuition_fee_cents / 100; // Convert from cents
+        $registration = $gradeLevelFee->registration_fee_cents / 100;
+        $miscellaneous = $gradeLevelFee->miscellaneous_fee_cents / 100;
 
         // Apply any discounts from options
         $discount = $options['discount'] ?? 0;
-        $discountAmount = ($tuitionFee + $miscellaneousFee + $laboratoryFee) * ($discount / 100);
+        $discountAmount = ($tuition + $registration + $miscellaneous) * ($discount / 100);
 
-        $totalAmount = $tuitionFee + $miscellaneousFee + $laboratoryFee - $discountAmount;
+        $total = $tuition + $registration + $miscellaneous - $discountAmount;
 
         return [
-            'tuition_fee' => $tuitionFee,
-            'miscellaneous_fee' => $miscellaneousFee,
-            'laboratory_fee' => $laboratoryFee,
-            'discount' => $discountAmount,
-            'total_amount' => $totalAmount,
+            'tuition' => $tuition,
+            'registration' => $registration,
+            'miscellaneous' => $miscellaneous,
+            'total' => $total,
         ];
     }
 
@@ -344,5 +388,17 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
     public function getPendingCount(): int
     {
         return $this->model->where('status', EnrollmentStatus::PENDING)->count();
+    }
+
+    /**
+     * Generate unique enrollment ID
+     */
+    protected function generateEnrollmentId(): string
+    {
+        do {
+            $id = 'ENR-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        } while ($this->model->where('enrollment_id', $id)->exists());
+
+        return $id;
     }
 }

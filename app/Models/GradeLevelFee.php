@@ -14,6 +14,7 @@ class GradeLevelFee extends Model
     protected $fillable = [
         'grade_level',
         'tuition_fee_cents',
+        'registration_fee_cents',
         'miscellaneous_fee_cents',
         'laboratory_fee_cents',
         'library_fee_cents',
@@ -41,6 +42,22 @@ class GradeLevelFee extends Model
     public function setTuitionFeeAttribute(float $value): void
     {
         $this->tuition_fee_cents = (int) ($value * 100);
+    }
+
+    /**
+     * Get registration fee in dollars
+     */
+    public function getRegistrationFeeAttribute(): float
+    {
+        return $this->registration_fee_cents / 100;
+    }
+
+    /**
+     * Set registration fee from dollars
+     */
+    public function setRegistrationFeeAttribute(float $value): void
+    {
+        $this->registration_fee_cents = (int) ($value * 100);
     }
 
     /**
@@ -112,9 +129,9 @@ class GradeLevelFee extends Model
      */
     public function getTotalFeeAttribute(): float
     {
-        return ($this->tuition_fee_cents + $this->miscellaneous_fee_cents +
-                $this->laboratory_fee_cents + $this->library_fee_cents +
-                $this->sports_fee_cents) / 100;
+        return ($this->tuition_fee_cents + $this->registration_fee_cents +
+                $this->miscellaneous_fee_cents + $this->laboratory_fee_cents +
+                $this->library_fee_cents + $this->sports_fee_cents) / 100;
     }
 
     /**
@@ -123,6 +140,14 @@ class GradeLevelFee extends Model
     public function getFormattedTuitionFeeAttribute(): string
     {
         return CurrencyService::formatCents($this->tuition_fee_cents);
+    }
+
+    /**
+     * Get formatted registration fee
+     */
+    public function getFormattedRegistrationFeeAttribute(): string
+    {
+        return CurrencyService::formatCents($this->registration_fee_cents);
     }
 
     /**
@@ -162,9 +187,9 @@ class GradeLevelFee extends Model
      */
     public function getFormattedTotalFeeAttribute(): string
     {
-        $totalCents = $this->tuition_fee_cents + $this->miscellaneous_fee_cents +
-                     $this->laboratory_fee_cents + $this->library_fee_cents +
-                     $this->sports_fee_cents;
+        $totalCents = $this->tuition_fee_cents + $this->registration_fee_cents +
+                     $this->miscellaneous_fee_cents + $this->laboratory_fee_cents +
+                     $this->library_fee_cents + $this->sports_fee_cents;
 
         return CurrencyService::formatCents($totalCents);
     }

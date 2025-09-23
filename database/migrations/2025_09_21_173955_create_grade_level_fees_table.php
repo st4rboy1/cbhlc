@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('grade_level');
             $table->integer('tuition_fee_cents'); // Store in cents for precision
+            $table->integer('registration_fee_cents')->default(0);
             $table->integer('miscellaneous_fee_cents')->default(0);
             $table->integer('laboratory_fee_cents')->default(0);
             $table->integer('library_fee_cents')->default(0);

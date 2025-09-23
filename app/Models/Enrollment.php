@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @property float $tuition_fee
@@ -233,7 +234,7 @@ class Enrollment extends Model
     /**
      * Get the payments for the enrollment through invoices
      */
-    public function payments(): HasMany
+    public function payments(): HasManyThrough
     {
         return $this->hasManyThrough(Payment::class, Invoice::class);
     }
