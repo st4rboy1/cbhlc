@@ -10,23 +10,26 @@ use App\Models\Payment;
 use App\Models\Student;
 use App\Services\DashboardService;
 use Carbon\Carbon;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    // Seed roles and permissions for each test
+    $this->seed(RolesAndPermissionsSeeder::class);
     $this->service = new DashboardService;
 });
 
-test('getAdminDashboardData returns complete admin statistics', function () {
+test('getQuickStats returns admin statistics', function () {
     // Create test data
     Student::factory()->count(10)->create();
     Enrollment::factory()->count(5)->create(['status' => EnrollmentStatus::APPROVED]);
     Enrollment::factory()->count(3)->create(['status' => EnrollmentStatus::PENDING]);
     Invoice::factory()->count(8)->create(['total_amount' => 10000]);
 
-    $result = $this->service->getAdminDashboardData();
+    $result = $this->service->getQuickStats();
 
     expect($result)->toHaveKeys([
         'total_students',

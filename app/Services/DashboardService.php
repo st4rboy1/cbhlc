@@ -68,6 +68,8 @@ class DashboardService implements DashboardServiceInterface
      */
     public function getRegistrarDashboardData(): array
     {
+        $this->logActivity('getRegistrarDashboardData', []);
+
         return Cache::remember('registrar_dashboard', 300, function () {
             $currentYear = date('Y').'-'.(date('Y') + 1);
 
@@ -253,22 +255,23 @@ class DashboardService implements DashboardServiceInterface
      */
     public function getQuickStats(): array
     {
+        $this->logActivity('getQuickStats', []);
+
         $currentYear = date('Y').'-'.(date('Y') + 1);
 
         return [
             'total_students' => Student::count(),
-            'new_students_this_month' => Student::whereMonth('created_at', date('m'))
-                ->whereYear('created_at', date('Y'))
-                ->count(),
-            'pending_enrollments' => Enrollment::where('status', EnrollmentStatus::PENDING)->count(),
             'active_enrollments' => Enrollment::where('school_year', $currentYear)
                 ->where('status', EnrollmentStatus::ENROLLED)
                 ->count(),
+            'pending_enrollments' => Enrollment::where('status', EnrollmentStatus::PENDING)->count(),
             'total_revenue' => Enrollment::where('school_year', $currentYear)
                 ->sum('amount_paid_cents') / 100,
-            'outstanding_balance' => Enrollment::where('school_year', $currentYear)
-                ->where('payment_status', '!=', PaymentStatus::PAID)
-                ->sum('balance_cents') / 100,
+            'recent_enrollments' => $this->getRecentActivities(5)->where('type', 'enrollment'),
+            'enrollment_trend' => $this->getEnrollmentTrend(6),
+            'revenue_chart' => $this->getRevenueChart(6),
+            'grade_distribution' => $this->getGradeDistribution(),
+            'collection_rate' => $this->calculateCollectionRate(),
         ];
     }
 
@@ -375,5 +378,168 @@ class DashboardService implements DashboardServiceInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Get enrollment trend data
+     */
+    public function getEnrollmentTrend(int $months = 6): array
+    {
+        $data = [];
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $count = Enrollment::whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->where('status', EnrollmentStatus::APPROVED)
+                ->count();
+
+            $data[] = [
+                'month' => $date->format('M Y'),
+                'count' => $count,
+            ];
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get revenue chart data
+     */
+    public function getRevenueChart(int $months = 6): array
+    {
+        $data = [];
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $revenue = \App\Models\Payment::whereYear('payment_date', $date->year)
+                ->whereMonth('payment_date', $date->month)
+                ->sum('amount');
+
+            $data[] = [
+                'month' => $date->format('M Y'),
+                'revenue' => $revenue,
+            ];
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get grade distribution
+     */
+    public function getGradeDistribution(): \Illuminate\Support\Collection
+    {
+        return Student::select('grade_level', DB::raw('count(*) as count'))
+            ->groupBy('grade_level')
+            ->orderBy('grade_level')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'grade' => $item->grade_level,
+                    'count' => $item->count,
+                ];
+            });
+    }
+
+    /**
+     * Calculate collection rate
+     */
+    protected function calculateCollectionRate(): float
+    {
+        $currentYear = date('Y').'-'.(date('Y') + 1);
+
+        $totalExpected = Enrollment::where('school_year', $currentYear)
+            ->sum('net_amount_cents');
+
+        $totalCollected = Enrollment::where('school_year', $currentYear)
+            ->sum('amount_paid_cents');
+
+        return $totalExpected > 0 ? round(($totalCollected / $totalExpected) * 100, 2) : 0;
+    }
+
+    /**
+     * Get admin dashboard data
+     */
+    public function getAdminDashboardData(): array
+    {
+        $this->logActivity('getAdminDashboardData', []);
+
+        return $this->getQuickStats();
+    }
+
+    /**
+     * Get parent dashboard data
+     */
+    public function getParentDashboardData(int $guardianId): array
+    {
+        $students = Student::where('guardian_id', $guardianId)->get();
+        $enrollments = Enrollment::where('guardian_id', $guardianId)
+            ->with('student')
+            ->get();
+
+        $pendingPayments = $enrollments->where('payment_status', '!=', PaymentStatus::PAID)
+            ->sum('balance_cents') / 100;
+
+        $recentActivities = $this->getRecentActivities(5);
+        $upcomingDeadlines = $this->getUpcomingDeadlines(30);
+
+        $this->logActivity('getParentDashboardData', ['guardian_id' => $guardianId]);
+
+        return [
+            'students' => $students,
+            'enrollments' => $enrollments,
+            'pending_payments' => $pendingPayments,
+            'recent_activities' => $recentActivities,
+            'upcoming_deadlines' => $upcomingDeadlines,
+        ];
+    }
+
+    /**
+     * Get student dashboard data
+     */
+    public function getStudentDashboardData(int $studentId): array
+    {
+        $student = Student::findOrFail($studentId);
+        $enrollment = Enrollment::where('student_id', $studentId)
+            ->latest()
+            ->first();
+
+        $this->logActivity('getStudentDashboardData', ['student_id' => $studentId]);
+
+        return [
+            'profile' => $student,
+            'enrollment_status' => $enrollment ? $enrollment->status->label() : 'Not Enrolled',
+            'current_grade' => $student->grade_level,
+            'school_year' => $enrollment ? $enrollment->school_year : null,
+            'announcements' => $this->getAnnouncements(),
+        ];
+    }
+
+    /**
+     * Get upcoming deadlines
+     */
+    public function getUpcomingDeadlines(int $days = 30): array
+    {
+        $invoices = \App\Models\Invoice::where('due_date', '>', now())
+            ->where('due_date', '<=', now()->addDays($days))
+            ->where('status', '!=', \App\Enums\InvoiceStatus::PAID)
+            ->get();
+
+        return $invoices->map(function ($invoice) {
+            return [
+                'type' => 'payment',
+                'title' => 'Payment Due',
+                'description' => 'Invoice #' . $invoice->invoice_number,
+                'date' => $invoice->due_date,
+                'amount' => $invoice->total_amount - $invoice->paid_amount,
+            ];
+        })->toArray();
+    }
+
+    /**
+     * Log activity (simple implementation)
+     */
+    protected function logActivity(string $action, array $data = []): void
+    {
+        \Illuminate\Support\Facades\Log::info("Service action: {$action}", $data);
     }
 }

@@ -60,6 +60,7 @@ class BillingService extends BaseService implements BillingServiceInterface
     {
         $this->logActivity('findWithPayments', ['invoice_id' => $invoiceId]);
 
+        /** @var Invoice */
         return $this->model->with(['payments', 'enrollment'])->findOrFail($invoiceId);
     }
 
@@ -79,6 +80,7 @@ class BillingService extends BaseService implements BillingServiceInterface
             }
 
             // Create invoice
+            /** @var Invoice $invoice */
             $invoice = $this->model->create([
                 'invoice_number' => $this->generateInvoiceNumber(),
                 'enrollment_id' => $enrollment->id,
@@ -110,6 +112,7 @@ class BillingService extends BaseService implements BillingServiceInterface
 
             $this->logActivity('generateInvoice', ['enrollment_id' => $enrollment->id, 'invoice_id' => $invoice->id]);
 
+            /** @var Invoice $invoice */
             return $invoice->load('items');
         });
     }
@@ -149,6 +152,7 @@ class BillingService extends BaseService implements BillingServiceInterface
                 'amount' => $amount,
             ]);
 
+            /** @var Payment $payment */
             return $payment;
         });
     }
@@ -270,7 +274,7 @@ class BillingService extends BaseService implements BillingServiceInterface
         $gradeLevelFee = GradeLevelFee::where('grade_level', $enrollment->grade_level)->first();
 
         if (! $gradeLevelFee) {
-            throw new \Exception('Grade level fee not found for '.$enrollment->grade_level);
+            throw new \Exception('Grade level fee not found for '.$enrollment->grade_level->value);
         }
 
         $tuitionFee = (int) $gradeLevelFee->tuition_fee;
@@ -421,6 +425,7 @@ class BillingService extends BaseService implements BillingServiceInterface
      */
     public function getGuardianBillingSummary(int $guardianId): Collection
     {
+        /** @var Collection */
         return Enrollment::where('guardian_id', $guardianId)
             ->with(['student', 'invoices'])
             ->get()
