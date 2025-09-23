@@ -40,6 +40,7 @@ return new class extends Migration
             // Additional Information
             $table->text('remarks')->nullable();
             $table->timestamp('approved_at')->nullable();
+            $table->timestamp('rejected_at')->nullable();
             $table->foreignId('approved_by')->nullable()->references('id')->on('users')->onDelete('set null');
 
             $table->timestamps();
