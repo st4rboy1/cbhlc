@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Registrar;
 use App\Enums\EnrollmentStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Registrar\BulkApproveEnrollmentsRequest;
+use App\Http\Requests\Registrar\RejectEnrollmentRequest;
+use App\Http\Requests\Registrar\UpdatePaymentStatusRequest;
 use App\Models\Enrollment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -91,11 +94,9 @@ class EnrollmentController extends Controller
     /**
      * Reject an enrollment application.
      */
-    public function reject(Request $request, Enrollment $enrollment)
+    public function reject(RejectEnrollmentRequest $request, Enrollment $enrollment)
     {
-        $validated = $request->validate([
-            'reason' => 'required|string|max:500',
-        ]);
+        $validated = $request->validated();
 
         if ($enrollment->status !== EnrollmentStatus::PENDING) {
             return back()->with('error', 'Only pending enrollments can be rejected.');
@@ -114,13 +115,9 @@ class EnrollmentController extends Controller
     /**
      * Update enrollment payment status.
      */
-    public function updatePaymentStatus(Request $request, Enrollment $enrollment)
+    public function updatePaymentStatus(UpdatePaymentStatusRequest $request, Enrollment $enrollment)
     {
-        $validated = $request->validate([
-            'amount_paid' => 'required|integer|min:0',
-            'payment_status' => 'required|string|in:'.implode(',', PaymentStatus::values()),
-            'remarks' => 'nullable|string|max:500',
-        ]);
+        $validated = $request->validated();
 
         $enrollment->update([
             'amount_paid_cents' => $validated['amount_paid'],
@@ -155,12 +152,9 @@ class EnrollmentController extends Controller
     /**
      * Bulk approve enrollments.
      */
-    public function bulkApprove(Request $request)
+    public function bulkApprove(BulkApproveEnrollmentsRequest $request)
     {
-        $validated = $request->validate([
-            'enrollment_ids' => 'required|array',
-            'enrollment_ids.*' => 'exists:enrollments,id',
-        ]);
+        $validated = $request->validated();
 
         $count = Enrollment::whereIn('id', $validated['enrollment_ids'])
             ->where('status', EnrollmentStatus::PENDING)

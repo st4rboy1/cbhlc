@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Guardian;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Guardian\StoreStudentRequest;
+use App\Http\Requests\Guardian\UpdateStudentRequest;
 use App\Models\GuardianStudent;
 use App\Models\Student;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
@@ -114,18 +115,9 @@ class StudentController extends Controller
     /**
      * Store a newly created student in storage.
      */
-    public function store(Request $request)
+    public function store(StoreStudentRequest $request)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:100',
-            'middle_name' => 'nullable|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'birthdate' => 'required|date|before:today',
-            'gender' => 'required|in:Male,Female',
-            'address' => 'required|string',
-            'contact_number' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-        ]);
+        $validated = $request->validated();
 
         // Generate student ID
         $validated['student_id'] = 'CBHLC'.date('Y').str_pad((string) (Student::count() + 1), 4, '0', STR_PAD_LEFT);
@@ -166,27 +158,9 @@ class StudentController extends Controller
     /**
      * Update the specified student in storage.
      */
-    public function update(Request $request, Student $student)
+    public function update(UpdateStudentRequest $request, Student $student)
     {
-        // Verify this guardian has access to this student
-        $hasAccess = GuardianStudent::where('guardian_id', Auth::id())
-            ->where('student_id', $student->id)
-            ->exists();
-
-        if (! $hasAccess) {
-            abort(403, 'You do not have access to update this student.');
-        }
-
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:100',
-            'middle_name' => 'nullable|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'birthdate' => 'required|date|before:today',
-            'gender' => 'required|in:Male,Female',
-            'address' => 'required|string',
-            'contact_number' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-        ]);
+        $validated = $request->validated();
 
         $student->update($validated);
 

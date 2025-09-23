@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Registrar;
 use App\Enums\EnrollmentStatus;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Registrar\RejectEnrollmentRequest;
 use App\Models\Enrollment;
 use App\Models\Student;
 use Carbon\Carbon;
@@ -130,11 +131,9 @@ class DashboardController extends Controller
     /**
      * Quick reject enrollment application.
      */
-    public function quickReject(Request $request, $enrollmentId)
+    public function quickReject(RejectEnrollmentRequest $request, $enrollmentId)
     {
-        $validated = $request->validate([
-            'reason' => 'required|string|max:500',
-        ]);
+        $validated = $request->validated();
 
         $enrollment = Enrollment::findOrFail($enrollmentId);
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Registrar;
 
 use App\Enums\GradeLevel;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Registrar\StoreStudentRequest;
+use App\Http\Requests\Registrar\UpdateStudentRequest;
 use App\Models\Guardian;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -121,20 +123,9 @@ class StudentController extends Controller
     /**
      * Store a newly created student in storage.
      */
-    public function store(Request $request)
+    public function store(StoreStudentRequest $request)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:100',
-            'middle_name' => 'nullable|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'birthdate' => 'required|date|before:today',
-            'gender' => 'required|in:Male,Female',
-            'address' => 'required|string',
-            'contact_number' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255|unique:students,email',
-            'grade_level' => 'nullable|string|in:'.implode(',', GradeLevel::values()),
-            'section' => 'nullable|string|max:50',
-        ]);
+        $validated = $request->validated();
 
         // Generate student ID
         $validated['student_id'] = 'CBHLC'.date('Y').str_pad((string) (Student::count() + 1), 4, '0', STR_PAD_LEFT);
@@ -159,20 +150,9 @@ class StudentController extends Controller
     /**
      * Update the specified student in storage.
      */
-    public function update(Request $request, Student $student)
+    public function update(UpdateStudentRequest $request, Student $student)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:100',
-            'middle_name' => 'nullable|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'birthdate' => 'required|date|before:today',
-            'gender' => 'required|in:Male,Female',
-            'address' => 'required|string',
-            'contact_number' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255|unique:students,email,'.$student->id,
-            'grade_level' => 'nullable|string|in:'.implode(',', GradeLevel::values()),
-            'section' => 'nullable|string|max:50',
-        ]);
+        $validated = $request->validated();
 
         $student->update($validated);
 

@@ -7,6 +7,7 @@ use App\Enums\GradeLevel;
 use App\Enums\PaymentStatus;
 use App\Enums\Quarter;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Guardian\StoreEnrollmentRequest;
 use App\Models\Enrollment;
 use App\Models\GuardianStudent;
 use App\Models\Student;
@@ -79,52 +80,11 @@ class EnrollmentController extends Controller
     /**
      * Store a newly created enrollment in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEnrollmentRequest $request)
     {
-        $validated = $request->validate([
-            'student_id' => 'required|exists:students,id',
-            'school_year' => 'required|string',
-            'quarter' => 'required|string',
-            'grade_level' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $student = Student::findOrFail($validated['student_id']);
-
-        // Verify this guardian has access to this student
-        $hasAccess = GuardianStudent::where('guardian_id', Auth::id())
-            ->where('student_id', $validated['student_id'])
-            ->exists();
-
-        if (! $hasAccess) {
-            abort(403, 'You do not have access to enroll this student.');
-        }
-
-        // Check for pending enrollments constraint
-        $hasPendingEnrollment = Enrollment::where('student_id', $validated['student_id'])
-            ->where('status', EnrollmentStatus::PENDING)
-            ->exists();
-
-        if ($hasPendingEnrollment) {
-            return back()->withErrors(['student_id' => 'This student already has a pending enrollment. Please wait for it to be processed before submitting another one.']);
-        }
-
-        // Check for active enrollment (enrolled status)
-        $hasActiveEnrollment = Enrollment::where('student_id', $validated['student_id'])
-            ->where('status', EnrollmentStatus::ENROLLED)
-            ->exists();
-
-        if ($hasActiveEnrollment) {
-            return back()->withErrors(['student_id' => 'This student has an active enrollment. Please wait for the current enrollment to be completed before applying for another year.']);
-        }
-
-        // Check if student already has an enrollment for this school year
-        $existingEnrollment = Enrollment::where('student_id', $validated['student_id'])
-            ->where('school_year', $validated['school_year'])
-            ->exists();
-
-        if ($existingEnrollment) {
-            return back()->withErrors(['student_id' => 'This student already has an enrollment for the selected school year.']);
-        }
 
         // Check if student is an existing student (has previous enrollments)
         $previousEnrollments = Enrollment::where('student_id', $validated['student_id'])
@@ -134,26 +94,6 @@ class EnrollmentController extends Controller
         if ($previousEnrollments) {
             // Business Rule 1: Existing students must enroll in First quarter
             $validated['quarter'] = Quarter::FIRST->value;
-
-            // Business Rule 2: Students cannot enroll in a lower grade than their previous enrollment
-            try {
-                // Get the previous grade level as enum
-                /** @var GradeLevel|string $previousGradeLevel */
-                $previousGradeLevel = $previousEnrollments->grade_level;
-                $previousGradeEnum = is_string($previousGradeLevel)
-                    ? GradeLevel::from($previousGradeLevel)
-                    : $previousGradeLevel;
-
-                // Get the new grade level as enum
-                $newGradeEnum = GradeLevel::from($validated['grade_level']);
-
-                // Compare grade levels using the order() method
-                if ($newGradeEnum->order() < $previousGradeEnum->order()) {
-                    return back()->withErrors(['grade_level' => 'Students cannot enroll in a grade level lower than their previous enrollment.']);
-                }
-            } catch (\ValueError $e) {
-                // If grade level enum conversion fails, skip the validation
-            }
         }
 
         // Get the fee for the selected grade level and school year
