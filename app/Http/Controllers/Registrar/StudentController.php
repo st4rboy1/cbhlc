@@ -92,6 +92,7 @@ class StudentController extends Controller
                 'guardians' => $student->guardianStudents->map(function ($gs) {
                     $guardianUser = $gs->guardian;
                     $guardianModel = Guardian::where('user_id', $guardianUser->id)->first();
+
                     return [
                         'id' => $guardianUser->id,
                         'name' => $guardianModel ?
