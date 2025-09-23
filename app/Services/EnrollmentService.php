@@ -193,7 +193,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
     /**
      * Reject enrollment
      */
-    public function rejectEnrollment(Enrollment $enrollment, string $reason = null): Enrollment
+    public function rejectEnrollment(Enrollment $enrollment, ?string $reason = null): Enrollment
     {
         return DB::transaction(function () use ($enrollment, $reason) {
             if ($enrollment->status !== EnrollmentStatus::PENDING) {
@@ -204,7 +204,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 'status' => EnrollmentStatus::REJECTED,
                 'remarks' => $reason,
                 'approved_by' => auth()->id(),
-                'approved_at' => now(),
+                'rejected_at' => now(),
             ]);
 
             $this->logActivity('rejectEnrollment', [
@@ -396,7 +396,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
     protected function generateEnrollmentId(): string
     {
         do {
-            $id = 'ENR-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            $id = 'ENR-'.str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
         } while ($this->model->where('enrollment_id', $id)->exists());
 
         return $id;

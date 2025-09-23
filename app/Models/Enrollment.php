@@ -62,11 +62,13 @@ class Enrollment extends Model
         'payment_due_date',
         'remarks',
         'approved_at',
+        'rejected_at',
         'approved_by',
     ];
 
     protected $casts = [
         'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
         'payment_due_date' => 'date',
         'quarter' => Quarter::class,
         'grade_level' => \App\Enums\GradeLevel::class,

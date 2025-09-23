@@ -463,7 +463,22 @@ class DashboardService implements DashboardServiceInterface
     {
         $this->logActivity('getAdminDashboardData', []);
 
-        return $this->getQuickStats();
+        $currentYear = date('Y').'-'.(date('Y') + 1);
+
+        return [
+            'total_students' => Student::count(),
+            'active_enrollments' => Enrollment::where('school_year', $currentYear)
+                ->where('status', EnrollmentStatus::ENROLLED)
+                ->count(),
+            'pending_enrollments' => Enrollment::where('status', EnrollmentStatus::PENDING)->count(),
+            'total_revenue' => Enrollment::where('school_year', $currentYear)
+                ->sum('amount_paid_cents') / 100,
+            'recent_enrollments' => $this->getRecentActivities(5)->where('type', 'enrollment'),
+            'enrollment_trend' => $this->getEnrollmentTrend(6),
+            'revenue_chart' => $this->getRevenueChart(6),
+            'grade_distribution' => $this->getGradeDistribution(),
+            'collection_rate' => $this->calculateCollectionRate(),
+        ];
     }
 
     /**
@@ -528,11 +543,52 @@ class DashboardService implements DashboardServiceInterface
             return [
                 'type' => 'payment',
                 'title' => 'Payment Due',
-                'description' => 'Invoice #' . $invoice->invoice_number,
+                'description' => 'Invoice #'.$invoice->invoice_number,
                 'date' => $invoice->due_date,
                 'amount' => $invoice->total_amount - $invoice->paid_amount,
             ];
         })->toArray();
+    }
+
+    /**
+     * Get payment method distribution
+     */
+    public function getPaymentMethodDistribution(): \Illuminate\Support\Collection
+    {
+        return \App\Models\Payment::select('payment_method', \Illuminate\Support\Facades\DB::raw('count(*) as count'), \Illuminate\Support\Facades\DB::raw('sum(amount) as total'))
+            ->groupBy('payment_method')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'method' => $item->payment_method->label(),
+                    'count' => $item->count,
+                    'total' => $item->total,
+                ];
+            });
+    }
+
+    /**
+     * Get enrollment status distribution
+     */
+    public function getEnrollmentStatusDistribution(): \Illuminate\Support\Collection
+    {
+        return Enrollment::select('status', \Illuminate\Support\Facades\DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'status' => $item->status->label(),
+                    'count' => $item->count,
+                ];
+            });
+    }
+
+    /**
+     * Get cache key for data caching
+     */
+    protected function getCacheKey(string $role, string $type): string
+    {
+        return "dashboard.{$role}.{$type}";
     }
 
     /**
