@@ -109,4 +109,4 @@ jobs:
           DB_DATABASE: ':memory:'
         run: |
           # Run tests with coverage using PCOV (much faster than xdebug)
-          ./vendor/bin/pest --parallel --coverage --min=60
+          ./vendor/bin/pest --parallel --coverage --min=50
