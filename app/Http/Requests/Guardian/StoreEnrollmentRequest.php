@@ -62,7 +62,7 @@ class StoreEnrollmentRequest extends FormRequest
                 function ($attribute, $value, $fail) {
                     // Validate school year format (e.g., 2024-2025)
                     $years = explode('-', $value);
-                    if (count($years) !== 2 || ($years[1] - $years[0]) !== 1) {
+                    if (count($years) !== 2 || ((int) $years[1] - (int) $years[0]) !== 1) {
                         $fail('School year must be in format YYYY-YYYY (e.g., 2024-2025) with consecutive years.');
                     }
 
