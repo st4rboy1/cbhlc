@@ -99,6 +99,24 @@ class EnrollmentController extends Controller
             abort(403, 'You do not have access to enroll this student.');
         }
 
+        // Check for pending enrollments constraint
+        $hasPendingEnrollment = Enrollment::where('student_id', $validated['student_id'])
+            ->where('status', EnrollmentStatus::PENDING)
+            ->exists();
+
+        if ($hasPendingEnrollment) {
+            return back()->withErrors(['student_id' => 'This student already has a pending enrollment. Please wait for it to be processed before submitting another one.']);
+        }
+
+        // Check for active enrollment (enrolled status)
+        $hasActiveEnrollment = Enrollment::where('student_id', $validated['student_id'])
+            ->whereIn('status', [EnrollmentStatus::ENROLLED, EnrollmentStatus::APPROVED])
+            ->exists();
+
+        if ($hasActiveEnrollment) {
+            return back()->withErrors(['student_id' => 'This student has an active enrollment. Please wait for the current enrollment to be completed before applying for another year.']);
+        }
+
         // Check if student already has an enrollment for this school year
         $existingEnrollment = Enrollment::where('student_id', $validated['student_id'])
             ->where('school_year', $validated['school_year'])
@@ -146,7 +164,7 @@ class EnrollmentController extends Controller
             'balance_cents' => $balanceCents,
         ]);
 
-        return redirect()->route('guardian.enrollments.show', $enrollment->id)
+        return redirect()->route('guardian.enrollments.index')
             ->with('success', 'Enrollment application submitted successfully. Please wait for approval.');
     }
 

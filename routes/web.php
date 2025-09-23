@@ -92,7 +92,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Registrar Routes
-    Route::prefix('registrar')->name('registrar.')->middleware('role:registrar')->group(function () {
+    Route::prefix('registrar')->name('registrar.')->middleware('role:registrar|administrator|super_admin')->group(function () {
         // Dashboard
         Route::get('/dashboard', [RegistrarDashboardController::class, 'index'])->name('dashboard');
 

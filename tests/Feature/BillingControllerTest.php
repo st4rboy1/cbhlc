@@ -226,7 +226,7 @@ describe('updatePayment method', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($admin)->put('/billing/payment/'.$enrollment->id, [
+        $response = $this->actingAs($admin)->put(route('registrar.enrollments.update-payment-status', $enrollment->id), [
             'amount_paid' => 10000,
             'payment_status' => PaymentStatus::PARTIAL->value,
             'remarks' => 'First payment received',
@@ -263,7 +263,7 @@ describe('updatePayment method', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($registrar)->put('/billing/payment/'.$enrollment->id, [
+        $response = $this->actingAs($registrar)->put(route('registrar.enrollments.update-payment-status', $enrollment->id), [
             'amount_paid' => 2750000,  // Pay full amount in cents
             'payment_status' => PaymentStatus::PAID->value,
         ]);
@@ -296,7 +296,7 @@ describe('updatePayment method', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($guardian)->put('/billing/payment/'.$enrollment->id, [
+        $response = $this->actingAs($guardian)->put(route('registrar.enrollments.update-payment-status', $enrollment->id), [
             'amount_paid' => 15000,
             'payment_status' => PaymentStatus::PARTIAL->value,
         ]);
@@ -331,25 +331,25 @@ describe('updatePayment method', function () {
         ]);
 
         // Test negative amount
-        $response = $this->actingAs($admin)->put('/billing/payment/'.$enrollment->id, [
+        $response = $this->actingAs($admin)->put(route('registrar.enrollments.update-payment-status', $enrollment->id), [
             'amount_paid' => -100,
             'payment_status' => PaymentStatus::PARTIAL->value,
         ]);
         $response->assertSessionHasErrors('amount_paid');
 
         // Test invalid payment status
-        $response = $this->actingAs($admin)->put('/billing/payment/'.$enrollment->id, [
+        $response = $this->actingAs($admin)->put(route('registrar.enrollments.update-payment-status', $enrollment->id), [
             'amount_paid' => 10000,
             'payment_status' => 'invalid_status',
         ]);
         $response->assertSessionHasErrors('payment_status');
 
         // Test missing required fields
-        $response = $this->actingAs($admin)->put('/billing/payment/'.$enrollment->id, []);
+        $response = $this->actingAs($admin)->put(route('registrar.enrollments.update-payment-status', $enrollment->id), []);
         $response->assertSessionHasErrors(['amount_paid', 'payment_status']);
 
         // Test remarks max length
-        $response = $this->actingAs($admin)->put('/billing/payment/'.$enrollment->id, [
+        $response = $this->actingAs($admin)->put(route('registrar.enrollments.update-payment-status', $enrollment->id), [
             'amount_paid' => 10000,
             'payment_status' => PaymentStatus::PARTIAL->value,
             'remarks' => str_repeat('a', 501),
@@ -361,7 +361,7 @@ describe('updatePayment method', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
 
-        $response = $this->actingAs($admin)->put('/billing/payment/99999', [
+        $response = $this->actingAs($admin)->put(route('registrar.enrollments.update-payment-status', 99999), [
             'amount_paid' => 10000,
             'payment_status' => PaymentStatus::PARTIAL->value,
         ]);
@@ -390,7 +390,7 @@ describe('updatePayment method', function () {
             'payment_status' => PaymentStatus::PARTIAL,
         ]);
 
-        $response = $this->actingAs($superAdmin)->put('/billing/payment/'.$enrollment->id, [
+        $response = $this->actingAs($superAdmin)->put(route('registrar.enrollments.update-payment-status', $enrollment->id), [
             'amount_paid' => 3200000,  // Pay full amount in cents
             'payment_status' => PaymentStatus::PAID->value,
             'remarks' => 'Full payment completed',
