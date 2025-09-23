@@ -108,6 +108,14 @@ class EnrollmentController extends Controller
             return back()->withErrors(['student_id' => 'This student already has a pending enrollment. Please wait for it to be processed before submitting another one.']);
         }
 
+        // Check for active enrollment (enrolled status)
+        $hasActiveEnrollment = Enrollment::where('student_id', $validated['student_id'])
+            ->where('status', EnrollmentStatus::ENROLLED)
+            ->exists();
+
+        if ($hasActiveEnrollment) {
+            return back()->withErrors(['student_id' => 'This student has an active enrollment. Please wait for the current enrollment to be completed before applying for another year.']);
+        }
 
         // Check if student already has an enrollment for this school year
         $existingEnrollment = Enrollment::where('student_id', $validated['student_id'])
@@ -156,7 +164,7 @@ class EnrollmentController extends Controller
             'balance_cents' => $balanceCents,
         ]);
 
-        return redirect()->route('enrollments.index')
+        return redirect()->route('guardian.enrollments.index')
             ->with('success', 'Enrollment application submitted successfully. Please wait for approval.');
     }
 
@@ -266,7 +274,7 @@ class EnrollmentController extends Controller
 
         $enrollment->delete();
 
-        return redirect()->route('enrollments.index')
+        return redirect()->route('guardian.enrollments.index')
             ->with('success', 'Enrollment application canceled successfully.');
     }
 }
