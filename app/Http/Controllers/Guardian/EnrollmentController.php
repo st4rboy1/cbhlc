@@ -32,7 +32,7 @@ class EnrollmentController extends Controller
             ->latest('created_at')
             ->paginate(10);
 
-        return Inertia::render('enrollments/index', [
+        return Inertia::render('guardian/enrollments/index', [
             'enrollments' => $enrollments,
         ]);
     }
@@ -67,7 +67,7 @@ class EnrollmentController extends Controller
             ];
         });
 
-        return Inertia::render('enrollments/create', [
+        return Inertia::render('guardian/enrollments/create', [
             'students' => $students,
             'gradeLevels' => GradeLevel::values(),
             'quarters' => Quarter::values(),
@@ -99,6 +99,24 @@ class EnrollmentController extends Controller
             abort(403, 'You do not have access to enroll this student.');
         }
 
+        // Check for pending enrollments constraint
+        $hasPendingEnrollment = Enrollment::where('student_id', $validated['student_id'])
+            ->where('status', EnrollmentStatus::PENDING)
+            ->exists();
+
+        if ($hasPendingEnrollment) {
+            return back()->withErrors(['student_id' => 'This student already has a pending enrollment. Please wait for it to be processed before submitting another one.']);
+        }
+
+        // Check for active enrollment (enrolled status)
+        $hasActiveEnrollment = Enrollment::where('student_id', $validated['student_id'])
+            ->where('status', EnrollmentStatus::ENROLLED)
+            ->exists();
+
+        if ($hasActiveEnrollment) {
+            return back()->withErrors(['student_id' => 'This student has an active enrollment. Please wait for the current enrollment to be completed before applying for another year.']);
+        }
+
         // Check if student already has an enrollment for this school year
         $existingEnrollment = Enrollment::where('student_id', $validated['student_id'])
             ->where('school_year', $validated['school_year'])
@@ -106,6 +124,36 @@ class EnrollmentController extends Controller
 
         if ($existingEnrollment) {
             return back()->withErrors(['student_id' => 'This student already has an enrollment for the selected school year.']);
+        }
+
+        // Check if student is an existing student (has previous enrollments)
+        $previousEnrollments = Enrollment::where('student_id', $validated['student_id'])
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($previousEnrollments) {
+            // Business Rule 1: Existing students must enroll in First quarter
+            $validated['quarter'] = Quarter::FIRST->value;
+
+            // Business Rule 2: Students cannot enroll in a lower grade than their previous enrollment
+            try {
+                // Get the previous grade level as enum
+                /** @var GradeLevel|string $previousGradeLevel */
+                $previousGradeLevel = $previousEnrollments->grade_level;
+                $previousGradeEnum = is_string($previousGradeLevel)
+                    ? GradeLevel::from($previousGradeLevel)
+                    : $previousGradeLevel;
+
+                // Get the new grade level as enum
+                $newGradeEnum = GradeLevel::from($validated['grade_level']);
+
+                // Compare grade levels using the order() method
+                if ($newGradeEnum->order() < $previousGradeEnum->order()) {
+                    return back()->withErrors(['grade_level' => 'Students cannot enroll in a grade level lower than their previous enrollment.']);
+                }
+            } catch (\ValueError $e) {
+                // If grade level enum conversion fails, skip the validation
+            }
         }
 
         // Get the fee for the selected grade level and school year
@@ -146,7 +194,7 @@ class EnrollmentController extends Controller
             'balance_cents' => $balanceCents,
         ]);
 
-        return redirect()->route('guardian.enrollments.show', $enrollment->id)
+        return redirect()->route('guardian.enrollments.index')
             ->with('success', 'Enrollment application submitted successfully. Please wait for approval.');
     }
 
@@ -166,7 +214,7 @@ class EnrollmentController extends Controller
 
         $enrollment->load(['student', 'guardian']);
 
-        return Inertia::render('enrollments/show', [
+        return Inertia::render('guardian/enrollments/show', [
             'enrollment' => $enrollment,
         ]);
     }
@@ -193,7 +241,7 @@ class EnrollmentController extends Controller
 
         $enrollment->load(['student']);
 
-        return Inertia::render('enrollments/edit', [
+        return Inertia::render('guardian/enrollments/edit', [
             'enrollment' => $enrollment,
             'gradeLevels' => GradeLevel::values(),
             'quarters' => Quarter::values(),

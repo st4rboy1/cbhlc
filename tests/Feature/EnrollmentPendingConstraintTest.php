@@ -48,7 +48,7 @@ describe('enrollment pending constraint', function () {
         ]);
 
         // Try to create second pending enrollment for different school year
-        $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+        $response = $this->actingAs($guardian)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
             'school_year' => '2025-2026',
             'quarter' => Quarter::FIRST->value,
@@ -100,14 +100,14 @@ describe('enrollment pending constraint', function () {
         ]);
 
         // Create new pending enrollment - should succeed
-        $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+        $response = $this->actingAs($guardian)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FIRST->value,
             'grade_level' => 'Grade 1',
         ]);
 
-        $response->assertRedirect(route('enrollments.index'));
+        $response->assertRedirect(route('guardian.enrollments.index'));
         $response->assertSessionHas('success');
     });
 
@@ -143,7 +143,7 @@ describe('enrollment pending constraint', function () {
         ]);
 
         // Try to create pending enrollment for next year - should fail due to ongoing enrollment
-        $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+        $response = $this->actingAs($guardian)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
             'school_year' => '2025-2026',
             'quarter' => Quarter::FIRST->value,
@@ -185,7 +185,7 @@ describe('enrollment pending constraint', function () {
         ]);
 
         // Try to create another enrollment for same school year
-        $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+        $response = $this->actingAs($guardian)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::SECOND->value,

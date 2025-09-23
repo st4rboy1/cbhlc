@@ -47,7 +47,7 @@ class EnrollmentController extends Controller
 
         $enrollments = $query->latest('created_at')->paginate(20);
 
-        return Inertia::render('enrollments/index', [
+        return Inertia::render('registrar/enrollments/index', [
             'enrollments' => $enrollments,
             'filters' => $request->only(['status', 'school_year', 'grade_level', 'payment_status', 'search']),
             'statuses' => EnrollmentStatus::values(),
@@ -62,7 +62,7 @@ class EnrollmentController extends Controller
     {
         $enrollment->load(['student', 'guardian']);
 
-        return Inertia::render('enrollments/show', [
+        return Inertia::render('registrar/enrollments/show', [
             'enrollment' => $enrollment,
             'statuses' => EnrollmentStatus::values(),
             'paymentStatuses' => PaymentStatus::values(),
@@ -117,12 +117,15 @@ class EnrollmentController extends Controller
     public function updatePaymentStatus(Request $request, Enrollment $enrollment)
     {
         $validated = $request->validate([
+            'amount_paid' => 'required|integer|min:0',
             'payment_status' => 'required|string|in:'.implode(',', PaymentStatus::values()),
-            'remarks' => 'nullable|string',
+            'remarks' => 'nullable|string|max:500',
         ]);
 
         $enrollment->update([
+            'amount_paid_cents' => $validated['amount_paid'],
             'payment_status' => PaymentStatus::from($validated['payment_status']),
+            'balance_cents' => $enrollment->total_amount_cents - $validated['amount_paid'],
             'remarks' => $validated['remarks'] ?? $enrollment->remarks,
         ]);
 

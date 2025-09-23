@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Enums\GradeLevel;
-use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,8 +19,11 @@ class StudentFactory extends Factory
     {
         $birthdate = $this->faker->dateTimeBetween('-18 years', '-6 years');
 
+        // Use a combination of timestamp and random to ensure uniqueness even in parallel tests
+        $uniqueId = substr(md5(uniqid(mt_rand(), true)), 0, 8);
+
         return [
-            'student_id' => Student::generateStudentId(),
+            'student_id' => 'TEST-'.$uniqueId,
             'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
             'middle_name' => $this->faker->optional()->firstName(),

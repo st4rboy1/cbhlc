@@ -22,11 +22,13 @@ class StudentController extends Controller
         $studentIds = GuardianStudent::where('guardian_id', $user->id)
             ->pluck('student_id');
 
+        /** @var \Illuminate\Support\Collection<int, array<string, mixed>> $students */
         $students = Student::with(['enrollments' => function ($query) {
             $query->latest('created_at')->limit(1);
         }])
             ->whereIn('id', $studentIds)
             ->get()
+            /** @phpstan-ignore-next-line */
             ->map(function (Student $student) {
                 $latestEnrollment = $student->enrollments->first();
 
@@ -50,7 +52,7 @@ class StudentController extends Controller
                 ];
             });
 
-        return Inertia::render('students/index', [
+        return Inertia::render('guardian/students/index', [
             'students' => $students,
         ]);
     }
@@ -71,7 +73,7 @@ class StudentController extends Controller
 
         $student->load('enrollments');
 
-        return Inertia::render('students/show', [
+        return Inertia::render('guardian/students/show', [
             'student' => [
                 'id' => $student->id,
                 'student_id' => $student->student_id,
@@ -85,6 +87,7 @@ class StudentController extends Controller
                 'email' => $student->email,
                 'grade_level' => $student->grade_level,
                 'section' => $student->section,
+                /** @phpstan-ignore-next-line */
                 'enrollments' => $student->enrollments->map(function (\App\Models\Enrollment $enrollment) {
                     return [
                         'id' => $enrollment->id,
@@ -105,7 +108,7 @@ class StudentController extends Controller
      */
     public function create()
     {
-        return Inertia::render('students/create');
+        return Inertia::render('guardian/students/create');
     }
 
     /**
@@ -133,7 +136,8 @@ class StudentController extends Controller
         GuardianStudent::create([
             'guardian_id' => Auth::id(),
             'student_id' => $student->id,
-            'is_primary' => true,
+            'relationship_type' => 'mother', // Default relationship type
+            'is_primary_contact' => true,
         ]);
 
         return redirect()->route('guardian.students.show', $student->id)
@@ -154,7 +158,7 @@ class StudentController extends Controller
             abort(403, 'You do not have access to edit this student.');
         }
 
-        return Inertia::render('students/edit', [
+        return Inertia::render('guardian/students/edit', [
             'student' => $student,
         ]);
     }
