@@ -34,7 +34,7 @@ class ServiceLayerProvider extends ServiceProvider
 
         // Register BillingService
         $this->app->bind(BillingServiceInterface::class, function ($app) {
-            return new BillingService($app->make(CurrencyService::class));
+            return new BillingService(new \App\Models\Invoice);
         });
 
         // Register DashboardService
