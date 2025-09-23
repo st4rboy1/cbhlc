@@ -101,7 +101,7 @@ describe('enrollment controller', function () {
 
         $response = $this->actingAs($guardian)->post(route('enrollments.store'), $enrollmentData);
 
-        $response->assertRedirect(route('enrollments.index'));
+        $response->assertRedirect(route('guardian.enrollments.index'));
         $this->assertDatabaseHas('enrollments', [
             'student_id' => $student->id,
             'school_year' => '2024-2025',
@@ -238,7 +238,7 @@ describe('enrollment controller', function () {
             'grade_level' => 'Grade 1',
         ]);
 
-        $response->assertRedirect(route('enrollments.index'));
+        $response->assertRedirect(route('guardian.enrollments.index'));
         $response->assertSessionHas('success');
 
         // Verify both enrollments exist
@@ -268,7 +268,7 @@ describe('enrollment controller', function () {
                 'grade_level' => 'Kinder',
             ]);
 
-            $response->assertRedirect(route('enrollments.index'));
+            $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
                 'quarter' => Quarter::SECOND,
@@ -314,7 +314,7 @@ describe('enrollment controller', function () {
                 'grade_level' => 'Grade 1',
             ]);
 
-            $response->assertRedirect(route('enrollments.index'));
+            $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',
@@ -345,7 +345,7 @@ describe('enrollment controller', function () {
                 'grade_level' => 'Grade 3',
             ]);
 
-            $response->assertRedirect(route('enrollments.index'));
+            $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
                 'grade_level' => 'Grade 3',
@@ -438,7 +438,7 @@ describe('enrollment controller', function () {
                 'grade_level' => 'Grade 3',
             ]);
 
-            $response->assertRedirect(route('enrollments.index'));
+            $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',
@@ -487,7 +487,7 @@ describe('enrollment controller', function () {
                 'grade_level' => 'Grade 4', // Skipping Grade 2 and 3
             ]);
 
-            $response->assertRedirect(route('enrollments.index'));
+            $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',
