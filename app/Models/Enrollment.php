@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @property float $tuition_fee
@@ -60,11 +62,13 @@ class Enrollment extends Model
         'payment_due_date',
         'remarks',
         'approved_at',
+        'rejected_at',
         'approved_by',
     ];
 
     protected $casts = [
         'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
         'payment_due_date' => 'date',
         'quarter' => Quarter::class,
         'grade_level' => \App\Enums\GradeLevel::class,
@@ -211,6 +215,30 @@ class Enrollment extends Model
     public function isFullyPaid(): bool
     {
         return $this->payment_status === PaymentStatus::PAID || $this->balance_cents <= 0;
+    }
+
+    /**
+     * Get the grade level fee
+     */
+    public function gradeLevelFee(): BelongsTo
+    {
+        return $this->belongsTo(GradeLevelFee::class, 'grade_level', 'grade_level');
+    }
+
+    /**
+     * Get the invoices for the enrollment
+     */
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    /**
+     * Get the payments for the enrollment through invoices
+     */
+    public function payments(): HasManyThrough
+    {
+        return $this->hasManyThrough(Payment::class, Invoice::class);
     }
 
     /**
