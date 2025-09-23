@@ -3,7 +3,7 @@
 namespace App\Contracts\Services;
 
 use App\Models\Enrollment;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 interface BillingServiceInterface
 {
@@ -15,7 +15,7 @@ interface BillingServiceInterface
     /**
      * Get billing summary for guardian's students
      */
-    public function getGuardianBillingSummary(int $guardianId): Collection;
+    public function getGuardianBillingSummary(int $guardianId): \Illuminate\Support\Collection;
 
     /**
      * Calculate payment plan
@@ -35,7 +35,7 @@ interface BillingServiceInterface
     /**
      * Get payment history
      */
-    public function getPaymentHistory(Enrollment $enrollment): Collection;
+    public function getPaymentHistory(Enrollment $enrollment): \Illuminate\Support\Collection;
 
     /**
      * Calculate late fees

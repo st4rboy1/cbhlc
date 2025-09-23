@@ -127,6 +127,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 'student_id' => $student->id,
             ]);
 
+            /** @var Enrollment $enrollment */
             return $enrollment->fresh(['student', 'guardian']);
         });
     }
@@ -198,6 +199,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 ->get();
 
             foreach ($enrollments as $enrollment) {
+                /** @var Enrollment $enrollment */
                 $this->approveEnrollment($enrollment);
                 $count++;
             }

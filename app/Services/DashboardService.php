@@ -123,7 +123,7 @@ class DashboardService implements DashboardServiceInterface
     /**
      * Get recent activities
      */
-    public function getRecentActivities(int $limit = 10): Collection
+    public function getRecentActivities(int $limit = 10): \Illuminate\Support\Collection
     {
         $enrollments = Enrollment::with(['student', 'guardian'])
             ->latest()
@@ -159,7 +159,7 @@ class DashboardService implements DashboardServiceInterface
     /**
      * Get pending tasks
      */
-    public function getPendingTasks(string $role): Collection
+    public function getPendingTasks(string $role): \Illuminate\Support\Collection
     {
         $tasks = collect();
 
@@ -227,7 +227,7 @@ class DashboardService implements DashboardServiceInterface
     /**
      * Get system announcements
      */
-    public function getAnnouncements(bool $activeOnly = true): Collection
+    public function getAnnouncements(bool $activeOnly = true): \Illuminate\Support\Collection
     {
         // This would fetch from an announcements table
         // For now, returning sample announcements

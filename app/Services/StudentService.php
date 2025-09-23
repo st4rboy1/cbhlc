@@ -69,6 +69,7 @@ class StudentService extends BaseService implements StudentServiceInterface
 
         $this->logActivity('findWithRelations', ['id' => $id, 'relations' => $relations]);
 
+        /** @var Student */
         return $this->model->with($relations)->findOrFail($id);
     }
 
@@ -84,6 +85,7 @@ class StudentService extends BaseService implements StudentServiceInterface
             }
 
             // Create the student
+            /** @var Student $student */
             $student = $this->model->create($data);
 
             // Associate with guardian if guardian_id is provided
@@ -93,6 +95,7 @@ class StudentService extends BaseService implements StudentServiceInterface
 
             $this->logActivity('createStudent', ['student_id' => $student->id]);
 
+            /** @var Student $student */
             return $student->fresh(['guardianStudents.guardian']);
         });
     }
@@ -128,6 +131,7 @@ class StudentService extends BaseService implements StudentServiceInterface
 
             $this->logActivity('updateStudent', ['student_id' => $student->id]);
 
+            /** @var Student $student */
             return $student->fresh(['guardianStudents.guardian']);
         });
     }
@@ -193,7 +197,7 @@ class StudentService extends BaseService implements StudentServiceInterface
             $newNumber = 1;
         }
 
-        return $year.str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+        return $year.str_pad((string) $newNumber, 4, '0', STR_PAD_LEFT);
     }
 
     /**
