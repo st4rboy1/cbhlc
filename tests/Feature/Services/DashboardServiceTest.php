@@ -180,9 +180,9 @@ test('getRevenueChart returns monthly revenue data', function () {
     $result = $this->service->getRevenueChart(3);
 
     expect($result)->toHaveCount(3);
-    expect($result[0]['revenue'])->toBe(30000);
-    expect($result[1]['revenue'])->toBe(75000);
-    expect($result[2]['revenue'])->toBe(40000);
+    expect((float) $result[0]['revenue'])->toBe(30000.0);
+    expect((float) $result[1]['revenue'])->toBe(75000.0);
+    expect((float) $result[2]['revenue'])->toBe(40000.0);
 });
 
 test('getGradeDistribution returns student count by grade level', function () {
@@ -287,9 +287,9 @@ test('getPaymentMethodDistribution returns payment statistics by method', functi
 
     expect($result)->toHaveCount(3);
     expect($result->firstWhere('method', 'Cash')['count'])->toBe(10);
-    expect($result->firstWhere('method', 'Cash')['total'])->toBe(50000);
+    expect((float) $result->firstWhere('method', 'Cash')['total'])->toBe(50000.0);
     expect($result->firstWhere('method', 'Bank Transfer')['count'])->toBe(5);
-    expect($result->firstWhere('method', 'Bank Transfer')['total'])->toBe(50000);
+    expect((float) $result->firstWhere('method', 'Bank Transfer')['total'])->toBe(50000.0);
 });
 
 test('getEnrollmentStatusDistribution returns enrollment counts by status', function () {

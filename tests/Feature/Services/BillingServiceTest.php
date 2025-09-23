@@ -272,7 +272,7 @@ test('getStatistics returns billing statistics', function () {
 
     expect($result)->toHaveKeys(['total_invoices', 'total_amount', 'total_paid', 'total_pending']);
     expect($result['total_invoices'])->toBe(6);
-    expect($result['total_amount'])->toBe(80000);
+    expect((float) $result['total_amount'])->toBe(80000.0);
     expect($result['total_paid'])->toBeGreaterThan(0);
     expect($result['total_pending'])->toBeNumeric();
 });
