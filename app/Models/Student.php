@@ -26,6 +26,7 @@ class Student extends Model
         'grade_level',
         'section',
         'user_id',
+        'guardian_id',
     ];
 
     protected $casts = [
@@ -47,6 +48,14 @@ class Student extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the guardian associated with the student
+     */
+    public function guardian(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'guardian_id');
     }
 
     /**

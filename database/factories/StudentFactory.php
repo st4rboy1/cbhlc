@@ -17,9 +17,9 @@ class StudentFactory extends Factory
      */
     public function definition(): array
     {
-        // Generate a birthdate between 6 and 18 years ago
-        $yearsAgo = fake()->numberBetween(6, 18);
-        $birthdate = now()->subYears($yearsAgo)->subDays(fake()->numberBetween(0, 365));
+        // Generate a birthdate between 6 and 17 years ago (under 18)
+        $yearsAgo = fake()->numberBetween(6, 17);
+        $birthdate = now()->subYears($yearsAgo)->subDays(fake()->numberBetween(0, 365))->addDays(1);
 
         // Use a combination of timestamp and random to ensure uniqueness even in parallel tests
         $uniqueId = substr(md5(uniqid(mt_rand(), true)), 0, 8);
@@ -32,7 +32,7 @@ class StudentFactory extends Factory
             'birthdate' => $birthdate->format('Y-m-d'),
             'gender' => fake()->randomElement(['Male', 'Female']),
             'address' => fake()->address(),
-            'contact_number' => fake()->optional()->phoneNumber(),
+            'contact_number' => fake()->optional()->numerify('+63 9## ### ####'),
             'email' => fake()->optional()->safeEmail(),
             'grade_level' => fake()->randomElement(GradeLevel::cases())->value,
             'section' => fake()->optional()->word(),
