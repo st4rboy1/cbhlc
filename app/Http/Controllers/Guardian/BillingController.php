@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Guardian;
 
-use App\Http\Controllers\Controller;
 use App\Enums\EnrollmentStatus;
+use App\Http\Controllers\Controller;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
 use App\Models\GuardianStudent;
