@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Guardian;
 
 use App\Http\Controllers\Controller;
+use App\Enums\EnrollmentStatus;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
 use App\Models\GuardianStudent;
@@ -34,7 +35,7 @@ class BillingController extends Controller
         /** @var \Illuminate\Support\Collection<int, array<string, mixed>> $enrollments */
         $enrollments = Enrollment::with(['student'])
             ->whereIn('student_id', $studentIds)
-            ->where('status', '!=', 'rejected')
+            ->where('status', '!=', EnrollmentStatus::REJECTED)
             ->get()
             /** @phpstan-ignore-next-line */
             ->map(function (Enrollment $enrollment) {
