@@ -90,7 +90,7 @@ class StudentService extends BaseService implements StudentServiceInterface
 
             // Associate with guardian if guardian_id is provided
             if (! empty($data['guardian_id'])) {
-                $this->associateGuardian($student, $data['guardian_id'], $data['relationship'] ?? 'parent');
+                $this->associateGuardian($student, $data['guardian_id'], $data['relationship'] ?? 'guardian');
             }
 
             $this->logActivity('createStudent', ['student_id' => $student->id]);
@@ -125,7 +125,7 @@ class StudentService extends BaseService implements StudentServiceInterface
                 $this->updateGuardianAssociation(
                     $student,
                     $guardianData['guardian_id'],
-                    $guardianData['relationship'] ?? 'parent'
+                    $guardianData['relationship'] ?? 'guardian'
                 );
             }
 
@@ -211,7 +211,7 @@ class StudentService extends BaseService implements StudentServiceInterface
     /**
      * Associate guardian with student
      */
-    protected function associateGuardian(Student $student, int $guardianId, string $relationship = 'parent'): GuardianStudent
+    protected function associateGuardian(Student $student, int $guardianId, string $relationship = 'guardian'): GuardianStudent
     {
         // Check if guardian exists
         $guardian = Guardian::findOrFail($guardianId);
