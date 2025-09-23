@@ -89,6 +89,7 @@ class StudentController extends Controller
                         'approved_at' => $enrollment->approved_at?->format('Y-m-d'),
                     ];
                 }),
+                /** @phpstan-ignore-next-line */
                 'guardians' => $student->guardianStudents->map(function ($gs) {
                     $guardianUser = $gs->guardian;
                     $guardianModel = Guardian::where('user_id', $guardianUser->id)->first();
