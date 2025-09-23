@@ -126,6 +126,34 @@ class EnrollmentController extends Controller
             return back()->withErrors(['student_id' => 'This student already has an enrollment for the selected school year.']);
         }
 
+        // Check if student is an existing student (has previous enrollments)
+        $previousEnrollments = Enrollment::where('student_id', $validated['student_id'])
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($previousEnrollments) {
+            // Business Rule 1: Existing students must enroll in First quarter
+            $validated['quarter'] = Quarter::FIRST->value;
+
+            // Business Rule 2: Students cannot enroll in a lower grade than their previous enrollment
+            try {
+                // Get the previous grade level as enum
+                $previousGradeEnum = is_string($previousEnrollments->grade_level)
+                    ? GradeLevel::from($previousEnrollments->grade_level)
+                    : $previousEnrollments->grade_level;
+
+                // Get the new grade level as enum
+                $newGradeEnum = GradeLevel::from($validated['grade_level']);
+
+                // Compare grade levels using the order() method
+                if ($newGradeEnum->order() < $previousGradeEnum->order()) {
+                    return back()->withErrors(['grade_level' => 'Students cannot enroll in a grade level lower than their previous enrollment.']);
+                }
+            } catch (\ValueError $e) {
+                // If grade level enum conversion fails, skip the validation
+            }
+        }
+
         // Get the fee for the selected grade level and school year
         $gradeLevelFee = \App\Models\GradeLevelFee::where('grade_level', $validated['grade_level'])
             ->where('school_year', $validated['school_year'])
