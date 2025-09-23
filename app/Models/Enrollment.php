@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property float $tuition_fee
@@ -211,6 +212,30 @@ class Enrollment extends Model
     public function isFullyPaid(): bool
     {
         return $this->payment_status === PaymentStatus::PAID || $this->balance_cents <= 0;
+    }
+
+    /**
+     * Get the grade level fee
+     */
+    public function gradeLevelFee(): BelongsTo
+    {
+        return $this->belongsTo(GradeLevelFee::class, 'grade_level', 'grade_level');
+    }
+
+    /**
+     * Get the invoices for the enrollment
+     */
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    /**
+     * Get the payments for the enrollment through invoices
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasManyThrough(Payment::class, Invoice::class);
     }
 
     /**

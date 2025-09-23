@@ -3,77 +3,153 @@
 namespace App\Services;
 
 use App\Contracts\Services\BillingServiceInterface;
+use App\Enums\InvoiceStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
+use App\Models\Invoice;
+use App\Models\Payment;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
-class BillingService implements BillingServiceInterface
+class BillingService extends BaseService implements BillingServiceInterface
 {
-    protected CurrencyService $currencyService;
-
     /**
-     * BillingService constructor.
+     * BillingService constructor
      */
-    public function __construct(CurrencyService $currencyService)
+    public function __construct(Invoice $model)
     {
-        $this->currencyService = $currencyService;
+        parent::__construct($model);
     }
 
     /**
-     * Get billing information for an enrollment
+     * Get paginated invoices with filters
      */
-    public function getBillingDetails(Enrollment $enrollment): array
+    public function getPaginatedInvoices(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $enrollment->load(['student', 'guardian']);
+        $query = $this->model->with(['enrollment', 'payments']);
 
-        return [
-            'enrollment_id' => $enrollment->id,
-            'student' => [
-                'id' => $enrollment->student->id,
-                'name' => $enrollment->student->full_name,
-                'student_id' => $enrollment->student->student_id,
-                'grade_level' => $enrollment->grade_level,
-            ],
-            'fees' => [
-                'tuition' => $this->currencyService->formatCents($enrollment->tuition_fee_cents),
-                'miscellaneous' => $this->currencyService->formatCents($enrollment->miscellaneous_fee_cents),
-                'laboratory' => $this->currencyService->formatCents($enrollment->laboratory_fee_cents),
-                'total' => $this->currencyService->formatCents($enrollment->total_amount_cents),
-                'discount' => $this->currencyService->formatCents(
-                    $enrollment->total_amount_cents - $enrollment->net_amount_cents
-                ),
-                'net_total' => $this->currencyService->formatCents($enrollment->net_amount_cents),
-            ],
-            'payment' => [
-                'paid' => $this->currencyService->formatCents($enrollment->amount_paid_cents),
-                'balance' => $this->currencyService->formatCents($enrollment->balance_cents),
-                'status' => $enrollment->payment_status,
-                'status_label' => $enrollment->payment_status->label(),
-                'status_color' => $enrollment->payment_status->color(),
-            ],
-            'payment_plan' => $enrollment->payment_plan ?? 'full',
-            'due_dates' => $this->calculateDueDates($enrollment),
-        ];
+        // Apply status filter
+        if (! empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        // Apply enrollment filter
+        if (! empty($filters['enrollment_id'])) {
+            $query->where('enrollment_id', $filters['enrollment_id']);
+        }
+
+        // Apply date range filter
+        if (! empty($filters['due_from'])) {
+            $query->where('due_date', '>=', $filters['due_from']);
+        }
+        if (! empty($filters['due_to'])) {
+            $query->where('due_date', '<=', $filters['due_to']);
+        }
+
+        $this->logActivity('getPaginatedInvoices', ['filters' => $filters]);
+
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     /**
-     * Get billing summary for guardian's students
+     * Find invoice with payment history
      */
-    public function getGuardianBillingSummary(int $guardianId): \Illuminate\Support\Collection
+    public function findWithPayments(int $invoiceId): Invoice
     {
-        $enrollments = Enrollment::where('guardian_id', $guardianId)
-            ->whereIn('status', ['enrolled', 'completed'])
-            ->with('student')
-            ->get();
+        $this->logActivity('findWithPayments', ['invoice_id' => $invoiceId]);
 
-        return $enrollments->map(function ($enrollment) {
-            return [
-                'enrollment' => $enrollment,
-                'billing' => $this->getBillingDetails($enrollment),
-                'payment_history' => $this->getPaymentHistory($enrollment),
-            ];
+        return $this->model->with(['payments', 'enrollment'])->findOrFail($invoiceId);
+    }
+
+    /**
+     * Generate invoice for enrollment
+     */
+    public function generateInvoice(Enrollment $enrollment): Invoice
+    {
+        return DB::transaction(function () use ($enrollment) {
+            $enrollment->load('gradeLevelFee');
+
+            $gradeLevelFee = $enrollment->gradeLevelFee ?? GradeLevelFee::where('grade_level', $enrollment->grade_level)->first();
+
+            $totalAmount = 0;
+            if ($gradeLevelFee) {
+                $totalAmount = $gradeLevelFee->tuition_fee + $gradeLevelFee->registration_fee + $gradeLevelFee->miscellaneous_fee;
+            }
+
+            // Create invoice
+            $invoice = $this->model->create([
+                'invoice_number' => $this->generateInvoiceNumber(),
+                'enrollment_id' => $enrollment->id,
+                'total_amount' => $totalAmount,
+                'paid_amount' => 0,
+                'status' => InvoiceStatus::DRAFT,
+                'due_date' => now()->addDays(30),
+            ]);
+
+            // Create invoice items
+            if ($gradeLevelFee) {
+                $items = [
+                    ['description' => 'Tuition Fee', 'amount' => $gradeLevelFee->tuition_fee],
+                    ['description' => 'Registration Fee', 'amount' => $gradeLevelFee->registration_fee],
+                    ['description' => 'Miscellaneous Fee', 'amount' => $gradeLevelFee->miscellaneous_fee],
+                ];
+
+                foreach ($items as $item) {
+                    if ($item['amount'] > 0) {
+                        $invoice->items()->create([
+                            'description' => $item['description'],
+                            'quantity' => 1,
+                            'unit_price' => $item['amount'],
+                            'amount' => $item['amount'],
+                        ]);
+                    }
+                }
+            }
+
+            $this->logActivity('generateInvoice', ['enrollment_id' => $enrollment->id, 'invoice_id' => $invoice->id]);
+
+            return $invoice->load('items');
+        });
+    }
+
+    /**
+     * Record payment for invoice
+     */
+    public function recordPayment(Invoice $invoice, array $data): Payment
+    {
+        return DB::transaction(function () use ($invoice, $data) {
+            $amount = $data['amount'];
+
+            // Check for overpayment
+            if ($amount > $invoice->remaining_balance) {
+                throw new \Exception('Payment amount exceeds remaining balance');
+            }
+
+            // Create payment record
+            $payment = $invoice->payments()->create($data);
+
+            // Update invoice paid amount
+            $invoice->paid_amount += $amount;
+
+            // Update invoice status
+            if ($invoice->paid_amount >= $invoice->total_amount) {
+                $invoice->status = InvoiceStatus::PAID;
+                $invoice->paid_at = now();
+            } elseif ($invoice->paid_amount > 0) {
+                $invoice->status = InvoiceStatus::PARTIALLY_PAID;
+            }
+
+            $invoice->save();
+
+            $this->logActivity('recordPayment', [
+                'invoice_id' => $invoice->id,
+                'payment_id' => $payment->id,
+                'amount' => $amount,
+            ]);
+
+            return $payment;
         });
     }
 
@@ -83,6 +159,169 @@ class BillingService implements BillingServiceInterface
     public function calculatePaymentPlan(float $totalAmount, string $plan): array
     {
         $plans = [
+            'full' => ['installments' => 1, 'discount' => 0.05],
+            'semestral' => ['installments' => 2, 'discount' => 0.03],
+            'quarterly' => ['installments' => 4, 'discount' => 0],
+            'monthly' => ['installments' => 10, 'discount' => 0],
+        ];
+
+        $planDetails = $plans[$plan] ?? $plans['monthly'];
+        $discount = $planDetails['discount'];
+        $installments = $planDetails['installments'];
+        $finalAmount = $totalAmount * (1 - $discount);
+        $installmentAmount = $finalAmount / $installments;
+
+        $schedule = [];
+        for ($i = 0; $i < $installments; $i++) {
+            $schedule[] = [
+                'installment' => $i + 1,
+                'amount' => $installmentAmount,
+                'due_date' => now()->addMonths($i)->format('Y-m-d'),
+            ];
+        }
+
+        return [
+            'plan' => $plan === '' || ! isset($plans[$plan]) ? 'monthly' : $plan,
+            'installments' => $installments,
+            'discount' => $discount,
+            'final_amount' => $finalAmount,
+            'schedule' => $schedule,
+        ];
+    }
+
+    /**
+     * Get overdue invoices
+     */
+    public function getOverdueInvoices(): Collection
+    {
+        return $this->model
+            ->where('due_date', '<', now())
+            ->whereNotIn('status', [InvoiceStatus::PAID, InvoiceStatus::CANCELLED])
+            ->with(['enrollment.student'])
+            ->get();
+    }
+
+    /**
+     * Get payments by enrollment
+     */
+    public function getPaymentsByEnrollment(int $enrollmentId): Collection
+    {
+        return Payment::whereHas('invoice', function ($query) use ($enrollmentId) {
+            $query->where('enrollment_id', $enrollmentId);
+        })->with('invoice')->get();
+    }
+
+    /**
+     * Get billing statistics
+     */
+    public function getStatistics(?string $fromDate = null, ?string $toDate = null): array
+    {
+        $query = $this->model->newQuery();
+
+        if ($fromDate) {
+            $query->where('created_at', '>=', $fromDate);
+        }
+        if ($toDate) {
+            $query->where('created_at', '<=', $toDate);
+        }
+
+        $totalInvoices = $query->count();
+        $totalAmount = $query->sum('total_amount');
+        $totalPaid = $query->sum('paid_amount');
+        $totalPending = $totalAmount - $totalPaid;
+
+        return [
+            'total_invoices' => $totalInvoices,
+            'total_amount' => $totalAmount,
+            'total_paid' => $totalPaid,
+            'total_pending' => $totalPending,
+        ];
+    }
+
+    /**
+     * Format invoice for display
+     */
+    public function formatInvoiceForDisplay(Invoice $invoice): array
+    {
+        return [
+            'invoice_number' => $invoice->invoice_number,
+            'formatted_total' => CurrencyService::formatCents($invoice->total_amount * 100),
+            'formatted_paid' => CurrencyService::formatCents($invoice->paid_amount * 100),
+            'formatted_balance' => CurrencyService::formatCents(($invoice->total_amount - $invoice->paid_amount) * 100),
+        ];
+    }
+
+    /**
+     * Generate unique invoice number
+     */
+    protected function generateInvoiceNumber(): string
+    {
+        return 'INV-'.str_pad((string) random_int(0, 9999999999), 10, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Get billing information for an enrollment
+     */
+    public function getBillingDetails(Enrollment $enrollment): array
+    {
+        $enrollment->load(['student', 'guardian']);
+
+        // Get the grade level fee
+        $gradeLevelFee = GradeLevelFee::where('grade_level', $enrollment->grade_level)->first();
+
+        if (! $gradeLevelFee) {
+            throw new \Exception('Grade level fee not found for '.$enrollment->grade_level);
+        }
+
+        $tuitionFee = (int) $gradeLevelFee->tuition_fee;
+        $miscellaneousFee = (int) $gradeLevelFee->miscellaneous_fee;
+        $laboratoryFee = (int) $gradeLevelFee->laboratory_fee;
+        $libraryFee = (int) $gradeLevelFee->library_fee;
+        $sportsFee = (int) $gradeLevelFee->sports_fee;
+
+        $totalAmount = $tuitionFee + $miscellaneousFee + $laboratoryFee + $libraryFee + $sportsFee;
+        $discount = 0; // This should be calculated based on business rules
+        $netAmount = $totalAmount - $discount;
+
+        // Update enrollment with billing details
+        $enrollment->update([
+            'tuition_fee_cents' => $tuitionFee,
+            'miscellaneous_fee_cents' => $miscellaneousFee,
+            'laboratory_fee_cents' => $laboratoryFee,
+            'library_fee_cents' => $libraryFee,
+            'sports_fee_cents' => $sportsFee,
+            'total_amount_cents' => $totalAmount,
+            'discount_cents' => $discount,
+            'net_amount_cents' => $netAmount,
+            'balance_cents' => $netAmount,
+        ]);
+
+        return [
+            'student' => $enrollment->student,
+            'guardian' => $enrollment->guardian,
+            'fees' => [
+                'tuition' => CurrencyService::formatCents($tuitionFee),
+                'miscellaneous' => CurrencyService::formatCents($miscellaneousFee),
+                'laboratory' => CurrencyService::formatCents($laboratoryFee),
+                'library' => CurrencyService::formatCents($libraryFee),
+                'sports' => CurrencyService::formatCents($sportsFee),
+            ],
+            'total' => CurrencyService::formatCents($totalAmount),
+            'discount' => CurrencyService::formatCents($discount),
+            'net_amount' => CurrencyService::formatCents($netAmount),
+            'payment_status' => $enrollment->payment_status->label(),
+            'amount_paid' => CurrencyService::formatCents($enrollment->amount_paid_cents),
+            'balance' => CurrencyService::formatCents($enrollment->balance_cents),
+            'payment_plans' => $this->getPaymentPlans($netAmount),
+        ];
+    }
+
+    /**
+     * Get available payment plans
+     */
+    public function getPaymentPlans(float $totalAmount): array
+    {
+        return [
             'full' => [
                 'name' => 'Full Payment',
                 'installments' => 1,
@@ -139,18 +378,6 @@ class BillingService implements BillingServiceInterface
                 'schedule' => [],
             ],
         ];
-
-        // Generate monthly schedule
-        if ($plan === 'monthly') {
-            for ($i = 1; $i <= 10; $i++) {
-                $plans['monthly']['schedule'][] = [
-                    'due_date' => now()->addMonths($i),
-                    'amount' => $totalAmount / 10,
-                ];
-            }
-        }
-
-        return $plans[$plan] ?? $plans['full'];
     }
 
     /**
@@ -159,7 +386,7 @@ class BillingService implements BillingServiceInterface
     public function processPayment(Enrollment $enrollment, float $amount, array $paymentDetails = []): array
     {
         return DB::transaction(function () use ($enrollment, $amount, $paymentDetails) {
-            $amountCents = $this->currencyService->toCents($amount);
+            $amountCents = CurrencyService::toCents($amount);
             $newPaidAmount = $enrollment->amount_paid_cents + $amountCents;
             $newBalance = $enrollment->net_amount_cents - $newPaidAmount;
 
@@ -178,81 +405,43 @@ class BillingService implements BillingServiceInterface
                 'payment_status' => $newStatus,
             ]);
 
-            // Log payment (you might want to create a payments table)
-            $paymentRecord = [
-                'enrollment_id' => $enrollment->id,
-                'amount' => $amount,
-                'payment_method' => $paymentDetails['method'] ?? 'cash',
-                'reference_number' => $paymentDetails['reference'] ?? null,
-                'notes' => $paymentDetails['notes'] ?? null,
-                'processed_at' => now(),
-                'processed_by' => auth()->id(),
-            ];
-
             return [
-                'success' => true,
                 'enrollment' => $enrollment->fresh(),
-                'payment' => $paymentRecord,
-                'message' => 'Payment processed successfully',
+                'payment_details' => array_merge($paymentDetails, [
+                    'amount' => CurrencyService::formatCents($amountCents),
+                    'new_balance' => CurrencyService::formatCents(max(0, $newBalance)),
+                    'payment_status' => $newStatus->label(),
+                ]),
             ];
         });
     }
 
     /**
-     * Generate invoice
+     * Get guardian billing summary
      */
-    public function generateInvoice(Enrollment $enrollment): array
+    public function getGuardianBillingSummary(int $guardianId): Collection
     {
-        $billing = $this->getBillingDetails($enrollment);
-
-        return [
-            'invoice_number' => 'INV-'.str_pad((string) $enrollment->id, 8, '0', STR_PAD_LEFT),
-            'date' => now()->format('Y-m-d'),
-            'due_date' => now()->addDays(30)->format('Y-m-d'),
-            'student' => $billing['student'],
-            'guardian' => [
-                'name' => $enrollment->guardian->name ?? 'N/A',
-                'email' => $enrollment->guardian->email ?? 'N/A',
-                'phone' => $enrollment->guardian->phone ?? 'N/A',
-            ],
-            'items' => [
-                [
-                    'description' => 'Tuition Fee',
-                    'amount' => $billing['fees']['tuition'],
-                ],
-                [
-                    'description' => 'Miscellaneous Fee',
-                    'amount' => $billing['fees']['miscellaneous'],
-                ],
-                [
-                    'description' => 'Laboratory Fee',
-                    'amount' => $billing['fees']['laboratory'],
-                ],
-            ],
-            'subtotal' => $billing['fees']['total'],
-            'discount' => $billing['fees']['discount'],
-            'total' => $billing['fees']['net_total'],
-            'paid' => $billing['payment']['paid'],
-            'balance' => $billing['payment']['balance'],
-            'status' => $billing['payment']['status'],
-        ];
+        return Enrollment::where('guardian_id', $guardianId)
+            ->with(['student', 'invoices'])
+            ->get()
+            ->map(function ($enrollment) {
+                return [
+                    'student' => $enrollment->student->first_name.' '.$enrollment->student->last_name,
+                    'grade_level' => $enrollment->grade_level,
+                    'total_amount' => $enrollment->net_amount,
+                    'amount_paid' => $enrollment->amount_paid,
+                    'balance' => $enrollment->balance,
+                    'payment_status' => $enrollment->payment_status->label(),
+                ];
+            });
     }
 
     /**
      * Get payment history
      */
-    public function getPaymentHistory(Enrollment $enrollment): \Illuminate\Support\Collection
+    public function getPaymentHistory(Enrollment $enrollment): Collection
     {
-        // This would fetch from a payments table if available
-        // For now, returning a mock collection
-        return collect([
-            [
-                'date' => $enrollment->created_at->format('Y-m-d'),
-                'description' => 'Initial enrollment',
-                'amount' => 0,
-                'balance' => $this->currencyService->formatCents($enrollment->net_amount_cents),
-            ],
-        ]);
+        return $enrollment->payments()->with('invoice')->orderBy('created_at', 'desc')->get();
     }
 
     /**
@@ -264,18 +453,17 @@ class BillingService implements BillingServiceInterface
             return 0;
         }
 
-        $dueDate = $enrollment->created_at->addDays(30);
-        $daysLate = max(0, now()->diffInDays($dueDate, false) * -1);
-
+        $daysLate = now()->diffInDays($enrollment->payment_due_date, false);
         if ($daysLate <= 0) {
             return 0;
         }
 
-        // 2% per month late fee
-        $monthsLate = ceil($daysLate / 30);
-        $lateFeePercentage = 0.02 * $monthsLate;
+        // 5% late fee after 30 days
+        if ($daysLate > 30) {
+            return $enrollment->balance * 0.05;
+        }
 
-        return ($enrollment->balance_cents / 100) * $lateFeePercentage;
+        return 0;
     }
 
     /**
@@ -283,28 +471,21 @@ class BillingService implements BillingServiceInterface
      */
     public function applyDiscount(Enrollment $enrollment, string $discountType, float $discountValue): Enrollment
     {
-        return DB::transaction(function () use ($enrollment, $discountType, $discountValue) {
-            $discountAmount = 0;
+        $discountAmount = 0;
 
-            if ($discountType === 'percentage') {
-                $discountAmount = ($enrollment->total_amount_cents / 100) * ($discountValue / 100);
-            } elseif ($discountType === 'fixed') {
-                $discountAmount = $discountValue;
-            }
+        if ($discountType === 'percentage') {
+            $discountAmount = $enrollment->total_amount * ($discountValue / 100);
+        } else {
+            $discountAmount = $discountValue;
+        }
 
-            $discountCents = $this->currencyService->toCents($discountAmount);
-            $newNetAmount = $enrollment->total_amount_cents - $discountCents;
-            $newBalance = $newNetAmount - $enrollment->amount_paid_cents;
+        $enrollment->update([
+            'discount_cents' => CurrencyService::toCents($discountAmount),
+            'net_amount_cents' => $enrollment->total_amount_cents - CurrencyService::toCents($discountAmount),
+            'balance_cents' => $enrollment->total_amount_cents - CurrencyService::toCents($discountAmount) - $enrollment->amount_paid_cents,
+        ]);
 
-            $enrollment->update([
-                'net_amount_cents' => max(0, $newNetAmount),
-                'balance_cents' => max(0, $newBalance),
-                'discount_type' => $discountType,
-                'discount_value' => $discountValue,
-            ]);
-
-            return $enrollment->fresh();
-        });
+        return $enrollment->fresh();
     }
 
     /**
@@ -316,44 +497,23 @@ class BillingService implements BillingServiceInterface
 
         if (! $gradeLevelFee) {
             return [
-                'grade_level' => $gradeLevel,
                 'tuition_fee' => 0,
+                'registration_fee' => 0,
                 'miscellaneous_fee' => 0,
-                'laboratory_fee' => 0,
                 'total' => 0,
-                'payment_plans' => [],
             ];
         }
 
-        $total = ($gradeLevelFee->tuition_fee +
-            $gradeLevelFee->miscellaneous_fee +
-            $gradeLevelFee->laboratory_fee) / 100;
-
         return [
-            'grade_level' => $gradeLevel,
-            'tuition_fee' => $this->currencyService->formatCents((int) $gradeLevelFee->tuition_fee),
-            'miscellaneous_fee' => $this->currencyService->formatCents((int) $gradeLevelFee->miscellaneous_fee),
-            'laboratory_fee' => $this->currencyService->formatCents((int) $gradeLevelFee->laboratory_fee),
-            'total' => $this->currencyService->format($total),
-            'payment_plans' => [
-                'full' => $this->calculatePaymentPlan($total, 'full'),
-                'semestral' => $this->calculatePaymentPlan($total, 'semestral'),
-                'quarterly' => $this->calculatePaymentPlan($total, 'quarterly'),
-                'monthly' => $this->calculatePaymentPlan($total, 'monthly'),
-            ],
+            'tuition_fee' => $gradeLevelFee->tuition_fee,
+            'registration_fee' => $gradeLevelFee->registration_fee,
+            'miscellaneous_fee' => $gradeLevelFee->miscellaneous_fee,
+            'laboratory_fee' => $gradeLevelFee->laboratory_fee,
+            'library_fee' => $gradeLevelFee->library_fee,
+            'sports_fee' => $gradeLevelFee->sports_fee,
+            'total' => $gradeLevelFee->tuition_fee + $gradeLevelFee->registration_fee +
+                      $gradeLevelFee->miscellaneous_fee + $gradeLevelFee->laboratory_fee +
+                      $gradeLevelFee->library_fee + $gradeLevelFee->sports_fee,
         ];
-    }
-
-    /**
-     * Calculate due dates for enrollment
-     */
-    protected function calculateDueDates(Enrollment $enrollment): array
-    {
-        $plan = $enrollment->payment_plan ?? 'full';
-        $totalAmount = $enrollment->net_amount_cents / 100;
-
-        $paymentPlan = $this->calculatePaymentPlan($totalAmount, $plan);
-
-        return $paymentPlan['schedule'] ?? [];
     }
 }

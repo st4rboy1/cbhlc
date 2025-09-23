@@ -1152,3 +1152,78 @@ Document certifying a student's good moral character and conduct from their prev
 ---
 
 _This document serves as the official Software Requirements Specification for the Web-Based Enrollment System for Christian Bible Heritage Learning Center. All stakeholders should review and approve this document before development commences._
+
+# Important Instructions for Development
+
+## Testing Commands
+
+ALWAYS use the following commands for testing:
+
+### Run Tests with Coverage
+
+```bash
+./vendor/bin/sail pest --coverage --min=60 --coverage-html=coverage --coverage-clover=coverage.xml
+```
+
+### Run Specific Test Files
+
+```bash
+./vendor/bin/sail pest path/to/test/file.php
+```
+
+### Run Tests with Stop on Failure
+
+```bash
+./vendor/bin/sail pest --stop-on-failure
+```
+
+## Code Style Fixing
+
+ALWAYS use Laravel Pint for code style fixes:
+
+```bash
+./vendor/bin/pint
+```
+
+Or for specific files:
+
+```bash
+./vendor/bin/pint path/to/file.php
+```
+
+## Important Development Rules
+
+1. **NEVER skip Husky pre-push hooks** - Always ensure all tests pass and code coverage meets the 60% minimum threshold
+2. **ALWAYS run tests before pushing** - Make sure all tests are passing
+3. **ALWAYS use Sail for Laravel commands** - Prefix all artisan and composer commands with `./vendor/bin/sail`
+4. **ALWAYS maintain code coverage above 60%** - Write tests for all new code
+5. **ALWAYS follow Laravel conventions** - Use existing patterns and conventions in the codebase
+6. **NEVER create files unless absolutely necessary** - Prefer editing existing files
+7. **NEVER proactively create documentation** - Only create docs when explicitly requested
+
+## Common Commands
+
+### Database Migrations
+
+```bash
+./vendor/bin/sail artisan migrate
+```
+
+### Clear Caches
+
+```bash
+./vendor/bin/sail artisan cache:clear
+./vendor/bin/sail artisan config:clear
+./vendor/bin/sail artisan route:clear
+```
+
+### Generate IDE Helper Files
+
+```bash
+./vendor/bin/sail artisan ide-helper:generate
+./vendor/bin/sail artisan ide-helper:models
+```
+
+## Do what has been asked; nothing more, nothing less.
+
+NEVER assume or add features that weren't explicitly requested.

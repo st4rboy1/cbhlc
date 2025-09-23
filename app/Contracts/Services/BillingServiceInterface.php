@@ -3,18 +3,32 @@
 namespace App\Contracts\Services;
 
 use App\Models\Enrollment;
+use App\Models\Invoice;
+use App\Models\Payment;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 interface BillingServiceInterface
 {
     /**
-     * Get billing information for an enrollment
+     * Get paginated invoices with filters
      */
-    public function getBillingDetails(Enrollment $enrollment): array;
+    public function getPaginatedInvoices(array $filters = [], int $perPage = 15): LengthAwarePaginator;
 
     /**
-     * Get billing summary for guardian's students
+     * Find invoice with payment history
      */
-    public function getGuardianBillingSummary(int $guardianId): \Illuminate\Support\Collection;
+    public function findWithPayments(int $invoiceId): Invoice;
+
+    /**
+     * Generate invoice for enrollment
+     */
+    public function generateInvoice(Enrollment $enrollment): Invoice;
+
+    /**
+     * Record payment for invoice
+     */
+    public function recordPayment(Invoice $invoice, array $data): Payment;
 
     /**
      * Calculate payment plan
@@ -22,19 +36,49 @@ interface BillingServiceInterface
     public function calculatePaymentPlan(float $totalAmount, string $plan): array;
 
     /**
+     * Get overdue invoices
+     */
+    public function getOverdueInvoices(): Collection;
+
+    /**
+     * Get payments by enrollment
+     */
+    public function getPaymentsByEnrollment(int $enrollmentId): Collection;
+
+    /**
+     * Get billing statistics
+     */
+    public function getStatistics(?string $fromDate = null, ?string $toDate = null): array;
+
+    /**
+     * Format invoice for display
+     */
+    public function formatInvoiceForDisplay(Invoice $invoice): array;
+
+    /**
+     * Get billing information for an enrollment
+     */
+    public function getBillingDetails(Enrollment $enrollment): array;
+
+    /**
+     * Get available payment plans
+     */
+    public function getPaymentPlans(float $totalAmount): array;
+
+    /**
      * Process payment
      */
     public function processPayment(Enrollment $enrollment, float $amount, array $paymentDetails = []): array;
 
     /**
-     * Generate invoice
+     * Get guardian billing summary
      */
-    public function generateInvoice(Enrollment $enrollment): array;
+    public function getGuardianBillingSummary(int $guardianId): Collection;
 
     /**
      * Get payment history
      */
-    public function getPaymentHistory(Enrollment $enrollment): \Illuminate\Support\Collection;
+    public function getPaymentHistory(Enrollment $enrollment): Collection;
 
     /**
      * Calculate late fees
