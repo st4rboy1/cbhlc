@@ -192,6 +192,6 @@ describe('enrollment pending constraint', function () {
             'grade_level' => 'Grade 1',
         ]);
 
-        $response->assertSessionHasErrors(['student_id']);
+        $response->assertSessionHasErrors(['school_year']);
     });
 });
