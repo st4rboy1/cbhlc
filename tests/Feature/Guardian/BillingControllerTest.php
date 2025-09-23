@@ -311,6 +311,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardian->id,
+            'status' => EnrollmentStatus::PENDING->value,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -363,10 +364,11 @@ describe('Guardian BillingController', function () {
     });
 
     test('guardian only sees their children enrollments', function () {
-        // Create enrollment for guardian's child
+        // Create enrollment for guardian's child with explicit non-rejected status
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardian->id,
+            'status' => EnrollmentStatus::PENDING->value,
         ]);
 
         // Create another student and enrollment for different guardian
@@ -383,6 +385,7 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $otherStudent->id,
             'guardian_id' => $otherGuardian->id,
+            'status' => EnrollmentStatus::PENDING->value,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -412,6 +415,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $studentNoMiddle->id,
             'guardian_id' => $this->guardian->id,
+            'status' => EnrollmentStatus::PENDING->value,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -429,6 +433,7 @@ describe('Guardian BillingController', function () {
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardian->id,
             'school_year' => '2024-2025',
+            'status' => EnrollmentStatus::PENDING->value,
         ]);
 
         $response = $this->actingAs($this->guardian)
