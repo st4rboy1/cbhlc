@@ -117,12 +117,15 @@ class EnrollmentController extends Controller
     public function updatePaymentStatus(Request $request, Enrollment $enrollment)
     {
         $validated = $request->validate([
+            'amount_paid' => 'required|integer|min:0',
             'payment_status' => 'required|string|in:'.implode(',', PaymentStatus::values()),
-            'remarks' => 'nullable|string',
+            'remarks' => 'nullable|string|max:500',
         ]);
 
         $enrollment->update([
+            'amount_paid_cents' => $validated['amount_paid'],
             'payment_status' => PaymentStatus::from($validated['payment_status']),
+            'balance_cents' => $enrollment->total_amount_cents - $validated['amount_paid'],
             'remarks' => $validated['remarks'] ?? $enrollment->remarks,
         ]);
 
