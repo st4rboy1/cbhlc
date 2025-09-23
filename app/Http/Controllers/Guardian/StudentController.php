@@ -136,7 +136,8 @@ class StudentController extends Controller
         GuardianStudent::create([
             'guardian_id' => Auth::id(),
             'student_id' => $student->id,
-            'is_primary' => true,
+            'relationship_type' => 'mother', // Default relationship type
+            'is_primary_contact' => true,
         ]);
 
         return redirect()->route('guardian.students.show', $student->id)

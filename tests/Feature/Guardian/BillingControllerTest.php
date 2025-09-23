@@ -19,7 +19,7 @@ beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create currency service
-    $this->currencyService = new CurrencyService();
+    $this->currencyService = new CurrencyService;
 
     // Create guardian user
     $this->guardian = User::factory()->create();

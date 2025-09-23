@@ -22,7 +22,9 @@ class Student extends Model
         'gender',
         'address',
         'contact_number',
+        'email',
         'grade_level',
+        'section',
         'user_id',
     ];
 
@@ -63,6 +65,14 @@ class Student extends Model
         return $this->belongsToMany(User::class, 'guardian_students', 'student_id', 'guardian_id')
             ->withPivot(['relationship_type', 'is_primary_contact'])
             ->withTimestamps();
+    }
+
+    /**
+     * Get the guardian student pivot records
+     */
+    public function guardianStudents(): HasMany
+    {
+        return $this->hasMany(GuardianStudent::class);
     }
 
     /**

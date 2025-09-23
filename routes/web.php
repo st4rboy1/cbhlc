@@ -97,8 +97,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [RegistrarDashboardController::class, 'index'])->name('dashboard');
 
         // Students Management
-        Route::resource('students', RegistrarStudentController::class);
         Route::get('/students/export', [RegistrarStudentController::class, 'export'])->name('students.export');
+        Route::resource('students', RegistrarStudentController::class);
 
         // Enrollments Management
         Route::resource('enrollments', RegistrarEnrollmentController::class)->only(['index', 'show']);
