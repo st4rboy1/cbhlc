@@ -432,7 +432,8 @@ class DashboardService implements DashboardServiceInterface
             ->groupBy('grade_level')
             ->orderBy('grade_level')
             ->get()
-            ->map(function ($item) {
+            // @phpstan-ignore-next-line
+            ->map(static function (object $item): array {
                 return [
                     'grade' => $item->grade_level,
                     'count' => $item->count,
@@ -558,7 +559,8 @@ class DashboardService implements DashboardServiceInterface
         return \App\Models\Payment::select('payment_method', \Illuminate\Support\Facades\DB::raw('count(*) as count'), \Illuminate\Support\Facades\DB::raw('sum(amount) as total'))
             ->groupBy('payment_method')
             ->get()
-            ->map(function ($item) {
+            // @phpstan-ignore-next-line
+            ->map(static function (object $item): array {
                 return [
                     'method' => $item->payment_method->label(),
                     'count' => $item->count,
@@ -575,7 +577,8 @@ class DashboardService implements DashboardServiceInterface
         return Enrollment::select('status', \Illuminate\Support\Facades\DB::raw('count(*) as count'))
             ->groupBy('status')
             ->get()
-            ->map(function ($item) {
+            // @phpstan-ignore-next-line
+            ->map(static function (object $item): array {
                 return [
                     'status' => $item->status->label(),
                     'count' => $item->count,
