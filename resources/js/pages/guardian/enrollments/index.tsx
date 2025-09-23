@@ -1,30 +1,17 @@
-import { Head, Link } from '@inertiajs/react'
-import { Button } from '@/components/ui/button'
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
-import { PlusCircle } from 'lucide-react'
-import type { Enrollment } from '@/types'
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import type { Enrollment } from '@/types';
+import { Head, Link } from '@inertiajs/react';
+import { PlusCircle } from 'lucide-react';
 
 interface Props {
     enrollments: {
-        data: Enrollment[]
-        links: any
-        meta: any
-    }
+        data: Enrollment[];
+        links: unknown;
+        meta: unknown;
+    };
 }
 
 const statusColors = {
@@ -33,14 +20,14 @@ const statusColors = {
     enrolled: 'green',
     rejected: 'red',
     completed: 'gray',
-} as const
+} as const;
 
 const paymentStatusColors = {
     pending: 'yellow',
     partial: 'orange',
     paid: 'green',
     overdue: 'red',
-} as const
+} as const;
 
 export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
     return (
@@ -48,7 +35,7 @@ export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
             <Head title="My Children's Enrollments" />
 
             <div className="container mx-auto py-6">
-                <div className="flex justify-between items-center mb-6">
+                <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-3xl font-bold">My Children's Enrollments</h1>
                     <Link href={route('guardian.enrollments.create')}>
                         <Button>
@@ -61,9 +48,7 @@ export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
                 <Card>
                     <CardHeader>
                         <CardTitle>Enrollment Applications</CardTitle>
-                        <CardDescription>
-                            View and manage your children's enrollment applications
-                        </CardDescription>
+                        <CardDescription>View and manage your children's enrollment applications</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Table>
@@ -87,9 +72,7 @@ export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
                                         <TableCell>{enrollment.school_year}</TableCell>
                                         <TableCell>{enrollment.grade_level}</TableCell>
                                         <TableCell>
-                                            <Badge variant={statusColors[enrollment.status] || 'default'}>
-                                                {enrollment.status}
-                                            </Badge>
+                                            <Badge variant={statusColors[enrollment.status] || 'default'}>{enrollment.status}</Badge>
                                         </TableCell>
                                         <TableCell>
                                             <Badge variant={paymentStatusColors[enrollment.payment_status] || 'default'}>
@@ -121,5 +104,5 @@ export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
                 </Card>
             </div>
         </>
-    )
+    );
 }

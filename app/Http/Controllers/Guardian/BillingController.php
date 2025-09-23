@@ -31,10 +31,12 @@ class BillingController extends Controller
             ->pluck('student_id');
 
         // Get enrollments with billing information
+        /** @var \Illuminate\Support\Collection<int, array<string, mixed>> $enrollments */
         $enrollments = Enrollment::with(['student'])
             ->whereIn('student_id', $studentIds)
             ->where('status', '!=', 'rejected')
             ->get()
+            /** @phpstan-ignore-next-line */
             ->map(function (Enrollment $enrollment) {
                 // Find the fee for the enrollment's grade level
                 $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)

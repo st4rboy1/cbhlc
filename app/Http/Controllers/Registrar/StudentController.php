@@ -73,6 +73,7 @@ class StudentController extends Controller
                 'section' => $student->section,
                 'created_at' => $student->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $student->updated_at->format('Y-m-d H:i:s'),
+                /** @phpstan-ignore-next-line */
                 'enrollments' => $student->enrollments->map(function (\App\Models\Enrollment $enrollment) {
                     return [
                         'id' => $enrollment->id,

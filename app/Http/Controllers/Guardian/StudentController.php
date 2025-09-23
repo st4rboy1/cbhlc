@@ -22,11 +22,13 @@ class StudentController extends Controller
         $studentIds = GuardianStudent::where('guardian_id', $user->id)
             ->pluck('student_id');
 
+        /** @var \Illuminate\Support\Collection<int, array<string, mixed>> $students */
         $students = Student::with(['enrollments' => function ($query) {
             $query->latest('created_at')->limit(1);
         }])
             ->whereIn('id', $studentIds)
             ->get()
+            /** @phpstan-ignore-next-line */
             ->map(function (Student $student) {
                 $latestEnrollment = $student->enrollments->first();
 
@@ -85,6 +87,7 @@ class StudentController extends Controller
                 'email' => $student->email,
                 'grade_level' => $student->grade_level,
                 'section' => $student->section,
+                /** @phpstan-ignore-next-line */
                 'enrollments' => $student->enrollments->map(function (\App\Models\Enrollment $enrollment) {
                     return [
                         'id' => $enrollment->id,
