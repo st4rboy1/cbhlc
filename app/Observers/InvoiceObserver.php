@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\InvoiceStatus;
 use App\Models\Invoice;
 
 class InvoiceObserver
@@ -18,7 +19,7 @@ class InvoiceObserver
 
         // Set default status if not provided
         if (empty($invoice->status)) {
-            $invoice->status = 'sent';
+            $invoice->status = InvoiceStatus::SENT;
         }
 
         // Calculate balance if total amount is set
@@ -49,10 +50,10 @@ class InvoiceObserver
             $balance = $invoice->total_amount - $invoice->paid_amount;
 
             if ($balance <= 0) {
-                $invoice->status = 'paid';
+                $invoice->status = InvoiceStatus::PAID;
                 $invoice->paid_at = now();
             } elseif ($invoice->paid_amount > 0) {
-                $invoice->status = 'partially_paid';
+                $invoice->status = InvoiceStatus::PARTIALLY_PAID;
             }
         }
     }
@@ -72,7 +73,7 @@ class InvoiceObserver
         }
 
         // Update enrollment payment status if invoice is fully paid
-        if ($invoice->wasChanged('status') && $invoice->status === 'paid' && $invoice->enrollment) {
+        if ($invoice->wasChanged('status') && $invoice->status === InvoiceStatus::PAID && $invoice->enrollment) {
             $invoice->enrollment->update([
                 'payment_status' => 'paid',
                 'amount_paid' => $invoice->paid_amount,
