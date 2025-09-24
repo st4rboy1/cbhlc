@@ -28,7 +28,7 @@ class StudentFactory extends Factory
             'student_id' => 'TEST-'.$uniqueId,
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
-            'middle_name' => fake()->optional()->firstName(),
+            'middle_name' => fake()->optional()->lastName(),
             'birthdate' => $birthdate->format('Y-m-d'),
             'gender' => fake()->randomElement(['Male', 'Female']),
             'address' => fake()->address(),
@@ -36,7 +36,8 @@ class StudentFactory extends Factory
             'email' => fake()->optional()->safeEmail(),
             'grade_level' => fake()->randomElement(GradeLevel::cases())->value,
             'section' => fake()->optional()->word(),
-            'user_id' => null, // Can be set explicitly when needed
+            'user_id' => null, // Can be set explicitly when needed (for students with user accounts)
+            'guardian_id' => null, // Can be set explicitly when needed (references users table)
         ];
     }
 }
