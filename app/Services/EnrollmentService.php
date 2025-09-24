@@ -5,16 +5,12 @@ namespace App\Services;
 use App\Contracts\Services\EnrollmentServiceInterface;
 use App\Enums\EnrollmentStatus;
 use App\Enums\PaymentStatus;
-use App\Mail\EnrollmentApproved;
-use App\Mail\EnrollmentRejected;
-use App\Mail\EnrollmentSubmitted;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class EnrollmentService extends BaseService implements EnrollmentServiceInterface
 {
@@ -150,11 +146,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 'student_id' => $student->id,
             ]);
 
-            // Send enrollment submitted notification
-            if ($enrollment->guardian && ! empty($enrollment->guardian->email)) {
-                Mail::to($enrollment->guardian->email)
-                    ->send(new EnrollmentSubmitted($enrollment));
-            }
+            // Email notification is handled by EnrollmentObserver
 
             return $enrollment->fresh(['student', 'guardian']);
         });
@@ -176,18 +168,9 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 'approved_at' => now(),
             ]);
 
-            // Update student's current grade level
-            $enrollment->student->update([
-                'grade_level' => $enrollment->grade_level,
-            ]);
-
             $this->logActivity('approveEnrollment', ['enrollment_id' => $enrollment->id]);
 
-            // Send approval notification
-            if ($enrollment->guardian && ! empty($enrollment->guardian->email)) {
-                Mail::to($enrollment->guardian->email)
-                    ->send(new EnrollmentApproved($enrollment));
-            }
+            // Email notification and student grade level update are handled by EnrollmentObserver
 
             return $enrollment->fresh(['student', 'guardian', 'approver']);
         });
@@ -229,11 +212,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 'reason' => $reason,
             ]);
 
-            // Send rejection notification
-            if ($enrollment->guardian && ! empty($enrollment->guardian->email)) {
-                Mail::to($enrollment->guardian->email)
-                    ->send(new EnrollmentRejected($enrollment, $reason));
-            }
+            // Email notification is handled by EnrollmentObserver
 
             return $enrollment->fresh(['student', 'guardian', 'approver']);
         });
@@ -261,16 +240,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                         'approved_at' => now(),
                     ]);
 
-                    // Update student's current grade level
-                    $enrollment->student->update([
-                        'grade_level' => $enrollment->grade_level,
-                    ]);
-
-                    // Send approval notification
-                    if ($enrollment->guardian && ! empty($enrollment->guardian->email)) {
-                        Mail::to($enrollment->guardian->email)
-                            ->send(new EnrollmentApproved($enrollment));
-                    }
+                    // Email notification and student grade level update are handled by EnrollmentObserver
 
                     $count++;
                 }
