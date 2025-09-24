@@ -11,7 +11,6 @@ use App\Mail\EnrollmentSubmitted;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
 use App\Models\Student;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -151,7 +150,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
             ]);
 
             // Send enrollment submitted notification
-            if ($enrollment->guardian && !empty($enrollment->guardian->email)) {
+            if ($enrollment->guardian && ! empty($enrollment->guardian->email)) {
                 Mail::to($enrollment->guardian->email)
                     ->send(new EnrollmentSubmitted($enrollment));
             }
@@ -185,7 +184,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
             $this->logActivity('approveEnrollment', ['enrollment_id' => $enrollment->id]);
 
             // Send approval notification
-            if ($enrollment->guardian && !empty($enrollment->guardian->email)) {
+            if ($enrollment->guardian && ! empty($enrollment->guardian->email)) {
                 Mail::to($enrollment->guardian->email)
                     ->send(new EnrollmentApproved($enrollment));
             }
@@ -231,7 +230,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
             ]);
 
             // Send rejection notification
-            if ($enrollment->guardian && !empty($enrollment->guardian->email)) {
+            if ($enrollment->guardian && ! empty($enrollment->guardian->email)) {
                 Mail::to($enrollment->guardian->email)
                     ->send(new EnrollmentRejected($enrollment, $reason));
             }
@@ -268,7 +267,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                     ]);
 
                     // Send approval notification
-                    if ($enrollment->guardian && !empty($enrollment->guardian->email)) {
+                    if ($enrollment->guardian && ! empty($enrollment->guardian->email)) {
                         Mail::to($enrollment->guardian->email)
                             ->send(new EnrollmentApproved($enrollment));
                     }

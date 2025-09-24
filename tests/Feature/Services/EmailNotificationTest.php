@@ -174,7 +174,7 @@ class EmailNotificationTest extends TestCase
         $enrollment = $this->service->createEnrollment($enrollmentData);
 
         // Assert
-        Mail::assertQueued(EnrollmentSubmitted::class, function ($mail) use ($enrollment, $student) {
+        Mail::assertQueued(EnrollmentSubmitted::class, function ($mail) use ($enrollment) {
             // Check if mail is for the correct recipient and enrollment
             return $mail->hasTo('guardian@test.com') &&
                    $mail->enrollment->id === $enrollment->id;
