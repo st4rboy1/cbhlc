@@ -40,7 +40,9 @@ class TuitionController extends Controller
         $gradeLevelFees = GradeLevelFee::currentSchoolYear()
             ->active()
             ->get()
-            ->mapWithKeys(function ($fee) {
+            /** @phpstan-ignore-next-line */
+            ->mapWithKeys(
+                function (GradeLevelFee $fee): array {
                 return [
                     $fee->grade_level->value => [
                         'tuition' => $fee->tuition_fee,

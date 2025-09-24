@@ -17,7 +17,7 @@ class MoneyCast implements CastsAttributes
         $centsKey = $this->getCentsKey($key);
         $centsValue = $attributes[$centsKey] ?? 0;
 
-        if ($centsValue === null) {
+        if ($centsValue === 0) {
             return 0.0;
         }
 
