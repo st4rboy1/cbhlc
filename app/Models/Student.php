@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\FullNameCast;
 use App\Enums\GradeLevel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,6 +33,7 @@ class Student extends Model
     protected $casts = [
         'birthdate' => 'date',
         'grade_level' => GradeLevel::class,
+        'full_name' => FullNameCast::class,
     ];
 
     /**

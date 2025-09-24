@@ -40,18 +40,21 @@ class TuitionController extends Controller
         $gradeLevelFees = GradeLevelFee::currentSchoolYear()
             ->active()
             ->get()
-            ->mapWithKeys(function ($fee) {
-                return [
-                    $fee->grade_level->value => [
-                        'tuition' => $fee->tuition_fee,
-                        'miscellaneous' => $fee->miscellaneous_fee,
-                        'laboratory' => $fee->laboratory_fee,
-                        'library' => $fee->library_fee,
-                        'sports' => $fee->sports_fee,
-                        'total' => $fee->total_fee,
-                    ],
-                ];
-            });
+            ->mapWithKeys(
+                /** @phpstan-ignore-next-line */
+                function (GradeLevelFee $fee): array {
+                    return [
+                        $fee->grade_level->value => [
+                            'tuition' => $fee->tuition_fee,
+                            'miscellaneous' => $fee->miscellaneous_fee,
+                            'laboratory' => $fee->laboratory_fee,
+                            'library' => $fee->library_fee,
+                            'sports' => $fee->sports_fee,
+                            'total' => $fee->total_fee,
+                        ],
+                    ];
+                }
+            );
 
         return Inertia::render('tuition', [
             'enrollments' => $enrollments,
