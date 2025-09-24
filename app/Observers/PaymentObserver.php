@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Enums\InvoiceStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Payment;
 
 class PaymentObserver
@@ -35,10 +37,10 @@ class PaymentObserver
             // Update invoice status
             $balance = $invoice->total_amount - $invoice->paid_amount;
             if ($balance <= 0) {
-                $invoice->status = 'paid';
+                $invoice->status = InvoiceStatus::PAID;
                 $invoice->paid_at = now();
             } else {
-                $invoice->status = 'partially_paid';
+                $invoice->status = InvoiceStatus::PARTIALLY_PAID;
             }
 
             $invoice->save();
@@ -52,9 +54,9 @@ class PaymentObserver
 
             // Update payment status
             if ($enrollment->balance <= 0) {
-                $enrollment->payment_status = 'paid';
+                $enrollment->payment_status = PaymentStatus::PAID;
             } else {
-                $enrollment->payment_status = 'partial';
+                $enrollment->payment_status = PaymentStatus::PARTIAL;
             }
 
             $enrollment->save();
@@ -84,12 +86,12 @@ class PaymentObserver
                 // Update invoice status
                 $balance = $invoice->total_amount - $invoice->paid_amount;
                 if ($balance <= 0) {
-                    $invoice->status = 'paid';
+                    $invoice->status = InvoiceStatus::PAID;
                     $invoice->paid_at = now();
                 } elseif ($invoice->paid_amount > 0) {
-                    $invoice->status = 'partially_paid';
+                    $invoice->status = InvoiceStatus::PARTIALLY_PAID;
                 } else {
-                    $invoice->status = 'sent';
+                    $invoice->status = InvoiceStatus::SENT;
                 }
 
                 $invoice->save();
@@ -118,9 +120,9 @@ class PaymentObserver
 
             // Update invoice status
             if ($invoice->paid_amount > 0) {
-                $invoice->status = 'partially_paid';
+                $invoice->status = InvoiceStatus::PARTIALLY_PAID;
             } else {
-                $invoice->status = 'sent';
+                $invoice->status = InvoiceStatus::SENT;
                 $invoice->paid_at = null;
             }
 

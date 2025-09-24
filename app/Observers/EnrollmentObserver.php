@@ -2,6 +2,8 @@
 
 namespace App\Observers;
 
+use App\Enums\EnrollmentStatus;
+use App\Enums\PaymentStatus;
 use App\Mail\EnrollmentApproved;
 use App\Mail\EnrollmentRejected;
 use App\Mail\EnrollmentSubmitted;
@@ -23,7 +25,7 @@ class EnrollmentObserver
 
         // Set default status if not provided
         if (empty($enrollment->status)) {
-            $enrollment->status = 'pending';
+            $enrollment->status = EnrollmentStatus::PENDING;
         }
 
         // Calculate fees if not set
@@ -33,7 +35,7 @@ class EnrollmentObserver
 
         // Set payment status
         if (empty($enrollment->payment_status)) {
-            $enrollment->payment_status = 'pending';
+            $enrollment->payment_status = PaymentStatus::PENDING;
         }
     }
 
