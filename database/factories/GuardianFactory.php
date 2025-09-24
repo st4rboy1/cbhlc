@@ -20,15 +20,22 @@ class GuardianFactory extends Factory
      */
     public function definition(): array
     {
+        $hasEmergencyContact = fake()->boolean(80); // 80% chance of having emergency contact
+
         return [
             'user_id' => User::factory(),
             'first_name' => fake()->firstName(),
-            'middle_name' => fake()->firstName(),
+            'middle_name' => fake()->optional(0.5)->firstName(), // 50% chance of having middle name
             'last_name' => fake()->lastName(),
             'contact_number' => fake()->phoneNumber(),
             'address' => fake()->address(),
             'occupation' => fake()->jobTitle(),
             'employer' => fake()->company(),
+            'emergency_contact_name' => $hasEmergencyContact ? fake()->name() : null,
+            'emergency_contact_phone' => $hasEmergencyContact ? fake()->phoneNumber() : null,
+            'emergency_contact_relationship' => $hasEmergencyContact
+                ? fake()->randomElement(['Spouse', 'Parent', 'Sibling', 'Friend', 'Relative'])
+                : null,
         ];
     }
 }

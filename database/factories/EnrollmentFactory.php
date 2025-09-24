@@ -28,11 +28,34 @@ class EnrollmentFactory extends Factory
         $tuitionFee = $this->faker->numberBetween(15000, 30000) * 100; // in cents
         $miscFee = $this->faker->numberBetween(3000, 8000) * 100;
         $labFee = $this->faker->numberBetween(1000, 5000) * 100;
-        $totalAmount = $tuitionFee + $miscFee + $labFee;
-        $amountPaid = $this->faker->numberBetween(0, $totalAmount);
-        $balance = $totalAmount - $amountPaid;
+        $libraryFee = $this->faker->numberBetween(500, 1500) * 100;
+        $sportsFee = $this->faker->numberBetween(500, 2000) * 100;
+        $discount = $this->faker->optional(0.2)->numberBetween(500, 5000) * 100; // 20% chance of discount
+
+        $totalAmount = $tuitionFee + $miscFee + $labFee + $libraryFee + $sportsFee;
+        $netAmount = $totalAmount - ($discount ?? 0);
+        $amountPaid = $this->faker->numberBetween(0, $netAmount);
+        $balance = $netAmount - $amountPaid;
+
+        // Generate a unique enrollment ID
+        $enrollmentId = 'ENR-'.date('Y').'-'.str_pad($this->faker->unique()->numberBetween(1, 9999), 4, '0', STR_PAD_LEFT);
+
+        $status = $this->faker->randomElement(EnrollmentStatus::values());
+        $approvedAt = null;
+        $rejectedAt = null;
+        $approvedBy = null;
+
+        if ($status === EnrollmentStatus::APPROVED->value) {
+            $approvedAt = $this->faker->dateTimeBetween('-1 week', 'now');
+            $approvedBy = \App\Models\User::whereHas('roles', function ($q) {
+                $q->whereIn('name', ['super-admin', 'administrator', 'registrar']);
+            })->inRandomOrder()->value('id');
+        } elseif ($status === EnrollmentStatus::REJECTED->value) {
+            $rejectedAt = $this->faker->dateTimeBetween('-1 week', 'now');
+        }
 
         return [
+            'enrollment_id' => $enrollmentId,
             'student_id' => Student::factory(),
             'guardian_id' => function (array $attributes) {
                 // Get a guardian user or create one
@@ -59,16 +82,23 @@ class EnrollmentFactory extends Factory
             'school_year' => $this->faker->randomElement(['2023-2024', '2024-2025', '2025-2026']),
             'quarter' => $this->faker->randomElement(Quarter::values()),
             'grade_level' => $this->faker->randomElement(GradeLevel::values()),
-            'status' => $this->faker->randomElement(EnrollmentStatus::values()),
+            'status' => $status,
             'tuition_fee_cents' => $tuitionFee,
             'miscellaneous_fee_cents' => $miscFee,
             'laboratory_fee_cents' => $labFee,
+            'library_fee_cents' => $libraryFee,
+            'sports_fee_cents' => $sportsFee,
             'total_amount_cents' => $totalAmount,
-            'net_amount_cents' => $totalAmount,
+            'discount_cents' => $discount ?? 0,
+            'net_amount_cents' => $netAmount,
             'amount_paid_cents' => $amountPaid,
             'balance_cents' => $balance,
             'payment_status' => $balance == 0 ? PaymentStatus::PAID : ($amountPaid > 0 ? PaymentStatus::PARTIAL : PaymentStatus::PENDING),
-            'approved_at' => $this->faker->optional()->dateTimeBetween('-1 week', 'now'),
+            'payment_due_date' => $this->faker->dateTimeBetween('now', '+3 months'),
+            'remarks' => $this->faker->optional(0.3)->sentence(), // 30% chance of having remarks
+            'approved_at' => $approvedAt,
+            'rejected_at' => $rejectedAt,
+            'approved_by' => $approvedBy,
         ];
     }
 
@@ -80,6 +110,10 @@ class EnrollmentFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => EnrollmentStatus::APPROVED,
             'approved_at' => now(),
+            'rejected_at' => null,
+            'approved_by' => \App\Models\User::whereHas('roles', function ($q) {
+                $q->whereIn('name', ['super-admin', 'administrator', 'registrar']);
+            })->inRandomOrder()->value('id') ?? 1,
         ]);
     }
 
@@ -91,6 +125,22 @@ class EnrollmentFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => EnrollmentStatus::PENDING,
             'approved_at' => null,
+            'rejected_at' => null,
+            'approved_by' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the enrollment is rejected.
+     */
+    public function rejected(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => EnrollmentStatus::REJECTED,
+            'approved_at' => null,
+            'rejected_at' => now(),
+            'approved_by' => null,
+            'remarks' => $this->faker->sentence(),
         ]);
     }
 
