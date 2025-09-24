@@ -28,18 +28,6 @@ class Enrollment extends Model
 {
     use HasFactory;
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($enrollment) {
-            if (empty($enrollment->enrollment_id)) {
-                $count = static::count() + 1;
-                $enrollment->enrollment_id = 'ENR-'.str_pad((string) $count, 4, '0', STR_PAD_LEFT);
-            }
-        });
-    }
-
     protected $fillable = [
         'enrollment_id',
         'student_id',
@@ -106,80 +94,80 @@ class Enrollment extends Model
     protected function tuitionFee(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->tuition_fee_cents / 100,
-            set: fn (float $value) => ['tuition_fee_cents' => (int) ($value * 100)]
+            get: fn () => $this->tuition_fee_cents ? $this->tuition_fee_cents / 100 : 0.0,
+            set: fn (?float $value) => ['tuition_fee_cents' => $value !== null ? (int) ($value * 100) : null]
         );
     }
 
     protected function miscellaneousFee(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->miscellaneous_fee_cents / 100,
-            set: fn (float $value) => ['miscellaneous_fee_cents' => (int) ($value * 100)]
+            get: fn () => $this->miscellaneous_fee_cents ? $this->miscellaneous_fee_cents / 100 : 0.0,
+            set: fn (?float $value) => ['miscellaneous_fee_cents' => $value !== null ? (int) ($value * 100) : null]
         );
     }
 
     protected function laboratoryFee(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->laboratory_fee_cents / 100,
-            set: fn (float $value) => ['laboratory_fee_cents' => (int) ($value * 100)]
+            get: fn () => $this->laboratory_fee_cents ? $this->laboratory_fee_cents / 100 : 0.0,
+            set: fn (?float $value) => ['laboratory_fee_cents' => $value !== null ? (int) ($value * 100) : null]
         );
     }
 
     protected function libraryFee(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->library_fee_cents / 100,
-            set: fn (float $value) => ['library_fee_cents' => (int) ($value * 100)]
+            get: fn () => $this->library_fee_cents ? $this->library_fee_cents / 100 : 0.0,
+            set: fn (?float $value) => ['library_fee_cents' => $value !== null ? (int) ($value * 100) : null]
         );
     }
 
     protected function sportsFee(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->sports_fee_cents / 100,
-            set: fn (float $value) => ['sports_fee_cents' => (int) ($value * 100)]
+            get: fn () => $this->sports_fee_cents ? $this->sports_fee_cents / 100 : 0.0,
+            set: fn (?float $value) => ['sports_fee_cents' => $value !== null ? (int) ($value * 100) : null]
         );
     }
 
     protected function totalAmount(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->total_amount_cents / 100,
-            set: fn (float $value) => ['total_amount_cents' => (int) ($value * 100)]
+            get: fn () => $this->total_amount_cents ? $this->total_amount_cents / 100 : 0.0,
+            set: fn (?float $value) => ['total_amount_cents' => $value !== null ? (int) ($value * 100) : null]
         );
     }
 
     protected function discount(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->discount_cents / 100,
-            set: fn (float $value) => ['discount_cents' => (int) ($value * 100)]
+            get: fn () => $this->discount_cents ? $this->discount_cents / 100 : 0.0,
+            set: fn (?float $value) => ['discount_cents' => $value !== null ? (int) ($value * 100) : null]
         );
     }
 
     protected function netAmount(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->net_amount_cents / 100,
-            set: fn (float $value) => ['net_amount_cents' => (int) ($value * 100)]
+            get: fn () => $this->net_amount_cents ? $this->net_amount_cents / 100 : 0.0,
+            set: fn (?float $value) => ['net_amount_cents' => $value !== null ? (int) ($value * 100) : null]
         );
     }
 
     protected function amountPaid(): Attribute
     {
         return Attribute::make(
-            get: fn () => (float) ($this->amount_paid_cents / 100),
-            set: fn (float $value) => ['amount_paid_cents' => (int) ($value * 100)]
+            get: fn () => $this->amount_paid_cents ? (float) ($this->amount_paid_cents / 100) : 0.0,
+            set: fn (?float $value) => ['amount_paid_cents' => $value !== null ? (int) ($value * 100) : null]
         );
     }
 
     protected function balance(): Attribute
     {
         return Attribute::make(
-            get: fn () => (float) ($this->balance_cents / 100),
-            set: fn (float $value) => ['balance_cents' => (int) ($value * 100)]
+            get: fn () => $this->balance_cents ? (float) ($this->balance_cents / 100) : 0.0,
+            set: fn (?float $value) => ['balance_cents' => $value !== null ? (int) ($value * 100) : null]
         );
     }
 
