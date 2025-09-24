@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\FullNameCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,6 +24,10 @@ class Guardian extends Model
         'emergency_contact_name',
         'emergency_contact_phone',
         'emergency_contact_relationship',
+    ];
+
+    protected $casts = [
+        'full_name' => FullNameCast::class,
     ];
 
     /**

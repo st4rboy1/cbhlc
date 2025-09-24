@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
+use App\Casts\FormattedMoneyCast;
+use App\Casts\MoneyCast;
 use App\Enums\GradeLevel;
-use App\Services\CurrencyService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,172 +27,31 @@ class GradeLevelFee extends Model
     protected $casts = [
         'grade_level' => GradeLevel::class,
         'is_active' => 'boolean',
+        // Money casts - convert cents to dollars
+        'tuition_fee' => MoneyCast::class,
+        'registration_fee' => MoneyCast::class,
+        'miscellaneous_fee' => MoneyCast::class,
+        'laboratory_fee' => MoneyCast::class,
+        'library_fee' => MoneyCast::class,
+        'sports_fee' => MoneyCast::class,
+        // Formatted money casts - display formatted currency
+        'formatted_tuition_fee' => FormattedMoneyCast::class,
+        'formatted_registration_fee' => FormattedMoneyCast::class,
+        'formatted_miscellaneous_fee' => FormattedMoneyCast::class,
+        'formatted_laboratory_fee' => FormattedMoneyCast::class,
+        'formatted_library_fee' => FormattedMoneyCast::class,
+        'formatted_sports_fee' => FormattedMoneyCast::class,
+        'formatted_total_fee' => FormattedMoneyCast::class,
     ];
 
     /**
-     * Get tuition fee in dollars
-     */
-    public function getTuitionFeeAttribute(): float
-    {
-        return $this->tuition_fee_cents / 100;
-    }
-
-    /**
-     * Set tuition fee from dollars
-     */
-    public function setTuitionFeeAttribute(float $value): void
-    {
-        $this->tuition_fee_cents = (int) ($value * 100);
-    }
-
-    /**
-     * Get registration fee in dollars
-     */
-    public function getRegistrationFeeAttribute(): float
-    {
-        return $this->registration_fee_cents / 100;
-    }
-
-    /**
-     * Set registration fee from dollars
-     */
-    public function setRegistrationFeeAttribute(float $value): void
-    {
-        $this->registration_fee_cents = (int) ($value * 100);
-    }
-
-    /**
-     * Get miscellaneous fee in dollars
-     */
-    public function getMiscellaneousFeeAttribute(): float
-    {
-        return $this->miscellaneous_fee_cents / 100;
-    }
-
-    /**
-     * Set miscellaneous fee from dollars
-     */
-    public function setMiscellaneousFeeAttribute(float $value): void
-    {
-        $this->miscellaneous_fee_cents = (int) ($value * 100);
-    }
-
-    /**
-     * Get laboratory fee in dollars
-     */
-    public function getLaboratoryFeeAttribute(): float
-    {
-        return $this->laboratory_fee_cents / 100;
-    }
-
-    /**
-     * Set laboratory fee from dollars
-     */
-    public function setLaboratoryFeeAttribute(float $value): void
-    {
-        $this->laboratory_fee_cents = (int) ($value * 100);
-    }
-
-    /**
-     * Get library fee in dollars
-     */
-    public function getLibraryFeeAttribute(): float
-    {
-        return $this->library_fee_cents / 100;
-    }
-
-    /**
-     * Set library fee from dollars
-     */
-    public function setLibraryFeeAttribute(float $value): void
-    {
-        $this->library_fee_cents = (int) ($value * 100);
-    }
-
-    /**
-     * Get sports fee in dollars
-     */
-    public function getSportsFeeAttribute(): float
-    {
-        return $this->sports_fee_cents / 100;
-    }
-
-    /**
-     * Set sports fee from dollars
-     */
-    public function setSportsFeeAttribute(float $value): void
-    {
-        $this->sports_fee_cents = (int) ($value * 100);
-    }
-
-    /**
-     * Get total fee in dollars
+     * Get total fee in dollars (computed attribute)
      */
     public function getTotalFeeAttribute(): float
     {
-        return ($this->tuition_fee_cents + $this->registration_fee_cents +
-                $this->miscellaneous_fee_cents + $this->laboratory_fee_cents +
-                $this->library_fee_cents + $this->sports_fee_cents) / 100;
-    }
-
-    /**
-     * Get formatted tuition fee
-     */
-    public function getFormattedTuitionFeeAttribute(): string
-    {
-        return CurrencyService::formatCents($this->tuition_fee_cents);
-    }
-
-    /**
-     * Get formatted registration fee
-     */
-    public function getFormattedRegistrationFeeAttribute(): string
-    {
-        return CurrencyService::formatCents($this->registration_fee_cents);
-    }
-
-    /**
-     * Get formatted miscellaneous fee
-     */
-    public function getFormattedMiscellaneousFeeAttribute(): string
-    {
-        return CurrencyService::formatCents($this->miscellaneous_fee_cents);
-    }
-
-    /**
-     * Get formatted laboratory fee
-     */
-    public function getFormattedLaboratoryFeeAttribute(): string
-    {
-        return CurrencyService::formatCents($this->laboratory_fee_cents);
-    }
-
-    /**
-     * Get formatted library fee
-     */
-    public function getFormattedLibraryFeeAttribute(): string
-    {
-        return CurrencyService::formatCents($this->library_fee_cents);
-    }
-
-    /**
-     * Get formatted sports fee
-     */
-    public function getFormattedSportsFeeAttribute(): string
-    {
-        return CurrencyService::formatCents($this->sports_fee_cents);
-    }
-
-    /**
-     * Get formatted total fee
-     */
-    public function getFormattedTotalFeeAttribute(): string
-    {
-        $totalCents = $this->tuition_fee_cents + $this->registration_fee_cents +
-                     $this->miscellaneous_fee_cents + $this->laboratory_fee_cents +
-                     $this->library_fee_cents + $this->sports_fee_cents;
-
-        return CurrencyService::formatCents($totalCents);
+        return $this->tuition_fee + $this->registration_fee +
+               $this->miscellaneous_fee + $this->laboratory_fee +
+               $this->library_fee + $this->sports_fee;
     }
 
     /**
