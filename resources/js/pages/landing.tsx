@@ -152,11 +152,7 @@ export default function Landing() {
                                 Join our community of learners and discover the difference Christian education makes. Start your enrollment process
                                 today.
                             </p>
-                            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                                <Button size="lg" variant="outline" className="border-white px-8 py-3 text-white hover:bg-white hover:text-blue-600">
-                                    Contact Us
-                                </Button>
-                            </div>
+                            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row"></div>
                         </div>
                     </div>
                 </section>
