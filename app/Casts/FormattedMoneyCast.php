@@ -57,6 +57,7 @@ class FormattedMoneyCast implements CastsAttributes
     {
         // Remove 'formatted_' prefix if present
         $baseKey = str_replace('formatted_', '', $key);
-        return $baseKey . '_cents';
+
+        return $baseKey.'_cents';
     }
 }

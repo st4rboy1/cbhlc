@@ -44,7 +44,6 @@ class GradeLevelFee extends Model
         'formatted_total_fee' => FormattedMoneyCast::class,
     ];
 
-
     /**
      * Get total fee in dollars (computed attribute)
      */
@@ -54,7 +53,6 @@ class GradeLevelFee extends Model
                $this->miscellaneous_fee + $this->laboratory_fee +
                $this->library_fee + $this->sports_fee;
     }
-
 
     /**
      * Scope to get active fees
