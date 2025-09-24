@@ -36,7 +36,8 @@ class StudentFactory extends Factory
             'email' => fake()->optional()->safeEmail(),
             'grade_level' => fake()->randomElement(GradeLevel::cases())->value,
             'section' => fake()->optional()->word(),
-            'user_id' => null, // Can be set explicitly when needed
+            'user_id' => null, // Can be set explicitly when needed (for students with user accounts)
+            'guardian_id' => null, // Can be set explicitly when needed (references users table)
         ];
     }
 }
