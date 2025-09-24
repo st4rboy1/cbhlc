@@ -8,7 +8,6 @@ use App\Mail\EnrollmentSubmitted;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
 class EnrollmentObserver
 {
@@ -44,7 +43,7 @@ class EnrollmentObserver
     public function created(Enrollment $enrollment): void
     {
         // Send enrollment submitted email
-        if ($enrollment->guardian && !empty($enrollment->guardian->email)) {
+        if ($enrollment->guardian && ! empty($enrollment->guardian->email)) {
             Mail::to($enrollment->guardian->email)
                 ->queue(new EnrollmentSubmitted($enrollment));
         }
@@ -53,7 +52,7 @@ class EnrollmentObserver
         activity()
             ->performedOn($enrollment)
             ->causedBy(auth()->user())
-            ->log('Enrollment created for student: ' . $enrollment->student->full_name);
+            ->log('Enrollment created for student: '.$enrollment->student->full_name);
     }
 
     /**
@@ -67,14 +66,11 @@ class EnrollmentObserver
             $newStatus = $enrollment->status;
 
             // Set status change timestamps
-            if ($oldStatus === 'pending' && $newStatus === 'approved') {
+            if ($oldStatus->value === 'pending' && ($newStatus->value === 'approved' || $newStatus->value === 'enrolled')) {
                 $enrollment->approved_at = now();
                 $enrollment->approved_by = auth()->id();
-            } elseif ($oldStatus === 'pending' && $newStatus === 'rejected') {
+            } elseif ($oldStatus->value === 'pending' && $newStatus->value === 'rejected') {
                 $enrollment->rejected_at = now();
-                $enrollment->rejected_by = auth()->id();
-            } elseif ($newStatus === 'enrolled') {
-                $enrollment->enrolled_at = now();
             }
         }
     }
@@ -89,8 +85,8 @@ class EnrollmentObserver
             $this->sendStatusChangeEmail($enrollment);
         }
 
-        // Update student's grade level if enrollment is approved
-        if ($enrollment->wasChanged('status') && $enrollment->status === 'approved') {
+        // Update student's grade level if enrollment is approved or enrolled
+        if ($enrollment->wasChanged('status') && ($enrollment->status->value === 'approved' || $enrollment->status->value === 'enrolled')) {
             $enrollment->student->update([
                 'grade_level' => $enrollment->grade_level,
             ]);
@@ -102,7 +98,7 @@ class EnrollmentObserver
                 ->performedOn($enrollment)
                 ->causedBy(auth()->user())
                 ->withProperties(['changes' => $enrollment->getChanges()])
-                ->log('Enrollment updated for student: ' . $enrollment->student->full_name);
+                ->log('Enrollment updated for student: '.$enrollment->student->full_name);
         }
     }
 
@@ -114,7 +110,7 @@ class EnrollmentObserver
         activity()
             ->performedOn($enrollment)
             ->causedBy(auth()->user())
-            ->log('Enrollment deleted for student: ' . $enrollment->student->full_name);
+            ->log('Enrollment deleted for student: '.$enrollment->student->full_name);
     }
 
     /**
@@ -155,25 +151,17 @@ class EnrollmentObserver
             $enrollment->tuition_fee = $fees->tuition_fee;
             $enrollment->miscellaneous_fee = $fees->miscellaneous_fee ?? 0;
 
-            // Only set other_fees if the field exists on the enrollment model
-            if (array_key_exists('other_fees', $enrollment->getAttributes())) {
-                $enrollment->other_fees = 0;
-            }
+            // Calculate total from the fees we're actually using
+            $total = $enrollment->tuition_fee + $enrollment->miscellaneous_fee;
 
-            $enrollment->total_amount = $fees->total_fee;
-            $enrollment->balance_cents = $fees->total_fee * 100;
+            $enrollment->total_amount = $total;
+            $enrollment->balance = $total;
         } else {
             // Set default values if no fee structure found
             $enrollment->tuition_fee = 0;
             $enrollment->miscellaneous_fee = 0;
-
-            // Only set other_fees if the field exists
-            if (array_key_exists('other_fees', $enrollment->getAttributes())) {
-                $enrollment->other_fees = 0;
-            }
-
             $enrollment->total_amount = 0;
-            $enrollment->balance_cents = 0;
+            $enrollment->balance = 0;
         }
     }
 
@@ -182,19 +170,20 @@ class EnrollmentObserver
      */
     private function sendStatusChangeEmail(Enrollment $enrollment): void
     {
-        if (!$enrollment->guardian || empty($enrollment->guardian->email)) {
+        if (! $enrollment->guardian || empty($enrollment->guardian->email)) {
             return;
         }
 
-        $newStatus = $enrollment->status;
+        $newStatus = $enrollment->status->value;
         $email = $enrollment->guardian->email;
 
         switch ($newStatus) {
             case 'approved':
+            case 'enrolled':
                 Mail::to($email)->queue(new EnrollmentApproved($enrollment));
                 break;
             case 'rejected':
-                $reason = $enrollment->rejection_reason ?? 'No specific reason provided';
+                $reason = $enrollment->remarks ?? 'No specific reason provided';
                 Mail::to($email)->queue(new EnrollmentRejected($enrollment, $reason));
                 break;
         }

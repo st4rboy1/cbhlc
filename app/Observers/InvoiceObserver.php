@@ -18,19 +18,12 @@ class InvoiceObserver
 
         // Set default status if not provided
         if (empty($invoice->status)) {
-            $invoice->status = 'pending';
+            $invoice->status = 'sent';
         }
 
-        // Calculate total amount from items if not set
-        if (empty($invoice->total_amount_cents) && $invoice->items) {
-            $total = $invoice->items->sum('amount_cents');
-            $invoice->total_amount_cents = $total;
-            $invoice->balance_cents = $total - ($invoice->amount_paid_cents ?? 0);
-        }
-
-        // Set issue date if not provided
-        if (empty($invoice->issue_date)) {
-            $invoice->issue_date = now();
+        // Calculate balance if total amount is set
+        if (! empty($invoice->total_amount) && empty($invoice->paid_amount)) {
+            $invoice->paid_amount = 0;
         }
     }
 
@@ -43,7 +36,7 @@ class InvoiceObserver
         activity()
             ->performedOn($invoice)
             ->causedBy(auth()->user())
-            ->log('Invoice created: ' . $invoice->invoice_number);
+            ->log('Invoice created: '.$invoice->invoice_number);
     }
 
     /**
@@ -51,16 +44,15 @@ class InvoiceObserver
      */
     public function updating(Invoice $invoice): void
     {
-        // Recalculate balance when payment is made
-        if ($invoice->isDirty('amount_paid_cents')) {
-            $invoice->balance_cents = $invoice->total_amount_cents - $invoice->amount_paid_cents;
+        // Update status based on payment
+        if ($invoice->isDirty('paid_amount')) {
+            $balance = $invoice->total_amount - $invoice->paid_amount;
 
-            // Update status based on payment
-            if ($invoice->balance_cents <= 0) {
+            if ($balance <= 0) {
                 $invoice->status = 'paid';
                 $invoice->paid_at = now();
-            } elseif ($invoice->amount_paid_cents > 0) {
-                $invoice->status = 'partial';
+            } elseif ($invoice->paid_amount > 0) {
+                $invoice->status = 'partially_paid';
             }
         }
     }
@@ -71,20 +63,20 @@ class InvoiceObserver
     public function updated(Invoice $invoice): void
     {
         // Log significant changes
-        if ($invoice->wasChanged(['status', 'amount_paid_cents'])) {
+        if ($invoice->wasChanged(['status', 'paid_amount'])) {
             activity()
                 ->performedOn($invoice)
                 ->causedBy(auth()->user())
                 ->withProperties(['changes' => $invoice->getChanges()])
-                ->log('Invoice updated: ' . $invoice->invoice_number);
+                ->log('Invoice updated: '.$invoice->invoice_number);
         }
 
         // Update enrollment payment status if invoice is fully paid
         if ($invoice->wasChanged('status') && $invoice->status === 'paid' && $invoice->enrollment) {
             $invoice->enrollment->update([
                 'payment_status' => 'paid',
-                'amount_paid_cents' => $invoice->amount_paid_cents,
-                'balance_cents' => 0,
+                'amount_paid' => $invoice->paid_amount,
+                'balance' => 0,
             ]);
         }
     }
@@ -97,7 +89,7 @@ class InvoiceObserver
         activity()
             ->performedOn($invoice)
             ->causedBy(auth()->user())
-            ->log('Invoice deleted: ' . $invoice->invoice_number);
+            ->log('Invoice deleted: '.$invoice->invoice_number);
     }
 
     /**

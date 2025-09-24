@@ -34,15 +34,15 @@ class StudentObserverTest extends TestCase
 
         // Create first student
         $student1 = Student::factory()->create(['student_id' => null]);
-        $this->assertEquals($year . '0001', $student1->student_id);
+        $this->assertEquals($year.'0001', $student1->student_id);
 
         // Create second student
         $student2 = Student::factory()->create(['student_id' => null]);
-        $this->assertEquals($year . '0002', $student2->student_id);
+        $this->assertEquals($year.'0002', $student2->student_id);
 
         // Create third student
         $student3 = Student::factory()->create(['student_id' => null]);
-        $this->assertEquals($year . '0003', $student3->student_id);
+        $this->assertEquals($year.'0003', $student3->student_id);
     }
 
     public function test_activity_is_logged_when_student_is_created(): void
@@ -53,7 +53,7 @@ class StudentObserverTest extends TestCase
 
         $activity = Activity::latest()->first();
         $this->assertNotNull($activity);
-        $this->assertEquals('Student created: ' . $student->full_name, $activity->description);
+        $this->assertEquals('Student created: '.$student->full_name, $activity->description);
         $this->assertEquals(Student::class, $activity->subject_type);
         $this->assertEquals($student->id, $activity->subject_id);
     }
@@ -69,7 +69,7 @@ class StudentObserverTest extends TestCase
 
         $activity = Activity::latest()->first();
         $this->assertNotNull($activity);
-        $this->assertEquals('Student updated: ' . $student->full_name, $activity->description);
+        $this->assertEquals('Student updated: '.$student->full_name, $activity->description);
         $this->assertArrayHasKey('changes', $activity->properties->toArray());
     }
 
@@ -85,7 +85,7 @@ class StudentObserverTest extends TestCase
 
         $activity = Activity::latest()->first();
         $this->assertNotNull($activity);
-        $this->assertEquals('Student deleted: ' . $fullName, $activity->description);
+        $this->assertEquals('Student deleted: '.$fullName, $activity->description);
     }
 
     public function test_no_activity_logged_when_no_significant_changes(): void

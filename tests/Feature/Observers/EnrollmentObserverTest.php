@@ -32,7 +32,7 @@ class EnrollmentObserverTest extends TestCase
 
         $this->assertNotNull($enrollment->enrollment_id);
         $this->assertMatchesRegularExpression('/^ENR-\d{10}$/', $enrollment->enrollment_id);
-        $this->assertStringStartsWith('ENR-' . date('Ym'), $enrollment->enrollment_id);
+        $this->assertStringStartsWith('ENR-'.date('Ym'), $enrollment->enrollment_id);
     }
 
     public function test_default_status_is_set_to_pending(): void
@@ -99,7 +99,6 @@ class EnrollmentObserverTest extends TestCase
         $enrollment->update(['status' => 'rejected']);
 
         $this->assertNotNull($enrollment->rejected_at);
-        $this->assertEquals(auth()->id(), $enrollment->rejected_by);
     }
 
     public function test_email_is_sent_when_enrollment_is_approved(): void
