@@ -142,6 +142,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
             ]);
 
             // Create enrollment
+            /** @var Enrollment $enrollment */
             $enrollment = $this->model->create($enrollmentData);
 
             $this->logActivity('createEnrollment', [
@@ -155,7 +156,6 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                     ->send(new EnrollmentSubmitted($enrollment));
             }
 
-            /** @var Enrollment $enrollment */
             return $enrollment->fresh(['student', 'guardian']);
         });
     }
