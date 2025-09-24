@@ -30,10 +30,6 @@ class FormattedMoneyCast implements CastsAttributes
             $centsValue = 0;
         }
 
-        if ($centsValue === null) {
-            $centsValue = 0;
-        }
-
         return CurrencyService::formatCents((int) $centsValue);
     }
 
