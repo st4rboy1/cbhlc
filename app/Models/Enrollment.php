@@ -99,7 +99,6 @@ class Enrollment extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-
     /**
      * Calculate the total amount before discount
      */

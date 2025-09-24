@@ -45,6 +45,6 @@ class MoneyCast implements CastsAttributes
      */
     private function getCentsKey(string $key): string
     {
-        return $key . '_cents';
+        return $key.'_cents';
     }
 }
