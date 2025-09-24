@@ -20,11 +20,6 @@ class PaymentObserver
         if (empty($payment->payment_date)) {
             $payment->payment_date = now();
         }
-
-        // Set status if not provided
-        if (empty($payment->status)) {
-            $payment->status = 'completed';
-        }
     }
 
     /**
@@ -35,15 +30,15 @@ class PaymentObserver
         // Update invoice balance
         if ($payment->invoice) {
             $invoice = $payment->invoice;
-            $invoice->amount_paid_cents += $payment->amount_cents;
-            $invoice->balance_cents = $invoice->total_amount_cents - $invoice->amount_paid_cents;
+            $invoice->paid_amount += ($payment->amount_cents / 100);
 
             // Update invoice status
-            if ($invoice->balance_cents <= 0) {
+            $balance = $invoice->total_amount - $invoice->paid_amount;
+            if ($balance <= 0) {
                 $invoice->status = 'paid';
                 $invoice->paid_at = now();
             } else {
-                $invoice->status = 'partial';
+                $invoice->status = 'partially_paid';
             }
 
             $invoice->save();
@@ -52,11 +47,11 @@ class PaymentObserver
         // Update enrollment if payment is for an enrollment invoice
         if ($payment->invoice && $payment->invoice->enrollment) {
             $enrollment = $payment->invoice->enrollment;
-            $enrollment->amount_paid_cents += $payment->amount_cents;
-            $enrollment->balance_cents = $enrollment->total_amount * 100 - $enrollment->amount_paid_cents;
+            $enrollment->amount_paid += ($payment->amount_cents / 100);
+            $enrollment->balance = $enrollment->total_amount - $enrollment->amount_paid;
 
             // Update payment status
-            if ($enrollment->balance_cents <= 0) {
+            if ($enrollment->balance <= 0) {
                 $enrollment->payment_status = 'paid';
             } else {
                 $enrollment->payment_status = 'partial';
@@ -69,7 +64,7 @@ class PaymentObserver
         activity()
             ->performedOn($payment)
             ->causedBy(auth()->user())
-            ->log('Payment recorded: ' . number_format($payment->amount_cents / 100, 2) . ' for ' . $payment->invoice->invoice_number);
+            ->log('Payment recorded: '.number_format($payment->amount_cents / 100, 2).($payment->invoice ? ' for '.$payment->invoice->invoice_number : ''));
     }
 
     /**
@@ -84,17 +79,17 @@ class PaymentObserver
 
             if ($payment->invoice) {
                 $invoice = $payment->invoice;
-                $invoice->amount_paid_cents += $difference;
-                $invoice->balance_cents = $invoice->total_amount_cents - $invoice->amount_paid_cents;
+                $invoice->paid_amount += ($difference / 100);
 
                 // Update invoice status
-                if ($invoice->balance_cents <= 0) {
+                $balance = $invoice->total_amount - $invoice->paid_amount;
+                if ($balance <= 0) {
                     $invoice->status = 'paid';
                     $invoice->paid_at = now();
-                } elseif ($invoice->amount_paid_cents > 0) {
-                    $invoice->status = 'partial';
+                } elseif ($invoice->paid_amount > 0) {
+                    $invoice->status = 'partially_paid';
                 } else {
-                    $invoice->status = 'pending';
+                    $invoice->status = 'sent';
                 }
 
                 $invoice->save();
@@ -102,12 +97,12 @@ class PaymentObserver
         }
 
         // Log significant changes
-        if ($payment->wasChanged(['amount_cents', 'status'])) {
+        if ($payment->wasChanged('amount_cents')) {
             activity()
                 ->performedOn($payment)
                 ->causedBy(auth()->user())
                 ->withProperties(['changes' => $payment->getChanges()])
-                ->log('Payment updated: ' . $payment->reference_number);
+                ->log('Payment updated: '.$payment->reference_number);
         }
     }
 
@@ -119,14 +114,13 @@ class PaymentObserver
         // Restore invoice balance
         if ($payment->invoice) {
             $invoice = $payment->invoice;
-            $invoice->amount_paid_cents -= $payment->amount_cents;
-            $invoice->balance_cents = $invoice->total_amount_cents - $invoice->amount_paid_cents;
+            $invoice->paid_amount -= ($payment->amount_cents / 100);
 
             // Update invoice status
-            if ($invoice->amount_paid_cents > 0) {
-                $invoice->status = 'partial';
+            if ($invoice->paid_amount > 0) {
+                $invoice->status = 'partially_paid';
             } else {
-                $invoice->status = 'pending';
+                $invoice->status = 'sent';
                 $invoice->paid_at = null;
             }
 
@@ -137,7 +131,7 @@ class PaymentObserver
         activity()
             ->performedOn($payment)
             ->causedBy(auth()->user())
-            ->log('Payment deleted: ' . $payment->reference_number);
+            ->log('Payment deleted: '.$payment->reference_number);
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Models\Student;
-use Illuminate\Support\Str;
 
 class StudentObserver
 {
@@ -30,7 +29,7 @@ class StudentObserver
         activity()
             ->performedOn($student)
             ->causedBy(auth()->user())
-            ->log('Student created: ' . $student->full_name);
+            ->log('Student created: '.$student->full_name);
     }
 
     /**
@@ -44,7 +43,7 @@ class StudentObserver
                 ->performedOn($student)
                 ->causedBy(auth()->user())
                 ->withProperties(['changes' => $student->getChanges()])
-                ->log('Student updated: ' . $student->full_name);
+                ->log('Student updated: '.$student->full_name);
         }
     }
 
@@ -57,7 +56,7 @@ class StudentObserver
         activity()
             ->performedOn($student)
             ->causedBy(auth()->user())
-            ->log('Student deleted: ' . $student->full_name);
+            ->log('Student deleted: '.$student->full_name);
     }
 
     /**
@@ -68,7 +67,7 @@ class StudentObserver
         $year = now()->format('Y');
 
         // Get the latest student ID for this year
-        $latestStudent = Student::where('student_id', 'like', $year . '%')
+        $latestStudent = Student::where('student_id', 'like', $year.'%')
             ->orderBy('student_id', 'desc')
             ->first();
 
