@@ -28,7 +28,7 @@ class StudentFactory extends Factory
             'student_id' => 'TEST-'.$uniqueId,
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
-            'middle_name' => fake()->optional()->firstName(),
+            'middle_name' => fake()->optional()->lastName(),
             'birthdate' => $birthdate->format('Y-m-d'),
             'gender' => fake()->randomElement(['Male', 'Female']),
             'address' => fake()->address(),

@@ -25,7 +25,7 @@ class GuardianFactory extends Factory
         return [
             'user_id' => User::factory(),
             'first_name' => fake()->firstName(),
-            'middle_name' => fake()->optional(0.5)->firstName(), // 50% chance of having middle name
+            'middle_name' => fake()->optional(0.5)->lastName(), // 50% chance of having middle name
             'last_name' => fake()->lastName(),
             'contact_number' => fake()->phoneNumber(),
             'address' => fake()->address(),
