@@ -67,7 +67,7 @@ describe('tuition controller', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('tuition')
+            ->component('shared/tuition')
             ->has('enrollments.data', 3)
             ->has('gradeLevelFees')
             ->where('gradeLevelFees.'.GradeLevel::GRADE_1->value.'.tuition', 20000)
@@ -138,7 +138,7 @@ describe('tuition controller', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('tuition')
+            ->component('shared/tuition')
             ->has('enrollments.data', 2) // Only guardian's children
         );
     });
@@ -170,7 +170,7 @@ describe('tuition controller', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('tuition')
+            ->component('shared/tuition')
             ->has('enrollments.data', 5)
         );
     });

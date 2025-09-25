@@ -7,7 +7,7 @@ test('application page renders successfully', function () {
 
     $response->assertOk();
     $response->assertInertia(fn (AssertableInertia $page) => $page
-        ->component('application')
+        ->component('public/application')
     );
 });
 

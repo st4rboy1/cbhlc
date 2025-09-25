@@ -42,7 +42,7 @@ class StudentReportController extends Controller
         // Load any additional data needed for the report
         $student->load(['enrollments', 'guardians']);
 
-        return Inertia::render('studentreport', [
+        return Inertia::render('shared/studentreport', [
             'student' => $student,
         ]);
     }

@@ -12,6 +12,6 @@ class LandingController extends Controller
      */
     public function index()
     {
-        return Inertia::render('landing');
+        return Inertia::render('public/landing');
     }
 }

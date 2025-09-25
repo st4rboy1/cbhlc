@@ -56,7 +56,7 @@ class TuitionController extends Controller
                 }
             );
 
-        return Inertia::render('tuition', [
+        return Inertia::render('shared/tuition', [
             'enrollments' => $enrollments,
             'gradeLevelFees' => $gradeLevelFees,
         ]);
