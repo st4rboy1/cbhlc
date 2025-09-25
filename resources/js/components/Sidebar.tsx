@@ -157,11 +157,11 @@ export default function Sidebar({ currentPage = '' }: SidebarProps) {
                 </Button>
 
                 <Button
-                    variant={isActive('profilesettings') ? 'secondary' : 'ghost'}
-                    className={cn('w-full justify-start gap-3', isActive('profilesettings') && 'bg-accent')}
+                    variant={isActive('profile.edit') ? 'secondary' : 'ghost'}
+                    className={cn('w-full justify-start gap-3', isActive('profile.edit') && 'bg-accent')}
                     asChild
                 >
-                    <Link href="/profile/settings">
+                    <Link href="/settings/profile">
                         <UserCircle className="h-4 w-4" />
                         Profile Settings
                     </Link>
