@@ -7,7 +7,7 @@ test('registrar info page renders successfully', function () {
 
     $response->assertOk();
     $response->assertInertia(fn (AssertableInertia $page) => $page
-        ->component('registrar')
+        ->component('public/registrar')
     );
 });
 
