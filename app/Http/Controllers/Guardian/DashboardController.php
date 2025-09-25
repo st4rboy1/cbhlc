@@ -31,7 +31,7 @@ class DashboardController extends Controller
             ->latest('created_at')
             ->take(5)
             ->get()
-            ->map(function ($enrollment) {
+            ->map(function (Enrollment $enrollment) {
                 return [
                     'id' => $enrollment->id,
                     'student_name' => $enrollment->student->first_name.' '.
@@ -67,11 +67,49 @@ class DashboardController extends Controller
             ],
         ];
 
+        // Format students as "children" for the frontend
+        /** @phpstan-ignore-next-line */
+        $children = $students->map(function (Student $student) {
+            $latestEnrollment = Enrollment::where('student_id', $student->id)
+                ->latest('created_at')
+                ->first();
+
+            return [
+                'id' => $student->id,
+                'name' => trim($student->first_name.' '.
+                    ($student->middle_name ? $student->middle_name.' ' : '').
+                    $student->last_name),
+                'grade' => $student->grade_level->label ?? $student->grade_level->value,
+                'enrollmentStatus' => $latestEnrollment ? $latestEnrollment->status->value : 'No Enrollment',
+                'photo' => null, // Placeholder for future profile photos
+            ];
+        });
+
+        // Format announcements for frontend
+        $formattedAnnouncements = collect($announcements)->map(function (array $announcement) {
+            return [
+                'id' => $announcement['id'],
+                'title' => $announcement['title'],
+                'message' => $announcement['content'],
+                'date' => $announcement['date'],
+                'type' => $announcement['priority'], // info, event, holiday, payment
+            ];
+        });
+
+        // Upcoming events (placeholder)
+        $upcomingEvents = [
+            ['date' => 'Dec 20, 2024', 'event' => 'Christmas Break Starts'],
+            ['date' => 'Jan 15, 2025', 'event' => 'Classes Resume'],
+            ['date' => 'Feb 14, 2025', 'event' => 'Parent-Teacher Conference'],
+        ];
+
         return Inertia::render('guardian/dashboard', [
-            'students' => $students,
+            'children' => $children,
+            'announcements' => $formattedAnnouncements,
+            'upcomingEvents' => $upcomingEvents,
+            'students' => $students, // Keep for backward compatibility
             'enrollments' => $enrollments,
             'enrollmentStats' => $enrollmentStats,
-            'announcements' => $announcements,
         ]);
     }
 }
