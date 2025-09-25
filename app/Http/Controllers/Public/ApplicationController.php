@@ -12,6 +12,6 @@ class ApplicationController extends Controller
      */
     public function index()
     {
-        return Inertia::render('application');
+        return Inertia::render('public/application');
     }
 }

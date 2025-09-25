@@ -45,7 +45,7 @@ describe('invoice controller', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('invoice')
+            ->component('shared/invoice')
             ->has('enrollment')
             ->where('enrollment.id', $enrollment->id)
             ->where('invoiceNumber', 'ENR-0001')
@@ -114,7 +114,7 @@ describe('invoice controller', function () {
         $response = $this->actingAs($guardian)->get(route('invoices.show', $ownEnrollment));
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('invoice')
+            ->component('shared/invoice')
             ->where('enrollment.id', $ownEnrollment->id)
         );
 
@@ -189,7 +189,7 @@ describe('invoice controller', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('invoice')
+            ->component('shared/invoice')
             ->has('enrollment')
             ->where('invoiceNumber', 'ENR-0005')
         );

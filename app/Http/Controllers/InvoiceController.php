@@ -37,7 +37,7 @@ class InvoiceController extends Controller
         // Load related data
         $invoice->load(['student', 'guardian']);
 
-        return Inertia::render('invoice', [
+        return Inertia::render('shared/invoice', [
             'enrollment' => $invoice,
             'invoiceNumber' => $invoice->enrollment_id ?? 'No Invoice Available',
             'currentDate' => now()->format('F d, Y'),
@@ -70,14 +70,14 @@ class InvoiceController extends Controller
         }
 
         if (! $enrollment) {
-            return Inertia::render('invoice', [
+            return Inertia::render('shared/invoice', [
                 'enrollment' => null,
                 'invoiceNumber' => 'No Invoice Available',
                 'currentDate' => now()->format('F d, Y'),
             ]);
         }
 
-        return Inertia::render('invoice', [
+        return Inertia::render('shared/invoice', [
             'enrollment' => $enrollment,
             'invoiceNumber' => $enrollment->enrollment_id ?? 'No Invoice Available',
             'currentDate' => now()->format('F d, Y'),
