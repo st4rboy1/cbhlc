@@ -6,7 +6,6 @@ use App\Http\Controllers\Guardian\DashboardController as GuardianDashboardContro
 use App\Http\Controllers\Guardian\EnrollmentController as GuardianEnrollmentController;
 use App\Http\Controllers\Guardian\StudentController as GuardianStudentController;
 use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\Profile\ProfileSettingsController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\ApplicationController;
 use App\Http\Controllers\Public\LandingController;
@@ -46,7 +45,7 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('profile')->name('profile.')->group(function () {
-        Route::get('/settings', [ProfileSettingsController::class, 'index'])->name('settings');
+        Route::redirect('/settings', '/settings/profile')->name('settings');
     });
 
     /*
