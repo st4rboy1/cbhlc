@@ -1,12 +1,14 @@
+import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { AlertCircle, Building2, Calendar, Download, FileText, Mail, Phone, Printer } from 'lucide-react';
 import { useRef } from 'react';
-import PageLayout from '../components/PageLayout';
 
 interface Student {
     student_id: string;
@@ -44,6 +46,13 @@ interface Props {
 }
 
 export default function Invoice({ enrollment, invoiceNumber, currentDate }: Props) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Invoice',
+            href: '/invoice',
+        },
+    ];
+
     const invoiceRef = useRef<HTMLDivElement>(null);
 
     const formatCurrency = (amount: number) => {
@@ -120,9 +129,11 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
 
     if (!enrollment) {
         return (
-            <>
+            <AppLayout breadcrumbs={breadcrumbs}>
                 <Head title="Invoice" />
-                <PageLayout title="INVOICE" currentPage="invoice">
+
+                <div className="px-4 py-6">
+                    <Heading title="Invoice" description="No enrollment record found" />
                     <Card className="mx-auto max-w-4xl">
                         <CardContent className="p-8">
                             <div className="flex flex-col items-center justify-center space-y-4 py-12">
@@ -137,8 +148,8 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
                             </div>
                         </CardContent>
                     </Card>
-                </PageLayout>
-            </>
+                </div>
+            </AppLayout>
         );
     }
 
@@ -175,7 +186,7 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
     };
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Invoice" />
             <style>{`
                 @media print {
@@ -183,7 +194,12 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
                     body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
                 }
             `}</style>
-            <PageLayout title="INVOICE" currentPage="invoice">
+
+            <div className="px-4 py-6">
+                <Heading
+                    title={`Invoice ${invoiceNumber}`}
+                    description={enrollment ? `Invoice for ${enrollment.student.first_name} ${enrollment.student.last_name}` : 'Tuition fee invoice'}
+                />
                 <Card className="mx-auto max-w-4xl">
                     <CardContent className="p-8" ref={invoiceRef}>
                         {/* Invoice Header */}
@@ -384,7 +400,7 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
                         </div>
                     </CardContent>
                 </Card>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 }

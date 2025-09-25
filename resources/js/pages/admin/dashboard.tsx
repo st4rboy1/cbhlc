@@ -1,13 +1,21 @@
-import PageLayout from '@/components/PageLayout';
+import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { type SharedData } from '@/types';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ChevronRight, FileText, GraduationCap, TrendingUp, UserCheck, Users } from 'lucide-react';
 
 export default function AdminDashboard() {
     const { auth } = usePage<SharedData>().props;
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Administrator Dashboard',
+            href: '/admin/dashboard',
+        },
+    ];
 
     // Mock statistics - replace with real data from backend
     const stats = {
@@ -25,14 +33,11 @@ export default function AdminDashboard() {
     ];
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin Dashboard" />
-            <PageLayout title="ADMINISTRATOR DASHBOARD" currentPage="admin.dashboard">
-                {/* Welcome Section */}
-                <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-foreground">Welcome back, {auth.user?.name}!</h2>
-                    <p className="text-muted-foreground">Here's an overview of your school's current status</p>
-                </div>
+
+            <div className="px-4 py-6">
+                <Heading title={`Welcome back, ${auth.user?.name}!`} description="Here's an overview of your school's current status" />
 
                 {/* Statistics Cards */}
                 <div className="mb-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -144,7 +149,7 @@ export default function AdminDashboard() {
                         </CardContent>
                     </Card>
                 </div>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 }
