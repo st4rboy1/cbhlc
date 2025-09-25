@@ -12,6 +12,6 @@ class RegistrarInfoController extends Controller
      */
     public function index()
     {
-        return Inertia::render('registrar');
+        return Inertia::render('public/registrar');
     }
 }

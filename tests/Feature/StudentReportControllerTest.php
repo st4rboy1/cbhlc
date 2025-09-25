@@ -25,7 +25,7 @@ describe('StudentReportController', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('studentreport')
+            ->component('shared/studentreport')
             ->has('student')
             ->where('student.id', $student->id)
         );
@@ -42,7 +42,7 @@ describe('StudentReportController', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('studentreport')
+            ->component('shared/studentreport')
             ->has('student')
             ->where('student.id', $student->id)
         );
@@ -59,7 +59,7 @@ describe('StudentReportController', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('studentreport')
+            ->component('shared/studentreport')
             ->has('student')
             ->where('student.id', $student->id)
         );
@@ -94,7 +94,7 @@ describe('StudentReportController', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('studentreport')
+            ->component('shared/studentreport')
             ->has('student')
             ->where('student.id', $student->id)
         );
@@ -150,7 +150,7 @@ describe('StudentReportController', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('studentreport')
+            ->component('shared/studentreport')
             ->has('student')
             ->where('student.id', $student->id)
         );
@@ -211,7 +211,7 @@ describe('StudentReportController', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('studentreport')
+            ->component('shared/studentreport')
             ->has('student.enrollments', 2)
         );
     });
@@ -246,7 +246,7 @@ describe('StudentReportController', function () {
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('studentreport')
+            ->component('shared/studentreport')
             ->has('student.guardians', 2)
         );
     });
@@ -289,7 +289,7 @@ describe('StudentReportController', function () {
 
         $response1->assertStatus(200);
         $response1->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('studentreport')
+            ->component('shared/studentreport')
             ->has('student')
             ->where('student.id', $student1->id)
         );
@@ -300,7 +300,7 @@ describe('StudentReportController', function () {
 
         $response2->assertStatus(200);
         $response2->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('studentreport')
+            ->component('shared/studentreport')
             ->has('student')
             ->where('student.id', $student2->id)
         );
