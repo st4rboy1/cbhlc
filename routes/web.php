@@ -1,20 +1,23 @@
 <?php
 
-// Guardian Controllers
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Guardian\BillingController as GuardianBillingController;
 use App\Http\Controllers\Guardian\DashboardController as GuardianDashboardController;
 use App\Http\Controllers\Guardian\EnrollmentController as GuardianEnrollmentController;
 use App\Http\Controllers\Guardian\StudentController as GuardianStudentController;
-// Registrar Controllers
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\Profile\ProfileSettingsController;
+use App\Http\Controllers\Public\AboutController;
+use App\Http\Controllers\Public\ApplicationController;
+use App\Http\Controllers\Public\LandingController;
+use App\Http\Controllers\Public\RegistrarInfoController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboardController;
 use App\Http\Controllers\Registrar\EnrollmentController as RegistrarEnrollmentController;
-// Shared Controllers (to be refactored later)
 use App\Http\Controllers\Registrar\StudentController as RegistrarStudentController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\StudentReportController;
 use App\Http\Controllers\TuitionController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,21 +25,13 @@ use Inertia\Inertia;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return Inertia::render('landing');
-})->name('home');
+Route::get('/', [LandingController::class, 'index'])->name('home');
 
-Route::get('/about', function () {
-    return Inertia::render('about');
-})->name('about');
+Route::get('/about', [AboutController::class, 'index'])->name('about');
 
-Route::get('/application', function () {
-    return Inertia::render('application');
-})->name('application');
+Route::get('/application', [ApplicationController::class, 'index'])->name('application');
 
-Route::get('/registrar', function () {
-    return Inertia::render('registrar');
-})->name('registrar');
+Route::get('/registrar', [RegistrarInfoController::class, 'index'])->name('registrar');
 
 /*
 |--------------------------------------------------------------------------
@@ -51,9 +46,7 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('profile')->name('profile.')->group(function () {
-        Route::get('/settings', function () {
-            return Inertia::render('profilesettings');
-        })->name('settings');
+        Route::get('/settings', [ProfileSettingsController::class, 'index'])->name('settings');
     });
 
     /*
@@ -86,9 +79,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Admin dashboards (for super_admin and administrator roles)
     Route::prefix('admin')->name('admin.')->middleware('role:super_admin|administrator')->group(function () {
-        Route::get('/dashboard', function () {
-            return Inertia::render('admin/dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     });
 
     // Registrar Routes
@@ -132,9 +123,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Student dashboard
     Route::prefix('student')->name('student.')->middleware('role:student')->group(function () {
-        Route::get('/dashboard', function () {
-            return Inertia::render('student/dashboard');
-        })->name('dashboard');
+        Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
     });
 });
 
