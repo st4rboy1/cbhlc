@@ -1,8 +1,10 @@
+import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { BookOpen, Building, Calendar, Gift, GraduationCap, Users } from 'lucide-react';
-import PageLayout from '../components/PageLayout';
 
 interface SchoolEvent {
     icon: React.ReactNode;
@@ -12,6 +14,13 @@ interface SchoolEvent {
 }
 
 export default function Registrar() {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Registrar',
+            href: '/registrar',
+        },
+    ];
+
     const schoolEvents: SchoolEvent[] = [
         {
             icon: <BookOpen className="h-5 w-5 text-blue-600" />,
@@ -72,9 +81,11 @@ export default function Registrar() {
     };
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Registrar" />
-            <PageLayout title="REGISTRAR" currentPage="registrar">
+
+            <div className="px-4 py-6">
+                <Heading title="Registrar" description="School events schedule and academic information" />
                 {/* Hero Images */}
                 <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
                     <Card className="min-h-[200px] overflow-hidden">
@@ -203,7 +214,7 @@ export default function Registrar() {
                         </CardContent>
                     </Card>
                 </div>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 }
