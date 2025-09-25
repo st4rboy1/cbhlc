@@ -263,13 +263,27 @@ test('getStudentsByGuardian returns guardian students', function () {
 });
 
 test('searchStudents delegates to getPaginatedStudents', function () {
-    Student::factory()->create(['first_name' => 'John']);
-    Student::factory()->create(['first_name' => 'Jane']);
+    // Create students with specific names to avoid flaky tests
+    // Use unique names that won't accidentally match in other fields
+    $john = Student::factory()->create([
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        'middle_name' => null,
+        'email' => 'john.doe@test.com',
+    ]);
+
+    Student::factory()->create([
+        'first_name' => 'Jane',
+        'last_name' => 'Smith',
+        'middle_name' => null,
+        'email' => 'jane.smith@test.com',
+    ]);
 
     $result = $this->service->searchStudents('John');
 
     expect($result)->toBeInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class);
     expect($result->count())->toBe(1);
+    expect($result->first()->id)->toBe($john->id);
     expect($result->first()->first_name)->toBe('John');
 });
 
