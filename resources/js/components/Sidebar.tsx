@@ -87,63 +87,72 @@ export default function Sidebar({ currentPage = '' }: SidebarProps) {
                     </Collapsible>
                 )}
 
-                {/* Enrollments Section */}
-                <Collapsible open={enrollmentsOpen} onOpenChange={setEnrollmentsOpen}>
-                    <CollapsibleTrigger asChild>
-                        <Button
-                            variant={currentPage?.includes('enrollments') ? 'secondary' : 'ghost'}
-                            className={cn('w-full justify-between gap-3', currentPage?.includes('enrollments') && 'bg-accent')}
-                        >
-                            <Link href="/enrollments" className="flex flex-1 items-center gap-3">
-                                <GraduationCap className="h-4 w-4" />
-                                Enrollments
-                            </Link>
-                            <ChevronDown className={cn('h-4 w-4 transition-transform', enrollmentsOpen && 'rotate-180')} />
-                        </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="ml-7 space-y-1">
-                        <Button
-                            variant={isActive('enrollments.create') ? 'secondary' : 'ghost'}
-                            size="sm"
-                            className={cn('w-full justify-start gap-2', isActive('enrollments.create') && 'bg-accent')}
-                            asChild
-                        >
-                            <Link href="/enrollments/create">
-                                <Plus className="h-3 w-3" />
-                                New Enrollment
-                            </Link>
-                        </Button>
-                    </CollapsibleContent>
-                </Collapsible>
-                <Collapsible open={billingOpen} onOpenChange={setBillingOpen}>
-                    <CollapsibleTrigger asChild>
-                        <Button variant="ghost" className="w-full justify-between gap-3">
-                            <div className="flex items-center gap-3">
-                                <CreditCard className="h-4 w-4" />
-                                Billing
-                            </div>
-                            <ChevronDown className={cn('h-4 w-4 transition-transform', billingOpen && 'rotate-180')} />
-                        </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="ml-7 space-y-1">
-                        <Button
-                            variant={isActive('tuition') ? 'secondary' : 'ghost'}
-                            size="sm"
-                            className={cn('w-full justify-start', isActive('tuition') && 'bg-accent')}
-                            asChild
-                        >
-                            <Link href="/tuition">Tuition</Link>
-                        </Button>
-                        <Button
-                            variant={isActive('invoice') ? 'secondary' : 'ghost'}
-                            size="sm"
-                            className={cn('w-full justify-start', isActive('invoice') && 'bg-accent')}
-                            asChild
-                        >
-                            <Link href="/invoices">Invoice</Link>
-                        </Button>
-                    </CollapsibleContent>
-                </Collapsible>
+                {/* Enrollments Section - Show only for guardians */}
+                {auth.user?.roles?.some((role) => role.name === 'guardian') && (
+                    <Collapsible open={enrollmentsOpen} onOpenChange={setEnrollmentsOpen}>
+                        <CollapsibleTrigger asChild>
+                            <Button
+                                variant={currentPage?.includes('guardian.enrollments') ? 'secondary' : 'ghost'}
+                                className={cn('w-full justify-between gap-3', currentPage?.includes('guardian.enrollments') && 'bg-accent')}
+                            >
+                                <Link href="/guardian/enrollments" className="flex flex-1 items-center gap-3">
+                                    <GraduationCap className="h-4 w-4" />
+                                    Enrollments
+                                </Link>
+                                <ChevronDown className={cn('h-4 w-4 transition-transform', enrollmentsOpen && 'rotate-180')} />
+                            </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="ml-7 space-y-1">
+                            <Button
+                                variant={isActive('guardian.enrollments.create') ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className={cn('w-full justify-start gap-2', isActive('guardian.enrollments.create') && 'bg-accent')}
+                                asChild
+                            >
+                                <Link href="/guardian/enrollments/create">
+                                    <Plus className="h-3 w-3" />
+                                    New Enrollment
+                                </Link>
+                            </Button>
+                        </CollapsibleContent>
+                    </Collapsible>
+                )}
+
+                {/* Billing Section - Show only for guardians */}
+                {auth.user?.roles?.some((role) => role.name === 'guardian') && (
+                    <Collapsible open={billingOpen} onOpenChange={setBillingOpen}>
+                        <CollapsibleTrigger asChild>
+                            <Button
+                                variant={currentPage?.includes('guardian.billing') ? 'secondary' : 'ghost'}
+                                className={cn('w-full justify-between gap-3', currentPage?.includes('guardian.billing') && 'bg-accent')}
+                            >
+                                <Link href="/guardian/billing" className="flex flex-1 items-center gap-3">
+                                    <CreditCard className="h-4 w-4" />
+                                    Billing
+                                </Link>
+                                <ChevronDown className={cn('h-4 w-4 transition-transform', billingOpen && 'rotate-180')} />
+                            </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="ml-7 space-y-1">
+                            <Button
+                                variant={isActive('tuition') ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className={cn('w-full justify-start', isActive('tuition') && 'bg-accent')}
+                                asChild
+                            >
+                                <Link href="/tuition">Tuition</Link>
+                            </Button>
+                            <Button
+                                variant={isActive('invoice') ? 'secondary' : 'ghost'}
+                                size="sm"
+                                className={cn('w-full justify-start', isActive('invoice') && 'bg-accent')}
+                                asChild
+                            >
+                                <Link href="/invoices">Invoice</Link>
+                            </Button>
+                        </CollapsibleContent>
+                    </Collapsible>
+                )}
 
                 <Button
                     variant={isActive('registrar') ? 'secondary' : 'ghost'}
