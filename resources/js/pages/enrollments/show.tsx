@@ -1,9 +1,11 @@
-import PageLayout from '@/components/PageLayout';
+import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib/utils';
+import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Edit } from 'lucide-react';
 import { type FC } from 'react';
@@ -50,6 +52,17 @@ interface Props {
 }
 
 const EnrollmentShow: FC<Props> = ({ enrollment }) => {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Enrollments',
+            href: '/enrollments',
+        },
+        {
+            title: `Enrollment ${enrollment.enrollment_id}`,
+            href: `/enrollments/${enrollment.id}`,
+        },
+    ];
+
     const getStatusBadge = (status: string) => {
         const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
             approved: 'default',
@@ -70,9 +83,15 @@ const EnrollmentShow: FC<Props> = ({ enrollment }) => {
     };
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Enrollment ${enrollment.enrollment_id}`} />
-            <PageLayout title="ENROLLMENT DETAILS" currentPage="enrollments">
+
+            <div className="px-4 py-6">
+                <Heading
+                    title={`Enrollment ${enrollment.enrollment_id}`}
+                    description={`Enrollment details for ${enrollment.student.first_name} ${enrollment.student.last_name}`}
+                />
+
                 <div className="space-y-6">
                     {/* Actions Bar */}
                     <div className="flex items-center justify-between">
@@ -246,8 +265,8 @@ const EnrollmentShow: FC<Props> = ({ enrollment }) => {
                         </Card>
                     )}
                 </div>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 };
 

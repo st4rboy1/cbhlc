@@ -1,9 +1,11 @@
-import PageLayout from '@/components/PageLayout';
+import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib/utils';
+import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Eye, Plus } from 'lucide-react';
 import { type FC } from 'react';
@@ -45,6 +47,13 @@ interface Props {
 }
 
 const EnrollmentIndex: FC<Props> = ({ enrollments }) => {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Enrollments',
+            href: '/enrollments',
+        },
+    ];
+
     const getStatusBadge = (status: string) => {
         const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
             approved: 'default',
@@ -65,9 +74,12 @@ const EnrollmentIndex: FC<Props> = ({ enrollments }) => {
     };
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Enrollments" />
-            <PageLayout title="ENROLLMENTS" currentPage="enrollments">
+
+            <div className="px-4 py-6">
+                <Heading title="Enrollments" description="Manage student enrollment applications" />
+
                 <div className="space-y-6">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
@@ -132,8 +144,8 @@ const EnrollmentIndex: FC<Props> = ({ enrollments }) => {
                         </CardContent>
                     </Card>
                 </div>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 };
 

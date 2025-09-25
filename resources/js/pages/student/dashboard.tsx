@@ -1,14 +1,22 @@
-import PageLayout from '@/components/PageLayout';
+import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { type SharedData } from '@/types';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { Award, Book, Calendar, Clock, FileText, School, Trophy, User } from 'lucide-react';
 
 export default function StudentDashboard() {
     const { auth } = usePage<SharedData>().props;
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Student Dashboard',
+            href: '/student/dashboard',
+        },
+    ];
 
     // Mock data - replace with real data from backend
     const studentInfo = {
@@ -44,14 +52,11 @@ export default function StudentDashboard() {
     const academicProgress = 88; // Example progress percentage
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Student Dashboard" />
-            <PageLayout title="STUDENT DASHBOARD" currentPage="student.dashboard">
-                {/* Welcome Section */}
-                <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-foreground">Welcome back, {auth.user?.name}!</h2>
-                    <p className="text-muted-foreground">Track your academic journey and school activities</p>
-                </div>
+
+            <div className="px-4 py-6">
+                <Heading title={`Welcome back, ${auth.user?.name}!`} description="Track your academic journey and school activities" />
 
                 {/* Student Information Card */}
                 <Card className="mb-6">
@@ -209,7 +214,7 @@ export default function StudentDashboard() {
                         </CardContent>
                     </Card>
                 </div>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 }

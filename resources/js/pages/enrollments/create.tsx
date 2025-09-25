@@ -1,9 +1,11 @@
-import PageLayout from '@/components/PageLayout';
+import Heading from '@/components/heading';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { AlertCircle } from 'lucide-react';
 import React, { FormEventHandler } from 'react';
@@ -28,6 +30,17 @@ interface Props {
 }
 
 export default function EnrollmentCreate({ students, quarters, currentSchoolYear, selectedStudentId }: Props) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Enrollments',
+            href: '/enrollments',
+        },
+        {
+            title: 'New Enrollment',
+            href: '/enrollments/create',
+        },
+    ];
+
     // Initialize with the selectedStudentId if provided
     const { data, setData, post, processing, errors } = useForm({
         student_id: selectedStudentId ? String(selectedStudentId) : '',
@@ -61,9 +74,12 @@ export default function EnrollmentCreate({ students, quarters, currentSchoolYear
     };
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="New Enrollment" />
-            <PageLayout title="NEW ENROLLMENT" currentPage="enrollments">
+
+            <div className="px-4 py-6">
+                <Heading title="New Enrollment" description="Submit an enrollment application for the current school year" />
+
                 <div className="mx-auto max-w-2xl space-y-6">
                     <Card>
                         <CardHeader>
@@ -239,7 +255,7 @@ export default function EnrollmentCreate({ students, quarters, currentSchoolYear
                         </CardContent>
                     </Card>
                 </div>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 }

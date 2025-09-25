@@ -1,9 +1,11 @@
+import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Calendar, CheckCircle, FileText, GraduationCap, MapPin, User } from 'lucide-react';
-import PageLayout from '../components/PageLayout';
 
 interface StudentInfo {
     name: string;
@@ -23,6 +25,13 @@ interface ReportData {
 }
 
 export default function StudentReport() {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Student Report',
+            href: '/studentreport',
+        },
+    ];
+
     const studentInfo: StudentInfo = {
         name: 'Manero Sj Rodriguez',
         age: 12,
@@ -67,9 +76,11 @@ export default function StudentReport() {
     };
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Student Report" />
-            <PageLayout title="STUDENT REPORT" currentPage="studentreport">
+
+            <div className="px-4 py-6">
+                <Heading title="Student Report" description="Detailed academic and enrollment information" />
                 {/* Status Banner */}
                 <Card className="mb-6 border-green-200 bg-green-50">
                     <CardHeader>
@@ -223,7 +234,7 @@ export default function StudentReport() {
                         </div>
                     </CardContent>
                 </Card>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 }

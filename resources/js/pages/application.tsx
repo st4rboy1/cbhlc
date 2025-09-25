@@ -1,25 +1,37 @@
+import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Calendar, Mail, MapPin, Phone, Save, Upload, User, UserCheck, Users } from 'lucide-react';
-import PageLayout from '../components/PageLayout';
 
 export default function Application() {
-    return (
-        <>
-            <Head title="Application" />
-            <PageLayout title="ENROLL > View My Application" currentPage="application">
-                <div className="mx-auto max-w-4xl">
-                    <div className="mb-6">
-                        <h2 className="mb-2 text-2xl font-bold">Edit Application</h2>
-                        <p className="text-muted-foreground">
-                            Please fill out all required fields accurately. Your application will be reviewed once submitted.
-                        </p>
-                    </div>
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Enrollment',
+            href: '/enrollment',
+        },
+        {
+            title: 'Application',
+            href: '/application',
+        },
+    ];
 
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Application" />
+
+            <div className="px-4 py-6">
+                <Heading
+                    title="Edit Application"
+                    description="Please fill out all required fields accurately. Your application will be reviewed once submitted."
+                />
+
+                <div className="mx-auto max-w-4xl">
                     <form id="applicationForm" className="space-y-8">
                         {/* Student Information */}
                         <Card>
@@ -223,7 +235,7 @@ export default function Application() {
                         </Card>
                     </form>
                 </div>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 }

@@ -1,9 +1,10 @@
-import PageLayout from '@/components/PageLayout';
+import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { type SharedData } from '@/types';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Bell, Book, Calendar, CreditCard, FileText, GraduationCap, MessageSquare, Plus, User } from 'lucide-react';
 
@@ -34,18 +35,22 @@ interface GuardianDashboardProps {
     upcomingEvents: UpcomingEvent[];
 }
 
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Guardian Dashboard',
+        href: '/guardian/dashboard',
+    },
+];
+
 export default function GuardianDashboard({ children, announcements, upcomingEvents }: GuardianDashboardProps) {
     const { auth } = usePage<SharedData>().props;
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Guardian Dashboard" />
-            <PageLayout title="GUARDIAN DASHBOARD" currentPage="guardian.dashboard">
-                {/* Welcome Section */}
-                <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-foreground">Welcome, {auth.user?.name}!</h2>
-                    <p className="text-muted-foreground">Monitor your children's education journey</p>
-                </div>
+
+            <div className="px-4 py-6">
+                <Heading title={`Welcome, ${auth.user?.name}!`} description="Monitor your children's education journey" />
 
                 {/* Children Cards */}
                 <div className="mb-6">
@@ -145,13 +150,13 @@ export default function GuardianDashboard({ children, announcements, upcomingEve
                             </CardHeader>
                             <CardContent className="space-y-2">
                                 <Button variant="outline" className="w-full justify-start" asChild>
-                                    <Link href="/enrollment">
+                                    <Link href="/guardian/enrollments">
                                         <GraduationCap className="mr-2 h-4 w-4" />
                                         New Enrollment
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="w-full justify-start" asChild>
-                                    <Link href="/invoice">
+                                    <Link href="/invoices">
                                         <FileText className="mr-2 h-4 w-4" />
                                         View Invoices
                                     </Link>
@@ -188,7 +193,7 @@ export default function GuardianDashboard({ children, announcements, upcomingEve
                         </Card>
                     </div>
                 </div>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 }

@@ -1,9 +1,11 @@
-import PageLayout from '@/components/PageLayout';
+import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { AlertCircle, Calendar, CheckCircle, Clock, DollarSign, FileText, GraduationCap, Users, XCircle } from 'lucide-react';
 
@@ -64,6 +66,13 @@ export default function RegistrarDashboard({
     upcomingDeadlines,
     gradeLevelDistribution,
 }: Props) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Registrar Dashboard',
+            href: '/registrar/dashboard',
+        },
+    ];
+
     const handleQuickApprove = (enrollmentId: number) => {
         if (confirm('Are you sure you want to approve this enrollment application?')) {
             router.post(
@@ -169,9 +178,12 @@ export default function RegistrarDashboard({
     };
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Registrar Dashboard" />
-            <PageLayout title="REGISTRAR DASHBOARD" currentPage="registrar.dashboard">
+
+            <div className="px-4 py-6">
+                <Heading title="Registrar Dashboard" description="Manage enrollment applications and student records" />
+
                 <div className="space-y-6">
                     {/* Overview Cards */}
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -413,7 +425,7 @@ export default function RegistrarDashboard({
                         </CardContent>
                     </Card>
                 </div>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 }
