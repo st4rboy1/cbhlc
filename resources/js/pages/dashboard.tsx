@@ -1,8 +1,10 @@
+import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { BookOpen, Building, Calendar, Gift, GraduationCap, Users } from 'lucide-react';
-import PageLayout from '../components/PageLayout';
 
 interface EventItem {
     icon: React.ReactNode;
@@ -12,6 +14,13 @@ interface EventItem {
 }
 
 export default function Dashboard() {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Dashboard',
+            href: '/dashboard',
+        },
+    ];
+
     const events: EventItem[] = [
         {
             icon: <BookOpen className="h-4 w-4" />,
@@ -59,9 +68,11 @@ export default function Dashboard() {
     };
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <PageLayout title="DASHBOARD" currentPage="dashboard">
+
+            <div className="px-4 py-6">
+                <Heading title="Dashboard" description="School events and announcements" />
                 {/* Hero Images */}
                 <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
                     <Card className="overflow-hidden">
@@ -110,7 +121,7 @@ export default function Dashboard() {
                         </div>
                     </CardContent>
                 </Card>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 }

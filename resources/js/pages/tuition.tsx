@@ -1,9 +1,11 @@
+import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { AlertCircle, DollarSign, MapPin, User } from 'lucide-react';
-import PageLayout from '../components/PageLayout';
 
 interface Student {
     id: number;
@@ -58,6 +60,13 @@ interface Props {
 }
 
 export default function Tuition({ enrollments, gradeLevelFees }: Props) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Tuition',
+            href: '/tuition',
+        },
+    ];
+
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-PH', {
             style: 'currency',
@@ -87,9 +96,11 @@ export default function Tuition({ enrollments, gradeLevelFees }: Props) {
     const hasEnrollments = enrollments.data && enrollments.data.length > 0;
 
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tuition" />
-            <PageLayout title="TUITION" currentPage="tuition">
+
+            <div className="px-4 py-6">
+                <Heading title="Tuition Information" description="View your tuition fees and payment details" />
                 {!hasEnrollments ? (
                     <Card className="mb-6 border-yellow-200 bg-yellow-50">
                         <CardHeader>
@@ -354,7 +365,7 @@ export default function Tuition({ enrollments, gradeLevelFees }: Props) {
                         </div>
                     </CardContent>
                 </Card>
-            </PageLayout>
-        </>
+            </div>
+        </AppLayout>
     );
 }
