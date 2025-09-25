@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Head, Link } from '@inertiajs/react';
-import { BookOpen, CheckCircle, Facebook, GraduationCap, Heart, Instagram, Users } from 'lucide-react';
+import { BookOpen, CheckCircle, Facebook, GraduationCap, Heart, Users } from 'lucide-react';
 
 export default function Landing() {
     const features = [
@@ -64,7 +64,7 @@ export default function Landing() {
                             </p>
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <Button size="lg" className="px-8 py-3">
-                                    Start Enrollment
+                                    <Link href="/login.tsx">Start Enrollment</Link>
                                 </Button>
                                 <Button variant="outline" size="lg" className="px-8 py-3" asChild>
                                     <Link href="/about">Learn More</Link>
@@ -178,14 +178,6 @@ export default function Landing() {
                                     rel="noopener noreferrer"
                                 >
                                     <Icon iconNode={Facebook} className="h-6 w-6" />
-                                </a>
-                                <a
-                                    href="https://www.instagram.com/awrabriguela/"
-                                    className="text-slate-400 transition-colors hover:text-white"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    <Icon iconNode={Instagram} className="h-6 w-6" />
                                 </a>
                             </div>
                             <p className="text-sm text-slate-500">©2025 CBHLC | All rights reserved</p>
