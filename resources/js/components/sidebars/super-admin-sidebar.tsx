@@ -4,24 +4,29 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, ClipboardList, CreditCard, FileCheck, Folder, GraduationCap, LayoutGrid, Settings, UserCog, Users } from 'lucide-react';
+import { BookOpen, CreditCard, FileCheck, Folder, GraduationCap, LayoutGrid, Settings, UserCog, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/admin/dashboard',
+        href: '/super-admin/dashboard',
         icon: LayoutGrid,
     },
     {
         title: 'Enrollments',
-        href: '/registrar/enrollments',
+        href: '/super-admin/enrollments',
         icon: GraduationCap,
     },
     {
         title: 'Students',
-        href: '/registrar/students',
+        href: '/super-admin/students',
         icon: Users,
+    },
+    {
+        title: 'Users',
+        href: '/super-admin/users',
+        icon: UserCog,
     },
     {
         title: 'Invoices',
@@ -32,16 +37,6 @@ const mainNavItems: NavItem[] = [
         title: 'Tuition Fees',
         href: '/tuition',
         icon: CreditCard,
-    },
-    {
-        title: 'Student Reports',
-        href: '/registrar/students',
-        icon: ClipboardList,
-    },
-    {
-        title: 'Users',
-        href: '/users',
-        icon: UserCog,
     },
     {
         title: 'Profile Settings',
@@ -70,7 +65,7 @@ export function SuperAdminSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/admin/dashboard" prefetch>
+                            <Link href="/super-admin/dashboard" prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

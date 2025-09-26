@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, ClipboardList, CreditCard, FileCheck, Folder, GraduationCap, LayoutGrid, Settings, UserCog, Users } from 'lucide-react';
+import { BookOpen, CreditCard, FileCheck, Folder, GraduationCap, LayoutGrid, Settings, UserCog, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -15,13 +15,18 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Enrollments',
-        href: '/registrar/enrollments',
+        href: '/admin/enrollments',
         icon: GraduationCap,
     },
     {
         title: 'Students',
-        href: '/registrar/students',
+        href: '/admin/students',
         icon: Users,
+    },
+    {
+        title: 'Users',
+        href: '/admin/users',
+        icon: UserCog,
     },
     {
         title: 'Invoices',
@@ -32,16 +37,6 @@ const mainNavItems: NavItem[] = [
         title: 'Tuition Fees',
         href: '/tuition',
         icon: CreditCard,
-    },
-    {
-        title: 'Student Reports',
-        href: '/registrar/students',
-        icon: ClipboardList,
-    },
-    {
-        title: 'Users',
-        href: '/users',
-        icon: UserCog,
     },
     {
         title: 'Profile Settings',
