@@ -26,7 +26,7 @@ class UpdateGuardianRequest extends FormRequest
 
         return [
             // User data
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $guardian->user_id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$guardian->user_id],
             'password' => ['nullable', 'confirmed', Password::defaults()],
 
             // Guardian data

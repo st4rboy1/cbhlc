@@ -29,11 +29,11 @@ class GuardianController extends Controller
             $search = $request->get('search');
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             })->orWhere(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
@@ -67,7 +67,7 @@ class GuardianController extends Controller
         DB::transaction(function () use ($validated) {
             // Create user account
             $user = User::create([
-                'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+                'name' => $validated['first_name'].' '.$validated['last_name'],
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
             ]);
@@ -133,7 +133,7 @@ class GuardianController extends Controller
         DB::transaction(function () use ($validated, $guardian) {
             // Update user account
             $guardian->user->update([
-                'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+                'name' => $validated['first_name'].' '.$validated['last_name'],
                 'email' => $validated['email'],
             ]);
 

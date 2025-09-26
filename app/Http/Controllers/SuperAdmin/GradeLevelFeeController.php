@@ -26,7 +26,7 @@ class GradeLevelFeeController extends Controller
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
                 $q->where('grade_level', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
