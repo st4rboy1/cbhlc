@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, ClipboardList, CreditCard, FileCheck, Folder, GraduationCap, LayoutGrid, Settings, Users } from 'lucide-react';
+import { BookOpen, ClipboardList, CreditCard, DollarSign, FileCheck, Folder, GraduationCap, LayoutGrid, Settings, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -22,6 +22,11 @@ const mainNavItems: NavItem[] = [
         title: 'Students',
         href: '/registrar/students',
         icon: Users,
+    },
+    {
+        title: 'Grade Level Fees',
+        href: '/registrar/grade-level-fees',
+        icon: DollarSign,
     },
     {
         title: 'Invoices',
