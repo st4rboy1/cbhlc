@@ -7,70 +7,63 @@ beforeEach(function () {
     $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 });
 
-test('registration route redirects to home', function () {
+test('registration page can be rendered', function () {
     $response = $this->get(route('register'));
 
-    $response->assertRedirect('/');
+    $response->assertStatus(200);
 });
 
-test('new guardian users can register', function () {
+test('new users can register and are assigned guardian role', function () {
     $response = $this->post(route('register.store'), [
         'name' => 'Test Parent',
         'email' => 'guardian@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
-        'role' => 'guardian',
     ]);
 
-    // Check if user was created and has role first
+    // Check if user was created and has guardian role
     $user = \App\Models\User::where('email', 'guardian@example.com')->first();
     expect($user)->not->toBeNull();
     expect($user->hasRole('guardian'))->toBeTrue();
 
     $this->assertAuthenticated();
-    // Parent users get redirected to guardian dashboard
+    // All registered users get redirected to guardian dashboard
     $response->assertRedirect(route('guardian.dashboard', absolute: false));
 });
 
-test('new student users can register', function () {
+test('registration no longer accepts role parameter', function () {
+    // Even if role is provided, it should be ignored and guardian role assigned
     $response = $this->post(route('register.store'), [
-        'name' => 'Test Student',
-        'email' => 'student@example.com',
+        'name' => 'Test User',
+        'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
-        'role' => 'student',
+        'role' => 'student', // This should be ignored
     ]);
 
-    // Check if user was created and has role first
-    $user = \App\Models\User::where('email', 'student@example.com')->first();
+    // Check if user was created with guardian role regardless of parameter
+    $user = \App\Models\User::where('email', 'test@example.com')->first();
     expect($user)->not->toBeNull();
-    expect($user->hasRole('student'))->toBeTrue();
+    expect($user->hasRole('guardian'))->toBeTrue();
+    expect($user->hasRole('student'))->toBeFalse();
 
     $this->assertAuthenticated();
-    // Student users get redirected to student dashboard
-    $response->assertRedirect(route('student.dashboard', absolute: false));
+    $response->assertRedirect(route('guardian.dashboard', absolute: false));
 });
 
-test('registration requires role selection', function () {
-    $response = $this->post(route('register.store'), [
-        'name' => 'Test User',
-        'email' => 'test@example.com',
-        'password' => 'password',
-        'password_confirmation' => 'password',
-        // Missing role field
-    ]);
+test('registration validates required fields', function () {
+    $response = $this->post(route('register.store'), []);
 
-    $response->assertSessionHasErrors('role');
+    $response->assertSessionHasErrors(['name', 'email', 'password']);
 });
 
-test('registration only accepts valid roles', function () {
+test('registration validates email format', function () {
     $response = $this->post(route('register.store'), [
         'name' => 'Test User',
-        'email' => 'test@example.com',
+        'email' => 'not-an-email',
         'password' => 'password',
         'password_confirmation' => 'password',
-        'role' => 'admin', // Invalid role - only guardian and student allowed
     ]);
 
-    $response->assertSessionHasErrors('role');
+    $response->assertSessionHasErrors('email');
 });
