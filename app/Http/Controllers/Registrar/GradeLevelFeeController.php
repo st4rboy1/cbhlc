@@ -212,6 +212,6 @@ class GradeLevelFeeController extends Controller
         $newFee->save();
 
         return redirect()->route('registrar.grade-level-fees.index')
-            ->with('success', 'Grade level fee duplicated successfully for school year ' . $validated['school_year']);
+            ->with('success', 'Grade level fee duplicated successfully for school year '.$validated['school_year']);
     }
 }
