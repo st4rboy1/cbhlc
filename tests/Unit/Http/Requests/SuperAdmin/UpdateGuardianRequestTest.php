@@ -34,17 +34,21 @@ class UpdateGuardianRequestTest extends TestCase
     {
         $existingGuardian = Guardian::factory()->create();
 
-        $request = new class($existingGuardian) extends UpdateGuardianRequest {
+        $request = new class($existingGuardian) extends UpdateGuardianRequest
+        {
             private $guardian;
+
             public function __construct($guardian)
             {
                 $this->guardian = $guardian;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'guardian') {
                     return $this->guardian;
                 }
+
                 return parent::route($param, $default);
             }
         };
@@ -81,17 +85,21 @@ class UpdateGuardianRequestTest extends TestCase
             'emergency_contact' => true,
         ];
 
-        $request = new class($existingGuardian) extends UpdateGuardianRequest {
+        $request = new class($existingGuardian) extends UpdateGuardianRequest
+        {
             private $guardian;
+
             public function __construct($guardian)
             {
                 $this->guardian = $guardian;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'guardian') {
                     return $this->guardian;
                 }
+
                 return parent::route($param, $default);
             }
         };
@@ -116,17 +124,21 @@ class UpdateGuardianRequestTest extends TestCase
             'emergency_contact' => false,
         ];
 
-        $request = new class($existingGuardian) extends UpdateGuardianRequest {
+        $request = new class($existingGuardian) extends UpdateGuardianRequest
+        {
             private $guardian;
+
             public function __construct($guardian)
             {
                 $this->guardian = $guardian;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'guardian') {
                     return $this->guardian;
                 }
+
                 return parent::route($param, $default);
             }
         };
@@ -151,17 +163,21 @@ class UpdateGuardianRequestTest extends TestCase
             // No password field
         ];
 
-        $request = new class($existingGuardian) extends UpdateGuardianRequest {
+        $request = new class($existingGuardian) extends UpdateGuardianRequest
+        {
             private $guardian;
+
             public function __construct($guardian)
             {
                 $this->guardian = $guardian;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'guardian') {
                     return $this->guardian;
                 }
+
                 return parent::route($param, $default);
             }
         };
@@ -185,17 +201,21 @@ class UpdateGuardianRequestTest extends TestCase
             'emergency_contact' => false,
         ];
 
-        $request = new class($existingGuardian) extends UpdateGuardianRequest {
+        $request = new class($existingGuardian) extends UpdateGuardianRequest
+        {
             private $guardian;
+
             public function __construct($guardian)
             {
                 $this->guardian = $guardian;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'guardian') {
                     return $this->guardian;
                 }
+
                 return parent::route($param, $default);
             }
         };

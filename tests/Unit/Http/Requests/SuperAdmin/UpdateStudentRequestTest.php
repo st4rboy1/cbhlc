@@ -35,17 +35,21 @@ class UpdateStudentRequestTest extends TestCase
     {
         $existingStudent = Student::factory()->create();
 
-        $request = new class($existingStudent) extends UpdateStudentRequest {
+        $request = new class($existingStudent) extends UpdateStudentRequest
+        {
             private $student;
+
             public function __construct($student)
             {
                 $this->student = $student;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'student') {
                     return $this->student;
                 }
+
                 return parent::route($param, $default);
             }
         };
@@ -86,17 +90,21 @@ class UpdateStudentRequestTest extends TestCase
             'guardian_ids' => [$guardian->id],
         ];
 
-        $request = new class($existingStudent) extends UpdateStudentRequest {
+        $request = new class($existingStudent) extends UpdateStudentRequest
+        {
             private $student;
+
             public function __construct($student)
             {
                 $this->student = $student;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'student') {
                     return $this->student;
                 }
+
                 return parent::route($param, $default);
             }
         };
@@ -122,17 +130,21 @@ class UpdateStudentRequestTest extends TestCase
             'guardian_ids' => [$guardian->id],
         ];
 
-        $request = new class($existingStudent) extends UpdateStudentRequest {
+        $request = new class($existingStudent) extends UpdateStudentRequest
+        {
             private $student;
+
             public function __construct($student)
             {
                 $this->student = $student;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'student') {
                     return $this->student;
                 }
+
                 return parent::route($param, $default);
             }
         };
