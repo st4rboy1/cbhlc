@@ -34,7 +34,6 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => 'required|in:guardian,student',
         ]);
 
         $user = User::create([
@@ -43,14 +42,14 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        // Assign the selected role
-        $user->assignRole($request->role);
+        // Registration is limited to guardians only
+        $user->assignRole('guardian');
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        // Redirect based on role
-        return redirect()->route($user->getDashboardRoute());
+        // Redirect to guardian dashboard
+        return redirect()->route('guardian.dashboard');
     }
 }
