@@ -8,7 +8,6 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Services\PaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class PaymentServiceTest extends TestCase
@@ -21,7 +20,7 @@ class PaymentServiceTest extends TestCase
     {
         parent::setUp();
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $this->paymentService = new PaymentService();
+        $this->paymentService = new PaymentService;
     }
 
     public function test_process_payment(): void

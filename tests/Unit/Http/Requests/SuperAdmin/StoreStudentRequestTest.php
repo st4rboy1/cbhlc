@@ -24,15 +24,15 @@ class StoreStudentRequestTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('super_admin');
 
-        $request = new StoreStudentRequest();
-        $request->setUserResolver(fn() => $user);
+        $request = new StoreStudentRequest;
+        $request->setUserResolver(fn () => $user);
 
         $this->assertTrue($request->authorize());
     }
 
     public function test_validation_rules(): void
     {
-        $request = new StoreStudentRequest();
+        $request = new StoreStudentRequest;
         $rules = $request->rules();
 
         $this->assertArrayHasKey('first_name', $rules);
@@ -64,7 +64,7 @@ class StoreStudentRequestTest extends TestCase
             'guardian_ids' => [$guardian->id],
         ];
 
-        $request = new StoreStudentRequest();
+        $request = new StoreStudentRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertTrue($validator->passes());
@@ -82,7 +82,7 @@ class StoreStudentRequestTest extends TestCase
             'guardian_ids' => [], // Empty array
         ];
 
-        $request = new StoreStudentRequest();
+        $request = new StoreStudentRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
@@ -103,7 +103,7 @@ class StoreStudentRequestTest extends TestCase
             'guardian_ids' => [$guardian->id],
         ];
 
-        $request = new StoreStudentRequest();
+        $request = new StoreStudentRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
@@ -124,7 +124,7 @@ class StoreStudentRequestTest extends TestCase
             'guardian_ids' => [$guardian->id],
         ];
 
-        $request = new StoreStudentRequest();
+        $request = new StoreStudentRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
@@ -133,7 +133,7 @@ class StoreStudentRequestTest extends TestCase
 
     public function test_custom_messages(): void
     {
-        $request = new StoreStudentRequest();
+        $request = new StoreStudentRequest;
         $messages = $request->messages();
 
         $this->assertArrayHasKey('guardian_ids.required', $messages);
