@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\InvoiceStatus;
 use App\Models\Invoice;
 use Illuminate\Support\Facades\DB;
 
@@ -15,7 +16,7 @@ class InvoiceService
         return DB::transaction(function () use ($data) {
             // Generate unique invoice number
             $data['invoice_number'] = $this->generateInvoiceNumber();
-            $data['status'] = $data['status'] ?? 'draft';
+            $data['status'] = $data['status'] ?? InvoiceStatus::DRAFT;
 
             // Calculate total
             $total = collect($data['items'])->sum('amount');

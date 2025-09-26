@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
+use App\Enums\InvoiceStatus;
 use App\Models\Invoice;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class PaymentService
 {
@@ -15,9 +15,6 @@ class PaymentService
     public function processPayment(array $data): Payment
     {
         return DB::transaction(function () use ($data) {
-            // Generate payment reference
-            $data['payment_reference'] = $this->generatePaymentReference();
-
             // Create payment
             $payment = Payment::create([
                 'invoice_id' => $data['invoice_id'],
@@ -25,10 +22,7 @@ class PaymentService
                 'amount' => $data['amount'],
                 'payment_method' => $data['payment_method'],
                 'reference_number' => $data['reference_number'] ?? null,
-                'payment_reference' => $data['payment_reference'],
-                'status' => $data['status'] ?? 'completed',
                 'notes' => $data['notes'] ?? null,
-                'processed_by' => $data['processed_by'] ?? auth()->id(),
             ]);
 
             // Update invoice status
@@ -46,16 +40,14 @@ class PaymentService
      */
     public function updateInvoiceStatus(Invoice $invoice): Invoice
     {
-        $totalPaid = $invoice->payments()
-            ->where('status', 'completed')
-            ->sum('amount');
+        $totalPaid = $invoice->payments()->sum('amount');
 
         if ($totalPaid >= $invoice->total_amount) {
-            $invoice->update(['status' => 'paid']);
+            $invoice->update(['status' => InvoiceStatus::PAID]);
         } elseif ($totalPaid > 0) {
-            $invoice->update(['status' => 'partially_paid']);
+            $invoice->update(['status' => InvoiceStatus::PARTIALLY_PAID]);
         } elseif ($invoice->due_date < now()) {
-            $invoice->update(['status' => 'overdue']);
+            $invoice->update(['status' => InvoiceStatus::OVERDUE]);
         }
 
         return $invoice->fresh();
@@ -73,18 +65,9 @@ class PaymentService
                 'payment_date' => now(),
                 'amount' => -$amount, // Negative amount for refund
                 'payment_method' => $payment->payment_method,
-                'reference_number' => $payment->reference_number,
-                'payment_reference' => $this->generatePaymentReference(),
-                'status' => 'refunded',
-                'notes' => "Refund for payment {$payment->payment_reference}: {$reason}",
-                'processed_by' => auth()->id(),
-                'parent_payment_id' => $payment->id,
+                'reference_number' => $payment->reference_number ? "REFUND-{$payment->reference_number}" : null,
+                'notes' => "Refund: {$reason}",
             ]);
-
-            // Update original payment status if fully refunded
-            if ($amount >= $payment->amount) {
-                $payment->update(['status' => 'refunded']);
-            }
 
             // Update invoice status
             $invoice = $payment->invoice;
@@ -94,16 +77,5 @@ class PaymentService
 
             return $refund;
         });
-    }
-
-    /**
-     * Generate unique payment reference
-     */
-    protected function generatePaymentReference(): string
-    {
-        $timestamp = now()->format('YmdHis');
-        $random = strtoupper(Str::random(4));
-
-        return "PAY-{$timestamp}-{$random}";
     }
 }
