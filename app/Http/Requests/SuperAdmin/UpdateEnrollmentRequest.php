@@ -31,7 +31,7 @@ class UpdateEnrollmentRequest extends FormRequest
             'type' => ['required', 'in:new,continuing,returnee,transferee'],
             'previous_school' => ['nullable', 'string', 'max:255'],
             'payment_plan' => ['required', 'in:annual,semestral,quarterly,monthly'],
-            'status' => ['required', 'string', 'in:' . implode(',', array_column(EnrollmentStatus::cases(), 'value'))],
+            'status' => ['required', 'string', 'in:'.implode(',', array_column(EnrollmentStatus::cases(), 'value'))],
         ];
     }
 

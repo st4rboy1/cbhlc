@@ -30,9 +30,9 @@ class StudentController extends Controller
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('student_id', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('student_id', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -45,8 +45,8 @@ class StudentController extends Controller
         if ($request->filled('status')) {
             $query->whereHas('enrollments', function ($q) use ($request) {
                 $q->where('status', $request->get('status'))
-                  ->latest()
-                  ->limit(1);
+                    ->latest()
+                    ->limit(1);
             });
         }
 

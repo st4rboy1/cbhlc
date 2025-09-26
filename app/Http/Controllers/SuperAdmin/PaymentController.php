@@ -33,15 +33,15 @@ class PaymentController extends Controller
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
                 $q->where('payment_reference', 'like', "%{$search}%")
-                  ->orWhere('reference_number', 'like', "%{$search}%")
-                  ->orWhereHas('invoice', function ($iq) use ($search) {
-                      $iq->where('invoice_number', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('invoice.enrollment.student', function ($sq) use ($search) {
-                      $sq->where('first_name', 'like', "%{$search}%")
-                         ->orWhere('last_name', 'like', "%{$search}%")
-                         ->orWhere('student_id', 'like', "%{$search}%");
-                  });
+                    ->orWhere('reference_number', 'like', "%{$search}%")
+                    ->orWhereHas('invoice', function ($iq) use ($search) {
+                        $iq->where('invoice_number', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('invoice.enrollment.student', function ($sq) use ($search) {
+                        $sq->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('student_id', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -118,7 +118,7 @@ class PaymentController extends Controller
             'invoice.enrollment.student',
             'invoice.enrollment.guardian.user',
             'invoice.items',
-            'processedBy'
+            'processedBy',
         ]);
 
         return Inertia::render('super-admin/payments/show', [
@@ -203,7 +203,7 @@ class PaymentController extends Controller
         Gate::authorize('update', $payment);
 
         $validated = $request->validate([
-            'refund_amount' => ['required', 'numeric', 'min:0.01', 'max:' . $payment->amount],
+            'refund_amount' => ['required', 'numeric', 'min:0.01', 'max:'.$payment->amount],
             'refund_reason' => ['required', 'string', 'max:500'],
         ]);
 

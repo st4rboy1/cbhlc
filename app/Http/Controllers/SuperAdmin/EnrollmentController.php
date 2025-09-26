@@ -35,8 +35,8 @@ class EnrollmentController extends Controller
             $search = $request->get('search');
             $query->whereHas('student', function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('student_id', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('student_id', 'like', "%{$search}%");
             })->orWhere('reference_number', 'like', "%{$search}%");
         }
 
@@ -92,7 +92,7 @@ class EnrollmentController extends Controller
         $validated = $request->validated();
 
         // Check if student can enroll
-        if (!$this->enrollmentService->canEnroll($validated['student_id'], $validated['school_year'])) {
+        if (! $this->enrollmentService->canEnroll($validated['student_id'], $validated['school_year'])) {
             return redirect()->back()
                 ->withErrors(['student_id' => 'Student already has a pending enrollment for this school year.']);
         }
