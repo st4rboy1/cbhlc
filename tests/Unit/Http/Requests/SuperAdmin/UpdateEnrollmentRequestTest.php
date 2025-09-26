@@ -2,7 +2,8 @@
 
 namespace Tests\Unit\Http\Requests\SuperAdmin;
 
-use App\Http\Requests\SuperAdmin\StoreEnrollmentRequest;
+use App\Enums\EnrollmentStatus;
+use App\Http\Requests\SuperAdmin\UpdateEnrollmentRequest;
 use App\Models\Guardian;
 use App\Models\Student;
 use App\Models\User;
@@ -10,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
 use Tests\TestCase;
 
-class StoreEnrollmentRequestTest extends TestCase
+class UpdateEnrollmentRequestTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -25,7 +26,7 @@ class StoreEnrollmentRequestTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('super_admin');
 
-        $request = new StoreEnrollmentRequest;
+        $request = new UpdateEnrollmentRequest;
         $request->setUserResolver(fn () => $user);
 
         $this->assertTrue($request->authorize());
@@ -33,7 +34,7 @@ class StoreEnrollmentRequestTest extends TestCase
 
     public function test_validation_rules(): void
     {
-        $request = new StoreEnrollmentRequest;
+        $request = new UpdateEnrollmentRequest;
         $rules = $request->rules();
 
         $this->assertArrayHasKey('student_id', $rules);
@@ -43,6 +44,7 @@ class StoreEnrollmentRequestTest extends TestCase
         $this->assertArrayHasKey('quarter', $rules);
         $this->assertArrayHasKey('type', $rules);
         $this->assertArrayHasKey('payment_plan', $rules);
+        $this->assertArrayHasKey('status', $rules);
     }
 
     public function test_validation_passes_with_valid_data(): void
@@ -55,13 +57,36 @@ class StoreEnrollmentRequestTest extends TestCase
             'guardian_id' => $guardian->id,
             'grade_level' => 'grade_1',
             'school_year' => '2024-2025',
-            'quarter' => 'first_quarter',
+            'quarter' => '1st',
             'type' => 'new',
-            'previous_school' => 'Previous School Name',
+            'previous_school' => 'Previous School',
             'payment_plan' => 'monthly',
+            'status' => EnrollmentStatus::APPROVED->value,
         ];
 
-        $request = new StoreEnrollmentRequest;
+        $request = new UpdateEnrollmentRequest;
+        $validator = Validator::make($data, $request->rules());
+
+        $this->assertTrue($validator->passes());
+    }
+
+    public function test_validation_passes_without_previous_school(): void
+    {
+        $student = Student::factory()->create();
+        $guardian = Guardian::factory()->create();
+
+        $data = [
+            'student_id' => $student->id,
+            'guardian_id' => $guardian->id,
+            'grade_level' => 'grade_2',
+            'school_year' => '2024-2025',
+            'quarter' => '2nd',
+            'type' => 'continuing',
+            'payment_plan' => 'annual',
+            'status' => EnrollmentStatus::PENDING->value,
+        ];
+
+        $request = new UpdateEnrollmentRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertTrue($validator->passes());
@@ -76,13 +101,14 @@ class StoreEnrollmentRequestTest extends TestCase
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
             'grade_level' => 'grade_1',
-            'school_year' => '2024', // Invalid format
-            'quarter' => 'first_quarter',
+            'school_year' => '2024/2025', // Invalid format
+            'quarter' => '1st',
             'type' => 'new',
             'payment_plan' => 'monthly',
+            'status' => EnrollmentStatus::PENDING->value,
         ];
 
-        $request = new StoreEnrollmentRequest;
+        $request = new UpdateEnrollmentRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
@@ -99,12 +125,13 @@ class StoreEnrollmentRequestTest extends TestCase
             'guardian_id' => $guardian->id,
             'grade_level' => 'grade_1',
             'school_year' => '2024-2025',
-            'quarter' => 'first_quarter',
+            'quarter' => '1st',
             'type' => 'invalid_type',
             'payment_plan' => 'monthly',
+            'status' => EnrollmentStatus::PENDING->value,
         ];
 
-        $request = new StoreEnrollmentRequest;
+        $request = new UpdateEnrollmentRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
@@ -121,12 +148,13 @@ class StoreEnrollmentRequestTest extends TestCase
             'guardian_id' => $guardian->id,
             'grade_level' => 'grade_1',
             'school_year' => '2024-2025',
-            'quarter' => 'first_quarter',
+            'quarter' => '1st',
             'type' => 'new',
-            'payment_plan' => 'weekly', // Invalid
+            'payment_plan' => 'invalid_plan',
+            'status' => EnrollmentStatus::PENDING->value,
         ];
 
-        $request = new StoreEnrollmentRequest;
+        $request = new UpdateEnrollmentRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
@@ -135,10 +163,10 @@ class StoreEnrollmentRequestTest extends TestCase
 
     public function test_custom_messages(): void
     {
-        $request = new StoreEnrollmentRequest;
+        $request = new UpdateEnrollmentRequest;
         $messages = $request->messages();
 
         $this->assertArrayHasKey('school_year.regex', $messages);
-        $this->assertStringContainsString('YYYY-YYYY', $messages['school_year.regex']);
+        $this->assertEquals('School year must be in the format YYYY-YYYY (e.g., 2024-2025).', $messages['school_year.regex']);
     }
 }

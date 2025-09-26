@@ -24,8 +24,8 @@ class StoreUserRequestTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('super_admin');
 
-        $request = new StoreUserRequest();
-        $request->setUserResolver(fn() => $user);
+        $request = new StoreUserRequest;
+        $request->setUserResolver(fn () => $user);
 
         $this->assertTrue($request->authorize());
     }
@@ -35,15 +35,15 @@ class StoreUserRequestTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('administrator');
 
-        $request = new StoreUserRequest();
-        $request->setUserResolver(fn() => $user);
+        $request = new StoreUserRequest;
+        $request->setUserResolver(fn () => $user);
 
         $this->assertFalse($request->authorize());
     }
 
     public function test_validation_rules(): void
     {
-        $request = new StoreUserRequest();
+        $request = new StoreUserRequest;
         $rules = $request->rules();
 
         $this->assertArrayHasKey('name', $rules);
@@ -64,7 +64,7 @@ class StoreUserRequestTest extends TestCase
             'role' => 'test_role',
         ];
 
-        $request = new StoreUserRequest();
+        $request = new StoreUserRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertTrue($validator->passes());
@@ -80,7 +80,7 @@ class StoreUserRequestTest extends TestCase
             'role' => 'administrator',
         ];
 
-        $request = new StoreUserRequest();
+        $request = new StoreUserRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
@@ -99,7 +99,7 @@ class StoreUserRequestTest extends TestCase
             'role' => 'administrator',
         ];
 
-        $request = new StoreUserRequest();
+        $request = new StoreUserRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
@@ -116,7 +116,7 @@ class StoreUserRequestTest extends TestCase
             'role' => 'administrator',
         ];
 
-        $request = new StoreUserRequest();
+        $request = new StoreUserRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
@@ -133,7 +133,7 @@ class StoreUserRequestTest extends TestCase
             'role' => 'non_existent_role',
         ];
 
-        $request = new StoreUserRequest();
+        $request = new StoreUserRequest;
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());

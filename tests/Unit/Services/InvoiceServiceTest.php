@@ -19,7 +19,7 @@ class InvoiceServiceTest extends TestCase
     {
         parent::setUp();
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $this->invoiceService = new InvoiceService();
+        $this->invoiceService = new InvoiceService;
     }
 
     public function test_create_invoice_with_items(): void
