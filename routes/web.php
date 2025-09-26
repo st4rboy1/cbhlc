@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\EnrollmentController as AdminEnrollmentController;
+use App\Http\Controllers\Admin\StudentController as AdminStudentController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Guardian\BillingController as GuardianBillingController;
 use App\Http\Controllers\Guardian\DashboardController as GuardianDashboardController;
 use App\Http\Controllers\Guardian\EnrollmentController as GuardianEnrollmentController;
@@ -13,8 +16,13 @@ use App\Http\Controllers\Public\RegistrarInfoController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboardController;
 use App\Http\Controllers\Registrar\EnrollmentController as RegistrarEnrollmentController;
 use App\Http\Controllers\Registrar\StudentController as RegistrarStudentController;
+use App\Http\Controllers\SharedController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\StudentReportController;
+use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
+use App\Http\Controllers\SuperAdmin\EnrollmentController as SuperAdminEnrollmentController;
+use App\Http\Controllers\SuperAdmin\StudentController as SuperAdminStudentController;
+use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use App\Http\Controllers\TuitionController;
 use Illuminate\Support\Facades\Route;
 
@@ -63,6 +71,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/students/{student}/report', [StudentReportController::class, 'show'])
         ->name('students.report');
 
+    // Shared Pages
+    Route::get('/docs', [SharedController::class, 'docs'])->name('docs');
+    Route::get('/help', [SharedController::class, 'help'])->name('help');
+    Route::get('/support', [SharedController::class, 'support'])->name('support');
+    Route::get('/resources', [SharedController::class, 'resources'])->name('resources');
+    Route::get('/parent-guide', [SharedController::class, 'parentGuide'])->name('parent-guide');
+
     // Temporary backward-compatible enrollment routes (redirect to role-specific routes)
     Route::middleware('role:guardian')->group(function () {
         Route::resource('enrollments', GuardianEnrollmentController::class);
@@ -76,9 +91,32 @@ Route::middleware(['auth'])->group(function () {
 */
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Admin dashboards (for super_admin and administrator roles)
-    Route::prefix('admin')->name('admin.')->middleware('role:super_admin|administrator')->group(function () {
+    // Super Admin Routes
+    Route::prefix('super-admin')->name('super-admin.')->middleware('role:super_admin')->group(function () {
+        Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
+
+        // Enrollments Management
+        Route::resource('enrollments', SuperAdminEnrollmentController::class);
+
+        // Students Management
+        Route::resource('students', SuperAdminStudentController::class);
+
+        // Users Management
+        Route::resource('users', SuperAdminUserController::class);
+    });
+
+    // Admin Routes (for administrator roles)
+    Route::prefix('admin')->name('admin.')->middleware('role:administrator')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        // Enrollments Management
+        Route::resource('enrollments', AdminEnrollmentController::class);
+
+        // Students Management
+        Route::resource('students', AdminStudentController::class);
+
+        // Users Management (limited compared to super-admin)
+        Route::resource('users', AdminUserController::class);
     });
 
     // Registrar Routes
