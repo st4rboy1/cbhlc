@@ -26,11 +26,11 @@ test('guests are redirected to the login page for student dashboard', function (
     $this->get(route('student.dashboard'))->assertRedirect(route('login'));
 });
 
-test('super admin can visit admin dashboard', function () {
+test('super admin can visit super-admin dashboard', function () {
     $user = User::factory()->create();
     $user->assignRole('super_admin');
 
-    $this->actingAs($user)->get(route('admin.dashboard'))->assertOk();
+    $this->actingAs($user)->get(route('super-admin.dashboard'))->assertOk();
 });
 
 test('administrator can visit admin dashboard', function () {
@@ -61,10 +61,10 @@ test('student can visit student dashboard', function () {
     $this->actingAs($user)->get(route('student.dashboard'))->assertOk();
 });
 
-test('super admin is redirected to admin dashboard', function () {
+test('super admin is redirected to super-admin dashboard', function () {
     $superAdmin = User::factory()->create();
     $superAdmin->assignRole('super_admin');
-    expect($superAdmin->getDashboardRoute())->toBe('admin.dashboard');
+    expect($superAdmin->getDashboardRoute())->toBe('super-admin.dashboard');
 });
 
 test('administrator is redirected to admin dashboard', function () {
