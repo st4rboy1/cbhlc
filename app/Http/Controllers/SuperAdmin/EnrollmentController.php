@@ -182,7 +182,7 @@ class EnrollmentController extends Controller
         Gate::authorize('delete', $enrollment);
 
         // Only allow deletion of pending enrollments
-        if ($enrollment->status !== EnrollmentStatus::PENDING->value) {
+        if ($enrollment->status !== EnrollmentStatus::PENDING) {
             return redirect()->route('super-admin.enrollments.index')
                 ->with('error', 'Can only delete pending enrollments.');
         }
