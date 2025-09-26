@@ -30,7 +30,7 @@ test('users can authenticate using the login screen', function () {
     $response->assertRedirect(route('home'));
 });
 
-test('super admin redirects to admin dashboard after login', function () {
+test('super admin redirects to super-admin dashboard after login', function () {
     $admin = User::factory()->superAdmin()->create();
 
     $response = $this->post(route('login.store'), [
@@ -39,7 +39,7 @@ test('super admin redirects to admin dashboard after login', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('admin.dashboard'));
+    $response->assertRedirect(route('super-admin.dashboard'));
 });
 
 test('administrator redirects to admin dashboard after login', function () {
