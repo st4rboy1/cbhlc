@@ -32,8 +32,9 @@ class PaymentService
             ]);
 
             // Update invoice status
-            if ($payment->invoice) {
-                $this->updateInvoiceStatus($payment->invoice);
+            $invoice = $payment->invoice;
+            if ($invoice instanceof Invoice) {
+                $this->updateInvoiceStatus($invoice);
             }
 
             return $payment->fresh('invoice');
@@ -86,8 +87,9 @@ class PaymentService
             }
 
             // Update invoice status
-            if ($payment->invoice) {
-                $this->updateInvoiceStatus($payment->invoice);
+            $invoice = $payment->invoice;
+            if ($invoice instanceof Invoice) {
+                $this->updateInvoiceStatus($invoice);
             }
 
             return $refund;

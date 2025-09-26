@@ -3,9 +3,7 @@
 namespace App\Services;
 
 use App\Models\Invoice;
-use App\Models\InvoiceItem;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class InvoiceService
 {

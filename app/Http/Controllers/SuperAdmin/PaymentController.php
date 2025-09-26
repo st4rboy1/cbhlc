@@ -161,8 +161,9 @@ class PaymentController extends Controller
 
             // Update invoice status if needed
             if ($oldInvoiceId !== $validated['invoice_id'] || $oldAmount !== $validated['amount']) {
-                if ($payment->invoice) {
-                    $this->paymentService->updateInvoiceStatus($payment->invoice);
+                $invoice = $payment->invoice;
+                if ($invoice instanceof Invoice) {
+                    $this->paymentService->updateInvoiceStatus($invoice);
                 }
 
                 if ($oldInvoiceId !== $validated['invoice_id']) {
@@ -190,7 +191,7 @@ class PaymentController extends Controller
             $payment->delete();
 
             // Update invoice status after deleting payment
-            if ($invoice) {
+            if ($invoice instanceof Invoice) {
                 $this->paymentService->updateInvoiceStatus($invoice);
             }
         });
