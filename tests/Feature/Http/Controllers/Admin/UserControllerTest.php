@@ -108,5 +108,4 @@ class UserControllerTest extends TestCase
                 ->where('total', 2)
             );
     }
-
 }
