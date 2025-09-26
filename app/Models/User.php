@@ -54,7 +54,9 @@ class User extends Authenticatable
      */
     public function getDashboardRoute(): string
     {
-        if ($this->hasAnyRole(['super_admin', 'administrator'])) {
+        if ($this->hasRole('super_admin')) {
+            return 'super-admin.dashboard';
+        } elseif ($this->hasRole('administrator')) {
             return 'admin.dashboard';
         } elseif ($this->hasRole('registrar')) {
             return 'registrar.dashboard';
