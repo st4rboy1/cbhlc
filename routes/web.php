@@ -21,6 +21,10 @@ use App\Http\Controllers\Student\DashboardController as StudentDashboardControll
 use App\Http\Controllers\StudentReportController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\EnrollmentController as SuperAdminEnrollmentController;
+use App\Http\Controllers\SuperAdmin\GradeLevelFeeController as SuperAdminGradeLevelFeeController;
+use App\Http\Controllers\SuperAdmin\GuardianController as SuperAdminGuardianController;
+use App\Http\Controllers\SuperAdmin\InvoiceController as SuperAdminInvoiceController;
+use App\Http\Controllers\SuperAdmin\PaymentController as SuperAdminPaymentController;
 use App\Http\Controllers\SuperAdmin\StudentController as SuperAdminStudentController;
 use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use App\Http\Controllers\TuitionController;
@@ -95,14 +99,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('super-admin')->name('super-admin.')->middleware('role:super_admin')->group(function () {
         Route::get('/dashboard', [SuperAdminDashboardController::class, 'index'])->name('dashboard');
 
-        // Enrollments Management
-        Route::resource('enrollments', SuperAdminEnrollmentController::class);
+        // Users Management
+        Route::resource('users', SuperAdminUserController::class);
 
         // Students Management
         Route::resource('students', SuperAdminStudentController::class);
 
-        // Users Management
-        Route::resource('users', SuperAdminUserController::class);
+        // Guardians Management
+        Route::resource('guardians', SuperAdminGuardianController::class);
+
+        // Enrollments Management
+        Route::resource('enrollments', SuperAdminEnrollmentController::class);
+        Route::post('/enrollments/{enrollment}/approve', [SuperAdminEnrollmentController::class, 'approve'])->name('enrollments.approve');
+        Route::post('/enrollments/{enrollment}/reject', [SuperAdminEnrollmentController::class, 'reject'])->name('enrollments.reject');
+
+        // Invoices Management
+        Route::resource('invoices', SuperAdminInvoiceController::class);
+
+        // Payments Management
+        Route::resource('payments', SuperAdminPaymentController::class);
+        Route::post('/payments/{payment}/refund', [SuperAdminPaymentController::class, 'refund'])->name('payments.refund');
+
+        // Grade Level Fees Management
+        Route::resource('grade-level-fees', SuperAdminGradeLevelFeeController::class);
     });
 
     // Admin Routes (for administrator roles)
