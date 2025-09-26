@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, FileText, Folder, GraduationCap, LayoutGrid, Receipt, Settings, UserCog, Users } from 'lucide-react';
+import { BookOpen, ClipboardList, CreditCard, FileCheck, Folder, GraduationCap, LayoutGrid, Settings, UserCog, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -15,13 +15,28 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Enrollments',
-        href: '/enrollments',
+        href: '/registrar/enrollments',
         icon: GraduationCap,
     },
     {
         title: 'Students',
-        href: '/students',
+        href: '/registrar/students',
         icon: Users,
+    },
+    {
+        title: 'Invoices',
+        href: '/invoices',
+        icon: FileCheck,
+    },
+    {
+        title: 'Tuition Fees',
+        href: '/tuition',
+        icon: CreditCard,
+    },
+    {
+        title: 'Student Reports',
+        href: '/registrar/students',
+        icon: ClipboardList,
     },
     {
         title: 'Users',
@@ -29,18 +44,8 @@ const mainNavItems: NavItem[] = [
         icon: UserCog,
     },
     {
-        title: 'Reports',
-        href: '/reports',
-        icon: FileText,
-    },
-    {
-        title: 'Tuition',
-        href: '/tuition',
-        icon: Receipt,
-    },
-    {
-        title: 'Settings',
-        href: '/settings',
+        title: 'Profile Settings',
+        href: '/settings/profile',
         icon: Settings,
     },
 ];

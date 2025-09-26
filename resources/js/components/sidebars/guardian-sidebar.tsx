@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, FileText, GraduationCap, HelpCircle, Home, LayoutGrid, Receipt, Users } from 'lucide-react';
+import { BookOpen, ClipboardList, CreditCard, FileCheck, GraduationCap, HelpCircle, Home, LayoutGrid, Settings, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -15,23 +15,38 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'My Children',
-        href: '/students',
+        href: '/guardian/students',
         icon: Users,
     },
     {
         title: 'Enrollments',
-        href: '/enrollments',
+        href: '/guardian/enrollments',
         icon: GraduationCap,
     },
     {
-        title: 'Tuition',
+        title: 'Billing',
+        href: '/guardian/billing',
+        icon: FileCheck,
+    },
+    {
+        title: 'Invoices',
+        href: '/invoices',
+        icon: FileCheck,
+    },
+    {
+        title: 'Tuition Fees',
         href: '/tuition',
-        icon: Receipt,
+        icon: CreditCard,
     },
     {
         title: 'Student Reports',
-        href: '/studentreport',
-        icon: FileText,
+        href: '/guardian/students',
+        icon: ClipboardList,
+    },
+    {
+        title: 'Profile Settings',
+        href: '/settings/profile',
+        icon: Settings,
     },
 ];
 
