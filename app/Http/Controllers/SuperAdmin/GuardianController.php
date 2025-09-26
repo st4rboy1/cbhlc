@@ -137,7 +137,7 @@ class GuardianController extends Controller
                 'email' => $validated['email'],
             ]);
 
-            if ($request->filled('password')) {
+            if (! empty($validated['password'])) {
                 $guardian->user->update([
                     'password' => Hash::make($validated['password']),
                 ]);
