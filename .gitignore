@@ -27,6 +27,8 @@ yarn-error.log
 /.zed
 /coverage
 *.cache
-
 coverage.xml
 .envrc
+*.md
+!README.md
+!CLAUDE.md

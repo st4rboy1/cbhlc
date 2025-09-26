@@ -22,7 +22,8 @@ export function RegisterDialog({ isOpen, onOpenChange, onLoginClick }: RegisterD
                     <DialogDescription>Enter your details below to create your account</DialogDescription>
                 </DialogHeader>
                 <Form
-                    {...RegisteredUserController.store.form()}
+                    action={RegisteredUserController.store.url()}
+                    method="post"
                     resetOnSuccess={['password', 'password_confirmation']}
                     onSuccess={() => onOpenChange(false)}
                     className="flex flex-col gap-6"
