@@ -41,7 +41,8 @@ export function LoginDialog({ canResetPassword = true, trigger }: LoginDialogPro
                         <DialogDescription>Enter your email and password below to log in</DialogDescription>
                     </DialogHeader>
                     <Form
-                        {...AuthenticatedSessionController.store.form()}
+                        action={AuthenticatedSessionController.store.url()}
+                        method="post"
                         resetOnSuccess={['password']}
                         onSuccess={() => setIsLoginOpen(false)}
                         className="flex flex-col gap-6"
