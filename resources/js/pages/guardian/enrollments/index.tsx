@@ -2,6 +2,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 
@@ -42,13 +44,18 @@ const paymentStatusColors = {
 } as const;
 
 export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        { title: 'Guardian', href: '/guardian/dashboard' },
+        { title: 'Enrollments', href: '/guardian/enrollments' },
+    ];
+
     return (
-        <>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="My Children's Enrollments" />
 
-            <div className="container mx-auto py-6">
-                <div className="mb-6 flex items-center justify-between">
-                    <h1 className="text-3xl font-bold">My Children's Enrollments</h1>
+            <div className="px-4 py-6">
+                <div className="mb-4 flex items-center justify-between">
+                    <h1 className="mb-4 text-2xl font-bold">My Children's Enrollments</h1>
                     <Link href="/guardian/enrollments/create">
                         <Button>
                             <PlusCircle className="mr-2 h-4 w-4" />
@@ -121,6 +128,6 @@ export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
                     </CardContent>
                 </Card>
             </div>
-        </>
+        </AppLayout>
     );
 }
