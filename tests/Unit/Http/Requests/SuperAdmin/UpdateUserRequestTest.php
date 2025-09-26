@@ -44,12 +44,14 @@ class UpdateUserRequestTest extends TestCase
     public function test_validation_rules(): void
     {
         // We test without mocking route to avoid PHPUnit method conflict
-        $request = new class extends UpdateUserRequest {
+        $request = new class extends UpdateUserRequest
+        {
             public function route($param = null, $default = null)
             {
                 if ($param === 'user') {
                     return User::factory()->create();
                 }
+
                 return parent::route($param, $default);
             }
         };
@@ -79,17 +81,21 @@ class UpdateUserRequestTest extends TestCase
             'role' => 'test_role',
         ];
 
-        $request = new class extends UpdateUserRequest {
+        $request = new class extends UpdateUserRequest
+        {
             private $user;
+
             public function __construct($user = null)
             {
                 $this->user = $user;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'user') {
                     return $this->user;
                 }
+
                 return parent::route($param, $default);
             }
         };
@@ -111,17 +117,21 @@ class UpdateUserRequestTest extends TestCase
             'role' => 'test_role',
         ];
 
-        $request = new class($existingUser) extends UpdateUserRequest {
+        $request = new class($existingUser) extends UpdateUserRequest
+        {
             private $user;
+
             public function __construct($user)
             {
                 $this->user = $user;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'user') {
                     return $this->user;
                 }
+
                 return parent::route($param, $default);
             }
         };
@@ -143,17 +153,21 @@ class UpdateUserRequestTest extends TestCase
             // No password field
         ];
 
-        $request = new class($existingUser) extends UpdateUserRequest {
+        $request = new class($existingUser) extends UpdateUserRequest
+        {
             private $user;
+
             public function __construct($user)
             {
                 $this->user = $user;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'user') {
                     return $this->user;
                 }
+
                 return parent::route($param, $default);
             }
         };
@@ -175,17 +189,21 @@ class UpdateUserRequestTest extends TestCase
             'role' => 'test_role',
         ];
 
-        $request = new class($existingUser) extends UpdateUserRequest {
+        $request = new class($existingUser) extends UpdateUserRequest
+        {
             private $user;
+
             public function __construct($user)
             {
                 $this->user = $user;
             }
+
             public function route($param = null, $default = null)
             {
                 if ($param === 'user') {
                     return $this->user;
                 }
+
                 return parent::route($param, $default);
             }
         };
