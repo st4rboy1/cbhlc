@@ -15,6 +15,7 @@ use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Public\RegistrarInfoController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboardController;
 use App\Http\Controllers\Registrar\EnrollmentController as RegistrarEnrollmentController;
+use App\Http\Controllers\Registrar\GradeLevelFeeController as RegistrarGradeLevelFeeController;
 use App\Http\Controllers\Registrar\StudentController as RegistrarStudentController;
 use App\Http\Controllers\SharedController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
@@ -159,6 +160,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Quick actions for dashboard
         Route::post('/enrollments/{enrollment}/quick-approve', [RegistrarDashboardController::class, 'quickApprove'])->name('enrollments.quick-approve');
         Route::post('/enrollments/{enrollment}/quick-reject', [RegistrarDashboardController::class, 'quickReject'])->name('enrollments.quick-reject');
+
+        // Grade Level Fees Management
+        Route::resource('grade-level-fees', RegistrarGradeLevelFeeController::class);
+        Route::post('/grade-level-fees/{gradeLevelFee}/duplicate', [RegistrarGradeLevelFeeController::class, 'duplicate'])->name('grade-level-fees.duplicate');
     });
 
     // Guardian Routes

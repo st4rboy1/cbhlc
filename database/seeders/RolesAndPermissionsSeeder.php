@@ -44,6 +44,9 @@ class RolesAndPermissionsSeeder extends Seeder
 
             // System configuration permissions
             'system.configure',
+
+            // Grade level fees management permissions
+            'grade_level_fees.manage',
         ];
 
         foreach ($permissions as $permission) {
@@ -60,7 +63,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $administrator = Role::firstOrCreate(['name' => 'administrator', 'guard_name' => 'web']);
         $administrator->syncPermissions(Permission::all());
 
-        // Registrar - Enrollment processing, student records management, reporting
+        // Registrar - Enrollment processing, student records management, reporting, fees management
         $registrar = Role::firstOrCreate(['name' => 'registrar', 'guard_name' => 'web']);
         $registrar->syncPermissions([
             'student.view',
@@ -75,6 +78,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'documents.verify',
             'reports.view',
             'reports.generate',
+            'grade_level_fees.manage',
         ]);
 
         // Guardian - Enrollment form submission, status tracking, billing access
