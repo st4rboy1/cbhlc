@@ -92,7 +92,8 @@ class EnrollmentController extends Controller
         $validated = $request->validated();
 
         // Check if student can enroll
-        if (! $this->enrollmentService->canEnroll($validated['student_id'], $validated['school_year'])) {
+        $student = Student::findOrFail($validated['student_id']);
+        if (! $this->enrollmentService->canEnroll($student, $validated['school_year'])) {
             return redirect()->back()
                 ->withErrors(['student_id' => 'Student already has a pending enrollment for this school year.']);
         }
@@ -102,7 +103,7 @@ class EnrollmentController extends Controller
 
             // Auto-approve if created by super admin
             if (auth()->user()->hasRole('super_admin')) {
-                $this->enrollmentService->approveEnrollment($enrollment, auth()->id());
+                $this->enrollmentService->approveEnrollment($enrollment);
             }
         });
 
@@ -162,9 +163,9 @@ class EnrollmentController extends Controller
             // Handle status changes
             if ($oldStatus !== $validated['status']) {
                 if ($validated['status'] === EnrollmentStatus::APPROVED->value) {
-                    $this->enrollmentService->approveEnrollment($enrollment, auth()->id());
+                    $this->enrollmentService->approveEnrollment($enrollment);
                 } elseif ($validated['status'] === EnrollmentStatus::REJECTED->value) {
-                    $this->enrollmentService->rejectEnrollment($enrollment, auth()->id(), 'Updated by admin');
+                    $this->enrollmentService->rejectEnrollment($enrollment, 'Updated by admin');
                 }
             }
         });
@@ -200,7 +201,7 @@ class EnrollmentController extends Controller
         Gate::authorize('approve-enrollment');
 
         try {
-            $this->enrollmentService->approveEnrollment($enrollment, auth()->id());
+            $this->enrollmentService->approveEnrollment($enrollment);
 
             return redirect()->route('super-admin.enrollments.index')
                 ->with('success', 'Enrollment approved successfully.');
@@ -222,7 +223,7 @@ class EnrollmentController extends Controller
         ]);
 
         try {
-            $this->enrollmentService->rejectEnrollment($enrollment, auth()->id(), $validated['reason']);
+            $this->enrollmentService->rejectEnrollment($enrollment, $validated['reason']);
 
             return redirect()->route('super-admin.enrollments.index')
                 ->with('success', 'Enrollment rejected successfully.');
