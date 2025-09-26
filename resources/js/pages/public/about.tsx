@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Head } from '@inertiajs/react';
-import { Award, BookOpen, Eye, Facebook, GraduationCap, Heart, Instagram, Mail, MapPin, Phone, Star, Target, Users } from 'lucide-react';
+import { Award, BookOpen, Eye, Facebook, GraduationCap, Heart, Mail, MapPin, Phone, Star, Target, Users } from 'lucide-react';
 
 export default function About() {
     const values = [
@@ -263,14 +263,6 @@ export default function About() {
                                         rel="noopener noreferrer"
                                     >
                                         <Icon iconNode={Facebook} className="h-6 w-6" />
-                                    </a>
-                                    <a
-                                        href="https://www.instagram.com/awrabriguela/"
-                                        className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white hover:text-blue-600"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        <Icon iconNode={Instagram} className="h-6 w-6" />
                                     </a>
                                 </div>
                             </div>
