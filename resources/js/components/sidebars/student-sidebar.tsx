@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Award, BookOpen, Calendar, FileText, HelpCircle, Home, LayoutGrid, Receipt } from 'lucide-react';
+import { BookOpen, ClipboardList, CreditCard, FileCheck, HelpCircle, Home, LayoutGrid, Settings } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -14,24 +14,24 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'My Enrollment',
-        href: '/enrollment',
-        icon: FileText,
+        title: 'My Invoices',
+        href: '/invoices',
+        icon: FileCheck,
     },
     {
-        title: 'Tuition',
+        title: 'Tuition Fees',
         href: '/tuition',
-        icon: Receipt,
+        icon: CreditCard,
     },
     {
         title: 'My Report',
-        href: '/studentreport',
-        icon: Award,
+        href: '/students/1/report',
+        icon: ClipboardList,
     },
     {
-        title: 'School Calendar',
-        href: '/calendar',
-        icon: Calendar,
+        title: 'Profile Settings',
+        href: '/settings/profile',
+        icon: Settings,
     },
 ];
 
