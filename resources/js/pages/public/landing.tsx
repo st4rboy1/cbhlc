@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Head, Link } from '@inertiajs/react';
-import { BookOpen, CheckCircle, Facebook, GraduationCap, Heart, Instagram, Users } from 'lucide-react';
+import { BookOpen, CheckCircle, Facebook, GraduationCap, Heart, Mail, MapPin, Phone, Users } from 'lucide-react';
 
 export default function Landing() {
     const features = [
@@ -153,7 +153,7 @@ export default function Landing() {
                                 today.
                             </p>
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                                <Button size="lg" variant="outline" className="border-white px-8 py-3 text-white hover:bg-white hover:text-blue-600">
+                                <Button size="lg" variant="secondary" className="bg-white px-8 py-3 text-blue-600 hover:bg-gray-100">
                                     Contact Us
                                 </Button>
                             </div>
@@ -164,12 +164,55 @@ export default function Landing() {
                 {/* Footer */}
                 <footer className="bg-slate-800 py-12 text-white">
                     <div className="container mx-auto px-6">
-                        <div className="text-center">
-                            <div className="mb-6 flex items-center justify-center space-x-2">
-                                <Icon iconNode={GraduationCap} className="h-8 w-8" />
-                                <span className="text-2xl font-bold">CBHLC</span>
+                        {/* Main Footer Content */}
+                        <div className="mb-8 grid gap-8 md:grid-cols-3">
+                            {/* School Info */}
+                            <div className="text-center md:text-left">
+                                <div className="mb-4 flex items-center justify-center space-x-2 md:justify-start">
+                                    <Icon iconNode={GraduationCap} className="h-8 w-8" />
+                                    <span className="text-2xl font-bold">CBHLC</span>
+                                </div>
+                                <p className="mb-4 text-slate-400">Christian Bible Heritage Learning Center</p>
+                                <p className="text-sm text-slate-500">
+                                    Providing quality Christian education that develops academic excellence, strong character, and faithful leaders.
+                                </p>
                             </div>
-                            <p className="mb-6 text-slate-400">Christian Bible Heritage Learning Center</p>
+
+                            {/* Contact Info */}
+                            <div className="text-center md:text-left">
+                                <h3 className="mb-4 text-lg font-semibold">Contact Us</h3>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-center space-x-2 md:justify-start">
+                                        <Icon iconNode={Phone} className="h-4 w-4 text-blue-400" />
+                                        <span className="text-sm text-slate-400">+63 123 456 7890</span>
+                                    </div>
+                                    <div className="flex items-center justify-center space-x-2 md:justify-start">
+                                        <Icon iconNode={Mail} className="h-4 w-4 text-blue-400" />
+                                        <span className="text-sm text-slate-400">info@cbhlc.edu.ph</span>
+                                    </div>
+                                    <div className="flex items-center justify-center space-x-2 md:justify-start">
+                                        <Icon iconNode={MapPin} className="h-4 w-4 text-blue-400" />
+                                        <span className="text-sm text-slate-400">Pasig City, Metro Manila</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Quick Links */}
+                            <div className="text-center md:text-left">
+                                <h3 className="mb-4 text-lg font-semibold">Quick Links</h3>
+                                <div className="space-y-2">
+                                    <Link href="/about" className="block text-sm text-slate-400 transition-colors hover:text-white">
+                                        About Us
+                                    </Link>
+                                    <Link href="/contact" className="block text-sm text-slate-400 transition-colors hover:text-white">
+                                        Contact
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer Bottom */}
+                        <div className="border-t border-slate-700 pt-8 text-center">
                             <div className="mb-6 flex justify-center space-x-6">
                                 <a
                                     href="https://www.facebook.com/CBHLC.Pasig"
@@ -178,14 +221,6 @@ export default function Landing() {
                                     rel="noopener noreferrer"
                                 >
                                     <Icon iconNode={Facebook} className="h-6 w-6" />
-                                </a>
-                                <a
-                                    href="https://www.instagram.com/awrabriguela/"
-                                    className="text-slate-400 transition-colors hover:text-white"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    <Icon iconNode={Instagram} className="h-6 w-6" />
                                 </a>
                             </div>
                             <p className="text-sm text-slate-500">©2025 CBHLC | All rights reserved</p>
