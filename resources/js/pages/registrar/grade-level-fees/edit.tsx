@@ -1,10 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -174,19 +173,26 @@ export default function RegistrarGradeLevelFeesEdit({ fee, gradeLevels }: Props)
 
                             <div className="space-y-2">
                                 <Label htmlFor="notes">Notes (Optional)</Label>
-                                <Textarea
+                                <textarea
                                     id="notes"
+                                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                                     placeholder="Additional notes about this fee structure..."
                                     value={data.notes}
-                                    onChange={(e) => setData('notes', e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('notes', e.target.value)}
                                     rows={3}
                                 />
                                 {errors.notes && <p className="text-sm text-red-600">{errors.notes}</p>}
                             </div>
 
                             <div className="flex items-center space-x-2">
-                                <Switch id="is_active" checked={data.is_active} onCheckedChange={(checked) => setData('is_active', checked)} />
-                                <Label htmlFor="is_active">Active</Label>
+                                <Checkbox
+                                    id="is_active"
+                                    checked={data.is_active}
+                                    onCheckedChange={(checked: boolean) => setData('is_active', checked)}
+                                />
+                                <Label htmlFor="is_active" className="cursor-pointer">
+                                    Active
+                                </Label>
                             </div>
                         </CardContent>
                     </Card>
