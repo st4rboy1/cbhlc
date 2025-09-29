@@ -16,7 +16,6 @@ class DashboardController extends Controller
                 'active_users' => 45,
                 'total_revenue' => 1250000,
             ],
-            'message' => 'Super Admin Dashboard',
         ]);
     }
 }
