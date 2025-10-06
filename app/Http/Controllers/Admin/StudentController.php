@@ -3,44 +3,41 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student;
 use Inertia\Inertia;
 
 class StudentController extends Controller
 {
     public function index()
     {
+        $students = Student::all();
+        $studentData = [];
+        foreach ($students as $student) {
+            $studentData[] = [
+                'id' => $student->id,
+                'name' => $student->name,
+                'grade' => $student->grade_level->name,
+                'status' => 'active', // Placeholder
+            ];
+        }
+
         return Inertia::render('admin/students/index', [
-            'students' => [
-                ['id' => 1, 'name' => 'John Doe', 'grade' => 'Grade 1', 'status' => 'active'],
-                ['id' => 2, 'name' => 'Jane Smith', 'grade' => 'Grade 2', 'status' => 'active'],
-            ],
-            'total' => 2,
+            'students' => $studentData,
+            'total' => $students->count(),
         ]);
     }
 
-    public function show($id)
+    public function show(Student $student)
     {
         return Inertia::render('admin/students/show', [
-            'student' => [
-                'id' => $id,
-                'name' => 'John Doe',
-                'grade' => 'Grade 1',
-                'status' => 'active',
-                'birth_date' => '2015-01-01',
-                'address' => '123 Main St',
-            ],
+            'student' => $student,
         ]);
     }
 
-    public function edit($id)
+    public function edit(Student $student)
     {
         return Inertia::render('admin/students/edit', [
-            'student' => [
-                'id' => $id,
-                'name' => 'John Doe',
-                'grade' => 'Grade 1',
-                'status' => 'active',
-            ],
+            'student' => $student,
         ]);
     }
 }
