@@ -42,3 +42,10 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Enrollment {
+    id: number;
+    student_name: string;
+    grade: string;
+    status: 'pending' | 'approved' | 'rejected';
+}
