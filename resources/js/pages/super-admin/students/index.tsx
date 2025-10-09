@@ -1,10 +1,7 @@
-import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { StudentTable } from '@/pages/super-admin/students/students-table';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
-import { useDebounce } from 'use-debounce';
+import { Head } from '@inertiajs/react';
 
 export type Student = {
     id: number;
@@ -53,20 +50,6 @@ export default function StudentsIndex({ students, filters }: Props) {
         { title: 'Students', href: '/super-admin/students' },
     ];
 
-    const [searchTerm, setSearchTerm] = useState(filters.search || '');
-    const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
-
-    useEffect(() => {
-        router.get(
-            '/super-admin/students',
-            { search: debouncedSearchTerm },
-            {
-                preserveState: true,
-                replace: true,
-            },
-        );
-    }, [debouncedSearchTerm]);
-
     const formattedStudents = students.data.map((student) => ({
         id: student.id,
         studentId: student.student_id,
@@ -85,17 +68,8 @@ export default function StudentsIndex({ students, filters }: Props) {
             <div className="px-4 py-6">
                 <div className="flex items-center justify-between">
                     <h1 className="mb-4 text-2xl font-bold">Students Index</h1>
-                    <div className="mb-4">
-                        <Input
-                            type="text"
-                            placeholder="Search by name, email, or student ID..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="max-w-sm"
-                        />
-                    </div>
                 </div>
-                <StudentTable students={formattedStudents} />
+                <StudentTable students={formattedStudents} filters={filters} />
             </div>
         </AppLayout>
     );
