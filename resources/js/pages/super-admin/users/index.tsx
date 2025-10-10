@@ -1,10 +1,7 @@
-import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { UsersTable } from '@/pages/super-admin/users/users-table';
 import { type BreadcrumbItem } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
-import { useDebounce } from 'use-debounce';
+import { Head } from '@inertiajs/react';
 
 // From the controller, the User model has these properties
 export type User = {
@@ -47,37 +44,14 @@ export default function UsersIndex({ users, filters }: Props) {
         { title: 'Users', href: '/super-admin/users' },
     ];
 
-    const [searchTerm, setSearchTerm] = useState(filters.search || '');
-    const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
-
-    useEffect(() => {
-        router.get(
-            '/super-admin/users',
-            { search: debouncedSearchTerm },
-            {
-                preserveState: true,
-                replace: true,
-            },
-        );
-    }, [debouncedSearchTerm]);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
             <div className="px-4 py-6">
                 <div className="flex items-center justify-between">
                     <h1 className="mb-4 text-2xl font-bold">Users Index</h1>
-                    <div className="mb-4">
-                        <Input
-                            type="text"
-                            placeholder="Search by name or email..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="max-w-sm"
-                        />
-                    </div>
                 </div>
-                <UsersTable users={users.data} />
+                <UsersTable users={users.data} filters={filters} />
             </div>
         </AppLayout>
     );
