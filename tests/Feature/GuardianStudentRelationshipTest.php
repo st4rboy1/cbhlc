@@ -142,19 +142,27 @@ test('guardian student relationship uses correct table and column names', functi
 });
 
 test('guardian student model relationships work correctly', function () {
-    $guardian = User::factory()->create();
-    $guardian->assignRole('guardian');
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+
+    $guardian = \App\Models\Guardian::create([
+        'user_id' => $user->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '789 Test Blvd',
+    ]);
 
     $student = Student::factory()->create();
 
     $relationship = GuardianStudent::create([
-        'guardian_id' => $guardian->id,
+        'guardian_id' => $user->id,
         'student_id' => $student->id,
         'relationship_type' => RelationshipType::OTHER->value,
         'is_primary_contact' => true,
     ]);
 
-    expect($relationship->guardian->id)->toBe($guardian->id);
+    expect($relationship->guardian->user_id)->toBe($user->id);
     expect($relationship->student->id)->toBe($student->id);
     expect($relationship->relationship_type)->toBe('other');
     expect($relationship->is_primary_contact)->toBeTrue();

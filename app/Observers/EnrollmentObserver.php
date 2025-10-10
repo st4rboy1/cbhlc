@@ -45,8 +45,8 @@ class EnrollmentObserver
     public function created(Enrollment $enrollment): void
     {
         // Send enrollment submitted email
-        if ($enrollment->guardian && ! empty($enrollment->guardian->email)) {
-            Mail::to($enrollment->guardian->email)
+        if ($enrollment->guardian && $enrollment->guardian->user && ! empty($enrollment->guardian->user->email)) {
+            Mail::to($enrollment->guardian->user->email)
                 ->queue(new EnrollmentSubmitted($enrollment));
         }
 
@@ -172,12 +172,12 @@ class EnrollmentObserver
      */
     private function sendStatusChangeEmail(Enrollment $enrollment): void
     {
-        if (! $enrollment->guardian || empty($enrollment->guardian->email)) {
+        if (! $enrollment->guardian || ! $enrollment->guardian->user || empty($enrollment->guardian->user->email)) {
             return;
         }
 
         $newStatus = $enrollment->status->value;
-        $email = $enrollment->guardian->email;
+        $email = $enrollment->guardian->user->email;
 
         switch ($newStatus) {
             case 'approved':
