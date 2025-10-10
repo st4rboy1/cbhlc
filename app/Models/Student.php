@@ -57,7 +57,7 @@ class Student extends Model
      */
     public function guardian(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'guardian_id');
+        return $this->belongsTo(Guardian::class);
     }
 
     /**
@@ -84,6 +84,14 @@ class Student extends Model
     public function guardianStudents(): HasMany
     {
         return $this->hasMany(GuardianStudent::class);
+    }
+
+    /**
+     * Get the documents for the student
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class);
     }
 
     /**
