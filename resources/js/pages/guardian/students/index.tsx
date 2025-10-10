@@ -1,8 +1,9 @@
 import AppLayout from '@/layouts/app-layout';
+import { GuardianDashboard } from '@/pages/guardian/students/guardian-dashboard';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
-export default function GuardianStudentsIndex(props: unknown) {
+export default function GuardianStudentsIndex() {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Students', href: '/guardian/students' },
@@ -13,7 +14,7 @@ export default function GuardianStudentsIndex(props: unknown) {
             <Head title="Students Index" />
             <div className="px-4 py-6">
                 <h1 className="mb-4 text-2xl font-bold">Students Index</h1>
-                <pre className="overflow-auto rounded bg-gray-100 p-4">{JSON.stringify(props, null, 2)}</pre>
+                <GuardianDashboard />
             </div>
         </AppLayout>
     );
