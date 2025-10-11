@@ -6,7 +6,6 @@ use App\Enums\GradeLevel;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Registrar\StoreStudentRequest;
 use App\Http\Requests\Registrar\UpdateStudentRequest;
-use App\Models\Guardian;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -58,7 +57,7 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-        $student->load(['enrollments.guardian', 'guardianStudents.guardian']);
+        $student->load(['enrollments.guardian.user', 'guardianStudents.guardian.user']);
 
         return Inertia::render('registrar/students/show', [
             'student' => [
@@ -93,19 +92,20 @@ class StudentController extends Controller
                 }),
                 /** @phpstan-ignore-next-line */
                 'guardians' => $student->guardianStudents->map(function ($gs) {
-                    $guardianUser = $gs->guardian;
-                    $guardianModel = Guardian::where('user_id', $guardianUser->id)->first();
+                    $guardian = $gs->guardian;
+
+                    if (! $guardian) {
+                        return null;
+                    }
 
                     return [
-                        'id' => $guardianUser->id,
-                        'name' => $guardianModel ?
-                            $guardianModel->first_name.' '.$guardianModel->last_name :
-                            $guardianUser->name,
-                        'email' => $guardianUser->email,
+                        'id' => $guardian->user_id,
+                        'name' => $guardian->first_name.' '.$guardian->last_name,
+                        'email' => $guardian->user->email ?? 'N/A',
                         'relationship_type' => $gs->relationship_type,
                         'is_primary_contact' => $gs->is_primary_contact,
                     ];
-                }),
+                })->filter(),
             ],
         ]);
     }

@@ -64,16 +64,23 @@ class EnrollmentObserverTest extends TestCase
 
     public function test_email_is_sent_when_enrollment_is_created(): void
     {
-        $guardian = User::factory()->create(['email' => 'guardian@test.com']);
-        $student = Student::factory()->create(['guardian_id' => $guardian->id]);
+        $user = User::factory()->create(['email' => 'guardian@test.com']);
+        $guardian = \App\Models\Guardian::create([
+            'user_id' => $user->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+        $student = Student::factory()->create();
 
         $enrollment = Enrollment::factory()->create([
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
         ]);
 
-        Mail::assertQueued(EnrollmentSubmitted::class, function ($mail) use ($guardian, $enrollment) {
-            return $mail->hasTo($guardian->email) &&
+        Mail::assertQueued(EnrollmentSubmitted::class, function ($mail) use ($user, $enrollment) {
+            return $mail->hasTo($user->email) &&
                    $mail->enrollment->id === $enrollment->id;
         });
     }
@@ -105,8 +112,15 @@ class EnrollmentObserverTest extends TestCase
     {
         $this->actingAs(User::factory()->create());
 
-        $guardian = User::factory()->create(['email' => 'guardian@test.com']);
-        $student = Student::factory()->create(['guardian_id' => $guardian->id]);
+        $user = User::factory()->create(['email' => 'guardian@test.com']);
+        $guardian = \App\Models\Guardian::create([
+            'user_id' => $user->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+        $student = Student::factory()->create();
         $enrollment = Enrollment::factory()->create([
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
@@ -117,8 +131,8 @@ class EnrollmentObserverTest extends TestCase
 
         $enrollment->update(['status' => 'approved']);
 
-        Mail::assertQueued(EnrollmentApproved::class, function ($mail) use ($guardian, $enrollment) {
-            return $mail->hasTo($guardian->email) &&
+        Mail::assertQueued(EnrollmentApproved::class, function ($mail) use ($user, $enrollment) {
+            return $mail->hasTo($user->email) &&
                    $mail->enrollment->id === $enrollment->id;
         });
     }

@@ -164,7 +164,7 @@ describe('Registrar StudentController', function () {
         // Create enrollment
         Enrollment::factory()->create([
             'student_id' => $student->id,
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
         ]);
 
         $response = $this->actingAs($this->registrar)
@@ -378,7 +378,7 @@ describe('Registrar StudentController', function () {
         // Create enrollment
         Enrollment::factory()->create([
             'student_id' => $student->id,
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
         ]);
 
         $response = $this->actingAs($this->registrar)
