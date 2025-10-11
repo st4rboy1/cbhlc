@@ -37,7 +37,7 @@ class EmailNotificationTest extends TestCase
             'contact_number' => '09123456789',
             'address' => '123 Test St',
         ]);
-        $student = Student::factory()->create(['guardian_id' => $user->id]);
+        $student = Student::factory()->create();
 
         $enrollmentData = [
             'student_id' => $student->id,
@@ -68,7 +68,7 @@ class EmailNotificationTest extends TestCase
             'contact_number' => '09123456789',
             'address' => '123 Test St',
         ]);
-        $student = Student::factory()->create(['guardian_id' => $user->id]);
+        $student = Student::factory()->create();
         $enrollment = Enrollment::factory()->create([
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
@@ -98,7 +98,7 @@ class EmailNotificationTest extends TestCase
             'contact_number' => '09123456789',
             'address' => '123 Test St',
         ]);
-        $student = Student::factory()->create(['guardian_id' => $user->id]);
+        $student = Student::factory()->create();
         $enrollment = Enrollment::factory()->create([
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
@@ -136,7 +136,7 @@ class EmailNotificationTest extends TestCase
             ]);
             $guardians[] = $guardian;
 
-            $student = Student::factory()->create(['guardian_id' => $user->id]);
+            $student = Student::factory()->create();
             $enrollments[] = Enrollment::factory()->create([
                 'student_id' => $student->id,
                 'guardian_id' => $guardian->id,
@@ -176,7 +176,7 @@ class EmailNotificationTest extends TestCase
             'contact_number' => '09123456789',
             'address' => '123 Test St',
         ]);
-        $student = Student::factory()->create(['guardian_id' => $user->id]);
+        $student = Student::factory()->create();
 
         $enrollmentData = [
             'student_id' => $student->id,
@@ -205,7 +205,6 @@ class EmailNotificationTest extends TestCase
             'address' => '123 Test St',
         ]);
         $student = Student::factory()->create([
-            'guardian_id' => $user->id,
             'first_name' => 'John',
             'last_name' => 'Doe',
         ]);

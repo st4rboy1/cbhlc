@@ -77,7 +77,14 @@ test('findWithRelations returns enrollment with relationships', function () {
 });
 
 test('createEnrollment creates new enrollment with pending status', function () {
-    $guardian = \App\Models\User::factory()->create();
+    $guardianUser = \App\Models\User::factory()->create();
+    $guardian = \App\Models\Guardian::create([
+        'user_id' => $guardianUser->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '123 Test St',
+    ]);
     $student = Student::factory()->create();
 
     $data = [
@@ -101,7 +108,14 @@ test('createEnrollment creates new enrollment with pending status', function () 
 });
 
 test('createEnrollment generates reference number', function () {
-    $guardian = \App\Models\User::factory()->create();
+    $guardianUser = \App\Models\User::factory()->create();
+    $guardian = \App\Models\Guardian::create([
+        'user_id' => $guardianUser->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '123 Test St',
+    ]);
     $student = Student::factory()->create();
 
     $data = [
