@@ -30,7 +30,6 @@ export default function RegistrarEnrollmentsIndex({ enrollments }: Props) {
         { title: 'Registrar', href: '/registrar/dashboard' },
         { title: 'Enrollments', href: '/registrar/enrollments' },
     ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Enrollments Index" />

@@ -8,7 +8,6 @@ export default function GuardianBillingIndex() {
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Billing', href: '/guardian/billing' },
     ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Billing Index" />
