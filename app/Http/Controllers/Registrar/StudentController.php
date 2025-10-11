@@ -6,7 +6,6 @@ use App\Enums\GradeLevel;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Registrar\StoreStudentRequest;
 use App\Http\Requests\Registrar\UpdateStudentRequest;
-use App\Models\Guardian;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Inertia\Inertia;

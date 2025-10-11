@@ -92,8 +92,16 @@ test('enrollment model isApproved works correctly', function () {
 });
 
 test('enrollment model guardian relationship works', function () {
-    $guardian = User::factory()->create();
-    $guardian->assignRole('guardian');
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+
+    $guardian = \App\Models\Guardian::create([
+        'user_id' => $user->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '123 Test St',
+    ]);
 
     $student = Student::factory()->create();
 
