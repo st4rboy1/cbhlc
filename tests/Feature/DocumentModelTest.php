@@ -24,7 +24,7 @@ test('documents table has required columns', function () {
 });
 
 test('document model can be instantiated', function () {
-    $document = new Document();
+    $document = new Document;
 
     expect($document)->toBeInstanceOf(Document::class);
 });
