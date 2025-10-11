@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
+import { UsersTable } from '@/pages/admin/users/users-table';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { UsersTable } from '@/pages/admin/users/users-table';
 
 interface Props {
     users?: Array<{
@@ -13,7 +13,7 @@ interface Props {
     total?: number;
 }
 
-export default function UsersIndex({ users, total }: Props) {
+export default function UsersIndex({ users }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin', href: '/admin/dashboard' },
         { title: 'Users', href: '/admin/users' },
