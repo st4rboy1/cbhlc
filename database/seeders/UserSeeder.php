@@ -295,6 +295,8 @@ class UserSeeder extends Seeder
      */
     private function createPendingEnrollmentStudents(User $guardian): void
     {
+        $guardianModel = Guardian::where('user_id', $guardian->id)->first();
+
         // Student 1 - Pending enrollment for Grade 5
         $student1 = Student::firstOrCreate(
             ['first_name' => 'Miguel', 'last_name' => 'Dela Cruz', 'birthdate' => '2013-05-20'],
@@ -321,7 +323,7 @@ class UserSeeder extends Seeder
             'student_id' => $student1->id,
             'school_year' => '2025-2026',
         ], [
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_5->value,
             'status' => EnrollmentStatus::PENDING,
@@ -362,7 +364,7 @@ class UserSeeder extends Seeder
             'student_id' => $student2->id,
             'school_year' => '2025-2026',
         ], [
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_4->value,
             'status' => EnrollmentStatus::PENDING,
@@ -383,6 +385,8 @@ class UserSeeder extends Seeder
      */
     private function createMixedStatusStudents(User $guardian): void
     {
+        $guardianModel = Guardian::where('user_id', $guardian->id)->first();
+
         // Student 1 - With rejected enrollment
         $student1 = Student::firstOrCreate(
             ['first_name' => 'Carlos', 'last_name' => 'Garcia', 'birthdate' => '2011-07-15'],
@@ -409,7 +413,7 @@ class UserSeeder extends Seeder
             'student_id' => $student1->id,
             'school_year' => '2025-2026',
         ], [
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::SECOND,
             'grade_level' => GradeLevel::GRADE_6->value,
             'status' => EnrollmentStatus::REJECTED,
@@ -452,7 +456,7 @@ class UserSeeder extends Seeder
             'student_id' => $student2->id,
             'school_year' => '2024-2025',
         ], [
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_5->value,
             'status' => EnrollmentStatus::ENROLLED,
@@ -474,6 +478,8 @@ class UserSeeder extends Seeder
      */
     private function createNewStudents(User $guardian): void
     {
+        $guardianModel = Guardian::where('user_id', $guardian->id)->first();
+
         // Student 1 - New to school
         $student1 = Student::firstOrCreate(
             ['first_name' => 'Gabriel', 'last_name' => 'Mendoza', 'birthdate' => '2016-04-12'],
@@ -500,7 +506,7 @@ class UserSeeder extends Seeder
             'student_id' => $student1->id,
             'school_year' => '2025-2026',
         ], [
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::KINDER->value,
             'status' => EnrollmentStatus::PENDING,
@@ -541,7 +547,7 @@ class UserSeeder extends Seeder
             'student_id' => $student2->id,
             'school_year' => '2025-2026',
         ], [
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_1->value,
             'status' => EnrollmentStatus::PENDING,
@@ -562,13 +568,15 @@ class UserSeeder extends Seeder
      */
     private function createEnrollmentHistory(Student $student, User $guardian): void
     {
+        $guardianModel = Guardian::where('user_id', $guardian->id)->first();
+
         // Create completed enrollments for previous years
         // Juan was in Grade 4 in 2022-2023 (completed)
         Enrollment::firstOrCreate([
             'student_id' => $student->id,
             'school_year' => '2022-2023',
         ], [
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_4->value,
             'status' => EnrollmentStatus::COMPLETED,
@@ -588,7 +596,7 @@ class UserSeeder extends Seeder
             'student_id' => $student->id,
             'school_year' => '2023-2024',
         ], [
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_5->value,
             'status' => EnrollmentStatus::COMPLETED,
@@ -608,7 +616,7 @@ class UserSeeder extends Seeder
             'student_id' => $student->id,
             'school_year' => '2024-2025',
         ], [
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_6->value,
             'status' => EnrollmentStatus::ENROLLED,
