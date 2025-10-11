@@ -1,8 +1,31 @@
 import AppLayout from '@/layouts/app-layout';
+import { EnrollmentsTable } from '@/pages/registrar/enrollments/enrollments-table';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
-export default function RegistrarEnrollmentsIndex(props: unknown) {
+interface Enrollment {
+    id: number;
+    student: { first_name: string; last_name: string; student_id: string };
+    guardian: { name: string };
+    school_year: string;
+    quarter: string;
+    grade_level: string;
+    status: string;
+    net_amount_cents: number;
+    amount_paid_cents: number;
+    balance_cents: number;
+    payment_status: string;
+}
+
+interface PaginatedEnrollments {
+    data: Enrollment[];
+}
+
+interface Props {
+    enrollments: PaginatedEnrollments;
+}
+
+export default function RegistrarEnrollmentsIndex({ enrollments }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Registrar', href: '/registrar/dashboard' },
         { title: 'Enrollments', href: '/registrar/enrollments' },
@@ -13,7 +36,7 @@ export default function RegistrarEnrollmentsIndex(props: unknown) {
             <Head title="Enrollments Index" />
             <div className="px-4 py-6">
                 <h1 className="mb-4 text-2xl font-bold">Enrollments Index</h1>
-                <pre className="overflow-auto rounded bg-gray-100 p-4">{JSON.stringify(props, null, 2)}</pre>
+                <EnrollmentsTable enrollments={enrollments.data} />
             </div>
         </AppLayout>
     );
