@@ -8,7 +8,6 @@ export default function GuardianStudentsIndex() {
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Students', href: '/guardian/students' },
     ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Students Index" />

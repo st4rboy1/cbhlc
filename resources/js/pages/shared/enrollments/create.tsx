@@ -58,7 +58,7 @@ export default function EnrollmentCreate({ students, quarters, currentSchoolYear
         if (selectedStudent && !selectedStudent.is_new_student) {
             setData('quarter', 'First');
         }
-    }, [selectedStudent]);
+    }, [selectedStudent, setData]);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
