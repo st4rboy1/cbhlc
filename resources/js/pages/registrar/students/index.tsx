@@ -36,7 +36,6 @@ export default function RegistrarStudentsIndex({ students }: Props) {
         { title: 'Registrar', href: '/registrar/dashboard' },
         { title: 'Students', href: '/registrar/students' },
     ];
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Students Index" />
