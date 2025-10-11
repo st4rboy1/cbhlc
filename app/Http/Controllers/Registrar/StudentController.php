@@ -101,7 +101,7 @@ class StudentController extends Controller
                     return [
                         'id' => $guardian->user_id,
                         'name' => $guardian->first_name.' '.$guardian->last_name,
-                        'email' => $guardian->user?->email ?? 'N/A',
+                        'email' => $guardian->user->email ?? 'N/A',
                         'relationship_type' => $gs->relationship_type,
                         'is_primary_contact' => $gs->is_primary_contact,
                     ];
