@@ -77,7 +77,7 @@ describe('invoice controller', function () {
         $ownEnrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0002',
             'student_id' => $ownChild->id,
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::SECOND,
             'grade_level' => GradeLevel::GRADE_5,
@@ -147,7 +147,7 @@ describe('invoice controller', function () {
         $oldEnrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0004',
             'student_id' => $child->id,
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'school_year' => '2023-2024',
             'quarter' => Quarter::FOURTH,
             'grade_level' => GradeLevel::KINDER,
@@ -171,7 +171,7 @@ describe('invoice controller', function () {
         $latestEnrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0005',
             'student_id' => $child->id,
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_1,

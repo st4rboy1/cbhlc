@@ -100,7 +100,7 @@ describe('tuition controller', function () {
             Enrollment::create([
                 'enrollment_id' => 'ENR-'.str_pad($child->id, 4, '0', STR_PAD_LEFT),
                 'student_id' => $child->id,
-                'guardian_id' => $guardian->id,  // Use user id
+                'guardian_id' => $guardianModel->id,
                 'school_year' => '2024-2025',
                 'quarter' => Quarter::FIRST,
                 'grade_level' => GradeLevel::GRADE_1,
