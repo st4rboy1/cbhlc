@@ -84,13 +84,18 @@ class StudentService extends BaseService implements StudentServiceInterface
                 $data['student_id'] = $this->generateStudentId();
             }
 
+            // Extract guardian-related data before creating student
+            $guardianId = $data['guardian_id'] ?? null;
+            $relationship = $data['relationship'] ?? 'guardian';
+            unset($data['guardian_id'], $data['relationship']);
+
             // Create the student
             /** @var Student $student */
             $student = $this->model->create($data);
 
             // Associate with guardian if guardian_id is provided
-            if (! empty($data['guardian_id'])) {
-                $this->associateGuardian($student, $data['guardian_id'], $data['relationship'] ?? 'guardian');
+            if (! empty($guardianId)) {
+                $this->associateGuardian($student, $guardianId, $relationship);
             }
 
             $this->logActivity('createStudent', ['student_id' => $student->id]);

@@ -73,7 +73,7 @@ describe('Guardian StudentController', function () {
         // Create enrollment for first student
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_3,
             'status' => EnrollmentStatus::ENROLLED,
@@ -102,7 +102,7 @@ describe('Guardian StudentController', function () {
         // Create multiple enrollments
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'school_year' => '2023-2024',
             'grade_level' => GradeLevel::GRADE_2,
             'status' => EnrollmentStatus::COMPLETED,
@@ -111,7 +111,7 @@ describe('Guardian StudentController', function () {
 
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_3,
             'status' => EnrollmentStatus::ENROLLED,
@@ -137,7 +137,7 @@ describe('Guardian StudentController', function () {
         // Create enrollment for context
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_3,
             'quarter' => Quarter::FIRST,
@@ -424,7 +424,7 @@ describe('Guardian StudentController', function () {
         // Create multiple enrollments
         Enrollment::factory()->count(3)->create([
             'student_id' => $this->student->id,
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
         ]);
 
         $response = $this->actingAs($this->guardian)

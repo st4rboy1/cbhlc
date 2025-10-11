@@ -29,8 +29,15 @@ class EmailNotificationTest extends TestCase
     public function test_sends_email_when_enrollment_is_submitted(): void
     {
         // Arrange
-        $guardian = User::factory()->create(['email' => 'guardian@test.com']);
-        $student = Student::factory()->create(['guardian_id' => $guardian->id]);
+        $user = User::factory()->create(['email' => 'guardian@test.com']);
+        $guardian = \App\Models\Guardian::create([
+            'user_id' => $user->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+        $student = Student::factory()->create();
 
         $enrollmentData = [
             'student_id' => $student->id,
@@ -44,8 +51,8 @@ class EmailNotificationTest extends TestCase
         $enrollment = $this->service->createEnrollment($enrollmentData);
 
         // Assert
-        Mail::assertQueued(EnrollmentSubmitted::class, function ($mail) use ($guardian, $enrollment) {
-            return $mail->hasTo($guardian->email) &&
+        Mail::assertQueued(EnrollmentSubmitted::class, function ($mail) use ($user, $enrollment) {
+            return $mail->hasTo($user->email) &&
                    $mail->enrollment->id === $enrollment->id;
         });
     }
@@ -53,8 +60,15 @@ class EmailNotificationTest extends TestCase
     public function test_sends_email_when_enrollment_is_approved(): void
     {
         // Arrange
-        $guardian = User::factory()->create(['email' => 'guardian@test.com']);
-        $student = Student::factory()->create(['guardian_id' => $guardian->id]);
+        $user = User::factory()->create(['email' => 'guardian@test.com']);
+        $guardian = \App\Models\Guardian::create([
+            'user_id' => $user->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+        $student = Student::factory()->create();
         $enrollment = Enrollment::factory()->create([
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
@@ -67,8 +81,8 @@ class EmailNotificationTest extends TestCase
         $this->service->approveEnrollment($enrollment);
 
         // Assert
-        Mail::assertQueued(EnrollmentApproved::class, function ($mail) use ($guardian, $enrollment) {
-            return $mail->hasTo($guardian->email) &&
+        Mail::assertQueued(EnrollmentApproved::class, function ($mail) use ($user, $enrollment) {
+            return $mail->hasTo($user->email) &&
                    $mail->enrollment->id === $enrollment->id;
         });
     }
@@ -76,8 +90,15 @@ class EmailNotificationTest extends TestCase
     public function test_sends_email_when_enrollment_is_rejected(): void
     {
         // Arrange
-        $guardian = User::factory()->create(['email' => 'guardian@test.com']);
-        $student = Student::factory()->create(['guardian_id' => $guardian->id]);
+        $user = User::factory()->create(['email' => 'guardian@test.com']);
+        $guardian = \App\Models\Guardian::create([
+            'user_id' => $user->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+        $student = Student::factory()->create();
         $enrollment = Enrollment::factory()->create([
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
@@ -91,8 +112,8 @@ class EmailNotificationTest extends TestCase
         $this->service->rejectEnrollment($enrollment, $reason);
 
         // Assert
-        Mail::assertQueued(EnrollmentRejected::class, function ($mail) use ($guardian, $enrollment, $reason) {
-            return $mail->hasTo($guardian->email) &&
+        Mail::assertQueued(EnrollmentRejected::class, function ($mail) use ($user, $enrollment, $reason) {
+            return $mail->hasTo($user->email) &&
                    $mail->enrollment->id === $enrollment->id &&
                    $mail->reason === $reason;
         });
@@ -101,11 +122,21 @@ class EmailNotificationTest extends TestCase
     public function test_sends_multiple_emails_when_bulk_approving_enrollments(): void
     {
         // Arrange
-        $guardians = User::factory()->count(3)->create();
+        $users = User::factory()->count(3)->create();
+        $guardians = [];
         $enrollments = [];
 
-        foreach ($guardians as $guardian) {
-            $student = Student::factory()->create(['guardian_id' => $guardian->id]);
+        foreach ($users as $user) {
+            $guardian = \App\Models\Guardian::create([
+                'user_id' => $user->id,
+                'first_name' => 'Test',
+                'last_name' => 'Guardian',
+                'contact_number' => '09123456789',
+                'address' => '123 Test St',
+            ]);
+            $guardians[] = $guardian;
+
+            $student = Student::factory()->create();
             $enrollments[] = Enrollment::factory()->create([
                 'student_id' => $student->id,
                 'guardian_id' => $guardian->id,
@@ -127,8 +158,8 @@ class EmailNotificationTest extends TestCase
         Mail::assertQueuedCount(3);
 
         foreach ($enrollments as $index => $enrollment) {
-            Mail::assertQueued(EnrollmentApproved::class, function ($mail) use ($guardians, $enrollment, $index) {
-                return $mail->hasTo($guardians[$index]->email) &&
+            Mail::assertQueued(EnrollmentApproved::class, function ($mail) use ($users, $enrollment, $index) {
+                return $mail->hasTo($users[$index]->email) &&
                        $mail->enrollment->id === $enrollment->id;
             });
         }
@@ -137,8 +168,15 @@ class EmailNotificationTest extends TestCase
     public function test_does_not_send_email_when_guardian_has_no_email(): void
     {
         // Arrange
-        $guardian = User::factory()->create(['email' => '']);
-        $student = Student::factory()->create(['guardian_id' => $guardian->id]);
+        $user = User::factory()->create(['email' => '']);
+        $guardian = \App\Models\Guardian::create([
+            'user_id' => $user->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+        $student = Student::factory()->create();
 
         $enrollmentData = [
             'student_id' => $student->id,
@@ -158,9 +196,15 @@ class EmailNotificationTest extends TestCase
     public function test_email_contains_correct_enrollment_details(): void
     {
         // Arrange
-        $guardian = User::factory()->create(['email' => 'guardian@test.com']);
+        $user = User::factory()->create(['email' => 'guardian@test.com']);
+        $guardian = \App\Models\Guardian::create([
+            'user_id' => $user->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
         $student = Student::factory()->create([
-            'guardian_id' => $guardian->id,
             'first_name' => 'John',
             'last_name' => 'Doe',
         ]);
@@ -170,7 +214,7 @@ class EmailNotificationTest extends TestCase
             'guardian_id' => $guardian->id,
             'school_year' => '2024-2025',
             'grade_level' => 'Grade 5',
-            'section' => 'B',
+            'section' => 'A',
         ];
 
         // Act

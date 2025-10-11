@@ -85,7 +85,14 @@ test('getRegistrarDashboardData returns registrar-specific data', function () {
 });
 
 test('getParentDashboardData returns parent-specific data', function () {
-    $guardian = \App\Models\User::factory()->create();
+    $user = \App\Models\User::factory()->create();
+    $guardian = \App\Models\Guardian::create([
+        'user_id' => $user->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '123 Test St',
+    ]);
     $student = Student::factory()->create(['guardian_id' => $guardian->id]);
     $enrollment = Enrollment::factory()->create([
         'student_id' => $student->id,

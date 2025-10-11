@@ -20,6 +20,14 @@ describe('enrollment pending constraint', function () {
         $guardian = User::factory()->create();
         $guardian->assignRole('guardian');
 
+        $guardianModel = \App\Models\Guardian::create([
+            'user_id' => $guardian->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+
         $student = Student::factory()->create();
 
         GuardianStudent::create([
@@ -32,7 +40,7 @@ describe('enrollment pending constraint', function () {
         // Create first pending enrollment
         Enrollment::create([
             'student_id' => $student->id,
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Grade 1',
@@ -69,6 +77,14 @@ describe('enrollment pending constraint', function () {
         $guardian = User::factory()->create();
         $guardian->assignRole('guardian');
 
+        $guardianModel = \App\Models\Guardian::create([
+            'user_id' => $guardian->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+
         // Create student with specific grade level
         $student = Student::factory()->create([
             'grade_level' => 'Kinder',
@@ -84,7 +100,7 @@ describe('enrollment pending constraint', function () {
         // Create completed enrollment for previous year
         Enrollment::create([
             'student_id' => $student->id,
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'school_year' => '2023-2024',
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Kinder',
@@ -115,6 +131,14 @@ describe('enrollment pending constraint', function () {
         $guardian = User::factory()->create();
         $guardian->assignRole('guardian');
 
+        $guardianModel = \App\Models\Guardian::create([
+            'user_id' => $guardian->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+
         $student = Student::factory()->create();
 
         GuardianStudent::create([
@@ -127,7 +151,7 @@ describe('enrollment pending constraint', function () {
         // Create enrolled enrollment for current year
         Enrollment::create([
             'student_id' => $student->id,
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Grade 1',
@@ -157,6 +181,14 @@ describe('enrollment pending constraint', function () {
         $guardian = User::factory()->create();
         $guardian->assignRole('guardian');
 
+        $guardianModel = \App\Models\Guardian::create([
+            'user_id' => $guardian->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+
         $student = Student::factory()->create();
 
         GuardianStudent::create([
@@ -169,7 +201,7 @@ describe('enrollment pending constraint', function () {
         // Create rejected enrollment
         Enrollment::create([
             'student_id' => $student->id,
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Grade 1',

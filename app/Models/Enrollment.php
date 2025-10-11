@@ -88,7 +88,7 @@ class Enrollment extends Model
      */
     public function guardian(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'guardian_id');
+        return $this->belongsTo(Guardian::class);
     }
 
     /**
@@ -105,8 +105,8 @@ class Enrollment extends Model
     public function calculateTotalAmount(): float
     {
         return ($this->tuition_fee_cents + $this->miscellaneous_fee_cents +
-                $this->laboratory_fee_cents + $this->library_fee_cents +
-                $this->sports_fee_cents) / 100;
+            $this->laboratory_fee_cents + $this->library_fee_cents +
+            $this->sports_fee_cents) / 100;
     }
 
     /**
