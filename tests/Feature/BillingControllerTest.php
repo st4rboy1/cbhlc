@@ -27,7 +27,7 @@ describe('invoice controller', function () {
         $enrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0001',
             'student_id' => $student->id,
-            'guardian_id' => Guardian::factory()->create()->user_id,
+            'guardian_id' => Guardian::factory()->create()->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_4,
@@ -96,7 +96,7 @@ describe('invoice controller', function () {
         $otherEnrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0003',
             'student_id' => $otherStudent->id,
-            'guardian_id' => Guardian::factory()->create()->user_id,
+            'guardian_id' => Guardian::factory()->create()->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::THIRD,
             'grade_level' => GradeLevel::GRADE_6,
@@ -212,7 +212,7 @@ describe('updatePayment method', function () {
         $enrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0006',
             'student_id' => Student::factory()->create()->id,
-            'guardian_id' => Guardian::factory()->create()->user_id,
+            'guardian_id' => Guardian::factory()->create()->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_2,
@@ -249,7 +249,7 @@ describe('updatePayment method', function () {
         $enrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0007',
             'student_id' => Student::factory()->create()->id,
-            'guardian_id' => Guardian::factory()->create()->user_id,
+            'guardian_id' => Guardian::factory()->create()->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::SECOND,
             'grade_level' => GradeLevel::GRADE_3,
@@ -282,7 +282,7 @@ describe('updatePayment method', function () {
         $enrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0008',
             'student_id' => Student::factory()->create()->id,
-            'guardian_id' => Guardian::factory()->create()->user_id,
+            'guardian_id' => Guardian::factory()->create()->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::THIRD,
             'grade_level' => GradeLevel::GRADE_4,
@@ -316,7 +316,7 @@ describe('updatePayment method', function () {
         $enrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0009',
             'student_id' => Student::factory()->create()->id,
-            'guardian_id' => Guardian::factory()->create()->user_id,
+            'guardian_id' => Guardian::factory()->create()->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FOURTH,
             'grade_level' => GradeLevel::GRADE_5,
@@ -376,7 +376,7 @@ describe('updatePayment method', function () {
         $enrollment = Enrollment::create([
             'enrollment_id' => 'ENR-0010',
             'student_id' => Student::factory()->create()->id,
-            'guardian_id' => Guardian::factory()->create()->user_id,
+            'guardian_id' => Guardian::factory()->create()->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_6,

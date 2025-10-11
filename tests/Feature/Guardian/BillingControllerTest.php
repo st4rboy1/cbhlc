@@ -333,7 +333,7 @@ describe('Guardian BillingController', function () {
         $otherStudent = Student::factory()->create();
         $enrollment = Enrollment::factory()->create([
             'student_id' => $otherStudent->id,
-            'guardian_id' => Guardian::factory()->create()->user_id,
+            'guardian_id' => Guardian::factory()->create()->id,
         ]);
 
         $response = $this->actingAs($this->guardian)
