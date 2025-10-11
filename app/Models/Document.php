@@ -69,9 +69,11 @@ class Document extends Model
     {
         $bytes = $this->file_size;
         $units = ['B', 'KB', 'MB', 'GB'];
+        $i = 0;
 
-        for ($i = 0; $bytes > 1024; $i++) {
+        while ($bytes >= 1024 && $i < count($units) - 1) {
             $bytes /= 1024;
+            $i++;
         }
 
         return round($bytes, 2).' '.$units[$i];
@@ -133,8 +135,17 @@ class Document extends Model
     protected static function booted(): void
     {
         static::deleted(function (Document $document) {
-            if ($document->file_path && Storage::disk('private')->exists($document->file_path)) {
-                Storage::disk('private')->delete($document->file_path);
+            try {
+                if ($document->file_path && Storage::disk('private')->exists($document->file_path)) {
+                    Storage::disk('private')->delete($document->file_path);
+                }
+            } catch (\Exception $e) {
+                // Log the error but don't fail the deletion
+                \Log::warning('Failed to delete document file', [
+                    'document_id' => $document->id,
+                    'file_path' => $document->file_path,
+                    'error' => $e->getMessage(),
+                ]);
             }
         });
     }
