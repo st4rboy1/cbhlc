@@ -114,9 +114,12 @@ class EnrollmentController extends Controller
         $amountPaidCents = 0;
         $balanceCents = $netAmountCents - $amountPaidCents;
 
+        // Get Guardian model ID for the authenticated user
+        $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
+
         $enrollment = Enrollment::create([
             'student_id' => $validated['student_id'],
-            'guardian_id' => Auth::id(),
+            'guardian_id' => $guardian->id,
             'school_year' => $validated['school_year'],
             'quarter' => Quarter::from($validated['quarter']),
             'grade_level' => GradeLevel::from($validated['grade_level']),
