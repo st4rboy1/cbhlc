@@ -1,4 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
+import { UsersTable } from '@/pages/admin/users/users-table';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
@@ -12,7 +13,7 @@ interface Props {
     total?: number;
 }
 
-export default function UsersIndex({ users, total }: Props) {
+export default function UsersIndex({ users }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin', href: '/admin/dashboard' },
         { title: 'Users', href: '/admin/users' },
@@ -23,7 +24,7 @@ export default function UsersIndex({ users, total }: Props) {
             <Head title="Admin Users" />
             <div className="px-4 py-6">
                 <h1 className="mb-4 text-2xl font-bold">Admin Users Index</h1>
-                <pre className="overflow-auto rounded bg-gray-100 p-4">{JSON.stringify({ users, total }, null, 2)}</pre>
+                <UsersTable users={users || []} />
             </div>
         </AppLayout>
     );
