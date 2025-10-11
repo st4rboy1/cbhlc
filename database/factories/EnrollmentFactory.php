@@ -58,17 +58,15 @@ class EnrollmentFactory extends Factory
             'enrollment_id' => $enrollmentId,
             'student_id' => Student::factory(),
             'guardian_id' => function (array $attributes) {
-                // Get a guardian user or create one
-                $guardianUser = \App\Models\User::whereHas('roles', function ($q) {
-                    $q->where('name', 'guardian');
-                })->inRandomOrder()->first();
+                // Get an existing guardian or create one
+                $guardian = Guardian::inRandomOrder()->first();
 
-                if (! $guardianUser) {
+                if (! $guardian) {
                     $guardianUser = \App\Models\User::factory()->create();
                     $guardianUser->assignRole('guardian');
 
                     // Create Guardian model
-                    Guardian::create([
+                    $guardian = Guardian::create([
                         'user_id' => $guardianUser->id,
                         'first_name' => $this->faker->firstName,
                         'last_name' => $this->faker->lastName,
@@ -77,7 +75,7 @@ class EnrollmentFactory extends Factory
                     ]);
                 }
 
-                return $guardianUser->id;
+                return $guardian->id;
             },
             'school_year' => $this->faker->randomElement(['2023-2024', '2024-2025', '2025-2026']),
             'quarter' => $this->faker->randomElement(Quarter::values()),

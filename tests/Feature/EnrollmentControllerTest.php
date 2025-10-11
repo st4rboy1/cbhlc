@@ -50,7 +50,7 @@ describe('enrollment controller', function () {
         ]);
         Enrollment::factory()->create([
             'student_id' => $ownStudent->id,
-            'guardian_id' => $guardian->id,
+            'guardian_id' => Guardian::factory()->create()->id,
         ]);
 
         // Create other student's enrollment
@@ -81,6 +81,15 @@ describe('enrollment controller', function () {
     test('can store new enrollment', function () {
         $guardian = User::factory()->create();
         $guardian->assignRole('guardian');
+
+        // Create Guardian model
+        $guardianModel = Guardian::create([
+            'user_id' => $guardian->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
 
         $student = Student::factory()->create();
 
@@ -157,7 +166,7 @@ describe('enrollment controller', function () {
         // Create first enrollment
         $firstEnrollment = Enrollment::create([
             'student_id' => $student->id,
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Grade 1',
@@ -215,7 +224,7 @@ describe('enrollment controller', function () {
         // Create first enrollment for 2024-2025
         Enrollment::create([
             'student_id' => $student->id,
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Kinder',
@@ -251,6 +260,15 @@ describe('enrollment controller', function () {
             $guardian = User::factory()->create();
             $guardian->assignRole('guardian');
 
+            // Create Guardian model
+            $guardianModel = Guardian::create([
+                'user_id' => $guardian->id,
+                'first_name' => 'Test',
+                'last_name' => 'Guardian',
+                'contact_number' => '09123456789',
+                'address' => '123 Test St',
+            ]);
+
             $student = Student::factory()->create();
 
             GuardianStudent::create([
@@ -279,6 +297,15 @@ describe('enrollment controller', function () {
             $guardian = User::factory()->create();
             $guardian->assignRole('guardian');
 
+            // Create Guardian model
+            $guardianModel = Guardian::create([
+                'user_id' => $guardian->id,
+                'first_name' => 'Test',
+                'last_name' => 'Guardian',
+                'contact_number' => '09123456789',
+                'address' => '123 Test St',
+            ]);
+
             $student = Student::factory()->create();
 
             GuardianStudent::create([
@@ -291,7 +318,7 @@ describe('enrollment controller', function () {
             // Create previous enrollment to make student "existing"
             Enrollment::create([
                 'student_id' => $student->id,
-                'guardian_id' => $guardian->id,
+                'guardian_id' => $guardianModel->id,
                 'school_year' => '2023-2024',
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Kinder',
@@ -328,6 +355,15 @@ describe('enrollment controller', function () {
             $guardian = User::factory()->create();
             $guardian->assignRole('guardian');
 
+            // Create Guardian model
+            $guardianModel = Guardian::create([
+                'user_id' => $guardian->id,
+                'first_name' => 'Test',
+                'last_name' => 'Guardian',
+                'contact_number' => '09123456789',
+                'address' => '123 Test St',
+            ]);
+
             $student = Student::factory()->create();
 
             GuardianStudent::create([
@@ -356,6 +392,15 @@ describe('enrollment controller', function () {
             $guardian = User::factory()->create();
             $guardian->assignRole('guardian');
 
+            // Create Guardian model
+            $guardianModel = Guardian::create([
+                'user_id' => $guardian->id,
+                'first_name' => 'Test',
+                'last_name' => 'Guardian',
+                'contact_number' => '09123456789',
+                'address' => '123 Test St',
+            ]);
+
             $student = Student::factory()->create([
                 'grade_level' => 'Grade 3',
             ]);
@@ -370,7 +415,7 @@ describe('enrollment controller', function () {
             // Create previous enrollment to establish current grade
             Enrollment::create([
                 'student_id' => $student->id,
-                'guardian_id' => $guardian->id,
+                'guardian_id' => $guardianModel->id,
                 'school_year' => '2023-2024',
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Grade 3',
@@ -401,6 +446,15 @@ describe('enrollment controller', function () {
             $guardian = User::factory()->create();
             $guardian->assignRole('guardian');
 
+            // Create Guardian model
+            $guardianModel = Guardian::create([
+                'user_id' => $guardian->id,
+                'first_name' => 'Test',
+                'last_name' => 'Guardian',
+                'contact_number' => '09123456789',
+                'address' => '123 Test St',
+            ]);
+
             $student = Student::factory()->create([
                 'grade_level' => 'Grade 2',
             ]);
@@ -415,7 +469,7 @@ describe('enrollment controller', function () {
             // Create previous enrollment to establish current grade
             Enrollment::create([
                 'student_id' => $student->id,
-                'guardian_id' => $guardian->id,
+                'guardian_id' => $guardianModel->id,
                 'school_year' => '2023-2024',
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Grade 2',
@@ -450,6 +504,15 @@ describe('enrollment controller', function () {
             $guardian = User::factory()->create();
             $guardian->assignRole('guardian');
 
+            // Create Guardian model
+            $guardianModel = Guardian::create([
+                'user_id' => $guardian->id,
+                'first_name' => 'Test',
+                'last_name' => 'Guardian',
+                'contact_number' => '09123456789',
+                'address' => '123 Test St',
+            ]);
+
             $student = Student::factory()->create([
                 'grade_level' => 'Grade 1',
             ]);
@@ -464,7 +527,7 @@ describe('enrollment controller', function () {
             // Create previous enrollment to establish current grade
             Enrollment::create([
                 'student_id' => $student->id,
-                'guardian_id' => $guardian->id,
+                'guardian_id' => $guardianModel->id,
                 'school_year' => '2023-2024',
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Grade 1',
