@@ -72,7 +72,7 @@ class EnrollmentObserverTest extends TestCase
             'contact_number' => '09123456789',
             'address' => '123 Test St',
         ]);
-        $student = Student::factory()->create(['guardian_id' => $user->id]);
+        $student = Student::factory()->create();
 
         $enrollment = Enrollment::factory()->create([
             'student_id' => $student->id,
@@ -120,7 +120,7 @@ class EnrollmentObserverTest extends TestCase
             'contact_number' => '09123456789',
             'address' => '123 Test St',
         ]);
-        $student = Student::factory()->create(['guardian_id' => $user->id]);
+        $student = Student::factory()->create();
         $enrollment = Enrollment::factory()->create([
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
