@@ -69,7 +69,7 @@ class InvoiceService
 
             if ($enrollment->tuition_fee_cents > 0) {
                 $items[] = [
-                    'description' => 'Tuition Fee - ' . $enrollment->grade_level->label(),
+                    'description' => 'Tuition Fee - '.$enrollment->grade_level->label(),
                     'quantity' => 1,
                     'unit_price' => $enrollment->tuition_fee_cents / 100,
                     'amount' => $enrollment->tuition_fee_cents / 100,

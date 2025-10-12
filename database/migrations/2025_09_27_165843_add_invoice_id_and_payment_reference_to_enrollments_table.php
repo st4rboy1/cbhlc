@@ -47,7 +47,7 @@ return new class extends Migration
                 'invoice_id',
                 'payment_reference',
                 'ready_for_payment_at',
-                'paid_at'
+                'paid_at',
             ]);
         });
     }
