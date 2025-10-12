@@ -127,7 +127,7 @@ class InvoiceService
                 'enrollment_id' => $enrollment->id,
                 'invoice_date' => now(),
                 'due_date' => $enrollment->payment_due_date ?? now()->addDays(30),
-                'status' => InvoiceStatus::PENDING,
+                'status' => InvoiceStatus::SENT,
                 'items' => $items,
             ]);
         });

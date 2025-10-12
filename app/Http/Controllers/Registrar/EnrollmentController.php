@@ -194,6 +194,9 @@ class EnrollmentController extends Controller
             }
         });
 
+        // Refresh enrollment to get the latest status after transaction
+        $enrollment->refresh();
+
         $message = $enrollment->status === EnrollmentStatus::ENROLLED
             ? 'Payment confirmed and student enrolled successfully.'
             : 'Payment confirmed. Partial payment recorded.';
