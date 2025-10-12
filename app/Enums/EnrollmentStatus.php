@@ -62,7 +62,7 @@ enum EnrollmentStatus: string
             self::READY_FOR_PAYMENT,
             self::PAID,
             self::ENROLLED,
-            self::COMPLETED
+            self::COMPLETED,
         ]);
     }
 

@@ -92,7 +92,7 @@ class EnrollmentController extends Controller
             ]);
 
             // Generate invoice for the enrollment
-            $invoiceService = new \App\Services\InvoiceService();
+            $invoiceService = new \App\Services\InvoiceService;
             $invoice = $invoiceService->createInvoiceFromEnrollment($enrollment);
 
             // Update enrollment with invoice reference and transition to ready for payment
