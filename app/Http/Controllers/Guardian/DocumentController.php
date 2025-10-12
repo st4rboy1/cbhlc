@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 class DocumentController extends Controller
 {
     use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
