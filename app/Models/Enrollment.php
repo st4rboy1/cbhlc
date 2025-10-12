@@ -52,11 +52,17 @@ class Enrollment extends Model
         'approved_at',
         'rejected_at',
         'approved_by',
+        'invoice_id',
+        'payment_reference',
+        'ready_for_payment_at',
+        'paid_at',
     ];
 
     protected $casts = [
         'approved_at' => 'datetime',
         'rejected_at' => 'datetime',
+        'ready_for_payment_at' => 'datetime',
+        'paid_at' => 'datetime',
         'payment_due_date' => 'date',
         'quarter' => Quarter::class,
         'grade_level' => \App\Enums\GradeLevel::class,
@@ -97,6 +103,14 @@ class Enrollment extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Get the invoice associated with the enrollment
+     */
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class);
     }
 
     /**
