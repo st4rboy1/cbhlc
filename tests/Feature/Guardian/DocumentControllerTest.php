@@ -16,12 +16,13 @@ beforeEach(function () {
     Storage::fake('private');
 
     // Create roles
-    \Spatie\Permission\Models\Role::create(['name' => 'guardian', 'guard_name' => 'web']);
+    $guardianRole = \Spatie\Permission\Models\Role::create(['name' => 'guardian', 'guard_name' => 'web']);
     \Spatie\Permission\Models\Role::create(['name' => 'registrar', 'guard_name' => 'web']);
 
     // Create guardian user and associated Guardian model
     $guardianModel = Guardian::factory()->create();
     $this->guardian = $guardianModel->user;
+    $this->guardian->assignRole($guardianRole);
 
     $this->student = Student::factory()->create();
     $this->student->guardians()->attach($guardianModel->id);
