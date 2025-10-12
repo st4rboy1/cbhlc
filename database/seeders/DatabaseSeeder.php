@@ -17,5 +17,8 @@ class DatabaseSeeder extends Seeder
 
         // Seed default users
         $this->call(UserSeeder::class);
+
+        // Seed settings
+        $this->call(SettingsSeeder::class);
     }
 }

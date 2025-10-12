@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
 use App\Models\Guardian;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -28,7 +29,7 @@ class TuitionController extends Controller
             // Guardians can only see their children's enrollments
             $guardian = Guardian::where('user_id', $user->id)->first();
             if ($guardian) {
-                $studentIds = $guardian->children()->pluck('students.id');
+                $studentIds = $guardian->children()->get()->pluck('id');
                 $enrollments = Enrollment::with(['student', 'guardian'])
                     ->whereIn('student_id', $studentIds)
                     ->latest()
@@ -56,9 +57,12 @@ class TuitionController extends Controller
                 }
             );
 
+        $settings = Setting::all()->pluck('value', 'key');
+
         return Inertia::render('shared/tuition', [
             'enrollments' => $enrollments,
             'gradeLevelFees' => $gradeLevelFees,
+            'settings' => $settings,
         ]);
     }
 }
