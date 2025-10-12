@@ -28,9 +28,25 @@ test('getPaginatedStudents returns paginated results with relationships', functi
 });
 
 test('getPaginatedStudents applies search filter', function () {
-    Student::factory()->create(['first_name' => 'John', 'last_name' => 'Doe']);
-    Student::factory()->create(['first_name' => 'Jane', 'last_name' => 'Smith']);
-    Student::factory()->create(['student_id' => 'STU001']);
+    Student::factory()->create([
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        'middle_name' => null,
+        'email' => 'john.doe@test.com',
+    ]);
+    Student::factory()->create([
+        'first_name' => 'Jane',
+        'last_name' => 'Smith',
+        'middle_name' => null,
+        'email' => 'jane.smith@test.com',
+    ]);
+    Student::factory()->create([
+        'student_id' => 'STU001',
+        'first_name' => 'Bob',
+        'last_name' => 'Williams',
+        'middle_name' => null,
+        'email' => 'bob@test.com',
+    ]);
 
     // Search by first name
     $result = $this->service->getPaginatedStudents(['search' => 'John'], 10);
