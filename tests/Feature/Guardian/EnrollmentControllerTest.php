@@ -49,7 +49,7 @@ class EnrollmentControllerTest extends TestCase
 
         // Link guardian to student
         GuardianStudent::create([
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'student_id' => $this->student->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => true,
@@ -464,10 +464,19 @@ class EnrollmentControllerTest extends TestCase
         // Create another guardian and student
         $otherGuardian = User::factory()->create();
         $otherGuardian->assignRole('guardian');
+
+        $otherGuardianModel = Guardian::create([
+            'user_id' => $otherGuardian->id,
+            'first_name' => 'Other',
+            'last_name' => 'Guardian',
+            'contact_number' => '09987654321',
+            'address' => '456 Other St',
+        ]);
+
         $otherStudent = Student::factory()->create();
 
         GuardianStudent::create([
-            'guardian_id' => $otherGuardian->id,
+            'guardian_id' => $otherGuardianModel->id,
             'student_id' => $otherStudent->id,
             'relationship_type' => 'father',
             'is_primary_contact' => true,
@@ -475,7 +484,7 @@ class EnrollmentControllerTest extends TestCase
 
         $enrollment = Enrollment::factory()->create([
             'student_id' => $otherStudent->id,
-            'guardian_id' => $otherGuardian->id,
+            'guardian_id' => $otherGuardianModel->id,
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 
@@ -491,10 +500,19 @@ class EnrollmentControllerTest extends TestCase
         // Create another guardian and student
         $otherGuardian = User::factory()->create();
         $otherGuardian->assignRole('guardian');
+
+        $otherGuardianModel = Guardian::create([
+            'user_id' => $otherGuardian->id,
+            'first_name' => 'Other',
+            'last_name' => 'Guardian',
+            'contact_number' => '09987654321',
+            'address' => '456 Other St',
+        ]);
+
         $otherStudent = Student::factory()->create();
 
         GuardianStudent::create([
-            'guardian_id' => $otherGuardian->id,
+            'guardian_id' => $otherGuardianModel->id,
             'student_id' => $otherStudent->id,
             'relationship_type' => 'father',
             'is_primary_contact' => true,
@@ -502,7 +520,7 @@ class EnrollmentControllerTest extends TestCase
 
         $enrollment = Enrollment::factory()->create([
             'student_id' => $otherStudent->id,
-            'guardian_id' => $otherGuardian->id,
+            'guardian_id' => $otherGuardianModel->id,
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 
@@ -521,10 +539,19 @@ class EnrollmentControllerTest extends TestCase
         // Create another guardian and student
         $otherGuardian = User::factory()->create();
         $otherGuardian->assignRole('guardian');
+
+        $otherGuardianModel = Guardian::create([
+            'user_id' => $otherGuardian->id,
+            'first_name' => 'Other',
+            'last_name' => 'Guardian',
+            'contact_number' => '09987654321',
+            'address' => '456 Other St',
+        ]);
+
         $otherStudent = Student::factory()->create();
 
         GuardianStudent::create([
-            'guardian_id' => $otherGuardian->id,
+            'guardian_id' => $otherGuardianModel->id,
             'student_id' => $otherStudent->id,
             'relationship_type' => 'father',
             'is_primary_contact' => true,
@@ -532,7 +559,7 @@ class EnrollmentControllerTest extends TestCase
 
         $enrollment = Enrollment::factory()->create([
             'student_id' => $otherStudent->id,
-            'guardian_id' => $otherGuardian->id,
+            'guardian_id' => $otherGuardianModel->id,
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 
@@ -680,7 +707,7 @@ class EnrollmentControllerTest extends TestCase
         $secondStudent = Student::factory()->create();
 
         GuardianStudent::create([
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'student_id' => $secondStudent->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => true,

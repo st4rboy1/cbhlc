@@ -68,7 +68,7 @@ describe('invoice controller', function () {
         // Create guardian's child
         $ownChild = Student::factory()->create();
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,  // Use user id, not guardian model id
+            'guardian_id' => $guardianModel->id,
             'student_id' => $ownChild->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => true,
@@ -137,7 +137,7 @@ describe('invoice controller', function () {
 
         $child = Student::factory()->create();
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,  // Use user id, not guardian model id
+            'guardian_id' => $guardianModel->id,
             'student_id' => $child->id,
             'relationship_type' => 'father',
             'is_primary_contact' => true,
