@@ -1,20 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { type Enrollment } from '@/types';
 import { Check, Clock, MoreVertical, User, X } from 'lucide-react';
-
-interface Enrollment {
-    id: number;
-    student_name: string;
-    grade: string;
-    status: 'pending' | 'approved' | 'rejected';
-}
 
 interface EnrollmentCardProps {
     enrollment: Enrollment;
-    onStatusChange: (id: number, status: 'pending' | 'approved' | 'rejected') => void;
 }
 
-export function EnrollmentCard({ enrollment, onStatusChange }: EnrollmentCardProps) {
+export function EnrollmentCard({ enrollment }: EnrollmentCardProps) {
     const statusConfig = {
         pending: {
             label: 'Pending',
@@ -31,6 +24,16 @@ export function EnrollmentCard({ enrollment, onStatusChange }: EnrollmentCardPro
             icon: X,
             className: 'bg-destructive/10 text-destructive-foreground border-destructive/20',
         },
+        enrolled: {
+            label: 'Enrolled',
+            icon: Check,
+            className: 'bg-primary/10 text-primary-foreground border-primary/20',
+        },
+        completed: {
+            label: 'Completed',
+            icon: Check,
+            className: 'bg-muted/10 text-muted-foreground border-muted/20',
+        },
     };
 
     const config = statusConfig[enrollment.status];
@@ -45,8 +48,8 @@ export function EnrollmentCard({ enrollment, onStatusChange }: EnrollmentCardPro
                     </div>
 
                     <div className="min-w-0 flex-1">
-                        <h3 className="text-base font-semibold text-foreground">{enrollment.student_name}</h3>
-                        <p className="text-sm text-muted-foreground">{enrollment.grade}</p>
+                        <h3 className="text-base font-semibold text-foreground">{enrollment.student.full_name}</h3>
+                        <p className="text-sm text-muted-foreground">{enrollment.grade_level}</p>
                     </div>
                 </div>
 
@@ -55,29 +58,6 @@ export function EnrollmentCard({ enrollment, onStatusChange }: EnrollmentCardPro
                         <StatusIcon className="h-4 w-4" />
                         {config.label}
                     </div>
-
-                    {enrollment.status === 'pending' && (
-                        <div className="flex gap-2">
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => onStatusChange(enrollment.id, 'approved')}
-                                className="bg-success/10 border-success/20 text-success-foreground hover:bg-success/20 gap-2"
-                            >
-                                <Check className="h-4 w-4" />
-                                Approve
-                            </Button>
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => onStatusChange(enrollment.id, 'rejected')}
-                                className="gap-2 border-destructive/20 bg-destructive/10 text-destructive-foreground hover:bg-destructive/20"
-                            >
-                                <X className="h-4 w-4" />
-                                Reject
-                            </Button>
-                        </div>
-                    )}
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -89,9 +69,6 @@ export function EnrollmentCard({ enrollment, onStatusChange }: EnrollmentCardPro
                         <DropdownMenuContent align="end" className="w-40">
                             <DropdownMenuItem>View Details</DropdownMenuItem>
                             <DropdownMenuItem>Edit</DropdownMenuItem>
-                            {enrollment.status !== 'pending' && (
-                                <DropdownMenuItem onClick={() => onStatusChange(enrollment.id, 'pending')}>Reset to Pending</DropdownMenuItem>
-                            )}
                             <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
