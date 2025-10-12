@@ -29,8 +29,5 @@ yarn-error.log
 *.cache
 coverage.xml
 .envrc
-*.md
 !README.md
 !CLAUDE.md
-/tickets/*
-!/tickets/.gitkeep
