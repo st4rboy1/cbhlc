@@ -121,7 +121,7 @@ export function DocumentUpload({ studentId, documentType: defaultDocumentType, o
         const k = 1024;
         const sizes = ['B', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
     };
 
     const handleUpload = async () => {
@@ -152,40 +152,36 @@ export function DocumentUpload({ studentId, documentType: defaultDocumentType, o
             });
         }, 200);
 
-        router.post(
-            `/guardian/students/${studentId}/documents`,
-            formData,
-            {
-                forceFormData: true,
-                onSuccess: (page) => {
-                    clearInterval(progressInterval);
-                    setUploadProgress(100);
-                    toast({
-                        title: 'Success',
-                        description: 'Document uploaded successfully',
-                    });
-                    clearFile();
-                    setIsUploading(false);
-                    if (onSuccess && page.props.document) {
-                        onSuccess(page.props.document as Document);
-                    }
-                },
-                onError: (errors) => {
-                    clearInterval(progressInterval);
-                    setIsUploading(false);
-                    setUploadProgress(0);
-                    const errorMessage = errors.document || errors.document_type || 'Failed to upload document. Please try again.';
-                    toast({
-                        variant: 'destructive',
-                        title: 'Upload Failed',
-                        description: errorMessage,
-                    });
-                    if (onError) {
-                        onError(errorMessage);
-                    }
-                },
-            }
-        );
+        router.post(`/guardian/students/${studentId}/documents`, formData, {
+            forceFormData: true,
+            onSuccess: (page) => {
+                clearInterval(progressInterval);
+                setUploadProgress(100);
+                toast({
+                    title: 'Success',
+                    description: 'Document uploaded successfully',
+                });
+                clearFile();
+                setIsUploading(false);
+                if (onSuccess && page.props.document) {
+                    onSuccess(page.props.document as Document);
+                }
+            },
+            onError: (errors) => {
+                clearInterval(progressInterval);
+                setIsUploading(false);
+                setUploadProgress(0);
+                const errorMessage = errors.document || errors.document_type || 'Failed to upload document. Please try again.';
+                toast({
+                    variant: 'destructive',
+                    title: 'Upload Failed',
+                    description: errorMessage,
+                });
+                if (onError) {
+                    onError(errorMessage);
+                }
+            },
+        });
     };
 
     return (
@@ -265,7 +261,7 @@ export function DocumentUpload({ studentId, documentType: defaultDocumentType, o
                             {isUploading && (
                                 <div className="space-y-2">
                                     <Progress value={uploadProgress} className="h-2" />
-                                    <p className="text-xs text-center text-muted-foreground">Uploading... {uploadProgress}%</p>
+                                    <p className="text-center text-xs text-muted-foreground">Uploading... {uploadProgress}%</p>
                                 </div>
                             )}
                         </div>
