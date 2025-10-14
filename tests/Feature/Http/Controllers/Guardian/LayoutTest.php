@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Guardian;
 
+use App\Models\Guardian;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
@@ -20,6 +21,15 @@ class LayoutTest extends TestCase
 
         $this->guardian = User::factory()->create();
         $this->guardian->assignRole('guardian');
+
+        // Create Guardian model for the user
+        Guardian::create([
+            'user_id' => $this->guardian->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
     }
 
     public function test_guardian_pages_use_app_layout(): void

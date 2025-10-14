@@ -219,7 +219,7 @@ class StudentService extends BaseService implements StudentServiceInterface
     protected function associateGuardian(Student $student, int $guardianId, string $relationship = 'guardian'): GuardianStudent
     {
         // Check if guardian exists
-        $guardian = User::findOrFail($guardianId);
+        $guardian = \App\Models\Guardian::findOrFail($guardianId);
 
         // Check if association already exists
         $existing = GuardianStudent::where('student_id', $student->id)
