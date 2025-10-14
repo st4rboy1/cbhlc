@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Contracts\Services\StudentServiceInterface;
+use App\Models\Guardian;
 use App\Models\GuardianStudent;
 use App\Models\Student;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -219,7 +219,7 @@ class StudentService extends BaseService implements StudentServiceInterface
     protected function associateGuardian(Student $student, int $guardianId, string $relationship = 'guardian'): GuardianStudent
     {
         // Check if guardian exists
-        $guardian = \App\Models\Guardian::findOrFail($guardianId);
+        $guardian = Guardian::findOrFail($guardianId);
 
         // Check if association already exists
         $existing = GuardianStudent::where('student_id', $student->id)
