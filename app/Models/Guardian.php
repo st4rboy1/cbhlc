@@ -40,12 +40,12 @@ class Guardian extends Model
 
     /**
      * Get the students (children) associated with this guardian
-     * Note: guardian_students table uses user_id (not guardian.id) as guardian_id
+     * Note: guardian_students table uses guardian.id as guardian_id
      */
     public function children(): BelongsToMany
     {
-        // We use the user's ID since guardian_students.guardian_id references users.id
-        return $this->belongsToMany(Student::class, 'guardian_students', 'guardian_id', 'student_id', 'user_id', 'id')
+        // guardian_students.guardian_id now references guardians.id after migration
+        return $this->belongsToMany(Student::class, 'guardian_students', 'guardian_id', 'student_id')
             ->withPivot('relationship_type', 'is_primary_contact')
             ->withTimestamps();
     }
