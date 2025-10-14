@@ -181,6 +181,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Billing Information
         Route::get('/billing', [GuardianBillingController::class, 'index'])->name('billing.index');
         Route::get('/billing/{enrollment}', [GuardianBillingController::class, 'show'])->name('billing.show');
+
+        // Document Management
+        Route::get('/students/{student}/documents', [\App\Http\Controllers\Guardian\DocumentController::class, 'index'])->name('students.documents.index');
+        Route::post('/students/{student}/documents', [\App\Http\Controllers\Guardian\DocumentController::class, 'store'])->name('students.documents.store');
+        Route::get('/students/{student}/documents/{document}', [\App\Http\Controllers\Guardian\DocumentController::class, 'show'])->name('students.documents.show');
+        Route::delete('/students/{student}/documents/{document}', [\App\Http\Controllers\Guardian\DocumentController::class, 'destroy'])->name('students.documents.destroy');
     });
 
     // Student dashboard
