@@ -214,6 +214,8 @@ class UserSeeder extends Seeder
      */
     private function createStudentsForGuardian(User $guardian): void
     {
+        $guardianModel = Guardian::where('user_id', $guardian->id)->first();
+
         // Create first child with login account
         $studentUser1 = User::firstOrCreate(
             ['email' => 'juan.santos@student.cbhlc.edu'],
@@ -242,7 +244,7 @@ class UserSeeder extends Seeder
 
         // Link student to guardian (check if relationship already exists)
         GuardianStudent::firstOrCreate([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student1->id,
         ], [
             'relationship_type' => RelationshipType::MOTHER->value,
@@ -277,7 +279,7 @@ class UserSeeder extends Seeder
 
         // Link second student to guardian
         GuardianStudent::firstOrCreate([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student2->id,
         ], [
             'relationship_type' => RelationshipType::MOTHER->value,
@@ -311,7 +313,7 @@ class UserSeeder extends Seeder
         );
 
         GuardianStudent::firstOrCreate([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student1->id,
         ], [
             'relationship_type' => RelationshipType::FATHER->value,
@@ -352,7 +354,7 @@ class UserSeeder extends Seeder
         );
 
         GuardianStudent::firstOrCreate([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student2->id,
         ], [
             'relationship_type' => RelationshipType::FATHER->value,
@@ -401,7 +403,7 @@ class UserSeeder extends Seeder
         );
 
         GuardianStudent::firstOrCreate([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student1->id,
         ], [
             'relationship_type' => RelationshipType::MOTHER->value,
@@ -444,7 +446,7 @@ class UserSeeder extends Seeder
         );
 
         GuardianStudent::firstOrCreate([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student2->id,
         ], [
             'relationship_type' => RelationshipType::MOTHER->value,
@@ -494,7 +496,7 @@ class UserSeeder extends Seeder
         );
 
         GuardianStudent::firstOrCreate([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student1->id,
         ], [
             'relationship_type' => RelationshipType::FATHER->value,
@@ -535,7 +537,7 @@ class UserSeeder extends Seeder
         );
 
         GuardianStudent::firstOrCreate([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student2->id,
         ], [
             'relationship_type' => RelationshipType::FATHER->value,
