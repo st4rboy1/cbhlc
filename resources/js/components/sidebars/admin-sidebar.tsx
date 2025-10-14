@@ -1,10 +1,8 @@
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, CreditCard, FileCheck, Folder, GraduationCap, LayoutGrid, Settings, UserCog, Users } from 'lucide-react';
+import { CreditCard, FileCheck, GraduationCap, LayoutGrid, Settings, UserCog, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -45,29 +43,14 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/st4rboy1/cbhlc',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: '/docs',
-        icon: BookOpen,
-    },
-];
-
 export function AdminSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href="/admin/dashboard" prefetch>
-                                <AppLogo />
-                            </Link>
+                        <SidebarMenuButton size="lg">
+                            <AppLogo />
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
@@ -78,7 +61,6 @@ export function AdminSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
