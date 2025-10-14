@@ -78,6 +78,15 @@ describe('enrollment controller', function () {
         $user = User::factory()->create();
         $user->assignRole('guardian');
 
+        // Create Guardian model for the user
+        Guardian::create([
+            'user_id' => $user->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+
         $response = $this->actingAs($user)->get(route('enrollments.create'));
 
         $response->assertStatus(200);
