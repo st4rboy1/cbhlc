@@ -28,9 +28,11 @@ export function EnrollmentList({ enrollments, filters, statusCounts }: Props) {
                         {enrollments.total} {enrollments.total === 1 ? 'enrollment' : 'enrollments'}
                     </p>
                 </div>
-                <Button className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    New Enrollment
+                <Button asChild className="gap-2">
+                    <Link href="/admin/enrollments/create">
+                        <Plus className="h-4 w-4" />
+                        New Enrollment
+                    </Link>
                 </Button>
             </div>
 
