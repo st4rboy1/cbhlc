@@ -31,7 +31,7 @@ describe('enrollment pending constraint', function () {
         $student = Student::factory()->create();
 
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student->id,
             'relationship_type' => 'father',
             'is_primary_contact' => true,
@@ -91,7 +91,7 @@ describe('enrollment pending constraint', function () {
         ]);
 
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => true,
@@ -142,7 +142,7 @@ describe('enrollment pending constraint', function () {
         $student = Student::factory()->create();
 
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student->id,
             'relationship_type' => 'father',
             'is_primary_contact' => true,
@@ -192,7 +192,7 @@ describe('enrollment pending constraint', function () {
         $student = Student::factory()->create();
 
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => true,

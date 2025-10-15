@@ -6,6 +6,7 @@ use App\Enums\EnrollmentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
+use App\Models\Guardian;
 use App\Models\GuardianStudent;
 use App\Services\CurrencyService;
 use Illuminate\Support\Facades\Auth;
@@ -25,10 +26,11 @@ class BillingController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
+        // Get Guardian model for authenticated user
+        $guardian = Guardian::where('user_id', Auth::id())->firstOrFail();
 
         // Get student IDs for this guardian
-        $studentIds = GuardianStudent::where('guardian_id', $user->id)
+        $studentIds = GuardianStudent::where('guardian_id', $guardian->id)
             ->pluck('student_id');
 
         // Get enrollments with billing information
@@ -110,8 +112,11 @@ class BillingController extends Controller
      */
     public function show(Enrollment $enrollment)
     {
+        // Get Guardian model for authenticated user
+        $guardian = Guardian::where('user_id', Auth::id())->firstOrFail();
+
         // Verify this guardian has access to this enrollment
-        $hasAccess = GuardianStudent::where('guardian_id', Auth::id())
+        $hasAccess = GuardianStudent::where('guardian_id', $guardian->id)
             ->where('student_id', $enrollment->student_id)
             ->exists();
 

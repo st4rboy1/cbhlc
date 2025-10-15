@@ -303,22 +303,30 @@ test('getEnrollmentStatusDistribution returns enrollment counts by status', func
     Enrollment::factory()->count(15)->create(['status' => EnrollmentStatus::APPROVED]);
     Enrollment::factory()->count(8)->create(['status' => EnrollmentStatus::PENDING]);
     Enrollment::factory()->count(3)->create(['status' => EnrollmentStatus::REJECTED]);
+    Enrollment::factory()->count(5)->create(['status' => EnrollmentStatus::READY_FOR_PAYMENT]);
+    Enrollment::factory()->count(10)->create(['status' => EnrollmentStatus::PAID]);
 
     $result = $this->service->getEnrollmentStatusDistribution();
 
-    expect($result)->toHaveCount(3);
+    expect($result)->toHaveCount(5);
 
-    $approvedItem = $result->firstWhere('status', 'Approved');
+    $approvedItem = $result->firstWhere('status', 'Approved - Awaiting Invoice');
     $pendingItem = $result->firstWhere('status', 'Pending Review');
     $rejectedItem = $result->firstWhere('status', 'Rejected');
+    $readyForPaymentItem = $result->firstWhere('status', 'Ready for Payment');
+    $paidItem = $result->firstWhere('status', 'Paid - Awaiting Confirmation');
 
     expect($approvedItem)->not->toBeNull();
     expect($pendingItem)->not->toBeNull();
     expect($rejectedItem)->not->toBeNull();
+    expect($readyForPaymentItem)->not->toBeNull();
+    expect($paidItem)->not->toBeNull();
 
     expect($approvedItem['count'])->toBeGreaterThanOrEqual(15);
     expect($pendingItem['count'])->toBeGreaterThanOrEqual(8);
     expect($rejectedItem['count'])->toBeGreaterThanOrEqual(3);
+    expect($readyForPaymentItem['count'])->toBeGreaterThanOrEqual(5);
+    expect($paidItem['count'])->toBeGreaterThanOrEqual(10);
 });
 
 test('getUpcomingDeadlines returns future important dates', function () {

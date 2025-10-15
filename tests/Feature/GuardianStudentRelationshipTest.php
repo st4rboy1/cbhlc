@@ -28,7 +28,7 @@ test('guardian can have children through guardian_students pivot table', functio
 
     // Create the relationship
     GuardianStudent::create([
-        'guardian_id' => $user->id,
+        'guardian_id' => $guardian->id,
         'student_id' => $student->id,
         'relationship_type' => RelationshipType::MOTHER->value,
         'is_primary_contact' => true,
@@ -43,11 +43,25 @@ test('guardian can have children through guardian_students pivot table', functio
 });
 
 test('student can have multiple guardians', function () {
-    $mother = User::factory()->create();
-    $mother->assignRole('guardian');
+    $motherUser = User::factory()->create();
+    $motherUser->assignRole('guardian');
+    $mother = \App\Models\Guardian::create([
+        'user_id' => $motherUser->id,
+        'first_name' => 'Mother',
+        'last_name' => 'Smith',
+        'contact_number' => '09111111111',
+        'address' => '111 Test St',
+    ]);
 
-    $father = User::factory()->create();
-    $father->assignRole('guardian');
+    $fatherUser = User::factory()->create();
+    $fatherUser->assignRole('guardian');
+    $father = \App\Models\Guardian::create([
+        'user_id' => $fatherUser->id,
+        'first_name' => 'Father',
+        'last_name' => 'Smith',
+        'contact_number' => '09222222222',
+        'address' => '111 Test St',
+    ]);
 
     $student = Student::factory()->create();
 
@@ -96,14 +110,14 @@ test('guardian can have multiple children', function () {
 
     // Create relationships
     GuardianStudent::create([
-        'guardian_id' => $user->id,
+        'guardian_id' => $guardian->id,
         'student_id' => $child1->id,
         'relationship_type' => RelationshipType::GUARDIAN->value,
         'is_primary_contact' => true,
     ]);
 
     GuardianStudent::create([
-        'guardian_id' => $user->id,
+        'guardian_id' => $guardian->id,
         'student_id' => $child2->id,
         'relationship_type' => RelationshipType::GUARDIAN->value,
         'is_primary_contact' => false,
@@ -116,8 +130,15 @@ test('guardian can have multiple children', function () {
 });
 
 test('guardian student relationship uses correct table and column names', function () {
-    $guardian = User::factory()->create();
-    $guardian->assignRole('guardian');
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+    $guardian = \App\Models\Guardian::create([
+        'user_id' => $user->id,
+        'first_name' => 'Grand',
+        'last_name' => 'Parent',
+        'contact_number' => '09333333333',
+        'address' => '333 Test St',
+    ]);
 
     $student = Student::factory()->create();
 
@@ -156,7 +177,7 @@ test('guardian student model relationships work correctly', function () {
     $student = Student::factory()->create();
 
     $relationship = GuardianStudent::create([
-        'guardian_id' => $user->id,
+        'guardian_id' => $guardian->id,
         'student_id' => $student->id,
         'relationship_type' => RelationshipType::OTHER->value,
         'is_primary_contact' => true,
@@ -169,8 +190,15 @@ test('guardian student model relationships work correctly', function () {
 });
 
 test('relationship type enum values are properly validated', function () {
-    $guardian = User::factory()->create();
-    $guardian->assignRole('guardian');
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+    $guardian = \App\Models\Guardian::create([
+        'user_id' => $user->id,
+        'first_name' => 'Valid',
+        'last_name' => 'Tester',
+        'contact_number' => '09444444444',
+        'address' => '444 Test St',
+    ]);
 
     $student = Student::factory()->create();
 

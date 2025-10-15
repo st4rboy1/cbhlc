@@ -37,8 +37,16 @@ describe('enrollment controller', function () {
     });
 
     test('guardian can only view their children enrollments at /enrollments', function () {
-        $guardian = User::factory()->create();
-        $guardian->assignRole('guardian');
+        $guardianUser = User::factory()->create();
+        $guardianUser->assignRole('guardian');
+
+        $guardian = Guardian::create([
+            'user_id' => $guardianUser->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
 
         // Create guardian's children with enrollments
         $ownStudent = Student::factory()->create();
@@ -50,14 +58,14 @@ describe('enrollment controller', function () {
         ]);
         Enrollment::factory()->create([
             'student_id' => $ownStudent->id,
-            'guardian_id' => Guardian::factory()->create()->id,
+            'guardian_id' => $guardian->id,
         ]);
 
         // Create other student's enrollment
         $otherStudent = Student::factory()->create();
         Enrollment::factory()->create(['student_id' => $otherStudent->id]);
 
-        $response = $this->actingAs($guardian)->get(route('enrollments.index'));
+        $response = $this->actingAs($guardianUser)->get(route('enrollments.index'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -70,6 +78,15 @@ describe('enrollment controller', function () {
         $user = User::factory()->create();
         $user->assignRole('guardian');
 
+        // Create Guardian model for the user
+        Guardian::create([
+            'user_id' => $user->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
+
         $response = $this->actingAs($user)->get(route('enrollments.create'));
 
         $response->assertStatus(200);
@@ -79,12 +96,12 @@ describe('enrollment controller', function () {
     });
 
     test('can store new enrollment', function () {
-        $guardian = User::factory()->create();
-        $guardian->assignRole('guardian');
+        $guardianUser = User::factory()->create();
+        $guardianUser->assignRole('guardian');
 
         // Create Guardian model
         $guardianModel = Guardian::create([
-            'user_id' => $guardian->id,
+            'user_id' => $guardianUser->id,
             'first_name' => 'Test',
             'last_name' => 'Guardian',
             'contact_number' => '09123456789',
@@ -102,13 +119,13 @@ describe('enrollment controller', function () {
 
         // Need to create guardian-student relationship first
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student->id,
             'relationship_type' => 'father',
             'is_primary_contact' => true,
         ]);
 
-        $response = $this->actingAs($guardian)->post(route('enrollments.store'), $enrollmentData);
+        $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), $enrollmentData);
 
         $response->assertRedirect(route('guardian.enrollments.index'));
         $this->assertDatabaseHas('enrollments', [
@@ -143,11 +160,11 @@ describe('enrollment controller', function () {
     });
 
     test('prevents duplicate enrollment for same student and school year', function () {
-        $guardian = User::factory()->create();
-        $guardian->assignRole('guardian');
+        $guardianUser = User::factory()->create();
+        $guardianUser->assignRole('guardian');
 
         $guardianModel = Guardian::create([
-            'user_id' => $guardian->id,
+            'user_id' => $guardianUser->id,
             'first_name' => 'Jane',
             'last_name' => 'Smith',
             'contact_number' => '09123456789',
@@ -157,7 +174,7 @@ describe('enrollment controller', function () {
         $student = Student::factory()->create();
 
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => true,
@@ -182,7 +199,7 @@ describe('enrollment controller', function () {
         ]);
 
         // Attempt to create duplicate enrollment for same student and school year
-        $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+        $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
             'student_id' => $student->id,
             'school_year' => '2024-2025',
             'quarter' => Quarter::SECOND->value,
@@ -201,11 +218,11 @@ describe('enrollment controller', function () {
     });
 
     test('allows enrollment for same student in different school year', function () {
-        $guardian = User::factory()->create();
-        $guardian->assignRole('guardian');
+        $guardianUser = User::factory()->create();
+        $guardianUser->assignRole('guardian');
 
         $guardianModel = Guardian::create([
-            'user_id' => $guardian->id,
+            'user_id' => $guardianUser->id,
             'first_name' => 'Bob',
             'last_name' => 'Johnson',
             'contact_number' => '09123456789',
@@ -215,7 +232,7 @@ describe('enrollment controller', function () {
         $student = Student::factory()->create();
 
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student->id,
             'relationship_type' => 'father',
             'is_primary_contact' => true,
@@ -240,7 +257,7 @@ describe('enrollment controller', function () {
         ]);
 
         // Create enrollment for different school year - should succeed (progression from Kinder to Grade 1)
-        $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+        $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
             'student_id' => $student->id,
             'school_year' => '2025-2026',
             'quarter' => Quarter::FIRST->value,
@@ -257,12 +274,12 @@ describe('enrollment controller', function () {
 
     describe('quarter selection business rules', function () {
         test('new students can select any quarter', function () {
-            $guardian = User::factory()->create();
-            $guardian->assignRole('guardian');
+            $guardianUser = User::factory()->create();
+            $guardianUser->assignRole('guardian');
 
             // Create Guardian model
             $guardianModel = Guardian::create([
-                'user_id' => $guardian->id,
+                'user_id' => $guardianUser->id,
                 'first_name' => 'Test',
                 'last_name' => 'Guardian',
                 'contact_number' => '09123456789',
@@ -272,14 +289,14 @@ describe('enrollment controller', function () {
             $student = Student::factory()->create();
 
             GuardianStudent::create([
-                'guardian_id' => $guardian->id,
+                'guardian_id' => $guardianModel->id,
                 'student_id' => $student->id,
                 'relationship_type' => 'father',
                 'is_primary_contact' => true,
             ]);
 
             // New student should be able to select any quarter
-            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',
                 'quarter' => Quarter::SECOND->value,
@@ -294,12 +311,12 @@ describe('enrollment controller', function () {
         });
 
         test('existing students are automatically enrolled in first quarter', function () {
-            $guardian = User::factory()->create();
-            $guardian->assignRole('guardian');
+            $guardianUser = User::factory()->create();
+            $guardianUser->assignRole('guardian');
 
             // Create Guardian model
             $guardianModel = Guardian::create([
-                'user_id' => $guardian->id,
+                'user_id' => $guardianUser->id,
                 'first_name' => 'Test',
                 'last_name' => 'Guardian',
                 'contact_number' => '09123456789',
@@ -309,7 +326,7 @@ describe('enrollment controller', function () {
             $student = Student::factory()->create();
 
             GuardianStudent::create([
-                'guardian_id' => $guardian->id,
+                'guardian_id' => $guardianModel->id,
                 'student_id' => $student->id,
                 'relationship_type' => 'mother',
                 'is_primary_contact' => true,
@@ -334,7 +351,7 @@ describe('enrollment controller', function () {
             ]);
 
             // Try to enroll in second quarter - should be overridden to first quarter
-            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',
                 'quarter' => Quarter::SECOND->value,
@@ -352,12 +369,12 @@ describe('enrollment controller', function () {
 
     describe('grade progression business rules', function () {
         test('new students can enroll in any grade level', function () {
-            $guardian = User::factory()->create();
-            $guardian->assignRole('guardian');
+            $guardianUser = User::factory()->create();
+            $guardianUser->assignRole('guardian');
 
             // Create Guardian model
             $guardianModel = Guardian::create([
-                'user_id' => $guardian->id,
+                'user_id' => $guardianUser->id,
                 'first_name' => 'Test',
                 'last_name' => 'Guardian',
                 'contact_number' => '09123456789',
@@ -367,14 +384,14 @@ describe('enrollment controller', function () {
             $student = Student::factory()->create();
 
             GuardianStudent::create([
-                'guardian_id' => $guardian->id,
+                'guardian_id' => $guardianModel->id,
                 'student_id' => $student->id,
                 'relationship_type' => 'father',
                 'is_primary_contact' => true,
             ]);
 
             // New student should be able to enroll in any grade
-            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',
                 'quarter' => Quarter::FIRST->value,
@@ -389,12 +406,12 @@ describe('enrollment controller', function () {
         });
 
         test('existing students cannot apply to grades lower than current grade', function () {
-            $guardian = User::factory()->create();
-            $guardian->assignRole('guardian');
+            $guardianUser = User::factory()->create();
+            $guardianUser->assignRole('guardian');
 
             // Create Guardian model
             $guardianModel = Guardian::create([
-                'user_id' => $guardian->id,
+                'user_id' => $guardianUser->id,
                 'first_name' => 'Test',
                 'last_name' => 'Guardian',
                 'contact_number' => '09123456789',
@@ -406,7 +423,7 @@ describe('enrollment controller', function () {
             ]);
 
             GuardianStudent::create([
-                'guardian_id' => $guardian->id,
+                'guardian_id' => $guardianModel->id,
                 'student_id' => $student->id,
                 'relationship_type' => 'mother',
                 'is_primary_contact' => true,
@@ -431,7 +448,7 @@ describe('enrollment controller', function () {
             ]);
 
             // Try to enroll in lower grade - should fail
-            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',
                 'quarter' => Quarter::FIRST->value,
@@ -443,12 +460,12 @@ describe('enrollment controller', function () {
         });
 
         test('students can progress to same or higher grade', function () {
-            $guardian = User::factory()->create();
-            $guardian->assignRole('guardian');
+            $guardianUser = User::factory()->create();
+            $guardianUser->assignRole('guardian');
 
             // Create Guardian model
             $guardianModel = Guardian::create([
-                'user_id' => $guardian->id,
+                'user_id' => $guardianUser->id,
                 'first_name' => 'Test',
                 'last_name' => 'Guardian',
                 'contact_number' => '09123456789',
@@ -460,7 +477,7 @@ describe('enrollment controller', function () {
             ]);
 
             GuardianStudent::create([
-                'guardian_id' => $guardian->id,
+                'guardian_id' => $guardianModel->id,
                 'student_id' => $student->id,
                 'relationship_type' => 'father',
                 'is_primary_contact' => true,
@@ -485,7 +502,7 @@ describe('enrollment controller', function () {
             ]);
 
             // Enroll in next grade level - should succeed
-            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',
                 'quarter' => Quarter::FIRST->value,
@@ -501,12 +518,12 @@ describe('enrollment controller', function () {
         });
 
         test('students can apply for accelerated progression beyond next grade', function () {
-            $guardian = User::factory()->create();
-            $guardian->assignRole('guardian');
+            $guardianUser = User::factory()->create();
+            $guardianUser->assignRole('guardian');
 
             // Create Guardian model
             $guardianModel = Guardian::create([
-                'user_id' => $guardian->id,
+                'user_id' => $guardianUser->id,
                 'first_name' => 'Test',
                 'last_name' => 'Guardian',
                 'contact_number' => '09123456789',
@@ -518,7 +535,7 @@ describe('enrollment controller', function () {
             ]);
 
             GuardianStudent::create([
-                'guardian_id' => $guardian->id,
+                'guardian_id' => $guardianModel->id,
                 'student_id' => $student->id,
                 'relationship_type' => 'mother',
                 'is_primary_contact' => true,
@@ -543,7 +560,7 @@ describe('enrollment controller', function () {
             ]);
 
             // Enroll in grade level beyond next (accelerated) - should succeed
-            $response = $this->actingAs($guardian)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year' => '2024-2025',
                 'quarter' => Quarter::FIRST->value,

@@ -22,10 +22,11 @@ class EnrollmentController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
+        // Get Guardian model for authenticated user
+        $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
 
         // Get student IDs for this guardian
-        $studentIds = GuardianStudent::where('guardian_id', $user->id)
+        $studentIds = GuardianStudent::where('guardian_id', $guardian->id)
             ->pluck('student_id');
 
         $enrollments = Enrollment::with(['student', 'guardian'])
@@ -43,12 +44,13 @@ class EnrollmentController extends Controller
      */
     public function create(Request $request)
     {
-        $user = Auth::user();
+        // Get Guardian model for authenticated user
+        $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
         $currentSchoolYear = date('Y').'-'.(date('Y') + 1);
         $selectedStudentId = $request->query('student_id');
 
         // Get guardian's students with enrollment info
-        $studentIds = GuardianStudent::where('guardian_id', $user->id)
+        $studentIds = GuardianStudent::where('guardian_id', $guardian->id)
             ->pluck('student_id');
         $studentsQuery = Student::whereIn('id', $studentIds)->get();
 
@@ -146,8 +148,11 @@ class EnrollmentController extends Controller
      */
     public function show(Enrollment $enrollment)
     {
+        // Get Guardian model for authenticated user
+        $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
+
         // Verify this guardian has access to this enrollment
-        $hasAccess = GuardianStudent::where('guardian_id', Auth::id())
+        $hasAccess = GuardianStudent::where('guardian_id', $guardian->id)
             ->where('student_id', $enrollment->student_id)
             ->exists();
 
@@ -167,8 +172,11 @@ class EnrollmentController extends Controller
      */
     public function edit(Enrollment $enrollment)
     {
+        // Get Guardian model for authenticated user
+        $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
+
         // Verify this guardian has access to this enrollment
-        $hasAccess = GuardianStudent::where('guardian_id', Auth::id())
+        $hasAccess = GuardianStudent::where('guardian_id', $guardian->id)
             ->where('student_id', $enrollment->student_id)
             ->exists();
 
@@ -196,8 +204,11 @@ class EnrollmentController extends Controller
      */
     public function update(Request $request, Enrollment $enrollment)
     {
+        // Get Guardian model for authenticated user
+        $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
+
         // Verify this guardian has access to this enrollment
-        $hasAccess = GuardianStudent::where('guardian_id', Auth::id())
+        $hasAccess = GuardianStudent::where('guardian_id', $guardian->id)
             ->where('student_id', $enrollment->student_id)
             ->exists();
 
@@ -230,8 +241,11 @@ class EnrollmentController extends Controller
      */
     public function destroy(Enrollment $enrollment)
     {
+        // Get Guardian model for authenticated user
+        $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
+
         // Verify this guardian has access to this enrollment
-        $hasAccess = GuardianStudent::where('guardian_id', Auth::id())
+        $hasAccess = GuardianStudent::where('guardian_id', $guardian->id)
             ->where('student_id', $enrollment->student_id)
             ->exists();
 
