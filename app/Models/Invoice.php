@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Invoice extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'invoice_number',
@@ -35,6 +38,23 @@ class Invoice extends Model
         'paid_amount' => 0,
         'status' => InvoiceStatus::DRAFT,
     ];
+
+    /**
+     * Get the activity log options for this model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
+                'created' => 'Invoice created',
+                'updated' => 'Invoice updated',
+                'deleted' => 'Invoice deleted',
+                default => "Invoice {$eventName}",
+            });
+    }
 
     public function enrollment(): BelongsTo
     {

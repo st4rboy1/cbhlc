@@ -6,10 +6,13 @@ use App\Enums\PaymentMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Payment extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'invoice_id',
@@ -25,6 +28,23 @@ class Payment extends Model
         'payment_method' => PaymentMethod::class,
         'payment_date' => 'date',
     ];
+
+    /**
+     * Get the activity log options for this model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
+                'created' => 'Payment recorded',
+                'updated' => 'Payment updated',
+                'deleted' => 'Payment deleted',
+                default => "Payment {$eventName}",
+            });
+    }
 
     public function invoice(): BelongsTo
     {
