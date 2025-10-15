@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\InvoiceStatus;
+use App\Models\Enrollment;
 use App\Models\Invoice;
 use Illuminate\Support\Facades\DB;
 
@@ -55,6 +56,81 @@ class InvoiceService
         $invoice->update(['total_amount' => $total]);
 
         return $invoice->fresh();
+    }
+
+    /**
+     * Generate invoice from enrollment
+     */
+    public function createInvoiceFromEnrollment(Enrollment $enrollment): Invoice
+    {
+        return DB::transaction(function () use ($enrollment) {
+            // Calculate invoice details
+            $items = [];
+
+            if ($enrollment->tuition_fee_cents > 0) {
+                $items[] = [
+                    'description' => 'Tuition Fee - '.$enrollment->grade_level->label(),
+                    'quantity' => 1,
+                    'unit_price' => $enrollment->tuition_fee_cents / 100,
+                    'amount' => $enrollment->tuition_fee_cents / 100,
+                ];
+            }
+
+            if ($enrollment->miscellaneous_fee_cents > 0) {
+                $items[] = [
+                    'description' => 'Miscellaneous Fee',
+                    'quantity' => 1,
+                    'unit_price' => $enrollment->miscellaneous_fee_cents / 100,
+                    'amount' => $enrollment->miscellaneous_fee_cents / 100,
+                ];
+            }
+
+            if ($enrollment->laboratory_fee_cents > 0) {
+                $items[] = [
+                    'description' => 'Laboratory Fee',
+                    'quantity' => 1,
+                    'unit_price' => $enrollment->laboratory_fee_cents / 100,
+                    'amount' => $enrollment->laboratory_fee_cents / 100,
+                ];
+            }
+
+            if ($enrollment->library_fee_cents > 0) {
+                $items[] = [
+                    'description' => 'Library Fee',
+                    'quantity' => 1,
+                    'unit_price' => $enrollment->library_fee_cents / 100,
+                    'amount' => $enrollment->library_fee_cents / 100,
+                ];
+            }
+
+            if ($enrollment->sports_fee_cents > 0) {
+                $items[] = [
+                    'description' => 'Sports Fee',
+                    'quantity' => 1,
+                    'unit_price' => $enrollment->sports_fee_cents / 100,
+                    'amount' => $enrollment->sports_fee_cents / 100,
+                ];
+            }
+
+            // Apply discount if any
+            if ($enrollment->discount_cents > 0) {
+                $items[] = [
+                    'description' => 'Discount',
+                    'quantity' => 1,
+                    'unit_price' => -($enrollment->discount_cents / 100),
+                    'amount' => -($enrollment->discount_cents / 100),
+                ];
+            }
+
+            // Create the invoice
+            return $this->createInvoice([
+                'enrollment_id' => $enrollment->id,
+                'invoice_date' => now(),
+                'due_date' => $enrollment->payment_due_date ?? now()->addDays(30),
+                'status' => InvoiceStatus::SENT,
+                'items' => $items,
+            ]);
+        });
     }
 
     /**
