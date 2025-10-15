@@ -24,7 +24,7 @@ class InvoiceController extends Controller
             // Guardians can only see their children's invoices
             $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
             if ($guardian) {
-                $studentIds = $guardian->children()->pluck('id');
+                $studentIds = $guardian->children()->pluck('students.id');
                 if (! $studentIds->contains($invoice->student_id)) {
                     abort(404);  // Return 404 for security - don't reveal invoice exists
                 }
@@ -59,7 +59,7 @@ class InvoiceController extends Controller
         if ($user->hasRole('guardian')) {
             $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
             if ($guardian) {
-                $studentIds = $guardian->children()->pluck('id');
+                $studentIds = $guardian->children()->pluck('students.id');
                 $enrollment = Enrollment::with(['student', 'guardian'])
                     ->whereIn('student_id', $studentIds)
                     ->latest()
