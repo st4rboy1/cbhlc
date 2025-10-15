@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Guardian;
 
+use App\Models\Guardian;
 use App\Models\GuardianStudent;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -16,9 +17,13 @@ class UpdateStudentRequest extends FormRequest
         // Check if guardian has access to this student
         $student = $this->route('student');
 
+        // Get Guardian model for authenticated user
+        $guardian = Guardian::where('user_id', Auth::id())->first();
+
         return Auth::check()
             && Auth::user()->hasRole('guardian')
-            && GuardianStudent::where('guardian_id', Auth::id())
+            && $guardian
+            && GuardianStudent::where('guardian_id', $guardian->id)
                 ->where('student_id', $student->id)
                 ->exists();
     }
