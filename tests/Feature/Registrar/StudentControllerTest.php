@@ -155,7 +155,7 @@ describe('Registrar StudentController', function () {
 
         // Create guardian relationship
         GuardianStudent::create([
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'student_id' => $student->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => true,
@@ -188,7 +188,7 @@ describe('Registrar StudentController', function () {
         // Create multiple guardian relationships
         $guardian1 = Guardian::factory()->create();
         GuardianStudent::create([
-            'guardian_id' => $guardian1->user_id,
+            'guardian_id' => $guardian1->id,
             'student_id' => $student->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => true,
@@ -196,7 +196,7 @@ describe('Registrar StudentController', function () {
 
         $guardian2 = Guardian::factory()->create();
         GuardianStudent::create([
-            'guardian_id' => $guardian2->user_id,
+            'guardian_id' => $guardian2->id,
             'student_id' => $student->id,
             'relationship_type' => 'father',
             'is_primary_contact' => false,

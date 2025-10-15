@@ -7,7 +7,25 @@ import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ChevronRight, FileText, GraduationCap, TrendingUp, UserCheck, Users } from 'lucide-react';
 
-export default function AdminDashboard() {
+interface Stats {
+    totalStudents: number;
+    newEnrollments: number;
+    pendingApplications: number;
+    totalStaff: number;
+}
+
+interface Activity {
+    id: number;
+    message: string;
+    time: string;
+}
+
+interface Props {
+    stats: Stats;
+    recentActivities: Activity[];
+}
+
+export default function AdminDashboard({ stats, recentActivities }: Props) {
     const { auth } = usePage<SharedData>().props;
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -15,21 +33,6 @@ export default function AdminDashboard() {
             title: 'Administrator Dashboard',
             href: '/admin/dashboard',
         },
-    ];
-
-    // Mock statistics - replace with real data from backend
-    const stats = {
-        totalStudents: 245,
-        newEnrollments: 12,
-        pendingApplications: 8,
-        totalStaff: 32,
-    };
-
-    const recentActivities = [
-        { id: 1, type: 'enrollment', message: 'New enrollment application from John Doe', time: '2 hours ago' },
-        { id: 2, type: 'approval', message: 'Application approved for Jane Smith', time: '4 hours ago' },
-        { id: 3, type: 'staff', message: 'New staff member added: Maria Garcia', time: '1 day ago' },
-        { id: 4, type: 'report', message: 'Monthly enrollment report generated', time: '2 days ago' },
     ];
 
     return (
@@ -100,26 +103,20 @@ export default function AdminDashboard() {
                         </CardHeader>
                         <CardContent className="space-y-3">
                             <Button variant="outline" className="w-full justify-between" asChild>
-                                <Link href="/enrollment">
+                                <Link href="/admin/enrollments">
                                     Review Enrollment Applications
                                     <ChevronRight className="h-4 w-4" />
                                 </Link>
                             </Button>
                             <Button variant="outline" className="w-full justify-between" asChild>
-                                <Link href="/registrar">
+                                <Link href="/admin/students">
                                     Manage Student Records
                                     <ChevronRight className="h-4 w-4" />
                                 </Link>
                             </Button>
                             <Button variant="outline" className="w-full justify-between" asChild>
-                                <Link href="/users">
+                                <Link href="/admin/users">
                                     Manage Users & Permissions
-                                    <ChevronRight className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <Button variant="outline" className="w-full justify-between" asChild>
-                                <Link href="/reports">
-                                    Generate Reports
                                     <ChevronRight className="h-4 w-4" />
                                 </Link>
                             </Button>

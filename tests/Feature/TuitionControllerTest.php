@@ -91,7 +91,7 @@ describe('tuition controller', function () {
         $ownChildren = Student::factory()->count(2)->create();
         foreach ($ownChildren as $child) {
             GuardianStudent::create([
-                'guardian_id' => $guardian->id,  // Use user id, not guardian model id
+                'guardian_id' => $guardianModel->id,
                 'student_id' => $child->id,
                 'relationship_type' => 'father',
                 'is_primary_contact' => true,

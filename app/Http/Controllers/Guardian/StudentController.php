@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Guardian;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guardian\StoreStudentRequest;
 use App\Http\Requests\Guardian\UpdateStudentRequest;
+use App\Models\Guardian;
 use App\Models\GuardianStudent;
 use App\Models\Student;
 use Illuminate\Support\Facades\Auth;
@@ -17,10 +18,11 @@ class StudentController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
+        // Get Guardian model for authenticated user
+        $guardian = Guardian::where('user_id', Auth::id())->firstOrFail();
 
         // Get all students for this guardian
-        $studentIds = GuardianStudent::where('guardian_id', $user->id)
+        $studentIds = GuardianStudent::where('guardian_id', $guardian->id)
             ->pluck('student_id');
 
         /** @var \Illuminate\Support\Collection<int, array<string, mixed>> $students */
@@ -63,8 +65,11 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
+        // Get Guardian model for authenticated user
+        $guardian = Guardian::where('user_id', Auth::id())->firstOrFail();
+
         // Verify this guardian has access to this student
-        $hasAccess = GuardianStudent::where('guardian_id', Auth::id())
+        $hasAccess = GuardianStudent::where('guardian_id', $guardian->id)
             ->where('student_id', $student->id)
             ->exists();
 
@@ -124,9 +129,12 @@ class StudentController extends Controller
 
         $student = Student::create($validated);
 
+        // Get Guardian model for authenticated user
+        $guardian = Guardian::where('user_id', Auth::id())->firstOrFail();
+
         // Link student to guardian
         GuardianStudent::create([
-            'guardian_id' => Auth::id(),
+            'guardian_id' => $guardian->id,
             'student_id' => $student->id,
             'relationship_type' => 'mother', // Default relationship type
             'is_primary_contact' => true,
@@ -141,8 +149,11 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
+        // Get Guardian model for authenticated user
+        $guardian = Guardian::where('user_id', Auth::id())->firstOrFail();
+
         // Verify this guardian has access to this student
-        $hasAccess = GuardianStudent::where('guardian_id', Auth::id())
+        $hasAccess = GuardianStudent::where('guardian_id', $guardian->id)
             ->where('student_id', $student->id)
             ->exists();
 

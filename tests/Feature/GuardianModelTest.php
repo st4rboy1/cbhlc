@@ -75,14 +75,14 @@ test('guardian can have many children', function () {
     $student2 = Student::factory()->create();
 
     GuardianStudent::create([
-        'guardian_id' => $user->id,  // Use user id, not guardian model id
+        'guardian_id' => $guardian->id,
         'student_id' => $student1->id,
         'relationship_type' => 'father',
         'is_primary_contact' => true,
     ]);
 
     GuardianStudent::create([
-        'guardian_id' => $user->id,  // Use user id, not guardian model id
+        'guardian_id' => $guardian->id,
         'student_id' => $student2->id,
         'relationship_type' => 'father',
         'is_primary_contact' => true,
@@ -110,7 +110,7 @@ test('guardian children relationship includes pivot data', function () {
     $student = Student::factory()->create();
 
     GuardianStudent::create([
-        'guardian_id' => $user->id,  // Use user id, not guardian model id
+        'guardian_id' => $guardian->id,
         'student_id' => $student->id,
         'relationship_type' => 'mother',
         'is_primary_contact' => true,
