@@ -81,14 +81,31 @@ class EnrollmentController extends Controller
             return back()->with('error', 'Only pending enrollments can be approved.');
         }
 
-        $enrollment->update([
-            'status' => EnrollmentStatus::ENROLLED,
-            'approved_at' => now(),
-            'approved_by' => Auth::id(),
-            'remarks' => $request->input('remarks'),
-        ]);
+        // Use database transaction to ensure consistency
+        \DB::transaction(function () use ($request, $enrollment) {
+            // First, approve the enrollment
+            $enrollment->update([
+                'status' => EnrollmentStatus::APPROVED,
+                'approved_at' => now(),
+                'approved_by' => Auth::id(),
+                'remarks' => $request->input('remarks'),
+            ]);
 
-        return back()->with('success', 'Enrollment approved successfully.');
+            // Generate invoice for the enrollment
+            $invoiceService = new \App\Services\InvoiceService;
+            $invoice = $invoiceService->createInvoiceFromEnrollment($enrollment);
+
+            // Update enrollment with invoice reference and transition to ready for payment
+            $enrollment->update([
+                'status' => EnrollmentStatus::READY_FOR_PAYMENT,
+                'invoice_id' => $invoice->id,
+                'ready_for_payment_at' => now(),
+            ]);
+
+            // TODO: Send notification to guardian about approval and payment requirements
+        });
+
+        return back()->with('success', 'Enrollment approved successfully. Invoice has been generated and sent to the parent.');
     }
 
     /**
@@ -127,6 +144,64 @@ class EnrollmentController extends Controller
         ]);
 
         return back()->with('success', 'Payment status updated successfully.');
+    }
+
+    /**
+     * Confirm payment for an enrollment.
+     */
+    public function confirmPayment(Request $request, Enrollment $enrollment)
+    {
+        if ($enrollment->status !== EnrollmentStatus::READY_FOR_PAYMENT) {
+            return back()->with('error', 'Only enrollments ready for payment can be confirmed.');
+        }
+
+        $validated = $request->validate([
+            'payment_reference' => 'required|string|max:100',
+            'amount_paid' => 'required|numeric|min:0',
+            'payment_method' => 'nullable|string|max:50',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        \DB::transaction(function () use ($validated, $enrollment) {
+            // Calculate amounts in cents
+            $amountPaidCents = (int) ($validated['amount_paid'] * 100);
+            $balanceCents = $enrollment->net_amount_cents - $amountPaidCents;
+
+            // Update enrollment payment details
+            $enrollment->update([
+                'status' => EnrollmentStatus::PAID,
+                'payment_status' => $balanceCents <= 0 ? PaymentStatus::PAID : PaymentStatus::PARTIAL,
+                'amount_paid_cents' => $amountPaidCents,
+                'balance_cents' => max(0, $balanceCents),
+                'payment_reference' => $validated['payment_reference'],
+                'paid_at' => now(),
+                'remarks' => $validated['notes'] ?? $enrollment->remarks,
+            ]);
+
+            // Update invoice status if fully paid
+            if ($enrollment->invoice && $balanceCents <= 0) {
+                $enrollment->invoice->update([
+                    'status' => \App\Enums\InvoiceStatus::PAID,
+                    'paid_at' => now(),
+                ]);
+            }
+
+            // Auto-transition to ENROLLED if fully paid
+            if ($balanceCents <= 0) {
+                $enrollment->update([
+                    'status' => EnrollmentStatus::ENROLLED,
+                ]);
+            }
+        });
+
+        // Refresh enrollment to get the latest status after transaction
+        $enrollment->refresh();
+
+        $message = $enrollment->status === EnrollmentStatus::ENROLLED
+            ? 'Payment confirmed and student enrolled successfully.'
+            : 'Payment confirmed. Partial payment recorded.';
+
+        return back()->with('success', $message);
     }
 
     /**

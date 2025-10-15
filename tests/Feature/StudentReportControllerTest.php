@@ -83,7 +83,7 @@ describe('StudentReportController', function () {
 
         // Link guardian to student
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => true,
@@ -223,8 +223,15 @@ describe('StudentReportController', function () {
         $student = Student::factory()->create();
 
         // Create guardian relationships
-        $guardian1 = User::factory()->create();
-        $guardian1->assignRole('guardian');
+        $guardian1User = User::factory()->create();
+        $guardian1User->assignRole('guardian');
+        $guardian1 = Guardian::create([
+            'user_id' => $guardian1User->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian1',
+            'contact_number' => '09123456789',
+            'address' => '123 Test St',
+        ]);
         GuardianStudent::create([
             'guardian_id' => $guardian1->id,
             'student_id' => $student->id,
@@ -232,8 +239,15 @@ describe('StudentReportController', function () {
             'is_primary_contact' => true,
         ]);
 
-        $guardian2 = User::factory()->create();
-        $guardian2->assignRole('guardian');
+        $guardian2User = User::factory()->create();
+        $guardian2User->assignRole('guardian');
+        $guardian2 = Guardian::create([
+            'user_id' => $guardian2User->id,
+            'first_name' => 'Test',
+            'last_name' => 'Guardian2',
+            'contact_number' => '09987654321',
+            'address' => '456 Test Ave',
+        ]);
         GuardianStudent::create([
             'guardian_id' => $guardian2->id,
             'student_id' => $student->id,
@@ -270,14 +284,14 @@ describe('StudentReportController', function () {
 
         // Link guardian to both students
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student1->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => true,
         ]);
 
         GuardianStudent::create([
-            'guardian_id' => $guardian->id,
+            'guardian_id' => $guardianModel->id,
             'student_id' => $student2->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => true,
