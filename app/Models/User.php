@@ -93,9 +93,12 @@ class User extends Authenticatable
      */
     public function getNotificationPreference(string $type): ?NotificationPreference
     {
-        return $this->notificationPreferences()
+        /** @var NotificationPreference|null $preference */
+        $preference = $this->notificationPreferences()
             ->where('notification_type', $type)
             ->first();
+
+        return $preference;
     }
 
     /**
