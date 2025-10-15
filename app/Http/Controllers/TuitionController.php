@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
 use App\Models\Guardian;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -56,9 +57,12 @@ class TuitionController extends Controller
                 }
             );
 
+        $settings = Setting::pluck('value', 'key');
+
         return Inertia::render('shared/tuition', [
             'enrollments' => $enrollments,
             'gradeLevelFees' => $gradeLevelFees,
+            'settings' => $settings,
         ]);
     }
 }

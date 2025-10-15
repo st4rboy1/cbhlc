@@ -57,9 +57,15 @@ interface GradeLevelFee {
 interface Props {
     enrollments: PaginatedData | { data: [] };
     gradeLevelFees: Record<string, GradeLevelFee>;
+    settings: {
+        payment_location: string;
+        payment_hours: string;
+        payment_methods: string;
+        payment_note: string;
+    };
 }
 
-export default function Tuition({ enrollments, gradeLevelFees }: Props) {
+export default function Tuition({ enrollments, gradeLevelFees, settings }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Tuition',
@@ -349,18 +355,16 @@ export default function Tuition({ enrollments, gradeLevelFees }: Props) {
                     <CardContent>
                         <div className="space-y-3 text-muted-foreground">
                             <p>
-                                <strong className="text-foreground">Payment Location:</strong> Visit the school cashier's office during business
-                                hours.
+                                <strong className="text-foreground">Payment Location:</strong> {settings.payment_location}
                             </p>
                             <p>
-                                <strong className="text-foreground">Business Hours:</strong> Monday to Friday, 8:00 AM - 5:00 PM
+                                <strong className="text-foreground">Business Hours:</strong> {settings.payment_hours}
                             </p>
                             <p>
-                                <strong className="text-foreground">Payment Methods:</strong> Cash or Check (Face-to-face payment only)
+                                <strong className="text-foreground">Payment Methods:</strong> {settings.payment_methods}
                             </p>
                             <p>
-                                <strong className="text-foreground">Note:</strong> Please bring this tuition statement and a valid ID when making
-                                payment.
+                                <strong className="text-foreground">Note:</strong> {settings.payment_note}
                             </p>
                         </div>
                     </CardContent>
