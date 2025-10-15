@@ -27,7 +27,10 @@ class DocumentPolicy
 
         // Guardians can view documents of students they are associated with
         if ($user->hasRole('guardian') && $user->guardian) {
-            return $document->student->guardians()->where('guardians.id', $user->guardian->id)->exists();
+            /** @var \App\Models\Student $student */
+            $student = $document->student;
+
+            return $student->guardians()->where('guardians.id', $user->guardian->id)->exists();
         }
 
         return false;
@@ -89,7 +92,10 @@ class DocumentPolicy
 
         // Guardians can delete their own pending or rejected documents
         if ($user->hasRole('guardian') && $user->guardian) {
-            $isStudentGuardian = $document->student->guardians()
+            /** @var \App\Models\Student $student */
+            $student = $document->student;
+
+            $isStudentGuardian = $student->guardians()
                 ->where('guardians.id', $user->guardian->id)
                 ->exists();
 
