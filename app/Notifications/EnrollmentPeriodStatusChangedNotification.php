@@ -24,7 +24,17 @@ class EnrollmentPeriodStatusChangedNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        $channels = [];
+
+        if ($notifiable->shouldReceiveNotification('enrollment_period_changed', 'mail')) {
+            $channels[] = 'mail';
+        }
+
+        if ($notifiable->shouldReceiveNotification('enrollment_period_changed', 'database')) {
+            $channels[] = 'database';
+        }
+
+        return $channels;
     }
 
     /**
