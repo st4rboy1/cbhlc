@@ -27,17 +27,26 @@ interface Props {
     quarters: string[];
     currentSchoolYear: string;
     selectedStudentId?: string | null;
+    submitRoute?: string;
+    indexRoute?: string;
 }
 
-export default function EnrollmentCreate({ students, quarters, currentSchoolYear, selectedStudentId }: Props) {
+export default function EnrollmentCreate({
+    students,
+    quarters,
+    currentSchoolYear,
+    selectedStudentId,
+    submitRoute = '/enrollments',
+    indexRoute = '/enrollments',
+}: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Enrollments',
-            href: '/enrollments',
+            href: indexRoute,
         },
         {
             title: 'New Enrollment',
-            href: '/enrollments/create',
+            href: `${indexRoute}/create`,
         },
     ];
 
@@ -62,7 +71,7 @@ export default function EnrollmentCreate({ students, quarters, currentSchoolYear
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post('/enrollments', {
+        post(submitRoute, {
             preserveScroll: false,
             onSuccess: () => {
                 // The redirect is handled by the server
