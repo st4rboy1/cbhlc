@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Enrollment;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -36,11 +37,13 @@ class InvoiceController extends Controller
 
         // Load related data
         $invoice->load(['student', 'guardian']);
+        $settings = Setting::pluck('value', 'key');
 
         return Inertia::render('shared/invoice', [
             'enrollment' => $invoice,
             'invoiceNumber' => $invoice->enrollment_id ?? 'No Invoice Available',
             'currentDate' => now()->format('F d, Y'),
+            'settings' => $settings,
         ]);
     }
 
@@ -69,11 +72,14 @@ class InvoiceController extends Controller
                 ->first();
         }
 
+        $settings = Setting::pluck('value', 'key');
+
         if (! $enrollment) {
             return Inertia::render('shared/invoice', [
                 'enrollment' => null,
                 'invoiceNumber' => 'No Invoice Available',
                 'currentDate' => now()->format('F d, Y'),
+                'settings' => $settings,
             ]);
         }
 
@@ -81,6 +87,7 @@ class InvoiceController extends Controller
             'enrollment' => $enrollment,
             'invoiceNumber' => $enrollment->enrollment_id ?? 'No Invoice Available',
             'currentDate' => now()->format('F d, Y'),
+            'settings' => $settings,
         ]);
     }
 }

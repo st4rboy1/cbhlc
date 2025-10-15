@@ -43,9 +43,40 @@ export interface User {
     [key: string]: unknown; // This allows for additional properties...
 }
 
+export interface Student {
+    id: number;
+    user_id: number;
+    full_name: string;
+    first_name: string;
+    last_name: string;
+    grade_level: string;
+}
+
 export interface Enrollment {
     id: number;
-    student_name: string;
-    grade: string;
-    status: 'pending' | 'approved' | 'rejected';
+    student: Student;
+    grade_level: string;
+    status: 'pending' | 'approved' | 'rejected' | 'enrolled' | 'completed';
+    school_year: string;
+    created_at: string;
+}
+
+export interface Paginated<T> {
+    current_page: number;
+    data: T[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: Array<{
+        url: string | null;
+        label: string;
+        active: boolean;
+    }>;
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
 }

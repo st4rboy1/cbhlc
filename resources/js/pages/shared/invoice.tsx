@@ -43,9 +43,19 @@ interface Props {
     enrollment?: Enrollment;
     invoiceNumber: string;
     currentDate: string;
+    settings: {
+        school_name: string;
+        school_address: string;
+        school_phone: string;
+        school_email: string;
+        payment_location: string;
+        payment_hours: string;
+        payment_methods: string;
+        payment_note: string;
+    };
 }
 
-export default function Invoice({ enrollment, invoiceNumber, currentDate }: Props) {
+export default function Invoice({ enrollment, invoiceNumber, currentDate, settings }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Invoice',
@@ -71,39 +81,30 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
         });
     };
 
-    const schoolInfo = {
-        name: 'Christian Bible Heritage Learning Center',
-        address: '123 School St, City, Country',
-        phone: '(02) 123-4567',
-        email: 'info@cbhlc.edu',
-    };
-
     const handlePrint = () => {
         const printContent = invoiceRef.current;
         if (!printContent) return;
 
-        const printWindow = window.open('', '', 'height=600,width=800');
+        const printWindow = window.open('', '', 'height=800,width=1000');
         if (!printWindow) return;
 
         printWindow.document.write('<html><head><title>Invoice</title>');
-        printWindow.document.write('<style>');
-        printWindow.document.write(`
-            body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { padding: 8px; text-align: left; }
-            th { border-bottom: 2px solid #333; }
-            td { border-bottom: 1px solid #ddd; }
-            .invoice-header { margin-bottom: 30px; }
-            .invoice-title { font-size: 24px; font-weight: bold; }
-            .school-name { font-size: 20px; font-weight: bold; color: #333; }
-            .payment-instructions { background-color: #f5f5f5; padding: 15px; margin-top: 30px; }
-            .no-print { display: none !important; }
-            @media print {
-                body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-                .no-print { display: none !important; }
+
+        // Copy all stylesheets from the main document to the print window
+        Array.from(document.styleSheets).forEach((styleSheet) => {
+            try {
+                const cssRules = Array.from(styleSheet.cssRules)
+                    .map((rule) => rule.cssText)
+                    .join('');
+                const style = printWindow.document.createElement('style');
+                style.appendChild(printWindow.document.createTextNode(cssRules));
+                printWindow.document.head.appendChild(style);
+            } catch (e) {
+                console.error('Could not read stylesheet', e);
             }
-        `);
-        printWindow.document.write('</style></head><body>');
+        });
+
+        printWindow.document.write('</head><body class="bg-white dark:bg-black">');
 
         // Clone the content and remove action buttons
         const clonedContent = printContent.cloneNode(true) as HTMLElement;
@@ -118,13 +119,15 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
         setTimeout(() => {
             printWindow.print();
             printWindow.close();
-        }, 250);
+        }, 500); // Increased timeout for better rendering
     };
 
     const handleDownloadPDF = () => {
-        // For now, we'll use the browser's print to PDF functionality
-        // In production, this should call a backend endpoint that generates a proper PDF
-        window.print();
+        // For now, we'll use the browser's print to PDF functionality.
+        // In a production environment, this should ideally trigger a backend service
+        // to generate a PDF using a library like DomPDF or Snappy (based on wkhtmltopdf)
+        // to ensure consistent output and professional formatting.
+        handlePrint();
     };
 
     if (!enrollment) {
@@ -191,7 +194,7 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
             <style>{`
                 @media print {
                     .no-print { display: none !important; }
-                    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+                    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                 }
             `}</style>
 
@@ -209,16 +212,16 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
                                     <Building2 className="h-8 w-8 text-primary" />
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl font-bold text-primary">{schoolInfo.name}</h1>
-                                    <p className="text-sm text-muted-foreground">{schoolInfo.address}</p>
+                                    <h1 className="text-2xl font-bold text-primary">{settings.school_name}</h1>
+                                    <p className="text-sm text-muted-foreground">{settings.school_address}</p>
                                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                         <span className="flex items-center gap-1">
                                             <Phone className="h-3 w-3" />
-                                            {schoolInfo.phone}
+                                            {settings.school_phone}
                                         </span>
                                         <span className="flex items-center gap-1">
                                             <Mail className="h-3 w-3" />
-                                            {schoolInfo.email}
+                                            {settings.school_email}
                                         </span>
                                     </div>
                                 </div>
@@ -354,7 +357,7 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
                         {enrollment.payment_status === 'pending' && (
                             <Card className="mb-8 border-red-200 bg-red-50">
                                 <CardContent className="p-4">
-                                    <p className="text-center font-semibold text-red-800">
+                                    <p className="font.semibold text-center text-red-800">
                                         Payment pending. Please pay {formatCurrency(enrollment.balance)} by {formatDate(enrollment.payment_due_date)}.
                                     </p>
                                 </CardContent>
@@ -371,19 +374,15 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
                             </CardHeader>
                             <CardContent className="space-y-3 text-sm">
                                 <p>
-                                    Please pay the total amount by the due date to avoid penalties. Payments must be made in person at the school
-                                    cashier's office during business hours.
+                                    <strong className="font-semibold">Payment Methods:</strong> {settings.payment_methods}
                                 </p>
                                 <p>
-                                    <strong>Payment Methods:</strong> Cash or Check only (Face-to-face payment required)
+                                    <strong className="font-semibold">Business Hours:</strong> {settings.payment_hours}
                                 </p>
                                 <p>
-                                    <strong>Business Hours:</strong> Monday to Friday, 8:00 AM - 5:00 PM
+                                    <strong className="font-semibold">Location:</strong> {settings.payment_location}
                                 </p>
-                                <p>
-                                    <strong>Location:</strong> School Cashier's Office, Ground Floor, Administration Building
-                                </p>
-                                <p className="font-medium">Thank you for your prompt payment!</p>
+                                <p className="italic">{settings.payment_note}</p>
                             </CardContent>
                         </Card>
 
@@ -395,7 +394,7 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate }: Prop
                             </Button>
                             <Button className="flex items-center gap-2" onClick={handleDownloadPDF}>
                                 <Download className="h-4 w-4" />
-                                Download PDF
+                                Download as PDF
                             </Button>
                         </div>
                     </CardContent>
