@@ -13,8 +13,11 @@ class LogAuthenticationActivity
      */
     public function handleLogin(Login $event): void
     {
+        /** @var \App\Models\User $user */
+        $user = $event->user;
+
         activity()
-            ->causedBy($event->user)
+            ->causedBy($user)
             ->withProperties([
                 'guard' => $event->guard,
                 'ip_address' => request()->ip(),
@@ -28,8 +31,11 @@ class LogAuthenticationActivity
      */
     public function handleLogout(Logout $event): void
     {
+        /** @var \App\Models\User $user */
+        $user = $event->user;
+
         activity()
-            ->causedBy($event->user)
+            ->causedBy($user)
             ->withProperties([
                 'guard' => $event->guard,
                 'ip_address' => request()->ip(),
