@@ -31,7 +31,7 @@ class DashboardController extends Controller
                 if ($enrollment->student) {
                     return [
                         'id' => $enrollment->id,
-                        'message' => 'New enrollment application from ' . $enrollment->student->full_name,
+                        'message' => 'New enrollment application from '.$enrollment->student->full_name,
                         'time' => $enrollment->created_at->diffForHumans(),
                     ];
                 }
