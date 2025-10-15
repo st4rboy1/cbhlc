@@ -30,7 +30,7 @@ This directory contains epics and implementable story tickets for features ident
 ### High Priority (Should Have) ⚡
 
 #### EPIC-002: Enrollment Period Management
-**Status:** Partially Started (1/5 complete) | **Total Effort:** 4.5 days | **Completed:** 0.5 days
+**Status:** In Progress (2/5 complete) | **Total Effort:** 4.5 days | **Completed:** 1 day
 
 | Ticket | Title | Effort | Status | Dependencies |
 |--------|-------|--------|--------|--------------|
@@ -38,7 +38,7 @@ This directory contains epics and implementable story tickets for features ident
 | [#008](./TICKET-008-enrollment-period-crud-backend.md) | Enrollment Period CRUD Backend | 1 day | ❌ Not Started | #007 |
 | [#009](./TICKET-009-enrollment-period-ui.md) | Enrollment Period Management UI | 1 day | ❌ Not Started | #008 |
 | [#010](./TICKET-010-enrollment-validation-with-periods.md) | Enrollment Validation with Periods | 1 day | ❌ Not Started | #007, #008 |
-| [#011](./TICKET-011-auto-period-status-updates.md) | Automatic Period Status Updates | 0.5 day | ❌ Not Started | #007 |
+| [#011](./TICKET-011-auto-period-status-updates.md) | Automatic Period Status Updates | 0.5 day | ✅ COMPLETED | #007 |
 
 **Required For:** FR-4.6 (Enrollment Period Constraints)
 
@@ -192,10 +192,11 @@ Each ticket includes:
 - **Document upload UI component** ⭐ (PR #86)
 - **Document list and management UI** ⭐ (PR #87)
 - **EnrollmentPeriod model and migration** ⭐ (PR #88)
+- **Automatic enrollment period status updates** ⭐ (PR #95)
 
 ### ⚠️ Partially Implemented
 - **Document management** (upload complete, verification workflow & security remaining - Tickets #005, #006)
-- **Enrollment period management** (model only, no CRUD/UI/validation - Tickets #008-#011)
+- **Enrollment period management** (model and auto-updates complete, CRUD/UI/validation remaining - Tickets #008-#010)
 - **Notification system** (Laravel notifications table only, no custom features)
 - **Audit logging** (Spatie Activity Log installed, NOT configured on models)
 - Reporting (basic reports, missing exports)
@@ -203,7 +204,7 @@ Each ticket includes:
 
 ### ❌ Missing
 - Document verification workflow and security validation
-- Enrollment period CRUD, UI, and validation integration
+- Enrollment period CRUD interface, UI, and validation integration
 - Notification center UI and preferences
 - Audit logging configuration and viewer UI
 - Comprehensive reporting with exports
@@ -277,9 +278,28 @@ Minimum coverage: 60% (enforced by Husky pre-push hook)
 **Total Tickets Created:** 16
 **Total Epics:** 8
 **Estimated Total Effort:** 30-40 days
-**Tickets Completed:** 4/16 (25%)
+**Tickets Completed:** 5/16 (31%)
 
 ## Recent Bug Fixes & Improvements
+
+### 2025-10-15: Automatic Enrollment Period Status Updates (PR #95)
+- **Feature:** Scheduled command to automatically update enrollment period statuses (TICKET-011)
+- **Implementation:**
+  - Created `UpdateEnrollmentPeriodStatus` console command with `--dry-run` and `--notify` options
+  - Automatically activates upcoming periods when start date is reached
+  - Automatically closes active periods when end date has passed
+  - Ensures only one active period at a time
+  - Logs all status changes to activity log for audit trail
+  - Sends notifications to super admins and administrators
+  - Scheduled to run daily at midnight (Asia/Manila timezone)
+- **Impact:**
+  - Eliminates manual enrollment period management
+  - Reduces administrative overhead
+  - Ensures timely period transitions
+  - Complete audit trail of all status changes
+  - 2/5 tickets complete in EPIC-002
+- **Tests:** 572 tests passing (2630 assertions), 64.42% coverage
+- **Files Changed:** 5 files (command, notification, scheduler, tests, docs)
 
 ### 2025-10-15: Admin New Enrollment Button Fix (PR #94)
 - **Issue:** "+ New Enrollment" button on Admin Enrollments Index page was non-functional
