@@ -8,7 +8,7 @@ echo "================================"
 
 # PHP Syntax Check
 echo "✓ Checking PHP syntax..."
-find . -name "*.php" -not -path "./vendor/*" -not -path "./storage/*" | xargs -n1 php -l > /dev/null
+find . -path "./vendor" -prune -o -path "./storage" -prune -o -name "*.php" -print 2>/dev/null | xargs -n1 php -l > /dev/null
 echo "  PHP syntax: ✅ PASSED"
 
 # Laravel Pint (Code Style)
