@@ -15,6 +15,7 @@ use Inertia\Inertia;
 class DocumentController extends Controller
 {
     use AuthorizesRequests;
+
     /**
      * Display a listing of pending documents.
      */
