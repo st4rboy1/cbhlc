@@ -81,7 +81,7 @@ export default function StudentDocumentsIndex({ student, documents }: Props) {
                 />
 
                 {/* Stats Cards */}
-                <div className="grid gap-4 md:grid-cols-4 mb-6">
+                <div className="mb-6 grid gap-4 md:grid-cols-4">
                     <Card>
                         <CardHeader className="pb-2">
                             <CardDescription>Total Documents</CardDescription>

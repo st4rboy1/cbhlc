@@ -15,7 +15,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { router } from '@inertiajs/react';
 import { Download, FileText, Trash2 } from 'lucide-react';
-import React from 'react';
 
 interface Document {
     id: number;
@@ -72,9 +71,7 @@ const getStatusBadge = (status: string) => {
                 </Badge>
             );
         case 'rejected':
-            return (
-                <Badge variant="destructive">Rejected</Badge>
-            );
+            return <Badge variant="destructive">Rejected</Badge>;
         case 'pending':
         default:
             return (
@@ -92,7 +89,7 @@ export function DocumentList({ documents, studentId, onDocumentDeleted }: Docume
         window.location.href = `/guardian/students/${studentId}/documents/${documentId}/download`;
     };
 
-    const handleDelete = (documentId: number, filename: string) => {
+    const handleDelete = (documentId: number) => {
         router.delete(`/guardian/students/${studentId}/documents/${documentId}`, {
             onSuccess: () => {
                 toast({
@@ -117,9 +114,9 @@ export function DocumentList({ documents, studentId, onDocumentDeleted }: Docume
         return (
             <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
-                    <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No Documents Uploaded</h3>
-                    <p className="text-sm text-muted-foreground text-center max-w-sm">
+                    <FileText className="mb-4 h-12 w-12 text-muted-foreground" />
+                    <h3 className="mb-2 text-lg font-semibold">No Documents Uploaded</h3>
+                    <p className="max-w-sm text-center text-sm text-muted-foreground">
                         Upload required documents to complete the enrollment process.
                     </p>
                 </CardContent>
@@ -135,16 +132,16 @@ export function DocumentList({ documents, studentId, onDocumentDeleted }: Docume
                         <div className="flex items-start gap-4">
                             {/* Icon */}
                             <div className="flex-shrink-0">
-                                <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                                     <FileText className="h-6 w-6 text-primary" />
                                 </div>
                             </div>
 
                             {/* Document Info */}
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-2 mb-1">
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="font-medium truncate">{document.original_filename}</h4>
+                            <div className="min-w-0 flex-1">
+                                <div className="mb-1 flex items-start justify-between gap-2">
+                                    <div className="min-w-0 flex-1">
+                                        <h4 className="truncate font-medium">{document.original_filename}</h4>
                                         <p className="text-sm text-muted-foreground">
                                             {DOCUMENT_TYPE_LABELS[document.document_type] || document.document_type}
                                         </p>
@@ -152,7 +149,7 @@ export function DocumentList({ documents, studentId, onDocumentDeleted }: Docume
                                     {getStatusBadge(document.verification_status)}
                                 </div>
 
-                                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-2">
+                                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                                     <span>{formatFileSize(document.file_size)}</span>
                                     <span>•</span>
                                     <span>Uploaded {formatDate(document.upload_date)}</span>
@@ -166,7 +163,7 @@ export function DocumentList({ documents, studentId, onDocumentDeleted }: Docume
 
                                 {/* Rejection Reason */}
                                 {document.verification_status === 'rejected' && document.rejection_reason && (
-                                    <div className="mt-2 p-2 bg-destructive/10 rounded-md">
+                                    <div className="mt-2 rounded-md bg-destructive/10 p-2">
                                         <p className="text-xs text-destructive">
                                             <strong>Reason:</strong> {document.rejection_reason}
                                         </p>
@@ -175,20 +172,13 @@ export function DocumentList({ documents, studentId, onDocumentDeleted }: Docume
 
                                 {/* Verified By */}
                                 {document.verification_status === 'verified' && document.verified_by && (
-                                    <p className="text-xs text-muted-foreground mt-2">
-                                        Verified by {document.verified_by.name}
-                                    </p>
+                                    <p className="mt-2 text-xs text-muted-foreground">Verified by {document.verified_by.name}</p>
                                 )}
                             </div>
 
                             {/* Actions */}
                             <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => handleDownload(document.id)}
-                                    title="Download document"
-                                >
+                                <Button variant="outline" size="icon" onClick={() => handleDownload(document.id)} title="Download document">
                                     <Download className="h-4 w-4" />
                                 </Button>
 
@@ -209,7 +199,7 @@ export function DocumentList({ documents, studentId, onDocumentDeleted }: Docume
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                                 <AlertDialogAction
-                                                    onClick={() => handleDelete(document.id, document.original_filename)}
+                                                    onClick={() => handleDelete(document.id)}
                                                     className="bg-destructive hover:bg-destructive/90"
                                                 >
                                                     Delete
