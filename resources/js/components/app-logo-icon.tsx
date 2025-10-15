@@ -1,3 +1,7 @@
 export default function AppLogoIcon() {
-    return <></>;
+    return (
+        <div className="flex aspect-square size-8 items-center justify-center">
+            <img className="h-full w-full object-cover" src="/images/cbhlc-logo.png" alt="CBHLC Logo" />
+        </div>
+    );
 }
