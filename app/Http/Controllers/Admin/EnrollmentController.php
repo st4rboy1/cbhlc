@@ -34,13 +34,16 @@ class EnrollmentController extends Controller
                     $query->where('status', $status);
                 }
             })
+            ->when($request->input('grade'), function ($query, $grade) {
+                $query->where('grade_level', $grade);
+            })
             ->latest()
             ->paginate(2)
             ->withQueryString();
 
         return Inertia::render('admin/enrollments/index', [
             'enrollments' => $enrollments,
-            'filters' => $request->only(['search', 'status']),
+            'filters' => $request->only(['search', 'status', 'grade']),
             'statusCounts' => $statusCounts,
         ]);
     }
