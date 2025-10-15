@@ -250,11 +250,12 @@ test('registrar can view document with temporary URL', function () {
     ]);
 });
 
-test('guardian can view their own students documents', function () {
+test('guardian cannot access registrar document routes', function () {
     $response = actingAs($this->guardian)
         ->get(route('registrar.documents.show', $this->document));
 
-    $response->assertOk();
+    // Guardians are blocked by middleware before policy check
+    $response->assertForbidden();
 });
 
 test('guardian cannot view other students documents', function () {
@@ -304,4 +305,202 @@ test('pending documents can be filtered by student', function () {
         ->get(route('registrar.documents.pending', ['student_id' => $this->student->id]));
 
     $response->assertOk();
+});
+
+// ========================================
+// NOTIFICATION CONTENT TESTS
+// ========================================
+
+test('document verified notification has correct email content', function () {
+    actingAs($this->registrar)
+        ->post(route('registrar.documents.verify', $this->document));
+
+    $this->document->refresh();
+
+    Notification::assertSentTo(
+        $this->guardian,
+        DocumentVerifiedNotification::class,
+        function ($notification) {
+            $mailMessage = $notification->toMail($this->guardian);
+
+            expect($mailMessage->subject)->toBe('Document Verified');
+            expect($mailMessage->introLines)->toContain('Your uploaded document has been verified.');
+
+            return true;
+        }
+    );
+});
+
+test('document verified notification has correct database content', function () {
+    actingAs($this->registrar)
+        ->post(route('registrar.documents.verify', $this->document));
+
+    $this->document->refresh();
+
+    Notification::assertSentTo(
+        $this->guardian,
+        DocumentVerifiedNotification::class,
+        function ($notification) {
+            $data = $notification->toArray($this->guardian);
+
+            expect($data['document_id'])->toBe($this->document->id);
+            expect($data['student_id'])->toBe($this->student->id);
+            expect($data['student_name'])->toBe($this->student->full_name);
+
+            return true;
+        }
+    );
+});
+
+test('document rejected notification has correct email content', function () {
+    actingAs($this->registrar)
+        ->post(route('registrar.documents.reject', $this->document), [
+            'notes' => 'Document is not clear enough.',
+        ]);
+
+    $this->document->refresh();
+
+    Notification::assertSentTo(
+        $this->guardian,
+        DocumentRejectedNotification::class,
+        function ($notification) {
+            $mailMessage = $notification->toMail($this->guardian);
+
+            expect($mailMessage->subject)->toBe('Document Rejected');
+            expect($mailMessage->introLines)->toContain('Your uploaded document has been rejected.');
+
+            return true;
+        }
+    );
+});
+
+test('document rejected notification has correct database content', function () {
+    actingAs($this->registrar)
+        ->post(route('registrar.documents.reject', $this->document), [
+            'notes' => 'Document is not clear enough.',
+        ]);
+
+    $this->document->refresh();
+
+    Notification::assertSentTo(
+        $this->guardian,
+        DocumentRejectedNotification::class,
+        function ($notification) {
+            $data = $notification->toArray($this->guardian);
+
+            expect($data['document_id'])->toBe($this->document->id);
+            expect($data['student_id'])->toBe($this->student->id);
+            expect($data['student_name'])->toBe($this->student->full_name);
+            expect($data['rejection_reason'])->toBe('Document is not clear enough.');
+
+            return true;
+        }
+    );
+});
+
+// ========================================
+// DOCUMENT POLICY DIRECT TESTS
+// ========================================
+
+test('document policy viewAny allows authorized roles', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+
+    expect($policy->viewAny($this->registrar))->toBeTrue();
+    expect($policy->viewAny($this->guardian))->toBeTrue();
+
+    $admin = User::factory()->create();
+    $admin->assignRole('administrator');
+    expect($policy->viewAny($admin))->toBeTrue();
+
+    $superAdmin = User::factory()->create();
+    $superAdmin->assignRole('super_admin');
+    expect($policy->viewAny($superAdmin))->toBeTrue();
+});
+
+test('document policy view allows registrar to view any document', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+
+    expect($policy->view($this->registrar, $this->document))->toBeTrue();
+});
+
+test('document policy view allows guardian to view own student documents', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+
+    expect($policy->view($this->guardian, $this->document))->toBeTrue();
+});
+
+test('document policy view denies guardian viewing other student documents', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+    $otherStudent = Student::factory()->create();
+    $otherDocument = Document::factory()->create(['student_id' => $otherStudent->id]);
+
+    expect($policy->view($this->guardian, $otherDocument))->toBeFalse();
+});
+
+test('document policy create allows authorized roles', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+
+    expect($policy->create($this->registrar))->toBeTrue();
+    expect($policy->create($this->guardian))->toBeTrue();
+});
+
+test('document policy verify allows only admin roles', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+
+    expect($policy->verify($this->registrar, $this->document))->toBeTrue();
+    expect($policy->verify($this->guardian, $this->document))->toBeFalse();
+});
+
+test('document policy verify denies verified documents', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+    $this->document->verify($this->registrar);
+
+    expect($policy->verify($this->registrar, $this->document))->toBeFalse();
+});
+
+test('document policy reject allows only admin roles', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+
+    expect($policy->reject($this->registrar, $this->document))->toBeTrue();
+    expect($policy->reject($this->guardian, $this->document))->toBeFalse();
+});
+
+test('document policy reject denies verified documents', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+    $this->document->verify($this->registrar);
+
+    expect($policy->reject($this->registrar, $this->document))->toBeFalse();
+});
+
+test('document policy delete allows super admin and administrator', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+
+    $admin = User::factory()->create();
+    $admin->assignRole('administrator');
+    expect($policy->delete($admin, $this->document))->toBeTrue();
+
+    $superAdmin = User::factory()->create();
+    $superAdmin->assignRole('super_admin');
+    expect($policy->delete($superAdmin, $this->document))->toBeTrue();
+});
+
+test('document policy delete allows guardian to delete own pending documents', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+
+    expect($policy->delete($this->guardian, $this->document))->toBeTrue();
+});
+
+test('document policy delete denies guardian deleting verified documents', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+    $this->document->verify($this->registrar);
+
+    expect($policy->delete($this->guardian, $this->document))->toBeFalse();
+});
+
+test('document policy delete denies guardian deleting other student documents', function () {
+    $policy = new \App\Policies\DocumentPolicy;
+    $otherStudent = Student::factory()->create();
+    $otherDocument = Document::factory()->create(['student_id' => $otherStudent->id]);
+
+    expect($policy->delete($this->guardian, $otherDocument))->toBeFalse();
 });
