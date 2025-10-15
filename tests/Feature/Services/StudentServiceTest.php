@@ -102,9 +102,16 @@ test('getPaginatedStudents applies sorting', function () {
 test('findWithRelations returns student with relationships', function () {
     $student = Student::factory()->create();
     $guardianUser = \App\Models\User::factory()->create();
+    $guardian = Guardian::create([
+        'user_id' => $guardianUser->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '123 Test St',
+    ]);
     GuardianStudent::create([
         'student_id' => $student->id,
-        'guardian_id' => $guardianUser->id,
+        'guardian_id' => $guardian->id,
         'relationship_type' => 'mother',
         'is_primary_contact' => true,
     ]);
@@ -162,7 +169,14 @@ test('createStudent uses provided student ID', function () {
 });
 
 test('createStudent associates guardian when provided', function () {
-    $guardian = \App\Models\User::factory()->create();
+    $guardianUser = \App\Models\User::factory()->create();
+    $guardian = Guardian::create([
+        'user_id' => $guardianUser->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '123 Test St',
+    ]);
     $data = [
         'first_name' => 'John',
         'last_name' => 'Doe',
@@ -200,7 +214,14 @@ test('updateStudent updates existing student', function () {
 
 test('updateStudent handles guardian association update', function () {
     $student = Student::factory()->create();
-    $guardian = \App\Models\User::factory()->create();
+    $guardianUser = \App\Models\User::factory()->create();
+    $guardian = Guardian::create([
+        'user_id' => $guardianUser->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '123 Test St',
+    ]);
 
     $result = $this->service->updateStudent($student, [
         'first_name' => 'NewName',
@@ -237,7 +258,14 @@ test('deleteStudent throws exception for student with enrollments', function () 
 
 test('deleteStudent removes guardian associations', function () {
     $student = Student::factory()->create();
-    $guardian = \App\Models\User::factory()->create();
+    $guardianUser = \App\Models\User::factory()->create();
+    $guardian = Guardian::create([
+        'user_id' => $guardianUser->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '123 Test St',
+    ]);
     GuardianStudent::create([
         'student_id' => $student->id,
         'guardian_id' => $guardian->id,
@@ -253,7 +281,14 @@ test('deleteStudent removes guardian associations', function () {
 });
 
 test('getStudentsByGuardian returns guardian students', function () {
-    $guardian = \App\Models\User::factory()->create();
+    $guardianUser = \App\Models\User::factory()->create();
+    $guardian = Guardian::create([
+        'user_id' => $guardianUser->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '123 Test St',
+    ]);
     $student1 = Student::factory()->create();
     $student2 = Student::factory()->create();
     Student::factory()->create(); // Student not associated with guardian
@@ -348,7 +383,14 @@ test('canDelete returns false for student with enrollments', function () {
 
 test('associateGuardian creates new association', function () {
     $student = Student::factory()->create();
-    $guardian = \App\Models\User::factory()->create();
+    $guardianUser = \App\Models\User::factory()->create();
+    $guardian = Guardian::create([
+        'user_id' => $guardianUser->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '123 Test St',
+    ]);
 
     // Use reflection to test protected method
     $reflection = new ReflectionClass($this->service);
@@ -364,7 +406,14 @@ test('associateGuardian creates new association', function () {
 
 test('associateGuardian updates existing association', function () {
     $student = Student::factory()->create();
-    $guardian = \App\Models\User::factory()->create();
+    $guardianUser = \App\Models\User::factory()->create();
+    $guardian = Guardian::create([
+        'user_id' => $guardianUser->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '09123456789',
+        'address' => '123 Test St',
+    ]);
 
     $existing = GuardianStudent::create([
         'student_id' => $student->id,

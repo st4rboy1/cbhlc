@@ -6,6 +6,7 @@ use App\Enums\EnrollmentStatus;
 use App\Enums\GradeLevel;
 use App\Enums\Quarter;
 use App\Models\Enrollment;
+use App\Models\Guardian;
 use App\Models\GuardianStudent;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -33,8 +34,11 @@ class StoreEnrollmentRequest extends FormRequest
                 'required',
                 'exists:students,id',
                 function ($attribute, $value, $fail) {
-                    // Verify guardian has access to this student
-                    if (! GuardianStudent::where('guardian_id', Auth::id())
+                    // Get Guardian model for authenticated user
+                    $guardian = Guardian::where('user_id', Auth::id())->first();
+
+                    // Verify guardian exists and has access to this student
+                    if (! $guardian || ! GuardianStudent::where('guardian_id', $guardian->id)
                         ->where('student_id', $value)
                         ->exists()) {
                         $fail('You are not authorized to enroll this student.');
