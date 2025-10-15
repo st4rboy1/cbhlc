@@ -1,10 +1,8 @@
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { BookOpen, ClipboardList, CreditCard, FileCheck, GraduationCap, HelpCircle, Home, LayoutGrid, Settings, Users } from 'lucide-react';
+import { ClipboardList, CreditCard, FileCheck, GraduationCap, LayoutGrid, Settings, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -50,34 +48,14 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'School Website',
-        href: 'https://cbhlc.edu.ph',
-        icon: Home,
-    },
-    {
-        title: 'Parent Guide',
-        href: '/parent-guide',
-        icon: BookOpen,
-    },
-    {
-        title: 'Support',
-        href: '/support',
-        icon: HelpCircle,
-    },
-];
-
 export function GuardianSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href="/guardian/dashboard" prefetch>
-                                <AppLogo />
-                            </Link>
+                        <SidebarMenuButton size="lg">
+                            <AppLogo />
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
@@ -88,7 +66,6 @@ export function GuardianSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
