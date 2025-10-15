@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
 use Spatie\Permission\Models\Role;
+
 use function Pest\Laravel\assertDatabaseHas;
 
 uses(RefreshDatabase::class);
