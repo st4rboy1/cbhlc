@@ -44,7 +44,7 @@ beforeEach(function () {
 
     // Link guardian to student
     GuardianStudent::create([
-        'guardian_id' => $this->guardian->id,
+        'guardian_id' => $this->guardianModel->id,
         'student_id' => $this->student->id,
         'relationship_type' => 'mother',
         'is_primary_contact' => true,
@@ -167,7 +167,7 @@ describe('Guardian BillingController', function () {
         // Create another student for the same guardian
         $student2 = Student::factory()->create();
         GuardianStudent::create([
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'student_id' => $student2->id,
             'relationship_type' => 'mother',
         ]);
@@ -386,7 +386,7 @@ describe('Guardian BillingController', function () {
         $otherStudent = Student::factory()->create();
 
         GuardianStudent::create([
-            'guardian_id' => $otherGuardian->id,
+            'guardian_id' => $otherGuardianModel->id,
             'student_id' => $otherStudent->id,
             'relationship_type' => 'father',
         ]);
@@ -416,7 +416,7 @@ describe('Guardian BillingController', function () {
         ]);
 
         GuardianStudent::create([
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'student_id' => $studentNoMiddle->id,
             'relationship_type' => 'mother',
         ]);

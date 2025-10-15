@@ -47,7 +47,7 @@ beforeEach(function () {
 
     // Link guardian to student
     GuardianStudent::create([
-        'guardian_id' => $this->guardian->id,
+        'guardian_id' => $this->guardianModel->id,
         'student_id' => $this->student->id,
         'relationship_type' => 'mother',
         'is_primary_contact' => true,
@@ -64,7 +64,7 @@ describe('Guardian StudentController', function () {
         ]);
 
         GuardianStudent::create([
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'student_id' => $student2->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => false,
@@ -171,8 +171,16 @@ describe('Guardian StudentController', function () {
 
     test('guardian cannot view other guardians students', function () {
         // Create another guardian's student
-        $otherGuardian = User::factory()->create();
-        $otherGuardian->assignRole('guardian');
+        $otherGuardianUser = User::factory()->create();
+        $otherGuardianUser->assignRole('guardian');
+
+        $otherGuardian = Guardian::create([
+            'user_id' => $otherGuardianUser->id,
+            'first_name' => 'Other',
+            'last_name' => 'Guardian',
+            'contact_number' => '09111222333',
+            'address' => '789 Other St',
+        ]);
 
         $otherStudent = Student::factory()->create();
 
@@ -233,7 +241,7 @@ describe('Guardian StudentController', function () {
 
         // Check guardian-student link was created
         $this->assertDatabaseHas('guardian_students', [
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'student_id' => $student->id,
             'is_primary_contact' => true,
         ]);
@@ -312,8 +320,16 @@ describe('Guardian StudentController', function () {
 
     test('guardian cannot edit other guardians students', function () {
         // Create another guardian's student
-        $otherGuardian = User::factory()->create();
-        $otherGuardian->assignRole('guardian');
+        $otherGuardianUser = User::factory()->create();
+        $otherGuardianUser->assignRole('guardian');
+
+        $otherGuardian = Guardian::create([
+            'user_id' => $otherGuardianUser->id,
+            'first_name' => 'Other',
+            'last_name' => 'Guardian',
+            'contact_number' => '09111222333',
+            'address' => '789 Other St',
+        ]);
 
         $otherStudent = Student::factory()->create();
 
@@ -357,8 +373,16 @@ describe('Guardian StudentController', function () {
 
     test('guardian cannot update other guardians students', function () {
         // Create another guardian's student
-        $otherGuardian = User::factory()->create();
-        $otherGuardian->assignRole('guardian');
+        $otherGuardianUser = User::factory()->create();
+        $otherGuardianUser->assignRole('guardian');
+
+        $otherGuardian = Guardian::create([
+            'user_id' => $otherGuardianUser->id,
+            'first_name' => 'Other',
+            'last_name' => 'Guardian',
+            'contact_number' => '09111222333',
+            'address' => '789 Other St',
+        ]);
 
         $otherStudent = Student::factory()->create();
 
@@ -403,7 +427,7 @@ describe('Guardian StudentController', function () {
         $studentNoEnrollment = Student::factory()->create();
 
         GuardianStudent::create([
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'student_id' => $studentNoEnrollment->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => false,
@@ -454,7 +478,7 @@ describe('Guardian StudentController', function () {
         ]);
 
         GuardianStudent::create([
-            'guardian_id' => $this->guardian->id,
+            'guardian_id' => $this->guardianModel->id,
             'student_id' => $studentNoMiddle->id,
             'relationship_type' => 'mother',
             'is_primary_contact' => false,
@@ -473,8 +497,16 @@ describe('Guardian StudentController', function () {
 
     test('guardian only sees their own students in list', function () {
         // Create another guardian with students
-        $otherGuardian = User::factory()->create();
-        $otherGuardian->assignRole('guardian');
+        $otherGuardianUser = User::factory()->create();
+        $otherGuardianUser->assignRole('guardian');
+
+        $otherGuardian = Guardian::create([
+            'user_id' => $otherGuardianUser->id,
+            'first_name' => 'Other',
+            'last_name' => 'Guardian',
+            'contact_number' => '09111222333',
+            'address' => '789 Other St',
+        ]);
 
         $otherStudent = Student::factory()->create([
             'first_name' => 'Other',

@@ -22,12 +22,12 @@ class GuardianStudent extends Model
     ];
 
     /**
-     * Get the guardian (user) associated with this relationship
-     * Note: guardian_id references users.id, not guardians.id
+     * Get the guardian associated with this relationship
+     * Note: guardian_id references guardians.id
      */
     public function guardian(): BelongsTo
     {
-        return $this->belongsTo(Guardian::class, 'guardian_id', 'user_id');
+        return $this->belongsTo(Guardian::class, 'guardian_id');
     }
 
     /**
