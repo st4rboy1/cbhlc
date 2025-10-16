@@ -61,7 +61,7 @@ export default function SuperAdminGradeLevelFeesIndex({ fees, filters }: Props) 
             {
                 search: search || undefined,
                 school_year: schoolYear || undefined,
-                active: activeFilter || undefined,
+                active: activeFilter && activeFilter !== 'all' ? activeFilter : undefined,
             },
             {
                 preserveState: true,
@@ -112,12 +112,12 @@ export default function SuperAdminGradeLevelFeesIndex({ fees, filters }: Props) 
                         onChange={(e) => setSchoolYear(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     />
-                    <Select value={activeFilter} onValueChange={setActiveFilter}>
+                    <Select value={activeFilter || 'all'} onValueChange={setActiveFilter}>
                         <SelectTrigger>
                             <SelectValue placeholder="Filter by status" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">All</SelectItem>
+                            <SelectItem value="all">All</SelectItem>
                             <SelectItem value="true">Active</SelectItem>
                             <SelectItem value="false">Inactive</SelectItem>
                         </SelectContent>
@@ -128,7 +128,7 @@ export default function SuperAdminGradeLevelFeesIndex({ fees, filters }: Props) 
                     </Button>
                 </div>
 
-                <div className="rounded-lg border bg-white shadow">
+                <div className="rounded-lg border shadow">
                     <Table>
                         <TableHeader>
                             <TableRow>
