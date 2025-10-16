@@ -64,24 +64,41 @@ function formatModelName(modelType: string | null): string {
 
 export default function AuditLogsIndex({ activities, filters, causers, subjectTypes }: Props) {
     const { toast } = useToast();
-    const [localFilters, setLocalFilters] = useState<Filters>(filters);
+    const [localFilters, setLocalFilters] = useState<Filters>({
+        causer_id: filters.causer_id || 'all',
+        subject_type: filters.subject_type || 'all',
+        description: filters.description || '',
+        date_from: filters.date_from,
+        date_to: filters.date_to,
+    });
 
     const applyFilters = () => {
-        router.get('/super-admin/audit-logs', Object.fromEntries(Object.entries(localFilters).filter(([, v]) => v !== '' && v !== undefined)), {
-            preserveState: true,
-            preserveScroll: true,
-        });
+        router.get(
+            '/super-admin/audit-logs',
+            Object.fromEntries(Object.entries(localFilters).filter(([, v]) => v !== '' && v !== undefined && v !== 'all')),
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
     };
 
     const clearFilters = () => {
-        setLocalFilters({});
+        const clearedFilters = {
+            causer_id: 'all',
+            subject_type: 'all',
+            description: '',
+            date_from: undefined,
+            date_to: undefined,
+        };
+        setLocalFilters(clearedFilters);
         router.get('/super-admin/audit-logs', {}, { preserveState: true });
     };
 
     const handleExport = () => {
         router.post(
             '/super-admin/audit-logs/export',
-            Object.fromEntries(Object.entries(localFilters).filter(([, v]) => v !== '' && v !== undefined)),
+            Object.fromEntries(Object.entries(localFilters).filter(([, v]) => v !== '' && v !== undefined && v !== 'all')),
             {
                 preserveState: true,
                 onSuccess: () => {
@@ -124,14 +141,14 @@ export default function AuditLogsIndex({ activities, filters, causers, subjectTy
                             <div className="space-y-2">
                                 <Label>User</Label>
                                 <Select
-                                    value={localFilters.causer_id || ''}
-                                    onValueChange={(value) => setLocalFilters({ ...localFilters, causer_id: value || undefined })}
+                                    value={localFilters.causer_id}
+                                    onValueChange={(value) => setLocalFilters({ ...localFilters, causer_id: value === 'all' ? undefined : value })}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="All users" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All users</SelectItem>
+                                        <SelectItem value="all">All users</SelectItem>
                                         {causers.map((user) => (
                                             <SelectItem key={user.id} value={user.id.toString()}>
                                                 {user.name}
@@ -144,14 +161,14 @@ export default function AuditLogsIndex({ activities, filters, causers, subjectTy
                             <div className="space-y-2">
                                 <Label>Model Type</Label>
                                 <Select
-                                    value={localFilters.subject_type || ''}
-                                    onValueChange={(value) => setLocalFilters({ ...localFilters, subject_type: value || undefined })}
+                                    value={localFilters.subject_type}
+                                    onValueChange={(value) => setLocalFilters({ ...localFilters, subject_type: value === 'all' ? undefined : value })}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="All models" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All models</SelectItem>
+                                        <SelectItem value="all">All models</SelectItem>
                                         {subjectTypes.map((type) => (
                                             <SelectItem key={type} value={type}>
                                                 {formatModelName(type)}
