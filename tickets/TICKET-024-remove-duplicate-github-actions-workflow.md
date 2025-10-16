@@ -2,8 +2,9 @@
 
 **Priority**: Medium
 **Estimated Effort**: 30 minutes
-**Status**: In Progress
+**Status**: Completed
 **Branch**: `fix/remove-duplicate-test-workflow`
+**PR**: [#109](https://github.com/st4rboy1/cbhlc/pull/109)
 
 ## Problem Statement
 
