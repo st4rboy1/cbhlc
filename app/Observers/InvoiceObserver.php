@@ -33,11 +33,7 @@ class InvoiceObserver
      */
     public function created(Invoice $invoice): void
     {
-        // Log invoice creation
-        activity()
-            ->performedOn($invoice)
-            ->causedBy(auth()->user())
-            ->log('Invoice created: '.$invoice->invoice_number);
+        // Note: Activity logging is handled automatically by LogsActivity trait
     }
 
     /**
@@ -63,14 +59,7 @@ class InvoiceObserver
      */
     public function updated(Invoice $invoice): void
     {
-        // Log significant changes
-        if ($invoice->wasChanged(['status', 'paid_amount'])) {
-            activity()
-                ->performedOn($invoice)
-                ->causedBy(auth()->user())
-                ->withProperties(['changes' => $invoice->getChanges()])
-                ->log('Invoice updated: '.$invoice->invoice_number);
-        }
+        // Note: Activity logging is handled automatically by LogsActivity trait
 
         // Update enrollment payment status if invoice is fully paid
         if ($invoice->wasChanged('status') && $invoice->status === InvoiceStatus::PAID && $invoice->enrollment) {
@@ -87,10 +76,7 @@ class InvoiceObserver
      */
     public function deleted(Invoice $invoice): void
     {
-        activity()
-            ->performedOn($invoice)
-            ->causedBy(auth()->user())
-            ->log('Invoice deleted: '.$invoice->invoice_number);
+        // Note: Activity logging is handled automatically by LogsActivity trait
     }
 
     /**
