@@ -29,7 +29,7 @@ class NotificationControllerTest extends TestCase
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('Notifications/Index', false)
+                ->component('notifications/Index', false)
                 ->has('notifications')
                 ->has('notifications.data')
                 ->where('filter', 'all')
@@ -262,7 +262,7 @@ class NotificationControllerTest extends TestCase
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
-                ->component('Notifications/Index', false)
+                ->component('notifications/Index', false)
                 ->where('filter', 'unread')
             );
     }
