@@ -9,6 +9,7 @@ use App\Http\Controllers\Guardian\DashboardController as GuardianDashboardContro
 use App\Http\Controllers\Guardian\EnrollmentController as GuardianEnrollmentController;
 use App\Http\Controllers\Guardian\StudentController as GuardianStudentController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\ApplicationController;
 use App\Http\Controllers\Public\ContactController;
@@ -61,6 +62,24 @@ Route::middleware(['auth'])->group(function () {
     */
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::redirect('/settings', '/settings/profile')->name('settings');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Notification Routes
+    |--------------------------------------------------------------------------
+    */
+    // Notifications page
+    Route::get('/notifications', [NotificationController::class, 'page'])->name('notifications');
+
+    // Notification API endpoints
+    Route::prefix('api/notifications')->name('api.notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread-count');
+        Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('mark-read');
+        Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('mark-all-read');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+        Route::delete('/', [NotificationController::class, 'destroyAll'])->name('destroy-all');
     });
 
     /*
