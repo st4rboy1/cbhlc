@@ -45,7 +45,6 @@ Route::get('/application', [ApplicationController::class, 'index'])->name('appli
 
 Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
-
 /*
 |--------------------------------------------------------------------------
 | Authenticated Routes
