@@ -39,6 +39,7 @@ export interface User {
     dashboard_route?: string;
     roles?: Array<{ id: number; name: string }>;
     role?: string; // Added for the single role
+    student_id?: number; // Student profile ID if user is a student
     created_at: string;
     updated_at: string;
 }
