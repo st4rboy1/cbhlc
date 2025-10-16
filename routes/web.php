@@ -14,6 +14,7 @@ use App\Http\Controllers\Public\ApplicationController;
 use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Public\RegistrarInfoController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboardController;
+use App\Http\Controllers\Registrar\DocumentController as RegistrarDocumentController;
 use App\Http\Controllers\Registrar\EnrollmentController as RegistrarEnrollmentController;
 use App\Http\Controllers\Registrar\GradeLevelFeeController as RegistrarGradeLevelFeeController;
 use App\Http\Controllers\Registrar\StudentController as RegistrarStudentController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\Student\DashboardController as StudentDashboardControll
 use App\Http\Controllers\StudentReportController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\EnrollmentController as SuperAdminEnrollmentController;
+use App\Http\Controllers\SuperAdmin\EnrollmentPeriodController as SuperAdminEnrollmentPeriodController;
 use App\Http\Controllers\SuperAdmin\GradeLevelFeeController as SuperAdminGradeLevelFeeController;
 use App\Http\Controllers\SuperAdmin\GuardianController as SuperAdminGuardianController;
 use App\Http\Controllers\SuperAdmin\InvoiceController as SuperAdminInvoiceController;
@@ -123,6 +125,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Grade Level Fees Management
         Route::resource('grade-level-fees', SuperAdminGradeLevelFeeController::class);
+
+        // Enrollment Periods Management
+        Route::resource('enrollment-periods', SuperAdminEnrollmentPeriodController::class);
+        Route::post('/enrollment-periods/{enrollmentPeriod}/activate', [SuperAdminEnrollmentPeriodController::class, 'activate'])->name('enrollment-periods.activate');
+        Route::post('/enrollment-periods/{enrollmentPeriod}/close', [SuperAdminEnrollmentPeriodController::class, 'close'])->name('enrollment-periods.close');
     });
 
     // Admin Routes (for administrator roles)
@@ -165,6 +172,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Grade Level Fees Management
         Route::resource('grade-level-fees', RegistrarGradeLevelFeeController::class);
         Route::post('/grade-level-fees/{gradeLevelFee}/duplicate', [RegistrarGradeLevelFeeController::class, 'duplicate'])->name('grade-level-fees.duplicate');
+
+        // Document Management
+        Route::get('/documents/pending', [RegistrarDocumentController::class, 'pending'])->name('documents.pending');
+        Route::get('/documents/{document}', [RegistrarDocumentController::class, 'show'])->name('documents.show');
+        Route::post('/documents/{document}/verify', [RegistrarDocumentController::class, 'verify'])->name('documents.verify');
+        Route::post('/documents/{document}/reject', [RegistrarDocumentController::class, 'reject'])->name('documents.reject');
     });
 
     // Guardian Routes
