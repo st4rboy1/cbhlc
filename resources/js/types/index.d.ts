@@ -38,9 +38,9 @@ export interface User {
     email_verified_at: string | null;
     dashboard_route?: string;
     roles?: Array<{ id: number; name: string }>;
+    role?: string; // Added for the single role
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
 }
 
 export interface Student {
@@ -49,7 +49,19 @@ export interface Student {
     full_name: string;
     first_name: string;
     last_name: string;
-    grade_level: string;
+    middle_name?: string;
+    grade_level: {
+        label: string;
+        value: string;
+    };
+    email: string;
+    birthdate: string;
+    gender: string;
+    address: string;
+    contact_number: string;
+    student_id: string;
+    section?: string;
+    guardian_id?: number;
 }
 
 export interface Enrollment {

@@ -1,26 +1,65 @@
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { type BreadcrumbItem, type Student } from '@/types';
 import { Head } from '@inertiajs/react';
 
 interface Props {
-    student?: {
-        id: number;
-        name: string;
-    };
+    student: Student;
 }
+
 export default function StudentShow({ student }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin', href: '/admin/dashboard' },
         { title: 'Students', href: '/admin/students' },
-        { title: student?.name || 'Student', href: `/admin/students/${student?.id}` },
+        { title: student.full_name, href: `/admin/students/${student.id}` },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={student?.name || 'Student'} />
+            <Head title={`Student - ${student.full_name}`} />
             <div className="px-4 py-6">
-                <h1 className="mb-4 text-2xl font-bold">Admin Student Show</h1>
-                <pre className="overflow-auto rounded bg-gray-100 p-4">{JSON.stringify({ student }, null, 2)}</pre>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Student Details</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="font-semibold">Name</p>
+                                <p>{student.full_name}</p>
+                            </div>
+                            <div>
+                                <p className="font-semibold">Email</p>
+                                <p>{student.email}</p>
+                            </div>
+                            <div>
+                                <p className="font-semibold">Grade Level</p>
+                                <p>{student.grade_level.label}</p>
+                            </div>
+                            <div>
+                                <p className="font-semibold">Birthdate</p>
+                                <p>{new Date(student.birthdate).toLocaleDateString()}</p>
+                            </div>
+                            <div>
+                                <p className="font-semibold">Gender</p>
+                                <p>{student.gender}</p>
+                            </div>
+                            <div>
+                                <p className="font-semibold">Address</p>
+                                <p>{student.address}</p>
+                            </div>
+                            <div>
+                                <p className="font-semibold">Contact Number</p>
+                                <p>{student.contact_number}</p>
+                            </div>
+                            <div>
+                                <p className="font-semibold">Student ID</p>
+                                <p>{student.student_id}</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </AppLayout>
     );
