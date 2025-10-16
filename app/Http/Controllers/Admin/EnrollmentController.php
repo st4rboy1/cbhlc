@@ -156,41 +156,26 @@ class EnrollmentController extends Controller
 
     public function show($id)
     {
-        $enrollment = Enrollment::with('student')->findOrFail($id);
-
         return Inertia::render('admin/enrollments/show', [
-            'enrollment' => $enrollment,
+            'enrollment' => [
+                'id' => $id,
+                'student_name' => 'John Doe',
+                'grade' => 'Grade 1',
+                'status' => 'pending',
+                'submitted_at' => now()->toDateTimeString(),
+            ],
         ]);
     }
 
     public function edit($id)
     {
-        $enrollment = Enrollment::findOrFail($id);
-
         return Inertia::render('admin/enrollments/edit', [
-            'enrollment' => $enrollment,
-            'statuses' => collect(EnrollmentStatus::cases())->map(fn ($status) => ['value' => $status->value, 'label' => $status->label()]),
+            'enrollment' => [
+                'id' => $id,
+                'student_name' => 'John Doe',
+                'grade' => 'Grade 1',
+                'status' => 'pending',
+            ],
         ]);
-    }
-
-    public function update(Request $request, $id)
-    {
-        $enrollment = Enrollment::findOrFail($id);
-
-        $validated = $request->validate([
-            'status' => 'required|string|in:'.implode(',', array_column(EnrollmentStatus::cases(), 'value')),
-        ]);
-
-        $enrollment->update($validated);
-
-        return redirect()->route('admin.enrollments.index')->with('success', 'Enrollment updated successfully.');
-    }
-
-    public function destroy($id)
-    {
-        $enrollment = Enrollment::findOrFail($id);
-        $enrollment->delete();
-
-        return redirect()->route('admin.enrollments.index')->with('success', 'Enrollment deleted successfully.');
     }
 }

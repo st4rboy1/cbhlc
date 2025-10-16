@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { type Enrollment } from '@/types';
-import { Link, router } from '@inertiajs/react';
 import { Check, Clock, MoreVertical, User, X } from 'lucide-react';
 
 interface EnrollmentCardProps {
@@ -68,22 +67,9 @@ export function EnrollmentCard({ enrollment }: EnrollmentCardProps) {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-40">
-                            <DropdownMenuItem asChild>
-                                <Link href={`/admin/enrollments/${enrollment.id}`}>View Details</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem asChild>
-                                <Link href={`/admin/enrollments/${enrollment.id}/edit`}>Edit</Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                className="text-destructive"
-                                onClick={() => {
-                                    if (window.confirm('Are you sure you want to delete this enrollment?')) {
-                                        router.delete(`/admin/enrollments/${enrollment.id}`);
-                                    }
-                                }}
-                            >
-                                Delete
-                            </DropdownMenuItem>
+                            <DropdownMenuItem>View Details</DropdownMenuItem>
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                            <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

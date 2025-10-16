@@ -1,48 +1,27 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type User } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
 interface Props {
-    user: User;
+    user?: {
+        id: number;
+        name: string;
+    };
 }
 
 export default function UserShow({ user }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin', href: '/admin/dashboard' },
         { title: 'Users', href: '/admin/users' },
-        { title: user.name, href: `/admin/users/${user.id}` },
+        { title: user?.name || 'User', href: `/admin/users/${user?.id}` },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`User - ${user.name}`} />
+            <Head title={user?.name || 'User'} />
             <div className="px-4 py-6">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>User Details</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <p className="font-semibold">Name</p>
-                                <p>{user.name}</p>
-                            </div>
-                            <div>
-                                <p className="font-semibold">Email</p>
-                                <p>{user.email}</p>
-                            </div>
-                            <div>
-                                <p className="font-semibold">Role</p>
-                                <p>{user.role}</p>
-                            </div>
-                            <div>
-                                <p className="font-semibold">Created At</p>
-                                <p>{new Date(user.created_at).toLocaleDateString()}</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                <h1 className="mb-4 text-2xl font-bold">Admin User Show</h1>
+                <pre className="overflow-auto rounded bg-gray-100 p-4">{JSON.stringify({ user }, null, 2)}</pre>
             </div>
         </AppLayout>
     );

@@ -1,34 +1,4 @@
-'use client';
-
-import { Link, router } from '@inertiajs/react';
-import {
-    ColumnDef,
-    ColumnFiltersState,
-    flexRender,
-    getCoreRowModel,
-    getFilteredRowModel,
-    getPaginationRowModel,
-    getSortedRowModel,
-    SortingState,
-    useReactTable,
-    VisibilityState,
-} from '@tanstack/react-table';
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react';
-import * as React from 'react';
-
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useState } from 'react';
 
 type User = {
     id: number;
@@ -41,198 +11,87 @@ type UsersTableProps = {
     users: User[];
 };
 
-export const columns: ColumnDef<User>[] = [
-    {
-        id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: 'name',
-        header: ({ column }) => {
-            return (
-                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                    Name
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
-        cell: ({ row }) => <div>{row.getValue('name')}</div>,
-    },
-    {
-        accessorKey: 'email',
-        header: ({ column }) => {
-            return (
-                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                    Email
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
-        cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
-    },
-    {
-        accessorKey: 'role',
-        header: 'Role',
-        cell: ({ row }) => <div className="capitalize">{row.getValue('role')}</div>,
-    },
-    {
-        id: 'actions',
-        enableHiding: false,
-        cell: ({ row }) => {
-            const user = row.original;
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id.toString())}>Copy user ID</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={`/admin/users/${user.id}`}>View</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href={`/admin/users/${user.id}/edit`}>Edit</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            onClick={() => {
-                                if (window.confirm('Are you sure you want to delete this user?')) {
-                                    router.delete(`/admin/users/${user.id}`);
-                                }
-                            }}
-                        >
-                            Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        },
-    },
-];
-
 export function UsersTable({ users }: UsersTableProps) {
-    const [sorting, setSorting] = React.useState<SortingState>([]);
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-    const [rowSelection, setRowSelection] = React.useState({});
+    const [sortKey, setSortKey] = useState<keyof User>('id');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-    const table = useReactTable({
-        data: users,
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection,
-        },
+    const handleSort = (key: keyof User) => {
+        if (sortKey === key) {
+            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortKey(key);
+            setSortOrder('asc');
+        }
+    };
+
+    const sortedUsers = [...users].sort((a, b) => {
+        const aValue = a[sortKey];
+        const bValue = b[sortKey];
+
+        if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
     });
 
     return (
-        <div className="w-full">
-            <div className="flex items-center py-4">
-                <Input
-                    placeholder="Filter emails..."
-                    value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-                    onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value)}
-                    className="max-w-sm"
-                />
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
-                            Columns <ChevronDown className="ml-2 h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {table
-                            .getAllColumns()
-                            .filter((column) => column.getCanHide())
-                            .map((column) => {
-                                return (
-                                    <DropdownMenuCheckboxItem
-                                        key={column.id}
-                                        className="capitalize"
-                                        checked={column.getIsVisible()}
-                                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                                    >
-                                        {column.id}
-                                    </DropdownMenuCheckboxItem>
-                                );
-                            })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-            <div className="overflow-hidden rounded-md border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                        </TableHead>
-                                    );
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
-                </div>
-                <div className="space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-                        Previous
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-                        Next
-                    </Button>
-                </div>
-            </div>
+        <div className="overflow-hidden rounded-lg border border-border">
+            <table className="w-full">
+                <thead>
+                    <tr className="border-b border-border bg-muted/50">
+                        <th
+                            className="cursor-pointer px-4 py-3 text-left text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                            onClick={() => handleSort('id')}
+                        >
+                            ID {sortKey === 'id' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th
+                            className="cursor-pointer px-4 py-3 text-left text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                            onClick={() => handleSort('name')}
+                        >
+                            Name {sortKey === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th
+                            className="cursor-pointer px-4 py-3 text-left text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                            onClick={() => handleSort('email')}
+                        >
+                            Email {sortKey === 'email' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </th>
+                        <th
+                            className="cursor-pointer px-4 py-3 text-left text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                            onClick={() => handleSort('role')}
+                        >
+                            Role {sortKey === 'role' && (sortOrder === 'asc' ? '↑' : '↓')}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {sortedUsers.map((user, index) => (
+                        <tr
+                            key={user.id}
+                            className={`border-b border-border transition-colors last:border-0 hover:bg-muted/30 ${
+                                index % 2 === 0 ? 'bg-background' : 'bg-muted/10'
+                            }`}
+                        >
+                            <td className="px-4 py-3 text-sm text-foreground">{user.id}</td>
+                            <td className="px-4 py-3 text-sm font-medium text-foreground">{user.name}</td>
+                            <td className="px-4 py-3 text-sm text-muted-foreground">{user.email}</td>
+                            <td className="px-4 py-3">
+                                <span
+                                    className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
+                                        user.role === 'registrar'
+                                            ? 'bg-chart-3/10 text-chart-3'
+                                            : user.role === 'guardian'
+                                              ? 'bg-chart-4/10 text-chart-4'
+                                              : 'bg-muted text-muted-foreground'
+                                    }`}
+                                >
+                                    {user.role}
+                                </span>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 }

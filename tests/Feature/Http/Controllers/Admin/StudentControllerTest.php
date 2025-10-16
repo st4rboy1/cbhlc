@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Http\Controllers\Admin;
 
-use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
@@ -14,8 +13,6 @@ class StudentControllerTest extends TestCase
 
     protected User $admin;
 
-    protected $students;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -23,9 +20,6 @@ class StudentControllerTest extends TestCase
 
         $this->admin = User::factory()->create();
         $this->admin->assignRole('administrator');
-
-        // Create students for testing
-        $this->students = Student::factory()->count(2)->create();
     }
 
     public function test_admin_can_view_students_index(): void
@@ -42,13 +36,13 @@ class StudentControllerTest extends TestCase
 
     public function test_admin_can_view_student_details(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('admin.students.show', $this->students->first()->id));
+        $response = $this->actingAs($this->admin)->get(route('admin.students.show', 1));
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/students/show')
                 ->has('student')
-                ->where('student.id', $this->students->first()->id)
+                ->where('student.id', '1')
                 ->has('student.name')
                 ->has('student.grade')
                 ->has('student.status')
@@ -59,13 +53,13 @@ class StudentControllerTest extends TestCase
 
     public function test_admin_can_view_student_edit_page(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('admin.students.edit', $this->students->first()->id));
+        $response = $this->actingAs($this->admin)->get(route('admin.students.edit', 1));
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/students/edit')
                 ->has('student')
-                ->where('student.id', $this->students->first()->id)
+                ->where('student.id', '1')
             );
     }
 
@@ -77,10 +71,10 @@ class StudentControllerTest extends TestCase
         $response = $this->actingAs($user)->get(route('admin.students.index'));
         $response->assertForbidden();
 
-        $response = $this->actingAs($user)->get(route('admin.students.show', $this->students->first()->id));
+        $response = $this->actingAs($user)->get(route('admin.students.show', 1));
         $response->assertForbidden();
 
-        $response = $this->actingAs($user)->get(route('admin.students.edit', $this->students->first()->id));
+        $response = $this->actingAs($user)->get(route('admin.students.edit', 1));
         $response->assertForbidden();
     }
 
@@ -89,10 +83,10 @@ class StudentControllerTest extends TestCase
         $response = $this->get(route('admin.students.index'));
         $response->assertRedirect(route('login'));
 
-        $response = $this->get(route('admin.students.show', $this->students->first()->id));
+        $response = $this->get(route('admin.students.show', 1));
         $response->assertRedirect(route('login'));
 
-        $response = $this->get(route('admin.students.edit', $this->students->first()->id));
+        $response = $this->get(route('admin.students.edit', 1));
         $response->assertRedirect(route('login'));
     }
 

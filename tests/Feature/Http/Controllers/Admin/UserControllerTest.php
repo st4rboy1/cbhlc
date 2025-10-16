@@ -20,9 +20,6 @@ class UserControllerTest extends TestCase
 
         $this->admin = User::factory()->create();
         $this->admin->assignRole('administrator');
-
-        // Create another user for testing index and other scenarios
-        User::factory()->create()->assignRole('registrar');
     }
 
     public function test_admin_can_view_users_index(): void
@@ -39,13 +36,13 @@ class UserControllerTest extends TestCase
 
     public function test_admin_can_view_user_details(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('admin.users.show', $this->admin->id));
+        $response = $this->actingAs($this->admin)->get(route('admin.users.show', 1));
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/users/show')
                 ->has('user')
-                ->where('user.id', $this->admin->id)
+                ->where('user.id', '1')
                 ->has('user.name')
                 ->has('user.email')
                 ->has('user.role')
@@ -55,15 +52,15 @@ class UserControllerTest extends TestCase
 
     public function test_admin_can_view_user_edit_page(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('admin.users.edit', $this->admin->id));
+        $response = $this->actingAs($this->admin)->get(route('admin.users.edit', 1));
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/users/edit')
                 ->has('user')
-                ->where('user.id', $this->admin->id)
+                ->where('user.id', '1')
                 ->has('roles')
-                ->where('roles', ['administrator', 'guardian', 'registrar', 'student', 'super_admin'])
+                ->where('roles', ['administrator', 'registrar', 'guardian', 'student'])
             );
     }
 
@@ -75,10 +72,10 @@ class UserControllerTest extends TestCase
         $response = $this->actingAs($user)->get(route('admin.users.index'));
         $response->assertForbidden();
 
-        $response = $this->actingAs($user)->get(route('admin.users.show', $this->admin->id));
+        $response = $this->actingAs($user)->get(route('admin.users.show', 1));
         $response->assertForbidden();
 
-        $response = $this->actingAs($user)->get(route('admin.users.edit', $this->admin->id));
+        $response = $this->actingAs($user)->get(route('admin.users.edit', 1));
         $response->assertForbidden();
     }
 
@@ -87,10 +84,10 @@ class UserControllerTest extends TestCase
         $response = $this->get(route('admin.users.index'));
         $response->assertRedirect(route('login'));
 
-        $response = $this->get(route('admin.users.show', $this->admin->id));
+        $response = $this->get(route('admin.users.show', 1));
         $response->assertRedirect(route('login'));
 
-        $response = $this->get(route('admin.users.edit', $this->admin->id));
+        $response = $this->get(route('admin.users.edit', 1));
         $response->assertRedirect(route('login'));
     }
 

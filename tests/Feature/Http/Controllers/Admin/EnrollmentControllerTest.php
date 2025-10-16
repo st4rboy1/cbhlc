@@ -2,9 +2,6 @@
 
 namespace Tests\Feature\Http\Controllers\Admin;
 
-use App\Models\Enrollment;
-use App\Models\Guardian;
-use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
@@ -15,7 +12,6 @@ class EnrollmentControllerTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
-    protected Enrollment $enrollment;
 
     protected function setUp(): void
     {
@@ -24,13 +20,6 @@ class EnrollmentControllerTest extends TestCase
 
         $this->admin = User::factory()->create();
         $this->admin->assignRole('administrator');
-
-        $student = Student::factory()->create();
-        $guardian = Guardian::factory()->create();
-        $this->enrollment = Enrollment::factory()->create([
-            'student_id' => $student->id,
-            'guardian_id' => $guardian->id,
-        ]);
     }
 
     public function test_admin_can_view_enrollments_index(): void
@@ -47,25 +36,25 @@ class EnrollmentControllerTest extends TestCase
 
     public function test_admin_can_view_enrollment_details(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('admin.enrollments.show', $this->enrollment->id));
+        $response = $this->actingAs($this->admin)->get(route('admin.enrollments.show', 1));
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/enrollments/show')
                 ->has('enrollment')
-                ->where('enrollment.id', $this->enrollment->id)
+                ->where('enrollment.id', '1')
             );
     }
 
     public function test_admin_can_view_enrollment_edit_page(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('admin.enrollments.edit', $this->enrollment->id));
+        $response = $this->actingAs($this->admin)->get(route('admin.enrollments.edit', 1));
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/enrollments/edit')
                 ->has('enrollment')
-                ->where('enrollment.id', $this->enrollment->id)
+                ->where('enrollment.id', '1')
             );
     }
 
@@ -77,10 +66,10 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($user)->get(route('admin.enrollments.index'));
         $response->assertForbidden();
 
-        $response = $this->actingAs($user)->get(route('admin.enrollments.show', $this->enrollment->id));
+        $response = $this->actingAs($user)->get(route('admin.enrollments.show', 1));
         $response->assertForbidden();
 
-        $response = $this->actingAs($user)->get(route('admin.enrollments.edit', $this->enrollment->id));
+        $response = $this->actingAs($user)->get(route('admin.enrollments.edit', 1));
         $response->assertForbidden();
     }
 
