@@ -56,7 +56,7 @@ class GradeLevelFeeController extends Controller
         Gate::authorize('create', GradeLevelFee::class);
 
         return Inertia::render('super-admin/grade-level-fees/create', [
-            'gradelevels' => \App\Enums\GradeLevel::cases(),
+            'gradeLevels' => \App\Enums\GradeLevel::values(),
         ]);
     }
 
@@ -94,7 +94,7 @@ class GradeLevelFeeController extends Controller
 
         return Inertia::render('super-admin/grade-level-fees/edit', [
             'fee' => $gradeLevelFee,
-            'gradelevels' => \App\Enums\GradeLevel::cases(),
+            'gradeLevels' => \App\Enums\GradeLevel::values(),
         ]);
     }
 
