@@ -17,7 +17,6 @@ interface GradeLevelFee {
     miscellaneous_fee: number;
     other_fees: number;
     payment_terms: string;
-    notes?: string;
     is_active: boolean;
 }
 
@@ -28,7 +27,6 @@ interface FormData {
     miscellaneous_fee: string;
     other_fees: string;
     payment_terms: string;
-    notes: string;
     is_active: boolean;
 }
 
@@ -45,7 +43,6 @@ export default function SuperAdminGradeLevelFeesEdit({ fee, gradeLevels = [] }: 
         miscellaneous_fee: fee.miscellaneous_fee.toString(),
         other_fees: fee.other_fees.toString(),
         payment_terms: fee.payment_terms,
-        notes: fee.notes || '',
         is_active: fee.is_active,
     });
 
@@ -169,19 +166,6 @@ export default function SuperAdminGradeLevelFeesEdit({ fee, gradeLevels = [] }: 
                                     </SelectContent>
                                 </Select>
                                 {errors.payment_terms && <p className="text-sm text-red-600">{errors.payment_terms}</p>}
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="notes">Notes (Optional)</Label>
-                                <textarea
-                                    id="notes"
-                                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-                                    placeholder="Additional notes about this fee structure..."
-                                    value={data.notes}
-                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('notes', e.target.value)}
-                                    rows={3}
-                                />
-                                {errors.notes && <p className="text-sm text-red-600">{errors.notes}</p>}
                             </div>
 
                             <div className="flex items-center space-x-2">
