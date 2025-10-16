@@ -39,9 +39,9 @@ export default function SuperAdminGradeLevelFeesEdit({ fee, gradeLevels = [] }: 
     const { data, setData, put, processing, errors } = useForm<FormData>({
         grade_level: fee.grade_level,
         school_year: fee.school_year,
-        tuition_fee: fee.tuition_fee.toString(),
-        miscellaneous_fee: fee.miscellaneous_fee.toString(),
-        other_fees: fee.other_fees.toString(),
+        tuition_fee: (fee.tuition_fee ?? 0).toString(),
+        miscellaneous_fee: (fee.miscellaneous_fee ?? 0).toString(),
+        other_fees: (fee.other_fees ?? 0).toString(),
         payment_terms: fee.payment_terms,
         is_active: fee.is_active,
     });
