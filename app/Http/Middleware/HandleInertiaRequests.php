@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
                     ...$request->user()->toArray(),
                     'roles' => $request->user()->roles->toArray(),
                     'dashboard_route' => route($request->user()->getDashboardRoute()),
+                    'student_id' => $request->user()->student?->id,
                 ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',

@@ -2,7 +2,7 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { ClipboardList, CreditCard, FileCheck, GraduationCap, LayoutGrid, Settings, Users } from 'lucide-react';
+import { CreditCard, FileCheck, GraduationCap, LayoutGrid, Settings, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -35,11 +35,6 @@ const mainNavItems: NavItem[] = [
         title: 'Tuition Fees',
         href: '/tuition',
         icon: CreditCard,
-    },
-    {
-        title: 'Student Reports',
-        href: '/guardian/students',
-        icon: ClipboardList,
     },
     {
         title: 'Profile Settings',
