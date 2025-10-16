@@ -96,7 +96,7 @@ class NotificationController extends Controller
 
         $notifications = $query->latest()->paginate(20);
 
-        return Inertia::render('Notifications/Index', [
+        return Inertia::render('notifications/Index', [
             'notifications' => $notifications,
             'filter' => $request->filter ?? 'all',
         ]);
