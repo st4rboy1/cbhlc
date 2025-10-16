@@ -32,7 +32,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
 import { router } from '@inertiajs/react';
-import { useDebounce } from 'use-debounce';
 
 export type GradeLevelFee = {
     id: number;
@@ -180,9 +179,10 @@ interface GradeLevelFeesTableProps {
         school_year: string | null;
         active: string | null;
     };
+    gradeLevels: string[];
 }
 
-export function GradeLevelFeesTable({ fees, filters }: GradeLevelFeesTableProps) {
+export function GradeLevelFeesTable({ fees, filters, gradeLevels }: GradeLevelFeesTableProps) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -207,35 +207,15 @@ export function GradeLevelFeesTable({ fees, filters }: GradeLevelFeesTableProps)
         },
     });
 
-    const searchValue = (table.getColumn('gradeLevel')?.getFilterValue() as string) ?? '';
-    const [debouncedSearchTerm] = useDebounce(searchValue, 500);
-
+    const [gradeLevelFilter, setGradeLevelFilter] = React.useState(filters.search || 'all');
     const [schoolYear, setSchoolYear] = React.useState(filters.school_year || '');
     const [activeFilter, setActiveFilter] = React.useState(filters.active || 'all');
-
-    React.useEffect(() => {
-        if (debouncedSearchTerm !== (filters.search || '')) {
-            router.get(
-                '/super-admin/grade-level-fees',
-                {
-                    search: debouncedSearchTerm || undefined,
-                    school_year: schoolYear || undefined,
-                    active: activeFilter !== 'all' ? activeFilter : undefined,
-                },
-                {
-                    preserveState: true,
-                    replace: true,
-                    preserveScroll: true,
-                },
-            );
-        }
-    }, [debouncedSearchTerm, filters.search]);
 
     const handleFilterChange = () => {
         router.get(
             '/super-admin/grade-level-fees',
             {
-                search: debouncedSearchTerm || undefined,
+                search: gradeLevelFilter !== 'all' ? gradeLevelFilter : undefined,
                 school_year: schoolYear || undefined,
                 active: activeFilter !== 'all' ? activeFilter : undefined,
             },
@@ -250,12 +230,25 @@ export function GradeLevelFeesTable({ fees, filters }: GradeLevelFeesTableProps)
     return (
         <div className="w-full">
             <div className="flex items-center gap-4 py-4">
-                <Input
-                    placeholder="Search grade level..."
-                    value={searchValue}
-                    onChange={(event) => table.getColumn('gradeLevel')?.setFilterValue(event.target.value)}
-                    className="max-w-sm"
-                />
+                <Select
+                    value={gradeLevelFilter}
+                    onValueChange={(value) => {
+                        setGradeLevelFilter(value);
+                        setTimeout(handleFilterChange, 0);
+                    }}
+                >
+                    <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Filter by grade level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Grade Levels</SelectItem>
+                        {gradeLevels.map((level) => (
+                            <SelectItem key={level} value={level}>
+                                {level}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                 <Input
                     placeholder="School year (e.g., 2024-2025)"
                     value={schoolYear}

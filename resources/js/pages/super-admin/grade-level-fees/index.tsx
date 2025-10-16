@@ -38,9 +38,10 @@ interface Props {
         school_year?: string;
         active?: string;
     };
+    gradeLevels: string[];
 }
 
-export default function SuperAdminGradeLevelFeesIndex({ fees, filters }: Props) {
+export default function SuperAdminGradeLevelFeesIndex({ fees, filters, gradeLevels }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Grade Level Fees', href: '/super-admin/grade-level-fees' },
@@ -78,6 +79,7 @@ export default function SuperAdminGradeLevelFeesIndex({ fees, filters }: Props) 
                         school_year: filters.school_year || null,
                         active: filters.active || null,
                     }}
+                    gradeLevels={gradeLevels}
                 />
             </div>
         </AppLayout>

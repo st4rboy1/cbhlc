@@ -2,7 +2,7 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { CreditCard, FileCheck, GraduationCap, LayoutGrid, Settings, UserCog, Users } from 'lucide-react';
+import { BadgeDollarSign, CreditCard, FileCheck, GraduationCap, LayoutGrid, Settings, UserCog, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -20,6 +20,11 @@ const mainNavItems: NavItem[] = [
         title: 'Students',
         href: '/super-admin/students',
         icon: Users,
+    },
+    {
+        title: 'Grade Level Fees',
+        href: '/super-admin/grade-level-fees',
+        icon: BadgeDollarSign,
     },
     {
         title: 'Users',
