@@ -34,10 +34,10 @@ interface FormData {
 
 interface Props {
     fee: GradeLevelFee;
-    gradeLevels: string[];
+    gradeLevels?: string[];
 }
 
-export default function SuperAdminGradeLevelFeesEdit({ fee, gradeLevels }: Props) {
+export default function SuperAdminGradeLevelFeesEdit({ fee, gradeLevels = [] }: Props) {
     const { data, setData, put, processing, errors } = useForm<FormData>({
         grade_level: fee.grade_level,
         school_year: fee.school_year,
