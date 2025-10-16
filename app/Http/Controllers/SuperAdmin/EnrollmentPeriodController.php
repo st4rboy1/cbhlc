@@ -21,7 +21,7 @@ class EnrollmentPeriodController extends Controller
 
         $activePeriod = EnrollmentPeriod::active()->first();
 
-        return Inertia::render('SuperAdmin/EnrollmentPeriods/Index', [
+        return Inertia::render('super-admin/enrollment-periods/index', [
             'periods' => $periods,
             'activePeriod' => $activePeriod,
         ]);
@@ -32,7 +32,7 @@ class EnrollmentPeriodController extends Controller
      */
     public function create()
     {
-        return Inertia::render('SuperAdmin/EnrollmentPeriods/Create');
+        return Inertia::render('super-admin/enrollment-periods/create');
     }
 
     /**
@@ -59,7 +59,7 @@ class EnrollmentPeriodController extends Controller
     {
         $enrollmentPeriod->loadCount('enrollments');
 
-        return Inertia::render('SuperAdmin/EnrollmentPeriods/Show', [
+        return Inertia::render('super-admin/enrollment-periods/show', [
             'period' => $enrollmentPeriod,
         ]);
     }
@@ -69,7 +69,7 @@ class EnrollmentPeriodController extends Controller
      */
     public function edit(EnrollmentPeriod $enrollmentPeriod)
     {
-        return Inertia::render('SuperAdmin/EnrollmentPeriods/Edit', [
+        return Inertia::render('super-admin/enrollment-periods/edit', [
             'period' => $enrollmentPeriod,
         ]);
     }

@@ -48,7 +48,7 @@ test('super admin can view enrollment periods index', function () {
     $response->assertOk();
     // Note: Inertia component check skipped - UI implementation is TICKET-009
     $response->assertInertia(fn ($page) => $page
-        ->component('SuperAdmin/EnrollmentPeriods/Index', false)
+        ->component('super-admin/enrollment-periods/index', false)
         ->has('periods')
         ->has('activePeriod')
     );
