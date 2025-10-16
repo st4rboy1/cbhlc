@@ -155,8 +155,8 @@ class AuditLogController extends Controller
                 fputcsv($file, [
                     $activity->id,
                     $activity->created_at->toDateTimeString(),
-                    $activity->causer?->name ?? 'System',
-                    $activity->causer?->email ?? '',
+                    $activity->causer->name ?? 'System',
+                    $activity->causer->email ?? '',
                     $activity->description,
                     $activity->subject_type ?? '',
                     $activity->subject_id ?? '',
