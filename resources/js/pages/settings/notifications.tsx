@@ -82,7 +82,8 @@ export default function Notifications({ preferences, availableTypes }: Props) {
             update.url(),
             {
                 preferences: localPreferences,
-            },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            } as any,
             {
                 preserveScroll: true,
                 onSuccess: () => {
