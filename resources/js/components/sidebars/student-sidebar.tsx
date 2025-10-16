@@ -1,13 +1,13 @@
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
+import { type NavItem, type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ClipboardList, CreditCard, FileCheck, LayoutGrid, Settings } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 export function StudentSidebar() {
-    const { auth } = usePage().props;
+    const { auth } = usePage<SharedData>().props;
     const studentId = auth.user?.student_id;
 
     const mainNavItems: NavItem[] = [
