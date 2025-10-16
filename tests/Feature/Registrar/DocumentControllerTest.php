@@ -280,7 +280,7 @@ test('registrar can view pending documents', function () {
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
-        ->component('Registrar/Documents/Pending', false)
+        ->component('registrar/documents/pending', false)
         ->has('documents')
     );
 });
