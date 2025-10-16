@@ -30,6 +30,7 @@ use App\Http\Controllers\SuperAdmin\GradeLevelFeeController as SuperAdminGradeLe
 use App\Http\Controllers\SuperAdmin\GuardianController as SuperAdminGuardianController;
 use App\Http\Controllers\SuperAdmin\InvoiceController as SuperAdminInvoiceController;
 use App\Http\Controllers\SuperAdmin\PaymentController as SuperAdminPaymentController;
+use App\Http\Controllers\SuperAdmin\SchoolInformationController as SuperAdminSchoolInformationController;
 use App\Http\Controllers\SuperAdmin\StudentController as SuperAdminStudentController;
 use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use App\Http\Controllers\TuitionController;
@@ -156,6 +157,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/', [SuperAdminAuditLogController::class, 'index'])->name('index');
             Route::get('/{activity}', [SuperAdminAuditLogController::class, 'show'])->name('show');
             Route::post('/export', [SuperAdminAuditLogController::class, 'export'])->name('export');
+        });
+
+        // School Information Management
+        Route::prefix('school-information')->name('school-information.')->group(function () {
+            Route::get('/', [SuperAdminSchoolInformationController::class, 'index'])->name('index');
+            Route::put('/', [SuperAdminSchoolInformationController::class, 'update'])->name('update');
         });
     });
 
