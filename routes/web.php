@@ -14,6 +14,7 @@ use App\Http\Controllers\Public\ApplicationController;
 use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Public\RegistrarInfoController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboardController;
+use App\Http\Controllers\Registrar\DocumentController as RegistrarDocumentController;
 use App\Http\Controllers\Registrar\EnrollmentController as RegistrarEnrollmentController;
 use App\Http\Controllers\Registrar\GradeLevelFeeController as RegistrarGradeLevelFeeController;
 use App\Http\Controllers\Registrar\StudentController as RegistrarStudentController;
@@ -171,6 +172,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Grade Level Fees Management
         Route::resource('grade-level-fees', RegistrarGradeLevelFeeController::class);
         Route::post('/grade-level-fees/{gradeLevelFee}/duplicate', [RegistrarGradeLevelFeeController::class, 'duplicate'])->name('grade-level-fees.duplicate');
+
+        // Document Management
+        Route::get('/documents/pending', [RegistrarDocumentController::class, 'pending'])->name('documents.pending');
+        Route::get('/documents/{document}', [RegistrarDocumentController::class, 'show'])->name('documents.show');
+        Route::post('/documents/{document}/verify', [RegistrarDocumentController::class, 'verify'])->name('documents.verify');
+        Route::post('/documents/{document}/reject', [RegistrarDocumentController::class, 'reject'])->name('documents.reject');
     });
 
     // Guardian Routes
