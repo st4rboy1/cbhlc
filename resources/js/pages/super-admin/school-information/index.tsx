@@ -64,7 +64,7 @@ export default function SchoolInformationIndex({ information }: Props) {
     const [formData, setFormData] = useState<Record<number, string>>(() => {
         const initial: Record<number, string> = {};
         Object.values(information).forEach((items) => {
-            items?.forEach((item) => {
+            items?.forEach((item: SchoolInformation) => {
                 initial[item.id] = item.value || '';
             });
         });
@@ -151,7 +151,7 @@ export default function SchoolInformationIndex({ information }: Props) {
                                     <CardDescription>{groupTitles[group]?.description || ''}</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
-                                    {items.map((item, index) => (
+                                    {items.map((item: SchoolInformation, index: number) => (
                                         <div key={item.id}>
                                             {index > 0 && <Separator className="my-4" />}
                                             <div className="space-y-2">
