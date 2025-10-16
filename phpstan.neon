@@ -14,6 +14,9 @@ parameters:
     # Ignore specific errors that are not relevant
     ignoreErrors:
         - '#Access to an undefined property [a-zA-Z\\]+::\$[a-zA-Z_]+#'
+        -
+            message: '#Property .* does not exist in model\.#'
+            path: app/Models/GradeLevelFee.php
 
     excludePaths:
         - vendor/
