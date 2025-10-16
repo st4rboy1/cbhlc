@@ -21,7 +21,7 @@ class NotificationPreferenceController extends Controller
 
         $availableTypes = NotificationPreference::availableTypes();
 
-        return Inertia::render('Settings/Notifications', [
+        return Inertia::render('settings/notifications', [
             'preferences' => $preferences,
             'availableTypes' => $availableTypes,
         ]);
