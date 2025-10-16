@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Guardian extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'user_id',
@@ -29,6 +32,23 @@ class Guardian extends Model
     protected $casts = [
         'full_name' => FullNameCast::class,
     ];
+
+    /**
+     * Get the activity log options for this model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
+                'created' => 'Guardian record created',
+                'updated' => 'Guardian record updated',
+                'deleted' => 'Guardian record deleted',
+                default => "Guardian {$eventName}",
+            });
+    }
 
     /**
      * Get the user account associated with this parent
