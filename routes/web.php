@@ -11,9 +11,8 @@ use App\Http\Controllers\Guardian\StudentController as GuardianStudentController
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\ApplicationController;
-use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Public\ContactController;
-
+use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboardController;
 use App\Http\Controllers\Registrar\EnrollmentController as RegistrarEnrollmentController;
 use App\Http\Controllers\Registrar\GradeLevelFeeController as RegistrarGradeLevelFeeController;
