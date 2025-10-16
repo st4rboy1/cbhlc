@@ -35,27 +35,27 @@ export default function StudentShow({ student }: Props) {
                             </div>
                             <div>
                                 <p className="font-semibold">Grade Level</p>
-                                <p>{student.grade_level.label}</p>
+                                <p>{student.grade_level?.label ?? 'N/A'}</p>
                             </div>
                             <div>
                                 <p className="font-semibold">Birthdate</p>
-                                <p>{new Date(student.birthdate).toLocaleDateString()}</p>
+                                <p>{student.birthdate ? new Date(student.birthdate).toLocaleDateString() : 'N/A'}</p>
                             </div>
                             <div>
                                 <p className="font-semibold">Gender</p>
-                                <p>{student.gender}</p>
+                                <p>{student.gender ?? 'N/A'}</p>
                             </div>
                             <div>
                                 <p className="font-semibold">Address</p>
-                                <p>{student.address}</p>
+                                <p>{student.address ?? 'N/A'}</p>
                             </div>
                             <div>
                                 <p className="font-semibold">Contact Number</p>
-                                <p>{student.contact_number}</p>
+                                <p>{student.contact_number ?? 'N/A'}</p>
                             </div>
                             <div>
                                 <p className="font-semibold">Student ID</p>
-                                <p>{student.student_id}</p>
+                                <p>{student.student_id ?? 'N/A'}</p>
                             </div>
                         </div>
                     </CardContent>
