@@ -211,13 +211,13 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels }: GradeLevelFe
     const [schoolYear, setSchoolYear] = React.useState(filters.school_year || '');
     const [activeFilter, setActiveFilter] = React.useState(filters.active || 'all');
 
-    const handleFilterChange = () => {
+    const applyFilters = (gradeLevel?: string, year?: string, active?: string) => {
         router.get(
             '/super-admin/grade-level-fees',
             {
-                search: gradeLevelFilter !== 'all' ? gradeLevelFilter : undefined,
-                school_year: schoolYear || undefined,
-                active: activeFilter !== 'all' ? activeFilter : undefined,
+                search: (gradeLevel ?? gradeLevelFilter) !== 'all' ? (gradeLevel ?? gradeLevelFilter) : undefined,
+                school_year: (year ?? schoolYear) || undefined,
+                active: (active ?? activeFilter) !== 'all' ? (active ?? activeFilter) : undefined,
             },
             {
                 preserveState: true,
@@ -234,7 +234,7 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels }: GradeLevelFe
                     value={gradeLevelFilter}
                     onValueChange={(value) => {
                         setGradeLevelFilter(value);
-                        setTimeout(handleFilterChange, 0);
+                        applyFilters(value, undefined, undefined);
                     }}
                 >
                     <SelectTrigger className="w-[200px]">
@@ -253,15 +253,15 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels }: GradeLevelFe
                     placeholder="School year (e.g., 2024-2025)"
                     value={schoolYear}
                     onChange={(e) => setSchoolYear(e.target.value)}
-                    onBlur={handleFilterChange}
-                    onKeyDown={(e) => e.key === 'Enter' && handleFilterChange()}
+                    onBlur={(e) => applyFilters(undefined, e.target.value, undefined)}
+                    onKeyDown={(e) => e.key === 'Enter' && applyFilters(undefined, schoolYear, undefined)}
                     className="max-w-sm"
                 />
                 <Select
                     value={activeFilter}
                     onValueChange={(value) => {
                         setActiveFilter(value);
-                        setTimeout(handleFilterChange, 0);
+                        applyFilters(undefined, undefined, value);
                     }}
                 >
                     <SelectTrigger className="w-[180px]">
