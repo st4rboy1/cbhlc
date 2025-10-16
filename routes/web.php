@@ -10,8 +10,8 @@ use App\Http\Controllers\Guardian\EnrollmentController as GuardianEnrollmentCont
 use App\Http\Controllers\Guardian\StudentController as GuardianStudentController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Public\AboutController;
-use App\Http\Controllers\Public\ContactController; 
 use App\Http\Controllers\Public\ApplicationController;
+use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Public\RegistrarInfoController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboardController;
@@ -31,7 +31,6 @@ use App\Http\Controllers\SuperAdmin\StudentController as SuperAdminStudentContro
 use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use App\Http\Controllers\TuitionController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
