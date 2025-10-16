@@ -50,11 +50,7 @@ class EnrollmentObserver
                 ->queue(new EnrollmentSubmitted($enrollment));
         }
 
-        // Log enrollment creation
-        activity()
-            ->performedOn($enrollment)
-            ->causedBy(auth()->user())
-            ->log('Enrollment created for student: '.$enrollment->student->full_name);
+        // Note: Activity logging is handled automatically by LogsActivity trait
     }
 
     /**
@@ -94,14 +90,7 @@ class EnrollmentObserver
             ]);
         }
 
-        // Log significant changes
-        if ($enrollment->wasChanged(['status', 'payment_status', 'grade_level'])) {
-            activity()
-                ->performedOn($enrollment)
-                ->causedBy(auth()->user())
-                ->withProperties(['changes' => $enrollment->getChanges()])
-                ->log('Enrollment updated for student: '.$enrollment->student->full_name);
-        }
+        // Note: Activity logging is handled automatically by LogsActivity trait
     }
 
     /**
@@ -109,10 +98,7 @@ class EnrollmentObserver
      */
     public function deleted(Enrollment $enrollment): void
     {
-        activity()
-            ->performedOn($enrollment)
-            ->causedBy(auth()->user())
-            ->log('Enrollment deleted for student: '.$enrollment->student->full_name);
+        // Note: Activity logging is handled automatically by LogsActivity trait
     }
 
     /**

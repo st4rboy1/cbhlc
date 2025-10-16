@@ -165,6 +165,6 @@ class EnrollmentObserverTest extends TestCase
             ->first();
 
         $this->assertNotNull($activity);
-        $this->assertStringContainsString('Enrollment created for student:', $activity->description);
+        $this->assertEquals('Enrollment application created', $activity->description);
     }
 }

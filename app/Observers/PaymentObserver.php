@@ -62,11 +62,7 @@ class PaymentObserver
             $enrollment->save();
         }
 
-        // Log payment creation
-        activity()
-            ->performedOn($payment)
-            ->causedBy(auth()->user())
-            ->log('Payment recorded: '.number_format($payment->amount_cents / 100, 2).($payment->invoice ? ' for '.$payment->invoice->invoice_number : ''));
+        // Note: Activity logging is handled automatically by LogsActivity trait
     }
 
     /**
@@ -98,14 +94,7 @@ class PaymentObserver
             }
         }
 
-        // Log significant changes
-        if ($payment->wasChanged('amount_cents')) {
-            activity()
-                ->performedOn($payment)
-                ->causedBy(auth()->user())
-                ->withProperties(['changes' => $payment->getChanges()])
-                ->log('Payment updated: '.$payment->reference_number);
-        }
+        // Note: Activity logging is handled automatically by LogsActivity trait
     }
 
     /**
@@ -129,11 +118,7 @@ class PaymentObserver
             $invoice->save();
         }
 
-        // Log payment deletion
-        activity()
-            ->performedOn($payment)
-            ->causedBy(auth()->user())
-            ->log('Payment deleted: '.$payment->reference_number);
+        // Note: Activity logging is handled automatically by LogsActivity trait
     }
 
     /**
