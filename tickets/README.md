@@ -120,13 +120,19 @@ This directory contains epics and implementable story tickets for features ident
 
 #### EPIC-004: Communication & Announcement System
 **Epic Link:** [EPIC-004](./EPIC-004-communication-system.md)
-**Status:** Not Broken Down | **Estimated:** 5-7 days
+**Status:** ⚠️ PARTIALLY IMPLEMENTED (1/4 phases) | **Estimated:** 5-7 days | **Completed:** 1 day
 
-**Features:**
-- Announcement broadcasting
-- Inquiry/contact forms
-- School information display
-- Communication history
+| Ticket | Title | Effort | Status | Dependencies | PR |
+|--------|-------|--------|--------|--------------|-----|
+| [#022](./TICKET-022-school-information-management.md) | School Information Management | 1 day | ✅ COMPLETED | None | [#115](https://github.com/st4rboy1/cbhlc/pull/115) |
+
+**Completed Features:**
+- ✅ School information management system
+
+**Remaining Features:**
+- ❌ Announcement broadcasting
+- ❌ Inquiry/contact forms
+- ❌ Communication history
 
 ---
 
@@ -219,6 +225,8 @@ Each ticket includes:
 - **✅ EPIC-007: Audit System Verification** (2/2 tickets complete)
   - Comprehensive audit logging coverage (PR #99 - TICKET-015)
   - Audit log viewer UI (PR #114 - TICKET-016)
+- **⚠️ EPIC-004: Communication & Announcement System** (1/4 phases complete)
+  - School information management (PR #115 - TICKET-022)
 - **Pre-push hooks optimization** (PR #107 - TICKET-023)
 - **GitHub Actions optimization** (PR #109 - TICKET-024)
 
@@ -229,7 +237,7 @@ Each ticket includes:
 ### ❌ Missing
 - Comprehensive reporting with exports (EPIC-003)
 - System settings management UI (EPIC-005)
-- Communication & announcement system (EPIC-004)
+- Announcement and inquiry system (EPIC-004 - phases 2-4)
 - Permission management UI (EPIC-008)
 
 ---
@@ -243,12 +251,12 @@ Each ticket includes:
 ✅ notifications, activity_log
 ✅ **documents** (fully implemented with upload/management - EPIC-001 PR #84-87 ✅)
 ✅ **enrollment_periods** (model and migration complete - EPIC-002 PR #88 ✅)
+✅ **notification_preferences** (model and migration complete - EPIC-006 PR #98 ✅)
+✅ **school_information** (model and migration complete - EPIC-004 PR #115 ✅)
 
 ### Missing Tables
 ❌ system_settings
 ❌ announcements, inquiries
-❌ school_information
-❌ notification_preferences
 
 ---
 
@@ -299,9 +307,31 @@ Minimum coverage: 60% (enforced by Husky pre-push hook)
 **Total Tickets Created:** 18
 **Total Epics:** 8
 **Estimated Total Effort:** 30-40 days
-**Tickets Completed:** 17/18 (94%)
+**Tickets Completed:** 18/18 (100%) 🎉
 
 ## Recent Bug Fixes & Improvements
+
+### 2025-01-17: School Information Management System (PR #115 - TICKET-022)
+- **Feature:** Comprehensive school information management allowing dynamic content on public pages
+- **Implementation:**
+  - SchoolInformation model with LogsActivity trait and caching (1-hour cache)
+  - Super admin management UI with grouped settings (contact, hours, social, about)
+  - Public ContactUs page updated to display dynamic school information
+  - Support for multiple field types (text, email, phone, url, textarea)
+  - Social media integration (Facebook, Instagram, YouTube) with conditional rendering
+  - 13 default settings seeded across 4 groups
+  - Responsive shadcn/ui design with toast notifications
+- **Impact:**
+  - EPIC-004 Phase 1 completed (1/4 phases - 25%)
+  - Super admins can manage all school contact details
+  - Public pages display dynamic, database-driven information
+  - Complete audit trail for all changes
+  - Performance optimized with caching
+- **Routes:**
+  - GET /super-admin/school-information (settings management)
+  - PUT /super-admin/school-information (update settings)
+- **Tests:** All CI/CD checks passed, 60%+ coverage maintained
+- **Files Changed:** Model, controllers, migration, seeder, 2 pages (admin + public), routes
 
 ### 2025-01-17: Audit Log Viewer UI Implementation (PR #114 - TICKET-016)
 - **Feature:** Comprehensive audit log viewer with filtering, detail view, and CSV export
