@@ -136,7 +136,7 @@ test('user can view notification preferences page', function () {
 
     $response->assertOk();
     $response->assertInertia(fn ($page) => $page
-        ->component('Settings/Notifications', false)
+        ->component('settings/notifications', false)
         ->has('preferences')
         ->has('availableTypes')
     );
