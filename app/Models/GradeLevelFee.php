@@ -17,12 +17,19 @@ class GradeLevelFee extends Model
 
     protected $fillable = [
         'grade_level',
+        'tuition_fee',
         'tuition_fee_cents',
+        'registration_fee',
         'registration_fee_cents',
+        'miscellaneous_fee',
         'miscellaneous_fee_cents',
+        'laboratory_fee',
         'laboratory_fee_cents',
+        'library_fee',
         'library_fee_cents',
+        'sports_fee',
         'sports_fee_cents',
+        'other_fees',
         'other_fees_cents',
         'payment_terms',
         'school_year',
@@ -84,6 +91,30 @@ class GradeLevelFee extends Model
     public function getTotalAmountAttribute(): float
     {
         return $this->total_fee;
+    }
+
+    /**
+     * Mutator to convert tuition_fee (dollars) to cents
+     */
+    public function setTuitionFeeAttribute($value): void
+    {
+        $this->attributes['tuition_fee_cents'] = round(floatval($value) * 100);
+    }
+
+    /**
+     * Mutator to convert miscellaneous_fee (dollars) to cents
+     */
+    public function setMiscellaneousFeeAttribute($value): void
+    {
+        $this->attributes['miscellaneous_fee_cents'] = round(floatval($value) * 100);
+    }
+
+    /**
+     * Mutator to convert other_fees (dollars) to cents
+     */
+    public function setOtherFeesAttribute($value): void
+    {
+        $this->attributes['other_fees_cents'] = round(floatval($value ?? 0) * 100);
     }
 
     /**
