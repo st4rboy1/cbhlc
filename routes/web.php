@@ -22,6 +22,7 @@ use App\Http\Controllers\Student\DashboardController as StudentDashboardControll
 use App\Http\Controllers\StudentReportController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\EnrollmentController as SuperAdminEnrollmentController;
+use App\Http\Controllers\SuperAdmin\EnrollmentPeriodController as SuperAdminEnrollmentPeriodController;
 use App\Http\Controllers\SuperAdmin\GradeLevelFeeController as SuperAdminGradeLevelFeeController;
 use App\Http\Controllers\SuperAdmin\GuardianController as SuperAdminGuardianController;
 use App\Http\Controllers\SuperAdmin\InvoiceController as SuperAdminInvoiceController;
@@ -123,6 +124,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Grade Level Fees Management
         Route::resource('grade-level-fees', SuperAdminGradeLevelFeeController::class);
+
+        // Enrollment Periods Management
+        Route::resource('enrollment-periods', SuperAdminEnrollmentPeriodController::class);
+        Route::post('/enrollment-periods/{enrollmentPeriod}/activate', [SuperAdminEnrollmentPeriodController::class, 'activate'])->name('enrollment-periods.activate');
+        Route::post('/enrollment-periods/{enrollmentPeriod}/close', [SuperAdminEnrollmentPeriodController::class, 'close'])->name('enrollment-periods.close');
     });
 
     // Admin Routes (for administrator roles)
