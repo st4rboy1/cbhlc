@@ -9,7 +9,11 @@ use App\Models\Document;
 use App\Models\Student;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DocumentController extends Controller
 {
@@ -37,8 +41,8 @@ class DocumentController extends Controller
      */
     public function store(StoreDocumentRequest $request, Student $student): JsonResponse
     {
-        // Authorize guardian owns student
-        $this->authorize('update', $student);
+        // Authorize user can upload documents for this student
+        $this->authorize('uploadDocument', [Document::class, $student]);
 
         try {
             // Handle file upload
@@ -87,7 +91,7 @@ class DocumentController extends Controller
      */
     public function show(Student $student, Document $document): JsonResponse
     {
-        $this->authorize('view', $student);
+        $this->authorize('view', $document);
 
         // Ensure document belongs to student
         if ($document->student_id !== $student->id) {
@@ -96,8 +100,26 @@ class DocumentController extends Controller
             ], 404);
         }
 
+        // Generate signed URL valid for 5 minutes
+        $url = URL::temporarySignedRoute(
+            'guardian.students.documents.download',
+            now()->addMinutes(5),
+            ['student' => $student->id, 'document' => $document->id]
+        );
+
+        // Log document access
+        activity()
+            ->performedOn($document)
+            ->withProperties([
+                'action' => 'viewed',
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ])
+            ->log('Document accessed');
+
         return response()->json([
             'document' => $document->load(['student:id,first_name,last_name', 'verifiedBy:id,name']),
+            'url' => $url,
         ]);
     }
 
@@ -106,7 +128,7 @@ class DocumentController extends Controller
      */
     public function destroy(Student $student, Document $document): JsonResponse
     {
-        $this->authorize('update', $student);
+        $this->authorize('delete', $document);
 
         // Ensure document belongs to student
         if ($document->student_id !== $student->id) {
@@ -115,14 +137,12 @@ class DocumentController extends Controller
             ], 404);
         }
 
-        // Only allow deletion if document is pending or rejected
-        if ($document->verification_status === VerificationStatus::VERIFIED) {
-            return response()->json([
-                'message' => 'Cannot delete a verified document.',
-            ], 403);
-        }
-
         try {
+            // Delete physical file
+            if (Storage::disk('private')->exists($document->file_path)) {
+                Storage::disk('private')->delete($document->file_path);
+            }
+
             $document->delete();
 
             return response()->json([
@@ -138,5 +158,42 @@ class DocumentController extends Controller
                 'message' => 'Failed to delete document. Please try again.',
             ], 500);
         }
+    }
+
+    /**
+     * Download the document with signed URL verification.
+     */
+    public function download(Request $request, Student $student, Document $document): StreamedResponse|JsonResponse
+    {
+        // Verify signed URL
+        if (! $request->hasValidSignature()) {
+            return response()->json([
+                'message' => 'Invalid or expired download link.',
+            ], 403);
+        }
+
+        $this->authorize('download', $document);
+
+        // Ensure document belongs to student
+        if ($document->student_id !== $student->id) {
+            return response()->json([
+                'message' => 'Document not found for this student.',
+            ], 404);
+        }
+
+        // Log document download
+        activity()
+            ->performedOn($document)
+            ->withProperties([
+                'action' => 'downloaded',
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent(),
+            ])
+            ->log('Document downloaded');
+
+        return Storage::disk('private')->download(
+            $document->file_path,
+            $document->original_filename
+        );
     }
 }

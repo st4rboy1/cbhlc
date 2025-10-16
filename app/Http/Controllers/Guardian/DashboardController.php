@@ -79,20 +79,19 @@ class DashboardController extends Controller
                 'name' => trim($student->first_name.' '.
                     ($student->middle_name ? $student->middle_name.' ' : '').
                     $student->last_name),
-                'grade' => $student->grade_level ? ($student->grade_level->label ?? $student->grade_level->value) : null,
+                'grade' => $student->grade_level ? ($student->grade_level->label ?? $student->grade_level->value) : 'N/A',
                 'enrollmentStatus' => $latestEnrollment ? $latestEnrollment->status->value : 'No Enrollment',
                 'photo' => null, // Placeholder for future profile photos
             ];
         });
 
         // Format announcements for frontend
-        $formattedAnnouncements = collect($announcements)->map(function (array $announcement) {
+        // Format announcements for frontend
+        $formattedAnnouncements = collect($announcements)->map(function ($announcement) {
             return [
                 'id' => $announcement['id'],
                 'title' => $announcement['title'],
                 'message' => $announcement['content'],
-                'date' => $announcement['date'],
-                'type' => $announcement['priority'], // info, event, holiday, payment
             ];
         });
 

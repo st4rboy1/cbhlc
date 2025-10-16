@@ -9,10 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Student extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'student_id',
@@ -35,6 +38,23 @@ class Student extends Model
         'grade_level' => GradeLevel::class,
         'full_name' => FullNameCast::class,
     ];
+
+    /**
+     * Get the activity log options for this model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
+                'created' => 'Student record created',
+                'updated' => 'Student record updated',
+                'deleted' => 'Student record deleted',
+                default => "Student {$eventName}",
+            });
+    }
 
     /**
      * Calculate age from birthdate

@@ -154,7 +154,7 @@ export default function Landing() {
                             </p>
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <Button size="lg" variant="secondary" className="bg-white px-8 py-3 text-blue-600 hover:bg-gray-100">
-                                    Contact Us
+                                    <Link href="/contact">Contact Us</Link>
                                 </Button>
                             </div>
                         </div>
@@ -188,11 +188,11 @@ export default function Landing() {
                                     </div>
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={Mail} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-slate-400">info@cbhlc.edu.ph</span>
+                                        <span className="text-sm text-slate-400">christianbibleheritage@gmail.com</span>
                                     </div>
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={MapPin} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-slate-400">Pasig City, Metro Manila</span>
+                                        <span className="text-sm text-slate-400">Bayabas Ext. NAPICO Manggahan 1611 Pasig, Philippines</span>
                                     </div>
                                 </div>
                             </div>
