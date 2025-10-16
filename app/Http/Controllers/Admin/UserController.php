@@ -35,6 +35,7 @@ class UserController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'role' => $user->getRoleNames()->first(),
+            'created_at' => $user->created_at,
         ];
 
         return Inertia::render('admin/users/show', [
@@ -50,6 +51,7 @@ class UserController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'role' => $user->getRoleNames()->first(),
+            'created_at' => $user->created_at,
         ];
 
         return Inertia::render('admin/users/edit', [

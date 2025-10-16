@@ -14,7 +14,6 @@ parameters:
     # Ignore specific errors that are not relevant
     ignoreErrors:
         - '#Access to an undefined property [a-zA-Z\\]+::\$[a-zA-Z_]+#'
-        - '~Parameter #1 \$callback of method Illuminate\\Database\\Eloquent\\Collection<int,App\\Models\\Student>::map\(\) contains unresolvable type\.~'
 
     excludePaths:
         - vendor/

@@ -13,13 +13,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-// Add missing imports for referenced classes
-// For the user() relationship
-// For the guardian() relationship
-// For enrollments() and related methods
-// For documents()
-// For guardianStudents()
-
+/**
+ * @property string $full_name
+ * @property \Illuminate\Support\Carbon $birth_date
+ */
 class Student extends Model
 {
     use HasFactory;

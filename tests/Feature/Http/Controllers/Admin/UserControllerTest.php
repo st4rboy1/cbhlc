@@ -63,7 +63,7 @@ class UserControllerTest extends TestCase
                 ->has('user')
                 ->where('user.id', $this->admin->id)
                 ->has('roles')
-                ->where('roles', ['administrator', 'registrar', 'guardian', 'student'])
+                ->where('roles', ['administrator', 'guardian', 'registrar', 'student', 'super_admin'])
             );
     }
 
