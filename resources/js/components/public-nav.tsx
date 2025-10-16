@@ -6,7 +6,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { GraduationCap } from 'lucide-react';
 
 interface PublicNavProps {
-    currentPage?: 'home' | 'about';
+    currentPage?: 'home' | 'about' | 'contact';
 }
 
 export function PublicNav({ currentPage }: PublicNavProps) {
@@ -42,6 +42,14 @@ export function PublicNav({ currentPage }: PublicNavProps) {
                         }`}
                     >
                         About
+                    </Link>
+                    <Link
+                        href="/contact"
+                        className={`font-medium transition-colors ${
+                            currentPage === 'contact' ? 'text-blue-600' : 'text-slate-600 hover:text-slate-800'
+                        }`}
+                    >
+                        Contact
                     </Link>
                     {auth.user ? (
                         <Button asChild variant="default">

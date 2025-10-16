@@ -7,10 +7,13 @@ use App\Casts\MoneyCast;
 use App\Enums\GradeLevel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class GradeLevelFee extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'grade_level',
@@ -43,6 +46,23 @@ class GradeLevelFee extends Model
         'formatted_sports_fee' => FormattedMoneyCast::class,
         'formatted_total_fee' => FormattedMoneyCast::class,
     ];
+
+    /**
+     * Get the activity log options for this model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
+                'created' => 'Grade level fee created',
+                'updated' => 'Grade level fee updated',
+                'deleted' => 'Grade level fee deleted',
+                default => "Grade level fee {$eventName}",
+            });
+    }
 
     /**
      * Get total fee in dollars (computed attribute)

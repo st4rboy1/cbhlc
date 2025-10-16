@@ -51,9 +51,13 @@ class StudentObserverTest extends TestCase
 
         $student = Student::factory()->create();
 
-        $activity = Activity::latest()->first();
+        $activity = Activity::where('subject_type', Student::class)
+            ->where('subject_id', $student->id)
+            ->latest()
+            ->first();
+
         $this->assertNotNull($activity);
-        $this->assertEquals('Student created: '.$student->full_name, $activity->description);
+        $this->assertEquals('Student record created', $activity->description);
         $this->assertEquals(Student::class, $activity->subject_type);
         $this->assertEquals($student->id, $activity->subject_id);
     }
@@ -69,8 +73,9 @@ class StudentObserverTest extends TestCase
 
         $activity = Activity::latest()->first();
         $this->assertNotNull($activity);
-        $this->assertEquals('Student updated: '.$student->full_name, $activity->description);
-        $this->assertArrayHasKey('changes', $activity->properties->toArray());
+        $this->assertEquals('Student record updated', $activity->description);
+        $this->assertArrayHasKey('attributes', $activity->properties->toArray());
+        $this->assertArrayHasKey('old', $activity->properties->toArray());
     }
 
     public function test_activity_is_logged_when_student_is_deleted(): void
@@ -78,27 +83,29 @@ class StudentObserverTest extends TestCase
         $this->actingAs(User::factory()->create());
 
         $student = Student::factory()->create();
-        $fullName = $student->full_name;
         Activity::truncate(); // Clear previous activities
 
         $student->delete();
 
         $activity = Activity::latest()->first();
         $this->assertNotNull($activity);
-        $this->assertEquals('Student deleted: '.$fullName, $activity->description);
+        $this->assertEquals('Student record deleted', $activity->description);
     }
 
-    public function test_no_activity_logged_when_no_significant_changes(): void
+    public function test_only_changed_attributes_are_logged(): void
     {
         $this->actingAs(User::factory()->create());
 
         $student = Student::factory()->create();
         Activity::truncate(); // Clear previous activities
 
-        // Update a non-significant field
+        // Update a field
         $student->update(['email' => 'newemail@example.com']);
 
         $activity = Activity::latest()->first();
-        $this->assertNull($activity);
+        $this->assertNotNull($activity);
+        $this->assertEquals('Student record updated', $activity->description);
+        $this->assertArrayHasKey('attributes', $activity->properties->toArray());
+        $this->assertEquals('newemail@example.com', $activity->properties['attributes']['email']);
     }
 }

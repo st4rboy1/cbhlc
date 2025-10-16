@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * @property float $tuition_fee
@@ -27,6 +29,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 class Enrollment extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'enrollment_id',
@@ -81,6 +84,23 @@ class Enrollment extends Model
         'amount_paid' => MoneyCast::class,
         'balance' => MoneyCast::class,
     ];
+
+    /**
+     * Get the activity log options for this model.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $eventName) => match ($eventName) {
+                'created' => 'Enrollment application created',
+                'updated' => 'Enrollment application updated',
+                'deleted' => 'Enrollment application deleted',
+                default => "Enrollment {$eventName}",
+            });
+    }
 
     /**
      * Get the student associated with the enrollment

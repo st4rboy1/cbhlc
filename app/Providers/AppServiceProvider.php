@@ -2,8 +2,16 @@
 
 namespace App\Providers;
 
+use App\Listeners\LogAuthenticationActivity;
 use App\Models\User;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register authentication event listeners
+        Event::listen(Login::class, [LogAuthenticationActivity::class, 'handleLogin']);
+        Event::listen(Logout::class, [LogAuthenticationActivity::class, 'handleLogout']);
+        Event::listen(Failed::class, [LogAuthenticationActivity::class, 'handleFailed']);
+
         // Super admin has access to everything
         Gate::before(function (User $user, string $ability) {
             if ($user->hasRole('super_admin')) {
@@ -36,6 +49,25 @@ class AppServiceProvider extends ServiceProvider
         $this->defineInvoiceGates();
         $this->definePaymentGates();
         $this->defineGradeLevelFeeGates();
+
+        // Configure rate limiters
+        $this->configureRateLimiters();
+    }
+
+    /**
+     * Configure rate limiters for the application.
+     */
+    protected function configureRateLimiters(): void
+    {
+        RateLimiter::for('document-uploads', function (Request $request) {
+            return Limit::perMinute(5)
+                ->by($request->user()?->id ?: $request->ip())
+                ->response(function () {
+                    return response()->json([
+                        'message' => 'Too many upload attempts. Please try again later.',
+                    ], 429);
+                });
+        });
     }
 
     /**

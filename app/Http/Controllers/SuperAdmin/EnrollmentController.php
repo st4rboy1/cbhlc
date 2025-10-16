@@ -57,6 +57,10 @@ class EnrollmentController extends Controller
 
         $enrollments = $query->latest()->paginate(15)->withQueryString();
 
+        if ($request->wantsJson()) {
+            return response()->json(['enrollments' => $enrollments]);
+        }
+
         return Inertia::render('super-admin/enrollments/index', [
             'enrollments' => $enrollments,
             'filters' => $request->only(['search', 'status', 'grade', 'school_year']),

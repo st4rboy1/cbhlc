@@ -67,10 +67,21 @@ else
     exit 1
 fi
 
+# Vite Build (to catch Inertia component path mismatches)
+echo "✓ Building assets with Vite..."
+if npm run build > /dev/null 2>&1; then
+    echo "  Vite build: ✅ PASSED"
+else
+    echo "  Vite build: ❌ FAILED"
+    echo "  Run 'npm run build' to see issues"
+    echo "  Common issue: Inertia component paths must use kebab-case (e.g., 'settings/notifications' not 'Settings/Notifications')"
+    exit 1
+fi
+
 # Tests (optional - takes longer)
 if [ "$1" == "--with-tests" ]; then
     echo "✓ Running tests..."
-    if ./vendor/bin/pest > /dev/null 2>&1; then
+    if ./vendor/bin/sail pest > /dev/null 2>&1; then
         echo "  Tests: ✅ PASSED"
     else
         echo "  Tests: ❌ FAILED"
