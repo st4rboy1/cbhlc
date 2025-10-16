@@ -31,6 +31,8 @@ class GradeLevelFeeFactory extends Factory
             'laboratory_fee_cents' => $this->faker->numberBetween(0, 100000), // 0 to 1,000 pesos
             'library_fee_cents' => $this->faker->numberBetween(20000, 50000), // 200 to 500 pesos
             'sports_fee_cents' => $this->faker->numberBetween(10000, 30000), // 100 to 300 pesos
+            'other_fees_cents' => $this->faker->numberBetween(0, 50000), // 0 to 500 pesos
+            'payment_terms' => $this->faker->randomElement(['ANNUAL', 'SEMESTRAL', 'QUARTERLY', 'MONTHLY']),
             'school_year' => $schoolYear,
             'is_active' => true,
         ];
