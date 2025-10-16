@@ -9,6 +9,7 @@
 /resources/js/wayfinder
 /storage/*.key
 /storage/pail
+/storage/pre-push-logs/
 /vendor
 .env
 .env.backup
