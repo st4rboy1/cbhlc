@@ -80,6 +80,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the student profile associated with this user
+     */
+    public function student(): HasOne
+    {
+        return $this->hasOne(Student::class);
+    }
+
+    /**
      * Get the dashboard route based on user role
      */
     public function getDashboardRoute(): string
