@@ -1,33 +1,71 @@
 #!/bin/bash
 
+# Exit on any error
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+# Log directory
+LOG_DIR="storage/pre-push-logs"
+
+# Function to get current branch name in snake_case
+get_branch_name() {
+    git branch --show-current | tr '/' '_' | tr '-' '_'
+}
+
+# Function to log command output and manage log rotation
+log_command() {
+    local command_name=$1
+    local branch=$(get_branch_name)
+    local timestamp=$(date +%Y_%m_%d_%H_%M_%S)
+    local log_file="${LOG_DIR}/${command_name}_${branch}_${timestamp}.log"
+
+    # Create log directory if it doesn't exist
+    mkdir -p "$LOG_DIR"
+
+    # Run command and capture output (shift to get actual command)
+    shift
+    if "$@" > "$log_file" 2>&1; then
+        # Keep only latest 5 logs for this command
+        ls -t "${LOG_DIR}/${command_name}_"*.log 2>/dev/null | tail -n +6 | xargs rm -f 2>/dev/null || true
+        return 0
+    else
+        # Keep only latest 5 logs for this command
+        ls -t "${LOG_DIR}/${command_name}_"*.log 2>/dev/null | tail -n +6 | xargs rm -f 2>/dev/null || true
+        echo "$log_file"
+        return 1
+    fi
+}
+
 echo "🚀 Running pre-push checks..."
 echo ""
 
 # Run the local test script
 ./scripts/test-local.sh
 
-# Check if the local test script passed
-if [ $? -ne 0 ]; then
+# Run tests with coverage (optimized with SQLite)
+echo "🧪 Running tests with coverage check..."
+
+start_time=$(date +%s.%N)
+
+if log_file=$(log_command "pest" ./vendor/bin/sail exec -T -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: laravel.test ./vendor/bin/pest --parallel --coverage --min=60 --coverage-text); then
+    end_time=$(date +%s.%N)
+    duration=$(awk "BEGIN {printf \"%.1f\", $end_time - $start_time}")
+    printf "  ${GREEN}✅ Tests: PASSED${NC} (${duration}s)\n"
+    echo "✅ Coverage: Minimum 60% met"
+else
+    end_time=$(date +%s.%N)
+    duration=$(awk "BEGIN {printf \"%.1f\", $end_time - $start_time}")
+    printf "  ${RED}❌ Tests: FAILED${NC} (${duration}s)\n"
+    echo "   See output in: $log_file"
     echo ""
-    echo "❌ Pre-push checks failed! Fix the issues before pushing."
-    echo ""
-    echo "Tip: You can bypass this check with 'git push --no-verify' (not recommended)"
-    exit 1
-fi
-
-# Run tests with coverage but optimized for speed
-echo ""
-echo "🧪 Running tests with coverage check (optimized with SQLite)..."
-
-# Use SQLite for much faster tests (5s vs 13s)
-./vendor/bin/sail exec -T -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: laravel.test ./vendor/bin/pest --parallel --coverage --min=60 --coverage-text
-
-# Check the exit status
-if [ $? -ne 0 ]; then
     echo "❌ Tests failed or coverage below 60%. Push aborted."
     exit 1
 fi
 
-echo "✅ All tests passed with minimum 60% coverage!"
+echo ""
 echo "✅ Pre-push checks completed successfully!"
 exit 0
