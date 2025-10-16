@@ -70,13 +70,14 @@ This directory contains epics and implementable story tickets for features ident
 ---
 
 #### Development Infrastructure & Tooling
-**Status:** In Progress | **Total Effort:** 2-3 hours
+**Status:** In Progress | **Total Effort:** 3 hours
 
 | Ticket | Title | Effort | Status | Dependencies | PR |
 |--------|-------|--------|--------|--------------|-----|
 | [#023](./TICKET-023-refactor-pre-push-hooks.md) | Refactor Pre-Push Hooks | 2-3 hours | ✅ COMPLETED | None | [#107](https://github.com/st4rboy1/cbhlc/pull/107) |
+| [#024](./TICKET-024-remove-duplicate-github-actions-workflow.md) | Remove Duplicate GitHub Actions Workflow | 30 min | 🚧 IN PROGRESS | None | TBD |
 
-**Impact:** Improved developer experience, better debugging, faster CI/CD
+**Impact:** Improved developer experience, better debugging, faster CI/CD, reduced resource usage
 
 ---
 
@@ -293,10 +294,10 @@ Minimum coverage: 60% (enforced by Husky pre-push hook)
 ---
 
 **Last Updated:** 2025-10-16
-**Total Tickets Created:** 17
+**Total Tickets Created:** 18
 **Total Epics:** 8
 **Estimated Total Effort:** 30-40 days
-**Tickets Completed:** 13/17 (76%)
+**Tickets Completed:** 13/18 (72%)
 
 ## Recent Bug Fixes & Improvements
 
