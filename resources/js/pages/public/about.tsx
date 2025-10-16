@@ -219,11 +219,7 @@ export default function About() {
                                         <Icon iconNode={MapPin} className="h-6 w-6" />
                                     </div>
                                     <h3 className="mb-2 text-lg font-semibold">Address</h3>
-                                    <p className="text-blue-100">
-                                        Pasig City, Metro Manila
-                                        <br />
-                                        Philippines
-                                    </p>
+                                    <p className="text-blue-100">Bayabas Ext. NAPICO Manggahan 1611 Pasig, Philippines</p>
                                 </div>
 
                                 <div className="text-center">

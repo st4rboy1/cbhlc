@@ -12,7 +12,8 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\ApplicationController;
 use App\Http\Controllers\Public\LandingController;
-use App\Http\Controllers\Public\RegistrarInfoController;
+use App\Http\Controllers\Public\ContactController;
+
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboardController;
 use App\Http\Controllers\Registrar\EnrollmentController as RegistrarEnrollmentController;
 use App\Http\Controllers\Registrar\GradeLevelFeeController as RegistrarGradeLevelFeeController;
@@ -42,6 +43,8 @@ Route::get('/', [LandingController::class, 'index'])->name('home');
 Route::get('/about', [AboutController::class, 'index'])->name('about');
 
 Route::get('/application', [ApplicationController::class, 'index'])->name('application');
+
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
 Route::get('/registrar', [RegistrarInfoController::class, 'index'])->name('registrar');
 
