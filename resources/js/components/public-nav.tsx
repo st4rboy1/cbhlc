@@ -6,7 +6,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { GraduationCap } from 'lucide-react';
 
 interface PublicNavProps {
-    currentPage?: 'home' | 'about';
+    currentPage?: 'home' | 'about' | 'contact';
 }
 
 export function PublicNav({ currentPage }: PublicNavProps) {
@@ -20,7 +20,7 @@ export function PublicNav({ currentPage }: PublicNavProps) {
     };
 
     return (
-        <header className="fixed top-0 left-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
+        <nav className="fixed top-0 left-0 z-50 w-full border-b bg-white/80 backdrop-blur-md">
             <div className="container mx-auto flex h-16 items-center justify-between px-6">
                 <Link href="/" className="flex items-center space-x-2 text-xl font-bold text-slate-800 transition-colors hover:text-blue-600">
                     <Icon iconNode={GraduationCap} className="h-6 w-6" />
@@ -43,6 +43,15 @@ export function PublicNav({ currentPage }: PublicNavProps) {
                     >
                         About
                     </Link>
+
+                    <Link
+                        href="/contact"
+                        className={`font-medium transition-colors ${
+                            currentPage === 'contact' ? 'text-blue-600' : 'text-slate-600 hover:text-slate-800'
+                        }`}
+                    >
+                        Contact
+                    </Link>
                     {auth.user ? (
                         <Button asChild variant="default">
                             <Link href={getDashboardUrl()}>Dashboard</Link>
@@ -52,6 +61,6 @@ export function PublicNav({ currentPage }: PublicNavProps) {
                     )}
                 </nav>
             </div>
-        </header>
+        </nav>
     );
 }
