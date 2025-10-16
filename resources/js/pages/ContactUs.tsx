@@ -24,7 +24,7 @@ export default function ContactUs() {
         {
             icon: Clock,
             title: 'Office Hours',
-            details: [],
+            details: ['8:00 AM - 4:30 PM'],
         },
     ];
 
@@ -81,19 +81,31 @@ export default function ContactUs() {
                             <Card className="shadow-lg">
                                 <CardHeader>
                                     <CardTitle className="text-xl text-slate-800">Visit Our Campus</CardTitle>
-                                    <CardDescription>Find us at the heart of Pasig City</CardDescription>
+                                    <CardDescription>Find us at Manggahan, Pasig City</CardDescription>
                                 </CardHeader>
                                 <CardContent>
                                     <div className="aspect-video overflow-hidden rounded-lg bg-slate-200">
                                         <iframe
-                                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d123646.8!2d121.0!3d14.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTTCsDMwJzAwLjAiTiAxMjHCsDAwJzAwLjAiRQ!5e0!3m2!1sen!2sph!4v1234567890"
+                                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3861.4438825869047!2d121.09235231484308!3d14.570845789827672!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397c7f9e9f9e9e9%3A0x0!2sBayabas%20Ext.%2C%20Manggahan%2C%20Pasig%2C%20Metro%20Manila!5e0!3m2!1sen!2sph!4v1234567890"
                                             width="100%"
                                             height="100%"
                                             style={{ border: 0 }}
                                             allowFullScreen
                                             loading="lazy"
                                             referrerPolicy="no-referrer-when-downgrade"
+                                            title="CBHLC Location Map"
                                         ></iframe>
+                                    </div>
+                                    <div className="mt-4">
+                                        <a
+                                            href="https://www.google.com/maps/search/?api=1&query=Bayabas+Ext.+NAPICO+Manggahan+1611+Pasig+Philippines"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center justify-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-700"
+                                        >
+                                            <Icon iconNode={MapPin} className="h-4 w-4" />
+                                            <span>Open in Google Maps</span>
+                                        </a>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -196,11 +208,11 @@ export default function ContactUs() {
                                     </div>
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={Mail} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-slate-400">info@cbhlc.edu.ph</span>
+                                        <span className="text-sm text-slate-400">christianbibleheritage@gmail.com</span>
                                     </div>
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={MapPin} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-slate-400">Pasig City, Metro Manila</span>
+                                        <span className="text-sm text-slate-400">Manggahan, Pasig City</span>
                                     </div>
                                 </div>
                             </div>

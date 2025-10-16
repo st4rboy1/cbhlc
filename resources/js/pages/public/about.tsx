@@ -230,7 +230,7 @@ export default function About() {
                                     <p className="text-blue-100">
                                         Contact us for inquiries
                                         <br />
-                                        Mon - Fri: 8:00 AM - 5:00 PM
+                                        Mon - Fri: 8:00 AM - 4:30 PM
                                     </p>
                                 </div>
 
@@ -240,9 +240,8 @@ export default function About() {
                                     </div>
                                     <h3 className="mb-2 text-lg font-semibold">Email</h3>
                                     <p className="text-blue-100">
-                                        admissions@cbhlc.edu.ph
+                                        christianbibleheritage@gmail.com
                                         <br />
-                                        info@cbhlc.edu.ph
                                     </p>
                                 </div>
                             </div>

@@ -154,7 +154,7 @@ export default function Landing() {
                             </p>
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <Button size="lg" variant="secondary" className="bg-white px-8 py-3 text-blue-600 hover:bg-gray-100">
-                                    Contact Us
+                                    <Link href="/contact">Contact Us</Link>
                                 </Button>
                             </div>
                         </div>
