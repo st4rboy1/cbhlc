@@ -197,8 +197,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Document Management
         Route::get('/students/{student}/documents', [\App\Http\Controllers\Guardian\DocumentController::class, 'index'])->name('students.documents.index');
-        Route::post('/students/{student}/documents', [\App\Http\Controllers\Guardian\DocumentController::class, 'store'])->name('students.documents.store');
+        Route::post('/students/{student}/documents', [\App\Http\Controllers\Guardian\DocumentController::class, 'store'])->name('students.documents.store')->middleware('throttle:document-uploads');
         Route::get('/students/{student}/documents/{document}', [\App\Http\Controllers\Guardian\DocumentController::class, 'show'])->name('students.documents.show');
+        Route::get('/students/{student}/documents/{document}/download', [\App\Http\Controllers\Guardian\DocumentController::class, 'download'])->name('students.documents.download');
         Route::delete('/students/{student}/documents/{document}', [\App\Http\Controllers\Guardian\DocumentController::class, 'destroy'])->name('students.documents.destroy');
     });
 

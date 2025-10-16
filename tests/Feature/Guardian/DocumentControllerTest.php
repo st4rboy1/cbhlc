@@ -165,7 +165,8 @@ test('guardian cannot view document from another student', function () {
     $response = $this->actingAs($this->guardian)
         ->getJson(route('guardian.students.documents.show', [$this->student, $document]));
 
-    $response->assertStatus(404);
+    // Should return 403 because policy check fails before document ownership check
+    $response->assertStatus(403);
 });
 
 test('guardian can delete pending document', function () {
@@ -205,7 +206,8 @@ test('guardian cannot delete document from another student', function () {
     $response = $this->actingAs($this->guardian)
         ->deleteJson(route('guardian.students.documents.destroy', [$this->student, $document]));
 
-    $response->assertStatus(404);
+    // Should return 403 because policy check fails before document ownership check
+    $response->assertStatus(403);
     expect(Document::count())->toBe(1);
 });
 

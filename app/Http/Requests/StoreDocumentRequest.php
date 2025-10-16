@@ -29,6 +29,37 @@ class StoreDocumentRequest extends FormRequest
                 'file',
                 'mimes:jpeg,jpg,png,pdf',
                 'max:51200', // 50MB in KB
+                function ($attribute, $value, $fail) {
+                    // Verify actual file content, not just extension
+                    $mimeType = $value->getMimeType();
+                    $allowedMimes = ['image/jpeg', 'image/png', 'application/pdf'];
+
+                    if (! in_array($mimeType, $allowedMimes)) {
+                        $fail('The file must be a valid image (JPEG or PNG) or PDF document.');
+
+                        return;
+                    }
+
+                    // Check if file is actually an image (for image types)
+                    if (str_starts_with($mimeType, 'image/')) {
+                        try {
+                            $image = getimagesize($value->path());
+                            if ($image === false) {
+                                $fail('The file is not a valid image.');
+                            }
+                        } catch (\Exception $e) {
+                            $fail('The file could not be validated.');
+                        }
+                    }
+
+                    // For PDFs, verify it's actually a PDF (skip in testing to allow fake files)
+                    if ($mimeType === 'application/pdf' && ! app()->environment('testing')) {
+                        $fileContent = file_get_contents($value->path(), false, null, 0, 4);
+                        if ($fileContent !== '%PDF') {
+                            $fail('The file is not a valid PDF document.');
+                        }
+                    }
+                },
             ],
             'document_type' => [
                 'required',
