@@ -27,7 +27,7 @@ class DocumentController extends Controller
             ->latest('upload_date')
             ->paginate(20);
 
-        return Inertia::render('Registrar/Documents/Pending', [
+        return Inertia::render('registrar/documents/pending', [
             'documents' => $documents,
         ]);
     }
