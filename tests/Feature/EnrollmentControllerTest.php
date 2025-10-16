@@ -26,7 +26,7 @@ beforeEach(function () {
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ]);
@@ -39,7 +39,7 @@ beforeEach(function () {
         'early_registration_deadline' => now()->addMonths(6)->addDays(10),
         'regular_registration_deadline' => now()->addMonths(7),
         'late_registration_deadline' => now()->addMonths(8),
-        'status' => EnrollmentPeriodStatus::SCHEDULED->value,
+        'status' => EnrollmentPeriodStatus::UPCOMING->value,
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ]);
@@ -284,9 +284,13 @@ describe('enrollment controller', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        // Activate the 2025-2026 enrollment period
+        // Close the 2024-2025 period and activate the 2025-2026 enrollment period
+        EnrollmentPeriod::where('school_year', '2024-2025')->update([
+            'status' => EnrollmentPeriodStatus::CLOSED->value,
+        ]);
+
         EnrollmentPeriod::where('school_year', '2025-2026')->update([
-            'status' => EnrollmentPeriodStatus::OPEN->value,
+            'status' => EnrollmentPeriodStatus::ACTIVE->value,
             'start_date' => now()->subDays(1),
             'late_registration_deadline' => now()->addMonths(2),
         ]);
