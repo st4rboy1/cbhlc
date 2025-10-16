@@ -2,31 +2,78 @@ import { Icon } from '@/components/icon';
 import { PublicNav } from '@/components/public-nav';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Head, Link } from '@inertiajs/react';
-import { Clock, Facebook, GraduationCap, Mail, MapPin, Phone } from 'lucide-react';
+import { Clock, Facebook, GraduationCap, Instagram, Mail, MapPin, Phone, Youtube } from 'lucide-react';
 
-export default function ContactUs() {
+interface SchoolInformation {
+    id: number;
+    key: string;
+    value: string | null;
+    type: string;
+    group: string;
+    label: string;
+    description: string | null;
+    order: number;
+}
+
+interface GroupedInformation {
+    contact?: SchoolInformation[];
+    hours?: SchoolInformation[];
+    social?: SchoolInformation[];
+    about?: SchoolInformation[];
+}
+
+interface Props {
+    schoolInformation?: GroupedInformation;
+}
+
+export default function ContactUs({ schoolInformation }: Props) {
+    // Helper function to get value by key
+    const getValue = (group: keyof GroupedInformation, key: string, defaultValue: string = '') => {
+        const item = schoolInformation?.[group]?.find((item) => item.key === key);
+        return item?.value || defaultValue;
+    };
+
     const contactInfo = [
         {
             icon: Phone,
             title: 'Phone',
-            details: ['+63 123 456 7890', '+63 987 654 3210'],
+            details: [getValue('contact', 'school_phone', '+63 123 456 7890'), getValue('contact', 'school_mobile', '+63 987 654 3210')].filter(
+                Boolean,
+            ),
         },
         {
             icon: Mail,
             title: 'Email',
-            details: ['christianbibleheritage@gmail.com'],
+            details: [getValue('contact', 'school_email', 'christianbibleheritage@gmail.com')].filter(Boolean),
         },
         {
             icon: MapPin,
             title: 'Address',
-            details: ['Bayabas Ext. NAPICO Manggahan 1611 Pasig, Philippines'],
+            details: [getValue('contact', 'school_address', 'Bayabas Ext. NAPICO Manggahan 1611 Pasig, Philippines')].filter(Boolean),
         },
         {
             icon: Clock,
             title: 'Office Hours',
-            details: ['8:00 AM - 4:30 PM'],
+            details: [
+                getValue('hours', 'office_hours_weekday', 'Monday to Friday: 8:00 AM - 5:00 PM'),
+                getValue('hours', 'office_hours_saturday'),
+                getValue('hours', 'office_hours_sunday'),
+            ].filter(Boolean),
         },
     ];
+
+    const facebookUrl = getValue('social', 'facebook_url', 'https://www.facebook.com/CBHLC.Pasig');
+    const instagramUrl = getValue('social', 'instagram_url');
+    const youtubeUrl = getValue('social', 'youtube_url');
+    const schoolName = getValue('contact', 'school_name', 'Christian Bible Heritage Learning Center');
+    const schoolDescription = getValue(
+        'about',
+        'school_description',
+        'Providing quality Christian education that develops academic excellence, strong character, and faithful leaders.',
+    );
+    const schoolEmail = getValue('contact', 'school_email', 'christianbibleheritage@gmail.com');
+    const schoolPhone = getValue('contact', 'school_phone', '+63 123 456 7890');
+    const schoolAddress = getValue('contact', 'school_address', 'Manggahan, Pasig City');
 
     return (
         <>
@@ -119,16 +166,40 @@ export default function ContactUs() {
                                         <CardDescription>Follow us on social media for updates and news</CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <div className="flex items-center space-x-4">
-                                            <a
-                                                href="https://www.facebook.com/CBHLC.Pasig"
-                                                className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-3 text-white transition-colors hover:bg-blue-700"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                            >
-                                                <Icon iconNode={Facebook} className="h-5 w-5" />
-                                                <span className="font-medium">Visit Our Facebook Page</span>
-                                            </a>
+                                        <div className="flex flex-wrap gap-3">
+                                            {facebookUrl && (
+                                                <a
+                                                    href={facebookUrl}
+                                                    className="flex items-center space-x-2 rounded-lg bg-blue-600 px-6 py-3 text-white transition-colors hover:bg-blue-700"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    <Icon iconNode={Facebook} className="h-5 w-5" />
+                                                    <span className="font-medium">Facebook</span>
+                                                </a>
+                                            )}
+                                            {instagramUrl && (
+                                                <a
+                                                    href={instagramUrl}
+                                                    className="flex items-center space-x-2 rounded-lg bg-pink-600 px-6 py-3 text-white transition-colors hover:bg-pink-700"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    <Icon iconNode={Instagram} className="h-5 w-5" />
+                                                    <span className="font-medium">Instagram</span>
+                                                </a>
+                                            )}
+                                            {youtubeUrl && (
+                                                <a
+                                                    href={youtubeUrl}
+                                                    className="flex items-center space-x-2 rounded-lg bg-red-600 px-6 py-3 text-white transition-colors hover:bg-red-700"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    <Icon iconNode={Youtube} className="h-5 w-5" />
+                                                    <span className="font-medium">YouTube</span>
+                                                </a>
+                                            )}
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -144,7 +215,7 @@ export default function ContactUs() {
                                         </p>
                                         <div className="flex items-center space-x-2">
                                             <Icon iconNode={Phone} className="h-5 w-5" />
-                                            <span className="text-lg font-semibold">+63 123 456 7890</span>
+                                            <span className="text-lg font-semibold">{schoolPhone}</span>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -193,10 +264,8 @@ export default function ContactUs() {
                                     <Icon iconNode={GraduationCap} className="h-8 w-8" />
                                     <span className="text-2xl font-bold">CBHLC</span>
                                 </div>
-                                <p className="mb-4 text-slate-400">Christian Bible Heritage Learning Center</p>
-                                <p className="text-sm text-slate-500">
-                                    Providing quality Christian education that develops academic excellence, strong character, and faithful leaders.
-                                </p>
+                                <p className="mb-4 text-slate-400">{schoolName}</p>
+                                <p className="text-sm text-slate-500">{schoolDescription}</p>
                             </div>
 
                             <div className="text-center md:text-left">
@@ -204,15 +273,15 @@ export default function ContactUs() {
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={Phone} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-slate-400">+63 123 456 7890</span>
+                                        <span className="text-sm text-slate-400">{schoolPhone}</span>
                                     </div>
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={Mail} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-slate-400">christianbibleheritage@gmail.com</span>
+                                        <span className="text-sm text-slate-400">{schoolEmail}</span>
                                     </div>
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={MapPin} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-slate-400">Manggahan, Pasig City</span>
+                                        <span className="text-sm text-slate-400">{schoolAddress}</span>
                                     </div>
                                 </div>
                             </div>
@@ -235,14 +304,36 @@ export default function ContactUs() {
 
                         <div className="border-t border-slate-700 pt-8 text-center">
                             <div className="mb-6 flex justify-center space-x-6">
-                                <a
-                                    href="https://www.facebook.com/CBHLC.Pasig"
-                                    className="text-slate-400 transition-colors hover:text-white"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    <Icon iconNode={Facebook} className="h-6 w-6" />
-                                </a>
+                                {facebookUrl && (
+                                    <a
+                                        href={facebookUrl}
+                                        className="text-slate-400 transition-colors hover:text-white"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <Icon iconNode={Facebook} className="h-6 w-6" />
+                                    </a>
+                                )}
+                                {instagramUrl && (
+                                    <a
+                                        href={instagramUrl}
+                                        className="text-slate-400 transition-colors hover:text-white"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <Icon iconNode={Instagram} className="h-6 w-6" />
+                                    </a>
+                                )}
+                                {youtubeUrl && (
+                                    <a
+                                        href={youtubeUrl}
+                                        className="text-slate-400 transition-colors hover:text-white"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <Icon iconNode={Youtube} className="h-6 w-6" />
+                                    </a>
+                                )}
                             </div>
                             <p className="text-sm text-slate-500">©2025 CBHLC | All rights reserved</p>
                         </div>
