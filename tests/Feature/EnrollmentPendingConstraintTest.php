@@ -24,7 +24,7 @@ beforeEach(function () {
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ]);

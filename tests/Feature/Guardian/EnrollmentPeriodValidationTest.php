@@ -46,8 +46,8 @@ beforeEach(function () {
     GradeLevelFee::create([
         'grade_level' => GradeLevel::GRADE_1->value,
         'school_year' => '2024-2025',
-        'tuition_fee' => 20000,
-        'miscellaneous_fee' => 5000,
+        'tuition_fee_cents' => 2000000,
+        'miscellaneous_fee_cents' => 500000,
     ]);
 });
 
@@ -71,7 +71,7 @@ test('guardian cannot view create form when enrollment period is closed', functi
         'early_registration_deadline' => now()->subMonths(2),
         'regular_registration_deadline' => now()->subMonth(),
         'late_registration_deadline' => now()->subDays(5),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ]);
@@ -93,7 +93,7 @@ test('guardian can view create form when active enrollment period exists', funct
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ]);
@@ -126,7 +126,7 @@ test('guardian cannot enroll when enrollment period deadline passed', function (
         'early_registration_deadline' => now()->subMonths(2),
         'regular_registration_deadline' => now()->subMonth(),
         'late_registration_deadline' => now()->subDays(5),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ]);
@@ -140,7 +140,7 @@ test('guardian cannot enroll when enrollment period deadline passed', function (
         ]);
 
     $response->assertRedirect();
-    $response->assertSessionHasErrors(['enrollment']);
+    $response->assertSessionHasErrors(['student_id']);
 });
 
 test('new student cannot enroll when period does not allow new students', function () {
@@ -152,7 +152,7 @@ test('new student cannot enroll when period does not allow new students', functi
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => false,
         'allow_returning_students' => true,
     ]);
@@ -166,7 +166,7 @@ test('new student cannot enroll when period does not allow new students', functi
         ]);
 
     $response->assertRedirect();
-    $response->assertSessionHasErrors(['enrollment_period']);
+    $response->assertSessionHasErrors(['student_id']);
 });
 
 test('returning student cannot enroll when period does not allow returning students', function () {
@@ -186,7 +186,7 @@ test('returning student cannot enroll when period does not allow returning stude
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => false,
     ]);
@@ -200,7 +200,7 @@ test('returning student cannot enroll when period does not allow returning stude
         ]);
 
     $response->assertRedirect();
-    $response->assertSessionHasErrors(['enrollment_period']);
+    $response->assertSessionHasErrors(['student_id']);
 });
 
 test('guardian can enroll when all period conditions are met', function () {
@@ -212,7 +212,7 @@ test('guardian can enroll when all period conditions are met', function () {
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ]);
@@ -243,7 +243,7 @@ test('enrollment period id is set correctly on enrollment', function () {
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ]);
@@ -273,7 +273,7 @@ test('school year must match active enrollment period', function () {
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ]);
@@ -298,7 +298,7 @@ test('enrollment relationship with enrollment period works', function () {
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ]);
@@ -347,7 +347,7 @@ test('canEnrollForPeriod method validates new student eligibility', function () 
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => false,
         'allow_returning_students' => true,
     ]);
@@ -374,7 +374,7 @@ test('canEnrollForPeriod method validates returning student eligibility', functi
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => false,
     ]);
@@ -393,7 +393,7 @@ test('canEnrollForPeriod method returns empty array when eligible', function () 
         'early_registration_deadline' => now()->addDays(10),
         'regular_registration_deadline' => now()->addMonth(),
         'late_registration_deadline' => now()->addMonths(2),
-        'status' => EnrollmentPeriodStatus::OPEN->value,
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ]);

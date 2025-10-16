@@ -74,6 +74,22 @@ class StoreEnrollmentRequest extends FormRequest
                         ->where('student_id', $value)
                         ->exists()) {
                         $fail('You are not authorized to enroll this student.');
+
+                        return;
+                    }
+
+                    // Validate enrollment period eligibility
+                    $activePeriod = EnrollmentPeriod::active()->first();
+                    if ($activePeriod) {
+                        $student = Student::find($value);
+                        if ($student) {
+                            $eligibilityErrors = Enrollment::canEnrollForPeriod($activePeriod, $student);
+                            if (! empty($eligibilityErrors)) {
+                                $fail($eligibilityErrors[0]);
+
+                                return;
+                            }
+                        }
                     }
 
                     // Check for pending enrollments
@@ -81,6 +97,8 @@ class StoreEnrollmentRequest extends FormRequest
                         ->where('status', EnrollmentStatus::PENDING)
                         ->exists()) {
                         $fail('This student already has a pending enrollment. Please wait for it to be processed before submitting another one.');
+
+                        return;
                     }
 
                     // Check for active enrollment
