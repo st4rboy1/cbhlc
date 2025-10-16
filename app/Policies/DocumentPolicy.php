@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Document;
+use App\Models\Student;
 use App\Models\User;
 
 class DocumentPolicy
@@ -20,7 +21,7 @@ class DocumentPolicy
      */
     public function view(User $user, Document $document): bool
     {
-        // Super admins, administrators, and registrars can view any document
+        // Super admins, administrators, and registrars can view all documents
         if ($user->hasAnyRole(['super_admin', 'administrator', 'registrar'])) {
             return true;
         }
@@ -30,7 +31,29 @@ class DocumentPolicy
             /** @var \App\Models\Student $student */
             $student = $document->student;
 
-            return $student->guardians()->where('guardians.id', $user->guardian->id)->exists();
+            return $student->guardians()
+                ->where('guardians.id', $user->guardian->id)
+                ->exists();
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine whether the user can upload documents for a student.
+     */
+    public function uploadDocument(User $user, Student $student): bool
+    {
+        // Super admins, administrators, and registrars can upload documents for any student
+        if ($user->hasAnyRole(['super_admin', 'administrator', 'registrar'])) {
+            return true;
+        }
+
+        // Guardians can only upload documents for students they are associated with
+        if ($user->hasRole('guardian') && $user->guardian) {
+            return $student->guardians()
+                ->where('guardians.id', $user->guardian->id)
+                ->exists();
         }
 
         return false;
@@ -103,5 +126,13 @@ class DocumentPolicy
         }
 
         return false;
+    }
+
+    /**
+     * Determine whether the user can download the document.
+     */
+    public function download(User $user, Document $document): bool
+    {
+        return $this->view($user, $document);
     }
 }
