@@ -22,6 +22,7 @@ use App\Http\Controllers\Registrar\StudentController as RegistrarStudentControll
 use App\Http\Controllers\SharedController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\StudentReportController;
+use App\Http\Controllers\SuperAdmin\AuditLogController as SuperAdminAuditLogController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\SuperAdmin\EnrollmentController as SuperAdminEnrollmentController;
 use App\Http\Controllers\SuperAdmin\EnrollmentPeriodController as SuperAdminEnrollmentPeriodController;
@@ -149,6 +150,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('enrollment-periods', SuperAdminEnrollmentPeriodController::class);
         Route::post('/enrollment-periods/{enrollmentPeriod}/activate', [SuperAdminEnrollmentPeriodController::class, 'activate'])->name('enrollment-periods.activate');
         Route::post('/enrollment-periods/{enrollmentPeriod}/close', [SuperAdminEnrollmentPeriodController::class, 'close'])->name('enrollment-periods.close');
+
+        // Audit Log Management
+        Route::prefix('audit-logs')->name('audit-logs.')->group(function () {
+            Route::get('/', [SuperAdminAuditLogController::class, 'index'])->name('index');
+            Route::get('/{activity}', [SuperAdminAuditLogController::class, 'show'])->name('show');
+            Route::post('/export', [SuperAdminAuditLogController::class, 'export'])->name('export');
+        });
     });
 
     // Admin Routes (for administrator roles)
