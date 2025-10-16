@@ -24,10 +24,7 @@ class GradeLevelFeeController extends Controller
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('grade_level', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
+            $query->where('grade_level', 'like', "%{$search}%");
         }
 
         // Filter by school year
