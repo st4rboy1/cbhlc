@@ -81,7 +81,7 @@ fi
 # Tests (optional - takes longer)
 if [ "$1" == "--with-tests" ]; then
     echo "✓ Running tests..."
-    if ./vendor/bin/pest > /dev/null 2>&1; then
+    if ./vendor/bin/sail pest > /dev/null 2>&1; then
         echo "  Tests: ✅ PASSED"
     else
         echo "  Tests: ❌ FAILED"
