@@ -9,6 +9,7 @@ use App\Enums\Quarter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guardian\StoreEnrollmentRequest;
 use App\Models\Enrollment;
+use App\Models\EnrollmentPeriod;
 use App\Models\GuardianStudent;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -44,9 +45,24 @@ class EnrollmentController extends Controller
      */
     public function create(Request $request)
     {
+        // Check for active enrollment period
+        $activePeriod = EnrollmentPeriod::active()->first();
+
+        if (! $activePeriod) {
+            return back()->withErrors([
+                'enrollment' => 'Enrollment is currently closed. No active enrollment period available.',
+            ]);
+        }
+
+        if (! $activePeriod->isOpen()) {
+            return back()->withErrors([
+                'enrollment' => 'Enrollment period is not currently open. The deadline has passed.',
+            ]);
+        }
+
         // Get Guardian model for authenticated user
         $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
-        $currentSchoolYear = date('Y').'-'.(date('Y') + 1);
+        $currentSchoolYear = $activePeriod->school_year;
         $selectedStudentId = $request->query('student_id');
 
         // Get guardian's students with enrollment info
@@ -76,6 +92,8 @@ class EnrollmentController extends Controller
             'quarters' => Quarter::values(),
             'currentSchoolYear' => $currentSchoolYear,
             'selectedStudentId' => $selectedStudentId,
+            'activePeriod' => $activePeriod,
+            'daysRemaining' => $activePeriod->getDaysRemaining(),
         ]);
     }
 
@@ -84,9 +102,33 @@ class EnrollmentController extends Controller
      */
     public function store(StoreEnrollmentRequest $request)
     {
+        // Check for active enrollment period
+        $activePeriod = EnrollmentPeriod::active()->first();
+
+        if (! $activePeriod) {
+            return back()->withErrors([
+                'enrollment' => 'Enrollment is currently closed. No active enrollment period available.',
+            ])->withInput();
+        }
+
+        if (! $activePeriod->isOpen()) {
+            return back()->withErrors([
+                'enrollment' => 'Enrollment period is not currently open. The deadline has passed.',
+            ])->withInput();
+        }
+
         $validated = $request->validated();
 
         $student = Student::findOrFail($validated['student_id']);
+
+        // Validate student eligibility for this enrollment period
+        $eligibilityErrors = Enrollment::canEnrollForPeriod($activePeriod, $student);
+
+        if (! empty($eligibilityErrors)) {
+            return back()->withErrors([
+                'enrollment' => $eligibilityErrors[0],
+            ])->withInput();
+        }
 
         // Check if student is an existing student (has previous enrollments)
         $previousEnrollments = Enrollment::where('student_id', $validated['student_id'])
@@ -100,7 +142,7 @@ class EnrollmentController extends Controller
 
         // Get the fee for the selected grade level and school year
         $gradeLevelFee = \App\Models\GradeLevelFee::where('grade_level', $validated['grade_level'])
-            ->where('school_year', $validated['school_year'])
+            ->where('school_year', $activePeriod->school_year)
             ->first();
 
         $tuitionFeeCents = ($gradeLevelFee ? $gradeLevelFee->tuition_fee : 0) * 100;
@@ -122,7 +164,8 @@ class EnrollmentController extends Controller
         $enrollment = Enrollment::create([
             'student_id' => $validated['student_id'],
             'guardian_id' => $guardian->id,
-            'school_year' => $validated['school_year'],
+            'school_year' => $activePeriod->school_year,
+            'enrollment_period_id' => $activePeriod->id,
             'quarter' => Quarter::from($validated['quarter']),
             'grade_level' => GradeLevel::from($validated['grade_level']),
             'status' => EnrollmentStatus::PENDING,

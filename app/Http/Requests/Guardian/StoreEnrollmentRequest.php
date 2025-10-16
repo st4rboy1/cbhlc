@@ -6,8 +6,10 @@ use App\Enums\EnrollmentStatus;
 use App\Enums\GradeLevel;
 use App\Enums\Quarter;
 use App\Models\Enrollment;
+use App\Models\EnrollmentPeriod;
 use App\Models\Guardian;
 use App\Models\GuardianStudent;
+use App\Models\Student;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -30,6 +32,36 @@ class StoreEnrollmentRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'enrollment_period' => [
+                function ($attribute, $value, $fail) {
+                    // Validate active enrollment period exists
+                    $activePeriod = EnrollmentPeriod::active()->first();
+
+                    if (! $activePeriod) {
+                        $fail('Enrollment is currently closed. No active enrollment period available.');
+
+                        return;
+                    }
+
+                    if (! $activePeriod->isOpen()) {
+                        $fail('Enrollment period is not currently open. The deadline has passed.');
+
+                        return;
+                    }
+
+                    // Validate student eligibility if student_id is present
+                    $studentId = $this->input('student_id');
+                    if ($studentId) {
+                        $student = Student::find($studentId);
+                        if ($student) {
+                            $eligibilityErrors = Enrollment::canEnrollForPeriod($activePeriod, $student);
+                            if (! empty($eligibilityErrors)) {
+                                $fail($eligibilityErrors[0]);
+                            }
+                        }
+                    }
+                },
+            ],
             'student_id' => [
                 'required',
                 'exists:students,id',
@@ -68,6 +100,12 @@ class StoreEnrollmentRequest extends FormRequest
                     $years = explode('-', $value);
                     if (count($years) !== 2 || ((int) $years[1] - (int) $years[0]) !== 1) {
                         $fail('School year must be in format YYYY-YYYY (e.g., 2024-2025) with consecutive years.');
+                    }
+
+                    // Validate school year matches active enrollment period
+                    $activePeriod = EnrollmentPeriod::active()->first();
+                    if ($activePeriod && $value !== $activePeriod->school_year) {
+                        $fail("School year must be {$activePeriod->school_year} for the current enrollment period.");
                     }
 
                     // Check for existing enrollment for this school year
