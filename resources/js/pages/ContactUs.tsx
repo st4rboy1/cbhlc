@@ -24,15 +24,7 @@ export default function ContactUs() {
         {
             icon: Clock,
             title: 'Office Hours',
-            details: [
-                'Monday: 8:00 AM - 4:30 PM',
-                'Tuesday: 8:00 AM - 4:30 PM',
-                'Wednesday: 8:00 AM - 4:30 PM',
-                'Thursday: 8:00 AM - 4:30 PM',
-                'Friday: 8:00 AM - 4:30 PM',
-                'Saturday: CLOSED',
-                'Sunday: CLOSED',
-            ],
+            details: [],
         },
     ];
 
