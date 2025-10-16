@@ -11,8 +11,8 @@ use App\Http\Controllers\Guardian\StudentController as GuardianStudentController
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\ApplicationController;
+use App\Http\Controllers\Public\ContactController;
 use App\Http\Controllers\Public\LandingController;
-use App\Http\Controllers\Public\RegistrarInfoController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboardController;
 use App\Http\Controllers\Registrar\DocumentController as RegistrarDocumentController;
 use App\Http\Controllers\Registrar\EnrollmentController as RegistrarEnrollmentController;
@@ -45,7 +45,7 @@ Route::get('/about', [AboutController::class, 'index'])->name('about');
 
 Route::get('/application', [ApplicationController::class, 'index'])->name('application');
 
-Route::get('/registrar', [RegistrarInfoController::class, 'index'])->name('registrar');
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
 /*
 |--------------------------------------------------------------------------
