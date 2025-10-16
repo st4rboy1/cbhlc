@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { type Page, type PageProps } from '@inertiajs/core';
 import { Head, router } from '@inertiajs/react';
 import { Bell } from 'lucide-react';
 import { useState } from 'react';
@@ -34,13 +35,9 @@ interface NotificationsData {
     links: PaginationLink[];
 }
 
-interface Props {
+interface Props extends PageProps {
     notifications: NotificationsData;
     filter: string;
-}
-
-interface InertiaPageProps {
-    props: Props;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -62,8 +59,8 @@ export default function Index({ notifications: initialNotifications, filter: ini
             {
                 preserveState: true,
                 preserveScroll: true,
-                onSuccess: (page: InertiaPageProps) => {
-                    setNotifications(page.props.notifications);
+                onSuccess: (page) => {
+                    setNotifications((page as Page<Props>).props.notifications);
                 },
             },
         );
@@ -164,8 +161,8 @@ export default function Index({ notifications: initialNotifications, filter: ini
             {
                 preserveState: true,
                 preserveScroll: false,
-                onSuccess: (page: InertiaPageProps) => {
-                    setNotifications(page.props.notifications);
+                onSuccess: (page) => {
+                    setNotifications((page as Page<Props>).props.notifications);
                 },
             },
         );
