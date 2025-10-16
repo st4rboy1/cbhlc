@@ -32,7 +32,14 @@ class StudentController extends Controller
         $student = Student::findOrFail($id);
 
         return Inertia::render('admin/students/show', [
-            'student' => $student,
+            'student' => [
+                'id' => $student->id,
+                'name' => $student->full_name,
+                'grade' => $student->grade_level?->label() ?? 'N/A',
+                'status' => 'active', // Assuming a default status or fetching from model if available
+                'birth_date' => $student->birth_date,
+                'address' => $student->address,
+            ],
         ]);
     }
 

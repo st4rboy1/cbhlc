@@ -20,6 +20,9 @@ class StudentControllerTest extends TestCase
 
         $this->admin = User::factory()->create();
         $this->admin->assignRole('administrator');
+
+        // Create students for testing
+        \App\Models\Student::factory()->count(2)->create();
     }
 
     public function test_admin_can_view_students_index(): void
@@ -42,7 +45,7 @@ class StudentControllerTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/students/show')
                 ->has('student')
-                ->where('student.id', '1')
+                ->where('student.id', 1)
                 ->has('student.name')
                 ->has('student.grade')
                 ->has('student.status')
@@ -59,7 +62,7 @@ class StudentControllerTest extends TestCase
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/students/edit')
                 ->has('student')
-                ->where('student.id', '1')
+                ->where('student.id', 1)
             );
     }
 
