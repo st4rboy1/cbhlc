@@ -1,26 +1,11 @@
 <?php
 
 use App\Models\Student;
-use App\Services\BaseService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
+use Tests\Feature\Services\TestService;
 
 uses(RefreshDatabase::class);
-
-// Create a concrete implementation for testing
-class TestService extends BaseService
-{
-    public function __construct()
-    {
-        parent::__construct(new Student);
-    }
-
-    // Expose protected method for testing
-    public function testApplyFilters($query, array $filters): void
-    {
-        $this->applyFilters($query, $filters);
-    }
-}
 
 beforeEach(function () {
     $this->service = new TestService;
