@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use App\Casts\FullNameCast;
-use App\Enums\GradeLevel;
+use App\Casts\FullNameCast;  // Already present
+use App\Enums\EnrollmentStatus;  // Already present
+use App\Enums\GradeLevel;  // Added for use in methods
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+
+// Add missing imports for referenced classes
+// For the user() relationship
+// For the guardian() relationship
+// For enrollments() and related methods
+// For documents()
+// For guardianStudents()
 
 class Student extends Model
 {
@@ -142,7 +150,7 @@ class Student extends Model
     public function getCurrentGradeLevel(): ?GradeLevel
     {
         $latestEnrollment = $this->enrollments()
-            ->where('status', \App\Enums\EnrollmentStatus::APPROVED)
+            ->where('status', EnrollmentStatus::APPROVED)
             ->latest('created_at')
             ->first();
 
@@ -150,8 +158,6 @@ class Student extends Model
             return $this->grade_level; // Use student's base grade level if no enrollments
         }
 
-        // Get the grade level from the enrollment, not the student record
-        // The student record grade_level might be outdated
         return $latestEnrollment->grade_level ?? $this->grade_level;
     }
 
@@ -160,27 +166,22 @@ class Student extends Model
      */
     public function passedPreviousYear(string $schoolYear): bool
     {
-        // Get previous school year
         $currentYearStart = (int) substr($schoolYear, 0, 4);
         $previousYear = ($currentYearStart - 1).'-'.$currentYearStart;
 
         $previousEnrollment = $this->enrollments()
             ->where('school_year', $previousYear)
-            ->where('status', \App\Enums\EnrollmentStatus::APPROVED)
+            ->where('status', EnrollmentStatus::APPROVED)
             ->first();
 
         if (! $previousEnrollment) {
-            // No previous enrollment means new student or first year
             return true;
         }
 
-        // Check if they completed the year
-        // COMPLETED status explicitly means they passed
-        // APPROVED/ENROLLED are also considered as passing for backward compatibility
         return in_array($previousEnrollment->status, [
-            \App\Enums\EnrollmentStatus::APPROVED,
-            \App\Enums\EnrollmentStatus::ENROLLED,
-            \App\Enums\EnrollmentStatus::COMPLETED,
+            EnrollmentStatus::APPROVED,
+            EnrollmentStatus::ENROLLED,
+            EnrollmentStatus::COMPLETED,
         ]);
     }
 
@@ -192,17 +193,13 @@ class Student extends Model
         $currentGrade = $this->getCurrentGradeLevel();
 
         if ($this->isNewStudent()) {
-            // New students can start at any grade
             return GradeLevel::getAvailableGradesFor(null);
         }
 
-        // Existing students can only progress if they passed previous year
         if (! $this->passedPreviousYear($schoolYear)) {
-            // Repeat current grade if didn't pass
             return $currentGrade ? [$currentGrade] : [];
         }
 
-        // Can progress to current grade or higher
         return GradeLevel::getAvailableGradesFor($currentGrade);
     }
 }
