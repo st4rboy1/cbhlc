@@ -23,6 +23,8 @@ class GradeLevelFee extends Model
         'laboratory_fee_cents',
         'library_fee_cents',
         'sports_fee_cents',
+        'other_fees_cents',
+        'payment_terms',
         'school_year',
         'is_active',
     ];
@@ -37,6 +39,7 @@ class GradeLevelFee extends Model
         'laboratory_fee' => MoneyCast::class,
         'library_fee' => MoneyCast::class,
         'sports_fee' => MoneyCast::class,
+        'other_fees' => MoneyCast::class,
         // Formatted money casts - display formatted currency
         'formatted_tuition_fee' => FormattedMoneyCast::class,
         'formatted_registration_fee' => FormattedMoneyCast::class,
@@ -44,6 +47,7 @@ class GradeLevelFee extends Model
         'formatted_laboratory_fee' => FormattedMoneyCast::class,
         'formatted_library_fee' => FormattedMoneyCast::class,
         'formatted_sports_fee' => FormattedMoneyCast::class,
+        'formatted_other_fees' => FormattedMoneyCast::class,
         'formatted_total_fee' => FormattedMoneyCast::class,
     ];
 
@@ -71,7 +75,15 @@ class GradeLevelFee extends Model
     {
         return $this->tuition_fee + $this->registration_fee +
                $this->miscellaneous_fee + $this->laboratory_fee +
-               $this->library_fee + $this->sports_fee;
+               $this->library_fee + $this->sports_fee + $this->other_fees;
+    }
+
+    /**
+     * Accessor for total_amount (alias for total_fee)
+     */
+    public function getTotalAmountAttribute(): float
+    {
+        return $this->total_fee;
     }
 
     /**
