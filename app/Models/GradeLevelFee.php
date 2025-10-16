@@ -10,6 +10,12 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+/**
+ * @property float $tuition_fee
+ * @property float $miscellaneous_fee
+ * @property float $other_fees
+ * @property float $total_amount
+ */
 class GradeLevelFee extends Model
 {
     use HasFactory;
