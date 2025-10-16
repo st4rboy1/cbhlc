@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type PaginatedData, type User } from '@/types';
+import { type BreadcrumbItem, type Paginated, type User } from '@/types';
 
 interface Activity {
     id: number;
@@ -37,7 +37,7 @@ interface Filters {
 }
 
 interface Props {
-    activities: PaginatedData<Activity>;
+    activities: Paginated<Activity>;
     filters: Filters;
     causers: User[];
     subjectTypes: string[];
@@ -173,8 +173,8 @@ export default function AuditLogsIndex({ activities, filters, causers, subjectTy
                             <div className="space-y-2">
                                 <Label>Date From</Label>
                                 <DatePicker
-                                    date={localFilters.date_from ? new Date(localFilters.date_from) : undefined}
-                                    onSelect={(date) =>
+                                    value={localFilters.date_from ? new Date(localFilters.date_from) : undefined}
+                                    onChange={(date: Date | undefined) =>
                                         setLocalFilters({ ...localFilters, date_from: date ? format(date, 'yyyy-MM-dd') : undefined })
                                     }
                                 />
@@ -183,8 +183,10 @@ export default function AuditLogsIndex({ activities, filters, causers, subjectTy
                             <div className="space-y-2">
                                 <Label>Date To</Label>
                                 <DatePicker
-                                    date={localFilters.date_to ? new Date(localFilters.date_to) : undefined}
-                                    onSelect={(date) => setLocalFilters({ ...localFilters, date_to: date ? format(date, 'yyyy-MM-dd') : undefined })}
+                                    value={localFilters.date_to ? new Date(localFilters.date_to) : undefined}
+                                    onChange={(date: Date | undefined) =>
+                                        setLocalFilters({ ...localFilters, date_to: date ? format(date, 'yyyy-MM-dd') : undefined })
+                                    }
                                 />
                             </div>
 
@@ -221,7 +223,7 @@ export default function AuditLogsIndex({ activities, filters, causers, subjectTy
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                activities.data.map((activity) => (
+                                activities.data.map((activity: Activity) => (
                                     <TableRow key={activity.id}>
                                         <TableCell className="text-sm">{format(new Date(activity.created_at), 'MMM d, yyyy HH:mm')}</TableCell>
                                         <TableCell>
@@ -266,7 +268,7 @@ export default function AuditLogsIndex({ activities, filters, causers, subjectTy
                             Showing {activities.from} to {activities.to} of {activities.total} results
                         </div>
                         <div className="flex gap-2">
-                            {activities.links.map((link, index) => (
+                            {activities.links.map((link: { url: string | null; label: string; active: boolean }, index: number) => (
                                 <Button
                                     key={index}
                                     variant={link.active ? 'default' : 'outline'}
