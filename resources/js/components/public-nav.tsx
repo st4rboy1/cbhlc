@@ -6,7 +6,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { GraduationCap } from 'lucide-react';
 
 interface PublicNavProps {
-    currentPage?: 'home' | 'about';
+    currentPage?: 'home' | 'about' | 'contact';
 }
 
 export function PublicNav({ currentPage }: PublicNavProps) {
