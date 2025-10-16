@@ -29,6 +29,13 @@ class GradeLevelFee extends Model
         'is_active',
     ];
 
+    protected $appends = [
+        'tuition_fee',
+        'miscellaneous_fee',
+        'other_fees',
+        'total_amount',
+    ];
+
     protected $casts = [
         'grade_level' => GradeLevel::class,
         'is_active' => 'boolean',
