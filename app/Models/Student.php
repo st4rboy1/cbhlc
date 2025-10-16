@@ -15,7 +15,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * @property string $full_name
- * @property \Illuminate\Support\Carbon $birth_date
+ * @property ?\Illuminate\Support\Carbon $birth_date
  */
 class Student extends Model
 {
