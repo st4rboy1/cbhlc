@@ -1,9 +1,11 @@
 <?php
 
+use App\Enums\EnrollmentPeriodStatus;
 use App\Enums\EnrollmentStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\Quarter;
 use App\Models\Enrollment;
+use App\Models\EnrollmentPeriod;
 use App\Models\GuardianStudent;
 use App\Models\Student;
 use App\Models\User;
@@ -13,6 +15,19 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
+
+    // Create an active enrollment period for all tests
+    EnrollmentPeriod::create([
+        'school_year' => '2024-2025',
+        'start_date' => now()->subDays(5),
+        'end_date' => now()->addMonths(3),
+        'early_registration_deadline' => now()->addDays(10),
+        'regular_registration_deadline' => now()->addMonth(),
+        'late_registration_deadline' => now()->addMonths(2),
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
+        'allow_new_students' => true,
+        'allow_returning_students' => true,
+    ]);
 });
 
 describe('enrollment pending constraint', function () {
