@@ -1,9 +1,11 @@
 <?php
 
+use App\Enums\EnrollmentPeriodStatus;
 use App\Enums\EnrollmentStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\Quarter;
 use App\Models\Enrollment;
+use App\Models\EnrollmentPeriod;
 use App\Models\Guardian;
 use App\Models\GuardianStudent;
 use App\Models\Student;
@@ -15,6 +17,32 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
+
+    // Create an active enrollment period for all tests
+    EnrollmentPeriod::create([
+        'school_year' => '2024-2025',
+        'start_date' => now()->subDays(5),
+        'end_date' => now()->addMonths(3),
+        'early_registration_deadline' => now()->addDays(10),
+        'regular_registration_deadline' => now()->addMonth(),
+        'late_registration_deadline' => now()->addMonths(2),
+        'status' => EnrollmentPeriodStatus::ACTIVE->value,
+        'allow_new_students' => true,
+        'allow_returning_students' => true,
+    ]);
+
+    // Create enrollment period for 2025-2026 for tests that need it
+    EnrollmentPeriod::create([
+        'school_year' => '2025-2026',
+        'start_date' => now()->addMonths(6),
+        'end_date' => now()->addMonths(9),
+        'early_registration_deadline' => now()->addMonths(6)->addDays(10),
+        'regular_registration_deadline' => now()->addMonths(7),
+        'late_registration_deadline' => now()->addMonths(8),
+        'status' => EnrollmentPeriodStatus::UPCOMING->value,
+        'allow_new_students' => true,
+        'allow_returning_students' => true,
+    ]);
 });
 
 describe('enrollment controller', function () {
@@ -254,6 +282,17 @@ describe('enrollment controller', function () {
             'amount_paid_cents' => 0,
             'balance_cents' => 0,
             'payment_status' => PaymentStatus::PENDING,
+        ]);
+
+        // Close the 2024-2025 period and activate the 2025-2026 enrollment period
+        EnrollmentPeriod::where('school_year', '2024-2025')->update([
+            'status' => EnrollmentPeriodStatus::CLOSED->value,
+        ]);
+
+        EnrollmentPeriod::where('school_year', '2025-2026')->update([
+            'status' => EnrollmentPeriodStatus::ACTIVE->value,
+            'start_date' => now()->subDays(1),
+            'late_registration_deadline' => now()->addMonths(2),
         ]);
 
         // Create enrollment for different school year - should succeed (progression from Kinder to Grade 1)

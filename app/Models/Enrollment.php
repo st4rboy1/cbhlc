@@ -36,6 +36,7 @@ class Enrollment extends Model
         'student_id',
         'guardian_id',
         'school_year',
+        'enrollment_period_id',
         'quarter',
         'grade_level',
         'status',
@@ -126,6 +127,14 @@ class Enrollment extends Model
     }
 
     /**
+     * Get the enrollment period associated with the enrollment
+     */
+    public function enrollmentPeriod(): BelongsTo
+    {
+        return $this->belongsTo(EnrollmentPeriod::class);
+    }
+
+    /**
      * Get the invoice associated with the enrollment
      */
     public function invoice(): BelongsTo
@@ -197,5 +206,31 @@ class Enrollment extends Model
     public function isApproved(): bool
     {
         return $this->status->isApproved();
+    }
+
+    /**
+     * Check if a student can enroll for a given period
+     *
+     * @return array<string> Array of error messages (empty if can enroll)
+     */
+    public static function canEnrollForPeriod(EnrollmentPeriod $period, Student $student): array
+    {
+        $errors = [];
+
+        if (! $period->isOpen()) {
+            $errors[] = 'Enrollment period is not currently open.';
+        }
+
+        $isNewStudent = $student->isNewStudent();
+
+        if ($isNewStudent && ! $period->allow_new_students) {
+            $errors[] = 'This enrollment period does not accept new students.';
+        }
+
+        if (! $isNewStudent && ! $period->allow_returning_students) {
+            $errors[] = 'This enrollment period does not accept returning students.';
+        }
+
+        return $errors;
     }
 }
