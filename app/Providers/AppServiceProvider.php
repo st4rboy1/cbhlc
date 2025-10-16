@@ -2,9 +2,14 @@
 
 namespace App\Providers;
 
+use App\Listeners\LogAuthenticationActivity;
 use App\Models\User;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register authentication event listeners
+        Event::listen(Login::class, [LogAuthenticationActivity::class, 'handleLogin']);
+        Event::listen(Logout::class, [LogAuthenticationActivity::class, 'handleLogout']);
+        Event::listen(Failed::class, [LogAuthenticationActivity::class, 'handleFailed']);
+
         // Super admin has access to everything
         Gate::before(function (User $user, string $ability) {
             if ($user->hasRole('super_admin')) {

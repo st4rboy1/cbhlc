@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Settings\AppearanceController;
+use App\Http\Controllers\Settings\NotificationPreferenceController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -20,4 +21,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('settings/appearance', [AppearanceController::class, 'index'])->name('appearance');
     Route::post('settings/appearance', [AppearanceController::class, 'update'])->name('appearance.update');
+
+    Route::prefix('settings/notifications')->name('settings.notifications.')->group(function () {
+        Route::get('/', [NotificationPreferenceController::class, 'index'])->name('index');
+        Route::put('/', [NotificationPreferenceController::class, 'update'])->name('update');
+        Route::post('/reset', [NotificationPreferenceController::class, 'reset'])->name('reset');
+    });
 });

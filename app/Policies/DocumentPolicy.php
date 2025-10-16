@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Enums\VerificationStatus;
 use App\Models\Document;
 use App\Models\Student;
 use App\Models\User;
@@ -61,6 +60,50 @@ class DocumentPolicy
     }
 
     /**
+     * Determine whether the user can create documents.
+     */
+    public function create(User $user): bool
+    {
+        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar', 'guardian']);
+    }
+
+    /**
+     * Determine whether the user can verify the document.
+     */
+    public function verify(User $user, Document $document): bool
+    {
+        // Only registrars, administrators, and super admins can verify documents
+        if (! $user->hasAnyRole(['super_admin', 'administrator', 'registrar'])) {
+            return false;
+        }
+
+        // Cannot verify already verified documents
+        if ($document->isVerified()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine whether the user can reject the document.
+     */
+    public function reject(User $user, Document $document): bool
+    {
+        // Only registrars, administrators, and super admins can reject documents
+        if (! $user->hasAnyRole(['super_admin', 'administrator', 'registrar'])) {
+            return false;
+        }
+
+        // Cannot reject already verified documents
+        if ($document->isVerified()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Determine whether the user can delete the document.
      */
     public function delete(User $user, Document $document): bool
@@ -70,34 +113,19 @@ class DocumentPolicy
             return true;
         }
 
-        // Guardians can delete their own documents, but only if pending or rejected
+        // Guardians can delete their own pending or rejected documents
         if ($user->hasRole('guardian') && $user->guardian) {
             /** @var \App\Models\Student $student */
             $student = $document->student;
 
-            return $student->guardians()
+            $isStudentGuardian = $student->guardians()
                 ->where('guardians.id', $user->guardian->id)
-                ->exists()
-                && in_array($document->verification_status, [VerificationStatus::PENDING, VerificationStatus::REJECTED]);
+                ->exists();
+
+            return $isStudentGuardian && ! $document->isVerified();
         }
 
         return false;
-    }
-
-    /**
-     * Determine whether the user can verify the document.
-     */
-    public function verify(User $user, Document $document): bool
-    {
-        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar']);
-    }
-
-    /**
-     * Determine whether the user can reject the document.
-     */
-    public function reject(User $user, Document $document): bool
-    {
-        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar']);
     }
 
     /**

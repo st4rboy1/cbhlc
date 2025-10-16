@@ -25,11 +25,7 @@ class StudentObserver
      */
     public function created(Student $student): void
     {
-        // Log student creation
-        activity()
-            ->performedOn($student)
-            ->causedBy(auth()->user())
-            ->log('Student created: '.$student->full_name);
+        // Note: Activity logging is handled automatically by LogsActivity trait
     }
 
     /**
@@ -37,14 +33,7 @@ class StudentObserver
      */
     public function updated(Student $student): void
     {
-        // Log significant changes
-        if ($student->wasChanged(['first_name', 'last_name', 'grade_level'])) {
-            activity()
-                ->performedOn($student)
-                ->causedBy(auth()->user())
-                ->withProperties(['changes' => $student->getChanges()])
-                ->log('Student updated: '.$student->full_name);
-        }
+        // Note: Activity logging is handled automatically by LogsActivity trait
     }
 
     /**
@@ -52,11 +41,7 @@ class StudentObserver
      */
     public function deleted(Student $student): void
     {
-        // Log student deletion
-        activity()
-            ->performedOn($student)
-            ->causedBy(auth()->user())
-            ->log('Student deleted: '.$student->full_name);
+        // Note: Activity logging is handled automatically by LogsActivity trait
     }
 
     /**
