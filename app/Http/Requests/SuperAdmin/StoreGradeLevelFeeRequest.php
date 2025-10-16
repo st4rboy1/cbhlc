@@ -22,7 +22,14 @@ class StoreGradeLevelFeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'grade_level' => ['required', 'string', 'max:50'],
+            'grade_level' => [
+                'required',
+                'string',
+                'max:50',
+                \Illuminate\Validation\Rule::unique('grade_level_fees')->where(function ($query) {
+                    return $query->where('school_year', $this->school_year);
+                }),
+            ],
             'school_year' => ['required', 'string', 'regex:/^\d{4}-\d{4}$/'],
             'tuition_fee' => ['required', 'numeric', 'min:0'],
             'miscellaneous_fee' => ['required', 'numeric', 'min:0'],
@@ -41,6 +48,7 @@ class StoreGradeLevelFeeRequest extends FormRequest
     {
         return [
             'school_year.regex' => 'School year must be in the format YYYY-YYYY (e.g., 2024-2025).',
+            'grade_level.unique' => 'A fee structure for this grade level and school year already exists.',
         ];
     }
 }
