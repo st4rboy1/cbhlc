@@ -21,18 +21,24 @@ class UpdateGradeLevelFeeRequest extends FormRequest
      */
     public function rules(): array
     {
+        $gradeLevelFeeId = $this->route('grade_level_fee');
+
         return [
-            'grade_level' => ['required', 'string', 'max:50'],
+            'grade_level' => [
+                'required',
+                'string',
+                'max:50',
+                \Illuminate\Validation\Rule::unique('grade_level_fees')
+                    ->ignore($gradeLevelFeeId)
+                    ->where(function ($query) {
+                        return $query->where('school_year', $this->school_year);
+                    }),
+            ],
             'school_year' => ['required', 'string', 'regex:/^\d{4}-\d{4}$/'],
             'tuition_fee' => ['required', 'numeric', 'min:0'],
             'miscellaneous_fee' => ['required', 'numeric', 'min:0'],
             'other_fees' => ['nullable', 'numeric', 'min:0'],
-            'total_fee' => ['required', 'numeric', 'min:0'],
-            'payment_plan_annual' => ['required', 'numeric', 'min:0'],
-            'payment_plan_semestral' => ['required', 'numeric', 'min:0'],
-            'payment_plan_quarterly' => ['required', 'numeric', 'min:0'],
-            'payment_plan_monthly' => ['required', 'numeric', 'min:0'],
-            'description' => ['nullable', 'string', 'max:500'],
+            'payment_terms' => ['required', 'string', 'in:ANNUAL,SEMESTRAL,QUARTERLY,MONTHLY'],
             'is_active' => ['boolean'],
         ];
     }
@@ -46,6 +52,7 @@ class UpdateGradeLevelFeeRequest extends FormRequest
     {
         return [
             'school_year.regex' => 'School year must be in the format YYYY-YYYY (e.g., 2024-2025).',
+            'grade_level.unique' => 'A fee structure for this grade level and school year already exists.',
         ];
     }
 }

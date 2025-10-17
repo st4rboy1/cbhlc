@@ -98,7 +98,16 @@ if ! run_check "Security audit" "composer_audit" composer audit; then
     # Don't exit on security audit failures, just warn
 fi
 
-# JavaScript/TypeScript checks
+# Vite Build (must run first to generate route files for TypeScript)
+echo "✓ Building assets with Vite..."
+if ! run_check "Vite build" "vite" npm run build; then
+    echo "     Run 'npm run build' to see issues"
+    echo "     Common issue: Inertia component paths must use kebab-case"
+    echo "     (e.g., 'settings/notifications' not 'Settings/Notifications')"
+    exit 1
+fi
+
+# JavaScript/TypeScript checks (run after build to ensure route files exist)
 echo "✓ Checking TypeScript..."
 if ! run_check "TypeScript" "typescript" npm run types; then
     echo "     Run 'npm run types' to see issues"
@@ -108,15 +117,6 @@ fi
 echo "✓ Checking Prettier formatting..."
 if ! run_check "Prettier" "prettier" npm run format:check; then
     echo "     Run 'npm run format' to fix"
-    exit 1
-fi
-
-# Vite Build (to catch Inertia component path mismatches)
-echo "✓ Building assets with Vite..."
-if ! run_check "Vite build" "vite" npm run build; then
-    echo "     Run 'npm run build' to see issues"
-    echo "     Common issue: Inertia component paths must use kebab-case"
-    echo "     (e.g., 'settings/notifications' not 'Settings/Notifications')"
     exit 1
 fi
 

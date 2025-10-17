@@ -10,12 +10,16 @@ on:
       - develop
       - feature/*
 
-jobs:
-  # Run quality checks and tests in parallel instead of sequentially
-  quality-checks:
-    name: Code Quality Checks
-    runs-on: ubuntu-latest
+# Cancel in-progress runs when a new workflow with the same group name is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
+jobs:
+  # Build job: Install dependencies and build assets once, share with other jobs
+  build:
+    name: Build Assets
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,10 +32,6 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      # Fast-fail: PHP Syntax Check
-      - name: PHP Syntax Check
-        run: find . -name "*.php" -not -path "./vendor/*" -not -path "./storage/*" | xargs -n1 php -l
-
       # Cache Composer dependencies
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -41,25 +41,37 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: Install Dependencies
+      - name: Install Composer Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv --no-scripts
 
-      # Code Quality Checks
-      - name: Code Style Check (Laravel Pint)
-        run: ./vendor/bin/pint --test
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
 
-      - name: Static Analysis (Larastan)
-        run: ./vendor/bin/phpstan analyse --memory-limit=2G
+      - name: Install Node Dependencies
+        run: npm ci
 
-      - name: Security Vulnerability Check
-        run: composer audit
+      - name: Build Assets
+        run: npm run build
 
-  tests:
-    name: Tests
+      # Upload built assets and vendor as artifacts for other jobs
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            public/build
+            resources/js/routes
+            vendor
+          retention-days: 1
+
+  # Fast-fail: PHP Syntax Check (fastest check, fails immediately on syntax errors)
+  php-syntax:
+    needs: build
+    name: PHP Syntax Check
     runs-on: ubuntu-latest
-    # Run tests in parallel with quality checks instead of waiting
-    # needs: quality-checks  # REMOVED to run in parallel
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -68,9 +80,86 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
-          extensions: mbstring, dom, fileinfo, mysql, iconv, sqlite3, pcov
+          extensions: mbstring, dom, fileinfo, mysql, iconv
           tools: composer:v2
-          coverage: pcov # Use PCOV for fast coverage (faster than xdebug)
+          coverage: none
+
+      - name: PHP Syntax Check
+        run: find . -name "*.php" -not -path "./vendor/*" -not -path "./storage/*" | xargs -n1 php -l
+
+  # PHP Code Style Check
+  php-style:
+    needs: build
+    name: PHP Code Style (Pint)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: Restore Executable Permissions
+        run: chmod +x vendor/bin/*
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: mbstring, dom, fileinfo, mysql, iconv
+          tools: composer:v2
+          coverage: none
+
+      - name: Code Style Check (Laravel Pint)
+        run: ./vendor/bin/pint --test
+
+  # PHP Static Analysis
+  php-analysis:
+    needs: build
+    name: PHP Static Analysis (PHPStan)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: Restore Executable Permissions
+        run: chmod +x vendor/bin/*
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: mbstring, dom, fileinfo, mysql, iconv
+          tools: composer:v2
+          coverage: none
+
+      # Cache PHPStan result cache for faster analysis
+      - name: Cache PHPStan Results
+        uses: actions/cache@v4
+        with:
+          path: .phpstan.cache
+          key: phpstan-${{ github.sha }}
+          restore-keys: |
+            phpstan-
+
+      - name: Static Analysis (Larastan)
+        run: ./vendor/bin/phpstan analyse --memory-limit=2G
+
+  # Frontend Quality Checks
+  frontend-checks:
+    needs: build
+    name: Frontend Quality (Prettier + ESLint)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -78,23 +167,64 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      # Cache dependencies
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
       - name: Install Node Dependencies
         run: npm ci
 
-      - name: Install PHP Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv --no-scripts
+      - name: Frontend Format Check (Prettier)
+        run: npm run format:check
 
-      - name: Build Assets
-        run: npm run build
+      - name: Frontend Lint Check (ESLint)
+        run: npm run lint:check
+
+  # Security Vulnerability Check
+  security:
+    needs: build
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: mbstring, dom, fileinfo, mysql, iconv
+          tools: composer:v2
+          coverage: none
+
+      - name: Security Vulnerability Check
+        run: composer audit
+
+  # Tests with Coverage
+  tests:
+    needs: build
+    name: Tests (Pest + Coverage)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: Restore Executable Permissions
+        run: chmod +x vendor/bin/*
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: mbstring, dom, fileinfo, mysql, iconv, sqlite3, pcov
+          tools: composer:v2
+          coverage: pcov # Use PCOV for fast coverage (faster than xdebug)
 
       - name: Copy Environment File
         run: cp .env.example .env

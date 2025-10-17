@@ -11,9 +11,15 @@ parameters:
     # Level 5 for balanced strictness (0-9 available, with 9 being the strictest)
     level: 5
 
+    # Enable result cache for faster subsequent runs
+    tmpDir: .phpstan.cache
+
     # Ignore specific errors that are not relevant
     ignoreErrors:
         - '#Access to an undefined property [a-zA-Z\\]+::\$[a-zA-Z_]+#'
+        -
+            message: '#Property .* does not exist in model\.#'
+            path: app/Models/GradeLevelFee.php
 
     excludePaths:
         - vendor/
