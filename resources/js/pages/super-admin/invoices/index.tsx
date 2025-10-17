@@ -57,7 +57,7 @@ interface Props {
 
 export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
-    const [status, setStatus] = useState(filters.status || '');
+    const [status, setStatus] = useState(filters.status || 'all');
     const [fromDate, setFromDate] = useState(filters.from_date || '');
     const [toDate, setToDate] = useState(filters.to_date || '');
 
@@ -71,7 +71,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
             '/super-admin/invoices',
             {
                 search: search || undefined,
-                status: status || undefined,
+                status: status && status !== 'all' ? status : undefined,
                 from_date: fromDate || undefined,
                 to_date: toDate || undefined,
             },
@@ -84,7 +84,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
 
     const handleClearFilters = () => {
         setSearch('');
-        setStatus('');
+        setStatus('all');
         setFromDate('');
         setToDate('');
         router.get('/super-admin/invoices', {}, { preserveState: true, preserveScroll: true });
@@ -161,7 +161,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                                     <SelectValue placeholder="Filter by status" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="">All Statuses</SelectItem>
+                                    <SelectItem value="all">All Statuses</SelectItem>
                                     <SelectItem value="draft">Draft</SelectItem>
                                     <SelectItem value="sent">Sent</SelectItem>
                                     <SelectItem value="partially_paid">Partially Paid</SelectItem>
@@ -183,7 +183,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                             <Search className="mr-2 h-4 w-4" />
                             Search
                         </Button>
-                        {(search || status || fromDate || toDate) && (
+                        {(search || (status && status !== 'all') || fromDate || toDate) && (
                             <Button onClick={handleClearFilters} variant="outline">
                                 Clear Filters
                             </Button>
