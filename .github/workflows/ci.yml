@@ -44,9 +44,24 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv --no-scripts
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm ci
+
       # Code Quality Checks
       - name: Code Style Check (Laravel Pint)
         run: ./vendor/bin/pint --test
+
+      - name: Frontend Format Check (Prettier)
+        run: npm run format:check
+
+      - name: Frontend Lint Check (ESLint)
+        run: npm run lint:check
 
       - name: Static Analysis (Larastan)
         run: ./vendor/bin/phpstan analyse --memory-limit=2G
