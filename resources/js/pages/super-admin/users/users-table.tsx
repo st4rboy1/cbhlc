@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { useDebounce } from 'use-debounce';
 import { type User } from './index';
 
@@ -156,8 +156,22 @@ export const columns: ColumnDef<User>[] = [
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id.toString())}>Copy User ID</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View User</DropdownMenuItem>
-                        <DropdownMenuItem>Edit User</DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={`/super-admin/users/${user.id}`}>View User</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href={`/super-admin/users/${user.id}/edit`}>Edit User</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            onClick={() => {
+                                if (window.confirm('Are you sure you want to delete this user?')) {
+                                    router.delete(`/super-admin/users/${user.id}`);
+                                }
+                            }}
+                        >
+                            Delete User
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );
