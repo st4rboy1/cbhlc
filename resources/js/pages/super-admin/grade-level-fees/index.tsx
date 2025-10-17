@@ -1,9 +1,10 @@
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { GradeLevelFeesTable } from '@/pages/super-admin/grade-level-fees/grade-level-fees-table';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { PlusCircle } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { AlertCircle, CheckCircle2, PlusCircle } from 'lucide-react';
 
 export type GradeLevelFee = {
     id: number;
@@ -42,6 +43,8 @@ interface Props {
 }
 
 export default function SuperAdminGradeLevelFeesIndex({ fees, filters, gradeLevels }: Props) {
+    const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Grade Level Fees', href: '/super-admin/grade-level-fees' },
@@ -63,6 +66,18 @@ export default function SuperAdminGradeLevelFeesIndex({ fees, filters, gradeLeve
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Grade Level Fees" />
             <div className="px-4 py-6">
+                {flash?.success && (
+                    <Alert className="mb-4 border-green-200 bg-green-50 text-green-900">
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <AlertDescription>{flash.success}</AlertDescription>
+                    </Alert>
+                )}
+                {flash?.error && (
+                    <Alert variant="destructive" className="mb-4">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{flash.error}</AlertDescription>
+                    </Alert>
+                )}
                 <div className="mb-4 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Grade Level Fees</h1>
                     <Link href="/super-admin/grade-level-fees/create">
