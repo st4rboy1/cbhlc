@@ -78,7 +78,9 @@ export default function SuperAdminPaymentsEdit({ payment, invoices }: Props) {
     });
 
     const selectedInvoice = invoices.find((inv) => inv.id.toString() === data.invoice_id);
-    const remainingBalance = selectedInvoice ? selectedInvoice.total_amount - selectedInvoice.paid_amount + payment.amount : 0;
+    const remainingBalance = selectedInvoice
+        ? Number(selectedInvoice.total_amount) - Number(selectedInvoice.paid_amount) + Number(payment.amount)
+        : 0;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -123,7 +125,7 @@ export default function SuperAdminPaymentsEdit({ payment, invoices }: Props) {
                                                     <SelectItem key={invoice.id} value={invoice.id.toString()}>
                                                         {invoice.invoice_number} - {invoice.enrollment.student.first_name}{' '}
                                                         {invoice.enrollment.student.last_name} (Balance: ₱
-                                                        {(invoice.total_amount - invoice.paid_amount).toFixed(2)})
+                                                        {(Number(invoice.total_amount) - Number(invoice.paid_amount)).toFixed(2)})
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -252,11 +254,11 @@ export default function SuperAdminPaymentsEdit({ payment, invoices }: Props) {
                                         </div>
                                         <div>
                                             <p className="text-muted-foreground">Total Amount</p>
-                                            <p className="font-medium">₱{selectedInvoice.total_amount.toFixed(2)}</p>
+                                            <p className="font-medium">₱{Number(selectedInvoice.total_amount).toFixed(2)}</p>
                                         </div>
                                         <div>
                                             <p className="text-muted-foreground">Amount Paid</p>
-                                            <p className="font-medium">₱{selectedInvoice.paid_amount.toFixed(2)}</p>
+                                            <p className="font-medium">₱{Number(selectedInvoice.paid_amount).toFixed(2)}</p>
                                         </div>
                                         <div>
                                             <p className="text-muted-foreground">Balance (after this payment)</p>
