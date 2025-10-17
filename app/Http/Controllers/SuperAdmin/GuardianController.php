@@ -22,7 +22,7 @@ class GuardianController extends Controller
     {
         Gate::authorize('viewAny', Guardian::class);
 
-        $query = Guardian::with(['user', 'children']);
+        $query = Guardian::with(['user', 'children'])->withCount('children as students_count');
 
         // Search functionality
         if ($request->filled('search')) {
@@ -33,15 +33,53 @@ class GuardianController extends Controller
             })->orWhere(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('contact_number', 'like', "%{$search}%");
             });
         }
 
         $guardians = $query->latest()->paginate(15)->withQueryString();
 
+        // Transform guardian data to match frontend expectations
+        /** @phpstan-ignore argument.unresolvableType */
+        $guardians->getCollection()->transform(function ($guardian) {
+            // Get primary relationship from first child if exists
+            $relationship = 'guardian';
+            $emergencyContact = false;
+            if ($guardian->children->isNotEmpty()) {
+                $firstChild = $guardian->children->first();
+                $relationship = $firstChild->pivot->relationship_type ?? 'guardian';
+                $emergencyContact = $firstChild->pivot->is_primary_contact ?? false;
+            }
+
+            return (object) [
+                'id' => $guardian->id,
+                'first_name' => $guardian->first_name,
+                'middle_name' => $guardian->middle_name,
+                'last_name' => $guardian->last_name,
+                'email' => $guardian->user->email,
+                'phone' => $guardian->contact_number,
+                'relationship' => $relationship,
+                'emergency_contact' => $emergencyContact,
+                'students_count' => $guardian->students_count,
+                'created_at' => $guardian->created_at,
+                'updated_at' => $guardian->updated_at,
+            ];
+        });
+
+        // Calculate stats
+        $stats = [
+            'total' => Guardian::count(),
+            'with_students' => Guardian::has('children')->count(),
+            'without_students' => Guardian::doesntHave('children')->count(),
+            'emergency_contacts' => Guardian::whereHas('children', function ($q) {
+                $q->where('is_primary_contact', true);
+            })->count(),
+        ];
+
         return Inertia::render('super-admin/guardians/index', [
             'guardians' => $guardians,
             'filters' => $request->only(['search']),
+            'stats' => $stats,
         ]);
     }
 
@@ -78,14 +116,12 @@ class GuardianController extends Controller
             Guardian::create([
                 'user_id' => $user->id,
                 'first_name' => $validated['first_name'],
-                'middle_name' => $validated['middle_name'],
+                'middle_name' => $validated['middle_name'] ?? null,
                 'last_name' => $validated['last_name'],
-                'relationship_type' => $validated['relationship_type'],
-                'phone' => $validated['phone'],
-                'occupation' => $validated['occupation'],
-                'employer' => $validated['employer'],
-                'address' => $validated['address'],
-                'emergency_contact' => $validated['emergency_contact'] ?? false,
+                'contact_number' => $validated['phone'] ?? null,
+                'occupation' => $validated['occupation'] ?? null,
+                'employer' => $validated['employer'] ?? null,
+                'address' => $validated['address'] ?? null,
             ]);
         });
 
@@ -146,14 +182,12 @@ class GuardianController extends Controller
             // Update guardian profile
             $guardian->update([
                 'first_name' => $validated['first_name'],
-                'middle_name' => $validated['middle_name'],
+                'middle_name' => $validated['middle_name'] ?? null,
                 'last_name' => $validated['last_name'],
-                'relationship_type' => $validated['relationship_type'],
-                'phone' => $validated['phone'],
-                'occupation' => $validated['occupation'],
-                'employer' => $validated['employer'],
-                'address' => $validated['address'],
-                'emergency_contact' => $validated['emergency_contact'] ?? false,
+                'contact_number' => $validated['phone'] ?? null,
+                'occupation' => $validated['occupation'] ?? null,
+                'employer' => $validated['employer'] ?? null,
+                'address' => $validated['address'] ?? null,
             ]);
         });
 
