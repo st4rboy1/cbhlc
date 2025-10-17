@@ -1,12 +1,16 @@
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { PlusCircle, Search } from 'lucide-react';
+import { format } from 'date-fns';
+import { CalendarIcon, PlusCircle, Search } from 'lucide-react';
 import { useState } from 'react';
 import { columns } from './columns';
 
@@ -58,8 +62,8 @@ interface Props {
 export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || 'all');
-    const [fromDate, setFromDate] = useState(filters.from_date || '');
-    const [toDate, setToDate] = useState(filters.to_date || '');
+    const [fromDate, setFromDate] = useState<Date | undefined>(filters.from_date ? new Date(filters.from_date) : undefined);
+    const [toDate, setToDate] = useState<Date | undefined>(filters.to_date ? new Date(filters.to_date) : undefined);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
@@ -72,8 +76,8 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
             {
                 search: search || undefined,
                 status: status && status !== 'all' ? status : undefined,
-                from_date: fromDate || undefined,
-                to_date: toDate || undefined,
+                from_date: fromDate ? format(fromDate, 'yyyy-MM-dd') : undefined,
+                to_date: toDate ? format(toDate, 'yyyy-MM-dd') : undefined,
             },
             {
                 preserveState: true,
@@ -85,8 +89,8 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
     const handleClearFilters = () => {
         setSearch('');
         setStatus('all');
-        setFromDate('');
-        setToDate('');
+        setFromDate(undefined);
+        setToDate(undefined);
         router.get('/super-admin/invoices', {}, { preserveState: true, preserveScroll: true });
     };
 
@@ -133,11 +137,37 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                         </div>
                         <div>
                             <label className="mb-1 block text-sm font-medium">From Date</label>
-                            <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className={cn('w-full justify-start text-left font-normal', !fromDate && 'text-muted-foreground')}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {fromDate ? format(fromDate, 'PPP') : <span>Pick a date</span>}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar mode="single" selected={fromDate} onSelect={setFromDate} initialFocus />
+                                </PopoverContent>
+                            </Popover>
                         </div>
                         <div>
                             <label className="mb-1 block text-sm font-medium">To Date</label>
-                            <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className={cn('w-full justify-start text-left font-normal', !toDate && 'text-muted-foreground')}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        {toDate ? format(toDate, 'PPP') : <span>Pick a date</span>}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0">
+                                    <Calendar mode="single" selected={toDate} onSelect={setToDate} initialFocus />
+                                </PopoverContent>
+                            </Popover>
                         </div>
                     </div>
                     <div className="mt-4 flex gap-2">
