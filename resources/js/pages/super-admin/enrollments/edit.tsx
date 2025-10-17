@@ -19,7 +19,7 @@ interface Guardian {
     id: number;
     first_name: string;
     last_name: string;
-    user: {
+    user?: {
         name: string;
         email: string;
     };
@@ -151,7 +151,8 @@ export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardi
                                             <SelectContent>
                                                 {guardians.map((guardian) => (
                                                     <SelectItem key={guardian.id} value={guardian.id.toString()}>
-                                                        {guardian.first_name} {guardian.last_name} ({guardian.user.email})
+                                                        {guardian.first_name} {guardian.last_name}
+                                                        {guardian.user?.email && ` (${guardian.user.email})`}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -268,7 +269,9 @@ export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardi
                                         <p className="font-medium">
                                             {enrollment.guardian.first_name} {enrollment.guardian.last_name}
                                         </p>
-                                        <p className="text-xs text-muted-foreground">{enrollment.guardian.user.email}</p>
+                                        {enrollment.guardian.user?.email && (
+                                            <p className="text-xs text-muted-foreground">{enrollment.guardian.user.email}</p>
+                                        )}
                                     </div>
                                     <div>
                                         <p className="text-muted-foreground">Current Grade Level</p>
