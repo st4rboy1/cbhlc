@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
@@ -97,22 +98,38 @@ export default function SuperAdminGuardiansIndex({ guardians, filters, stats }: 
 
                 {/* Stats Cards */}
                 <div className="mb-6 grid gap-4 md:grid-cols-4">
-                    <div className="rounded-lg border bg-white p-4">
-                        <p className="text-sm text-gray-600">Total Guardians</p>
-                        <p className="text-2xl font-bold">{stats.total}</p>
-                    </div>
-                    <div className="rounded-lg border bg-white p-4">
-                        <p className="text-sm text-gray-600">With Students</p>
-                        <p className="text-2xl font-bold">{stats.with_students}</p>
-                    </div>
-                    <div className="rounded-lg border bg-white p-4">
-                        <p className="text-sm text-gray-600">Without Students</p>
-                        <p className="text-2xl font-bold">{stats.without_students}</p>
-                    </div>
-                    <div className="rounded-lg border bg-white p-4">
-                        <p className="text-sm text-gray-600">Emergency Contacts</p>
-                        <p className="text-2xl font-bold">{stats.emergency_contacts}</p>
-                    </div>
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Total Guardians</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.total}</div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">With Students</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.with_students}</div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Without Students</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.without_students}</div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">Emergency Contacts</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{stats.emergency_contacts}</div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Search */}
@@ -131,7 +148,7 @@ export default function SuperAdminGuardiansIndex({ guardians, filters, stats }: 
                 </div>
 
                 {/* Table */}
-                <div className="rounded-lg border bg-white shadow">
+                <Card>
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -147,7 +164,7 @@ export default function SuperAdminGuardiansIndex({ guardians, filters, stats }: 
                         <TableBody>
                             {guardians.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="text-center text-gray-500">
+                                    <TableCell colSpan={7} className="text-center text-muted-foreground">
                                         No guardians found.
                                     </TableCell>
                                 </TableRow>
@@ -184,7 +201,7 @@ export default function SuperAdminGuardiansIndex({ guardians, filters, stats }: 
                             )}
                         </TableBody>
                     </Table>
-                </div>
+                </Card>
 
                 {/* Pagination */}
                 {guardians.last_page > 1 && (
@@ -197,10 +214,10 @@ export default function SuperAdminGuardiansIndex({ guardians, filters, stats }: 
                                 preserveScroll
                                 className={`rounded px-3 py-1 ${
                                     link.active
-                                        ? 'bg-primary text-white'
+                                        ? 'bg-primary text-primary-foreground'
                                         : link.url
-                                          ? 'bg-gray-200 hover:bg-gray-300'
-                                          : 'cursor-not-allowed bg-gray-100 text-gray-400'
+                                          ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                                          : 'cursor-not-allowed bg-muted text-muted-foreground'
                                 }`}
                                 dangerouslySetInnerHTML={{ __html: link.label }}
                             />
