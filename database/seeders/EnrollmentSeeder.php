@@ -119,7 +119,7 @@ class EnrollmentSeeder extends Seeder
 
             // Create enrollment
             $enrollment = Enrollment::create([
-                'enrollment_id' => 'ENR-'.now()->format('Ym').'-'.str_pad($enrollmentCount + 1, 4, '0', STR_PAD_LEFT),
+                'enrollment_id' => 'ENR-'.now()->format('Ym').'-'.str_pad((string) ($enrollmentCount + 1), 4, '0', STR_PAD_LEFT),
                 'student_id' => $student->id,
                 'guardian_id' => $guardian->id,
                 'school_year' => '2024-2025',
