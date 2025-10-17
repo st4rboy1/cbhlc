@@ -1,3 +1,4 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { calculateAge } from '@/pages/registrar/students/students-table';
 import { type BreadcrumbItem } from '@/types';
@@ -40,49 +41,62 @@ export default function RegistrarStudentsShow({ student }: Props) {
             <div className="px-4 py-6">
                 <h1 className="mb-4 text-2xl font-bold">Student Details</h1>
 
-                <div className="space-y-4 rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div>
-                            <p className="text-sm font-medium text-muted-foreground">Student ID</p>
-                            <p className="text-lg font-semibold">{student.student_id}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-muted-foreground">Name</p>
-                            <p className="text-lg font-semibold">{`${student.first_name} ${student.middle_name} ${student.last_name}`}</p>
-                        </div>
-                    </div>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Personal Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Student ID</p>
+                                <p className="text-lg font-semibold">{student.student_id}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Name</p>
+                                <p className="text-lg font-semibold">{`${student.first_name} ${student.middle_name} ${student.last_name}`}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Birthdate</p>
+                                <p className="text-lg font-semibold">{student.birthdate}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Age</p>
+                                <p className="text-lg font-semibold">{calculateAge(student.birthdate)}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Gender</p>
+                                <p className="text-lg font-semibold">{student.gender}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div>
-                            <p className="text-sm font-medium text-muted-foreground">Birthdate</p>
-                            <p className="text-lg font-semibold">{student.birthdate}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-muted-foreground">Age</p>
-                            <p className="text-lg font-semibold">{calculateAge(student.birthdate)}</p>
-                        </div>
-                    </div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Contact Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Contact Number</p>
+                                <p className="text-lg font-semibold">{student.contact_number}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-muted-foreground">Address</p>
+                                <p className="text-lg font-semibold">{student.address}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        <div>
-                            <p className="text-sm font-medium text-muted-foreground">Gender</p>
-                            <p className="text-lg font-semibold">{student.gender}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-muted-foreground">Grade Level</p>
-                            <p className="text-lg font-semibold">{student.grade_level || 'Not assigned'}</p>
-                        </div>
-                    </div>
-
-                    <div>
-                        <p className="text-sm font-medium text-muted-foreground">Contact Number</p>
-                        <p className="text-lg font-semibold">{student.contact_number}</p>
-                    </div>
-
-                    <div>
-                        <p className="text-sm font-medium text-muted-foreground">Address</p>
-                        <p className="text-lg font-semibold">{student.address}</p>
-                    </div>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Academic Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Grade Level</p>
+                                <p className="text-lg font-semibold">{student.grade_level || 'Not assigned'}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </AppLayout>
