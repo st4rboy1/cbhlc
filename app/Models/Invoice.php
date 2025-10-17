@@ -18,6 +18,7 @@ class Invoice extends Model
     protected $fillable = [
         'invoice_number',
         'enrollment_id',
+        'invoice_date',
         'total_amount',
         'paid_amount',
         'status',
@@ -30,6 +31,7 @@ class Invoice extends Model
         'status' => InvoiceStatus::class,
         'total_amount' => 'decimal:2',
         'paid_amount' => 'decimal:2',
+        'invoice_date' => 'date',
         'due_date' => 'date',
         'paid_at' => 'datetime',
     ];
