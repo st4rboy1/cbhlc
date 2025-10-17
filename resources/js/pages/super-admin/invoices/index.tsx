@@ -1,14 +1,14 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { DataTable } from '@/components/ui/data-table';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Edit, Eye, PlusCircle, Search, Trash } from 'lucide-react';
+import { PlusCircle, Search } from 'lucide-react';
 import { useState } from 'react';
+import { columns } from './columns';
 
 interface Student {
     id: number;
@@ -90,46 +90,6 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
         router.get('/super-admin/invoices', {}, { preserveState: true, preserveScroll: true });
     };
 
-    const handleDelete = (id: number, invoiceNumber: string) => {
-        if (confirm(`Are you sure you want to delete invoice ${invoiceNumber}? This action cannot be undone.`)) {
-            router.delete(`/super-admin/invoices/${id}`);
-        }
-    };
-
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('en-PH', {
-            style: 'currency',
-            currency: 'PHP',
-        }).format(amount);
-    };
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-        });
-    };
-
-    const getStatusBadge = (status: string) => {
-        const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {
-            draft: { variant: 'outline', label: 'Draft' },
-            sent: { variant: 'default', label: 'Sent' },
-            partially_paid: { variant: 'secondary', label: 'Partially Paid' },
-            paid: { variant: 'default', label: 'Paid' },
-            cancelled: { variant: 'destructive', label: 'Cancelled' },
-            overdue: { variant: 'destructive', label: 'Overdue' },
-        };
-
-        const config = variants[status] || { variant: 'outline' as const, label: status };
-
-        return (
-            <Badge variant={config.variant} className={status === 'paid' ? 'bg-green-100 text-green-800' : ''}>
-                {config.label}
-            </Badge>
-        );
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Invoices" />
@@ -191,69 +151,8 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                     </div>
                 </Card>
 
-                {/* Table */}
-                <Card>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Invoice #</TableHead>
-                                <TableHead>Student</TableHead>
-                                <TableHead>Total Amount</TableHead>
-                                <TableHead>Paid Amount</TableHead>
-                                <TableHead>Balance</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Due Date</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {invoices.data.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={8} className="text-center text-muted-foreground">
-                                        No invoices found.
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                invoices.data.map((invoice) => (
-                                    <TableRow key={invoice.id}>
-                                        <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
-                                        <TableCell>
-                                            {invoice.enrollment.student.first_name} {invoice.enrollment.student.last_name}
-                                            <br />
-                                            <span className="text-sm text-muted-foreground">ID: {invoice.enrollment.student.student_id}</span>
-                                        </TableCell>
-                                        <TableCell>{formatCurrency(invoice.total_amount)}</TableCell>
-                                        <TableCell className="text-green-600">{formatCurrency(invoice.paid_amount)}</TableCell>
-                                        <TableCell className="text-red-600">{formatCurrency(invoice.total_amount - invoice.paid_amount)}</TableCell>
-                                        <TableCell>{getStatusBadge(invoice.status)}</TableCell>
-                                        <TableCell>{formatDate(invoice.due_date)}</TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <Link href={`/super-admin/invoices/${invoice.id}`}>
-                                                    <Button size="sm" variant="outline">
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                </Link>
-                                                <Link href={`/super-admin/invoices/${invoice.id}/edit`}>
-                                                    <Button size="sm" variant="outline">
-                                                        <Edit className="h-4 w-4" />
-                                                    </Button>
-                                                </Link>
-                                                <Button
-                                                    size="sm"
-                                                    variant="destructive"
-                                                    onClick={() => handleDelete(invoice.id, invoice.invoice_number)}
-                                                >
-                                                    <Trash className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </Card>
+                {/* Data Table */}
+                <DataTable columns={columns} data={invoices.data} />
 
                 {/* Pagination */}
                 {invoices.last_page > 1 && (
