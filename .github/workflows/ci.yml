@@ -83,6 +83,10 @@ jobs:
         with:
           name: build-artifacts
 
+      # Restore executable permissions for vendor binaries
+      - name: Restore Executable Permissions
+        run: chmod +x vendor/bin/*
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -134,6 +138,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
+
+      # Restore executable permissions for vendor binaries
+      - name: Restore Executable Permissions
+        run: chmod +x vendor/bin/*
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
