@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -35,36 +36,57 @@ export default function UserShow({ user }: Props) {
             <Head title={user.name} />
             <div className="px-4 py-6">
                 <h1 className="mb-4 text-2xl font-bold">User Details</h1>
-                <div className="space-y-4">
-                    <div>
-                        <h2 className="text-lg font-semibold">Personal Information</h2>
-                        <p>
-                            <strong>Name:</strong> {user.name}
-                        </p>
-                        <p>
-                            <strong>Email:</strong> {user.email}
-                        </p>
-                        {user.address && (
-                            <p>
-                                <strong>Address:</strong> {user.address}
-                            </p>
-                        )}
-                        <p>
-                            <strong>Created At:</strong> {formatDate(user.created_at)}
-                        </p>
-                    </div>
+
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Personal Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Name</p>
+                                <p className="text-lg font-semibold">{user.name}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Email</p>
+                                <p className="text-lg font-semibold">{user.email}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Created At</p>
+                                <p className="text-lg font-semibold">{formatDate(user.created_at)}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Contact Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            {user.address && (
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">Address</p>
+                                    <p className="text-lg font-semibold">{user.address}</p>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
 
                     {user.roles.length > 0 && (
-                        <div>
-                            <h2 className="text-lg font-semibold">Roles</h2>
-                            <div className="flex flex-wrap gap-1">
-                                {user.roles.map((role) => (
-                                    <Badge key={role.id} variant="secondary">
-                                        {role.name}
-                                    </Badge>
-                                ))}
-                            </div>
-                        </div>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Roles</CardTitle>
+                            </CardHeader>
+                            <CardContent className="grid gap-4">
+                                <div className="flex flex-wrap gap-1">
+                                    {user.roles.map((role) => (
+                                        <Badge key={role.id} variant="secondary">
+                                            {role.name}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
                     )}
                 </div>
             </div>
