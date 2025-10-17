@@ -21,6 +21,7 @@ class Payment extends Model
         'payment_date',
         'reference_number',
         'notes',
+        'processed_by',
     ];
 
     protected $casts = [
@@ -49,6 +50,14 @@ class Payment extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    /**
+     * Get the user who processed this payment
+     */
+    public function processedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'processed_by');
     }
 
     /**
