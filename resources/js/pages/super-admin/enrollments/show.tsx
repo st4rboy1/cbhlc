@@ -1,31 +1,318 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { format } from 'date-fns';
+import { ArrowLeft, BookOpen, Calendar, CreditCard, FileText, GraduationCap, Hash, User, Users } from 'lucide-react';
 
-interface Props {
-    enrollment: {
-        id: string | number;
-        student_name: string;
-        grade: string;
-        status: string;
-        submitted_at: string;
-        documents: unknown[];
+interface Student {
+    id: number;
+    student_id: string;
+    first_name: string;
+    last_name: string;
+}
+
+interface Guardian {
+    id: number;
+    first_name: string;
+    last_name: string;
+    user?: {
+        name: string;
+        email: string;
     };
 }
 
-export default function EnrollmentShow({ enrollment }: Props) {
+interface Enrollment {
+    id: number;
+    reference_number: string;
+    student_id: number;
+    guardian_id: number;
+    grade_level: string;
+    quarter: string;
+    school_year: string;
+    status: string;
+    tuition_fee_cents: number;
+    miscellaneous_fee_cents: number;
+    laboratory_fee_cents: number;
+    library_fee_cents: number;
+    sports_fee_cents: number;
+    total_amount_cents: number;
+    discount_cents: number;
+    net_amount_cents: number;
+    amount_paid_cents: number;
+    balance_cents: number;
+    payment_status: string;
+    created_at: string;
+    updated_at: string;
+    approved_at: string | null;
+    rejected_at: string | null;
+    student: Student;
+    guardian: Guardian;
+}
+
+interface Props {
+    enrollment: Enrollment;
+}
+
+const getStatusBadge = (status: string) => {
+    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string; label: string }> = {
+        pending: { variant: 'outline', className: 'bg-yellow-100 text-yellow-800', label: 'Pending Review' },
+        approved: { variant: 'default', className: 'bg-blue-100 text-blue-800', label: 'Approved' },
+        rejected: { variant: 'destructive', label: 'Rejected' },
+        ready_for_payment: { variant: 'outline', className: 'bg-yellow-100 text-yellow-800', label: 'Ready for Payment' },
+        paid: { variant: 'default', className: 'bg-green-100 text-green-800', label: 'Paid' },
+        enrolled: { variant: 'default', className: 'bg-primary text-primary-foreground', label: 'Enrolled' },
+        completed: { variant: 'secondary', label: 'Completed' },
+    };
+
+    const config = variants[status] || { variant: 'outline' as const, label: status };
+
+    return (
+        <Badge variant={config.variant} className={config.className}>
+            {config.label}
+        </Badge>
+    );
+};
+
+const getPaymentStatusBadge = (status: string) => {
+    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string; label: string }> = {
+        pending: { variant: 'outline', className: 'bg-yellow-100 text-yellow-800', label: 'Pending' },
+        partial: { variant: 'secondary', className: 'bg-orange-100 text-orange-800', label: 'Partial' },
+        paid: { variant: 'default', className: 'bg-green-100 text-green-800', label: 'Paid' },
+        overdue: { variant: 'destructive', label: 'Overdue' },
+    };
+
+    const config = variants[status] || { variant: 'outline' as const, label: status };
+
+    return (
+        <Badge variant={config.variant} className={config.className}>
+            {config.label}
+        </Badge>
+    );
+};
+
+const formatCurrency = (cents: number) => {
+    return new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+    }).format(cents / 100);
+};
+
+export default function SuperAdminEnrollmentsShow({ enrollment }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Enrollments', href: '/super-admin/enrollments' },
-        { title: `Enrollment #${enrollment.id}`, href: `/super-admin/enrollments/${enrollment.id}` },
+        { title: enrollment.reference_number, href: `/super-admin/enrollments/${enrollment.id}` },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Enrollment #${enrollment.id}`} />
-            <div className="px-4 py-6">
-                <h1 className="mb-4 text-2xl font-bold">Enrollment Show</h1>
-                <pre className="overflow-auto rounded bg-gray-100 p-4">{JSON.stringify({ enrollment }, null, 2)}</pre>
+            <Head title={`Enrollment ${enrollment.reference_number}`} />
+            <div className="container mx-auto px-4 py-6">
+                <div className="mb-6 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <Link href="/super-admin/enrollments">
+                            <Button variant="outline" size="icon">
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                        </Link>
+                        <div>
+                            <h1 className="text-2xl font-bold">Enrollment Details</h1>
+                            <p className="text-sm text-muted-foreground">Reference: {enrollment.reference_number}</p>
+                        </div>
+                    </div>
+                    <Link href={`/super-admin/enrollments/${enrollment.id}/edit`}>
+                        <Button>Edit Enrollment</Button>
+                    </Link>
+                </div>
+
+                <div className="grid gap-6 lg:grid-cols-3">
+                    {/* Main Content */}
+                    <div className="space-y-6 lg:col-span-2">
+                        {/* Enrollment Information */}
+                        <Card className="p-6">
+                            <h2 className="mb-4 text-lg font-semibold">Enrollment Information</h2>
+                            <div className="grid gap-6 md:grid-cols-2">
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <Hash className="h-4 w-4" />
+                                        Reference Number
+                                    </div>
+                                    <p className="text-lg font-bold">{enrollment.reference_number}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <FileText className="h-4 w-4" />
+                                        Status
+                                    </div>
+                                    <div>{getStatusBadge(enrollment.status)}</div>
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <GraduationCap className="h-4 w-4" />
+                                        Grade Level
+                                    </div>
+                                    <p className="text-lg font-medium">{enrollment.grade_level}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <Calendar className="h-4 w-4" />
+                                        Quarter
+                                    </div>
+                                    <p className="text-lg font-medium">{enrollment.quarter}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <BookOpen className="h-4 w-4" />
+                                        School Year
+                                    </div>
+                                    <p className="text-lg font-medium">{enrollment.school_year}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <CreditCard className="h-4 w-4" />
+                                        Payment Status
+                                    </div>
+                                    <div>{getPaymentStatusBadge(enrollment.payment_status)}</div>
+                                </div>
+                            </div>
+                        </Card>
+
+                        {/* Financial Information */}
+                        <Card className="p-6">
+                            <h2 className="mb-4 text-lg font-semibold">Financial Information</h2>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-muted-foreground">Tuition Fee</span>
+                                    <span className="font-medium">{formatCurrency(enrollment.tuition_fee_cents)}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-muted-foreground">Miscellaneous Fee</span>
+                                    <span className="font-medium">{formatCurrency(enrollment.miscellaneous_fee_cents)}</span>
+                                </div>
+                                {enrollment.laboratory_fee_cents > 0 && (
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-muted-foreground">Laboratory Fee</span>
+                                        <span className="font-medium">{formatCurrency(enrollment.laboratory_fee_cents)}</span>
+                                    </div>
+                                )}
+                                {enrollment.library_fee_cents > 0 && (
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-muted-foreground">Library Fee</span>
+                                        <span className="font-medium">{formatCurrency(enrollment.library_fee_cents)}</span>
+                                    </div>
+                                )}
+                                {enrollment.sports_fee_cents > 0 && (
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm text-muted-foreground">Sports Fee</span>
+                                        <span className="font-medium">{formatCurrency(enrollment.sports_fee_cents)}</span>
+                                    </div>
+                                )}
+                                <Separator />
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium">Total Amount</span>
+                                    <span className="font-bold">{formatCurrency(enrollment.total_amount_cents)}</span>
+                                </div>
+                                {enrollment.discount_cents > 0 && (
+                                    <>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm text-muted-foreground">Discount</span>
+                                            <span className="font-medium text-green-600">-{formatCurrency(enrollment.discount_cents)}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-medium">Net Amount</span>
+                                            <span className="font-bold">{formatCurrency(enrollment.net_amount_cents)}</span>
+                                        </div>
+                                    </>
+                                )}
+                                <Separator />
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-muted-foreground">Amount Paid</span>
+                                    <span className="font-medium text-green-600">{formatCurrency(enrollment.amount_paid_cents)}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-bold">Balance</span>
+                                    <span className="text-lg font-bold text-primary">{formatCurrency(enrollment.balance_cents)}</span>
+                                </div>
+                            </div>
+                        </Card>
+                    </div>
+
+                    {/* Sidebar */}
+                    <div className="space-y-6">
+                        {/* Student Information */}
+                        <Card className="p-6">
+                            <div className="mb-4 flex items-center gap-2">
+                                <User className="h-4 w-4 text-muted-foreground" />
+                                <h2 className="text-lg font-semibold">Student Information</h2>
+                            </div>
+                            <div className="space-y-3">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Name</p>
+                                    <p className="font-medium">
+                                        {enrollment.student.first_name} {enrollment.student.last_name}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Student ID</p>
+                                    <p className="font-medium">{enrollment.student.student_id}</p>
+                                </div>
+                            </div>
+                        </Card>
+
+                        {/* Guardian Information */}
+                        <Card className="p-6">
+                            <div className="mb-4 flex items-center gap-2">
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                                <h2 className="text-lg font-semibold">Guardian Information</h2>
+                            </div>
+                            <div className="space-y-3">
+                                <div>
+                                    <p className="text-sm text-muted-foreground">Name</p>
+                                    <p className="font-medium">
+                                        {enrollment.guardian.first_name} {enrollment.guardian.last_name}
+                                    </p>
+                                </div>
+                                {enrollment.guardian.user?.email && (
+                                    <div>
+                                        <p className="text-sm text-muted-foreground">Email</p>
+                                        <p className="text-sm font-medium">{enrollment.guardian.user.email}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </Card>
+
+                        {/* Metadata */}
+                        <Card className="p-6">
+                            <h2 className="mb-4 text-lg font-semibold">Metadata</h2>
+                            <div className="space-y-3 text-sm">
+                                <div>
+                                    <p className="text-muted-foreground">Created</p>
+                                    <p className="font-medium">{format(new Date(enrollment.created_at), 'MMM dd, yyyy HH:mm')}</p>
+                                </div>
+                                <div>
+                                    <p className="text-muted-foreground">Last Updated</p>
+                                    <p className="font-medium">{format(new Date(enrollment.updated_at), 'MMM dd, yyyy HH:mm')}</p>
+                                </div>
+                                {enrollment.approved_at && (
+                                    <div>
+                                        <p className="text-muted-foreground">Approved At</p>
+                                        <p className="font-medium">{format(new Date(enrollment.approved_at), 'MMM dd, yyyy HH:mm')}</p>
+                                    </div>
+                                )}
+                                {enrollment.rejected_at && (
+                                    <div>
+                                        <p className="text-muted-foreground">Rejected At</p>
+                                        <p className="font-medium">{format(new Date(enrollment.rejected_at), 'MMM dd, yyyy HH:mm')}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </Card>
+                    </div>
+                </div>
             </div>
         </AppLayout>
     );
