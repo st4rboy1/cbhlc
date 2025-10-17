@@ -40,7 +40,6 @@ class UpdatePaymentRequestTest extends TestCase
         $this->assertArrayHasKey('amount', $rules);
         $this->assertArrayHasKey('payment_method', $rules);
         $this->assertArrayHasKey('reference_number', $rules);
-        $this->assertArrayHasKey('status', $rules);
         $this->assertArrayHasKey('notes', $rules);
     }
 
@@ -54,7 +53,6 @@ class UpdatePaymentRequestTest extends TestCase
             'amount' => 5000,
             'payment_method' => 'cash',
             'reference_number' => 'REF-123456',
-            'status' => 'completed',
             'notes' => 'Payment received in cash',
         ];
 
@@ -73,7 +71,6 @@ class UpdatePaymentRequestTest extends TestCase
             'payment_date' => now()->format('Y-m-d'),
             'amount' => 1000,
             'payment_method' => 'bank_transfer',
-            'status' => 'pending',
             // No reference_number and notes
         ];
 
@@ -92,7 +89,6 @@ class UpdatePaymentRequestTest extends TestCase
             'payment_date' => now()->format('Y-m-d'),
             'amount' => 0, // Invalid amount (minimum is 0.01)
             'payment_method' => 'cash',
-            'status' => 'completed',
         ];
 
         $request = new UpdatePaymentRequest;
@@ -111,7 +107,6 @@ class UpdatePaymentRequestTest extends TestCase
             'payment_date' => now()->format('Y-m-d'),
             'amount' => 1000,
             'payment_method' => 'invalid_method',
-            'status' => 'completed',
         ];
 
         $request = new UpdatePaymentRequest;
@@ -121,25 +116,6 @@ class UpdatePaymentRequestTest extends TestCase
         $this->assertArrayHasKey('payment_method', $validator->errors()->toArray());
     }
 
-    public function test_validation_fails_with_invalid_status(): void
-    {
-        $invoice = Invoice::factory()->create();
-
-        $data = [
-            'invoice_id' => $invoice->id,
-            'payment_date' => now()->format('Y-m-d'),
-            'amount' => 1000,
-            'payment_method' => 'cash',
-            'status' => 'invalid_status',
-        ];
-
-        $request = new UpdatePaymentRequest;
-        $validator = Validator::make($data, $request->rules());
-
-        $this->assertFalse($validator->passes());
-        $this->assertArrayHasKey('status', $validator->errors()->toArray());
-    }
-
     public function test_validation_fails_with_non_existent_invoice(): void
     {
         $data = [
@@ -147,7 +123,6 @@ class UpdatePaymentRequestTest extends TestCase
             'payment_date' => now()->format('Y-m-d'),
             'amount' => 1000,
             'payment_method' => 'cash',
-            'status' => 'completed',
         ];
 
         $request = new UpdatePaymentRequest;
