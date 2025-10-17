@@ -23,7 +23,7 @@ export interface Guardian {
 
 export interface Enrollment {
     id: number;
-    reference_number: string;
+    enrollment_id: string;
     student: Student;
     guardian: Guardian;
     grade_level: string;
@@ -52,10 +52,10 @@ const getStatusBadge = (status: string) => {
     );
 };
 
-const handleDelete = (id: number, referenceNumber: string) => {
+const handleDelete = (id: number, enrollmentId: string) => {
     if (
         confirm(
-            `Are you sure you want to delete enrollment ${referenceNumber}? This action cannot be undone and only pending enrollments can be deleted.`,
+            `Are you sure you want to delete enrollment ${enrollmentId}? This action cannot be undone and only pending enrollments can be deleted.`,
         )
     ) {
         router.delete(`/super-admin/enrollments/${id}`);
@@ -64,16 +64,16 @@ const handleDelete = (id: number, referenceNumber: string) => {
 
 export const columns: ColumnDef<Enrollment>[] = [
     {
-        accessorKey: 'reference_number',
+        accessorKey: 'enrollment_id',
         header: ({ column }) => {
             return (
                 <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                    Reference #
+                    Enrollment ID
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             );
         },
-        cell: ({ row }) => <div className="font-medium">{row.getValue('reference_number')}</div>,
+        cell: ({ row }) => <div className="font-medium">{row.getValue('enrollment_id')}</div>,
     },
     {
         id: 'student',
@@ -176,7 +176,7 @@ export const columns: ColumnDef<Enrollment>[] = [
                         </Button>
                     </Link>
                     {enrollment.status === 'pending' && (
-                        <Button size="sm" variant="destructive" onClick={() => handleDelete(enrollment.id, enrollment.reference_number)}>
+                        <Button size="sm" variant="destructive" onClick={() => handleDelete(enrollment.id, enrollment.enrollment_id)}>
                             <Trash className="h-4 w-4" />
                         </Button>
                     )}
