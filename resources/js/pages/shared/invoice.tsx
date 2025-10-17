@@ -156,20 +156,22 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
         );
     }
 
+    const parseCurrency = (amount: number) => amount || 0;
+
     const invoiceItems = [
-        { description: 'Tuition Fee', amount: enrollment.tuition_fee },
-        { description: 'Miscellaneous Fee', amount: enrollment.miscellaneous_fee },
+        { description: 'Tuition Fee', amount: parseCurrency(enrollment.tuition_fee) },
+        { description: 'Miscellaneous Fee', amount: parseCurrency(enrollment.miscellaneous_fee) },
     ];
 
     // Add optional fees if they exist
-    if (enrollment.laboratory_fee > 0) {
-        invoiceItems.push({ description: 'Laboratory Fee', amount: enrollment.laboratory_fee });
+    if (parseCurrency(enrollment.laboratory_fee) > 0) {
+        invoiceItems.push({ description: 'Laboratory Fee', amount: parseCurrency(enrollment.laboratory_fee) });
     }
-    if (enrollment.library_fee > 0) {
-        invoiceItems.push({ description: 'Library Fee', amount: enrollment.library_fee });
+    if (parseCurrency(enrollment.library_fee) > 0) {
+        invoiceItems.push({ description: 'Library Fee', amount: parseCurrency(enrollment.library_fee) });
     }
-    if (enrollment.sports_fee > 0) {
-        invoiceItems.push({ description: 'Sports Fee', amount: enrollment.sports_fee });
+    if (parseCurrency(enrollment.sports_fee) > 0) {
+        invoiceItems.push({ description: 'Sports Fee', amount: parseCurrency(enrollment.sports_fee) });
     }
 
     const getStudentFullName = () => {
@@ -301,18 +303,20 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                                     </TableRow>
                                     <TableRow>
                                         <TableCell className="text-right font-semibold">Subtotal:</TableCell>
-                                        <TableCell className="text-right font-semibold">{formatCurrency(enrollment.total_amount)}</TableCell>
+                                        <TableCell className="text-right font-semibold">
+                                            {formatCurrency(parseCurrency(enrollment.total_amount))}
+                                        </TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell className="text-right font-semibold">Less: Discounts & Rebates:</TableCell>
                                         <TableCell className="text-right font-semibold">
-                                            {enrollment.discount > 0 ? `-${formatCurrency(enrollment.discount)}` : formatCurrency(0)}
+                                            {enrollment.discount > 0 ? `-${formatCurrency(parseCurrency(enrollment.discount))}` : formatCurrency(0)}
                                         </TableCell>
                                     </TableRow>
                                     <TableRow className="border-t-2">
                                         <TableCell className="text-right text-xl font-bold">NET AMOUNT:</TableCell>
                                         <TableCell className="text-right text-xl font-bold text-primary">
-                                            {formatCurrency(enrollment.net_amount)}
+                                            {formatCurrency(parseCurrency(enrollment.net_amount))}
                                         </TableCell>
                                     </TableRow>
                                     {enrollment.amount_paid > 0 && (
@@ -320,13 +324,13 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                                             <TableRow>
                                                 <TableCell className="text-right font-semibold text-green-600">Amount Paid:</TableCell>
                                                 <TableCell className="text-right font-semibold text-green-600">
-                                                    {formatCurrency(enrollment.amount_paid)}
+                                                    {formatCurrency(parseCurrency(enrollment.amount_paid))}
                                                 </TableCell>
                                             </TableRow>
                                             <TableRow className="border-t">
                                                 <TableCell className="text-right text-xl font-bold">BALANCE DUE:</TableCell>
                                                 <TableCell className="text-right text-xl font-bold text-red-600">
-                                                    {formatCurrency(enrollment.balance)}
+                                                    {formatCurrency(parseCurrency(enrollment.balance))}
                                                 </TableCell>
                                             </TableRow>
                                         </>
@@ -348,7 +352,7 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                             <Card className="mb-8 border-yellow-200 bg-yellow-50">
                                 <CardContent className="p-4">
                                     <p className="text-center font-semibold text-yellow-800">
-                                        Partial payment received. Balance of {formatCurrency(enrollment.balance)} is still due.
+                                        Partial payment received. Balance of {formatCurrency(parseCurrency(enrollment.balance))} is still due.
                                     </p>
                                 </CardContent>
                             </Card>
@@ -358,7 +362,8 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                             <Card className="mb-8 border-red-200 bg-red-50">
                                 <CardContent className="p-4">
                                     <p className="font.semibold text-center text-red-800">
-                                        Payment pending. Please pay {formatCurrency(enrollment.balance)} by {formatDate(enrollment.payment_due_date)}.
+                                        Payment pending. Please pay {formatCurrency(parseCurrency(enrollment.balance))} by{' '}
+                                        {formatDate(enrollment.payment_due_date)}.
                                     </p>
                                 </CardContent>
                             </Card>
