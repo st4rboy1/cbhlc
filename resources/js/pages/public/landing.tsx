@@ -3,6 +3,7 @@ import { PublicNav } from '@/components/public-nav';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { register } from '@/routes';
 import { Head, Link } from '@inertiajs/react';
 import { BookOpen, CheckCircle, Facebook, GraduationCap, Heart, Mail, MapPin, Phone, Users } from 'lucide-react';
 
@@ -63,8 +64,8 @@ export default function Landing() {
                                 tomorrow.
                             </p>
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                                <Button size="lg" className="px-8 py-3">
-                                    Start Enrollment
+                                <Button size="lg" className="px-8 py-3" asChild>
+                                    <Link href={register()}>Start Enrollment</Link>
                                 </Button>
                                 <Button variant="outline" size="lg" className="px-8 py-3" asChild>
                                     <Link href="/about">Learn More</Link>
@@ -153,7 +154,7 @@ export default function Landing() {
                                 today.
                             </p>
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                                <Button size="lg" variant="secondary" className="bg-white px-8 py-3 text-blue-600 hover:bg-gray-100">
+                                <Button size="lg" variant="secondary" className="bg-white px-8 py-3 text-blue-600 hover:bg-gray-100" asChild>
                                     <Link href="/contact">Contact Us</Link>
                                 </Button>
                             </div>

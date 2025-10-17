@@ -20,5 +20,11 @@ class DatabaseSeeder extends Seeder
 
         // Seed settings
         $this->call(SettingsSeeder::class);
+
+        // Seed enrollments (includes students and guardians if needed)
+        $this->call(EnrollmentSeeder::class);
+
+        // Seed invoices for enrollments
+        $this->call(InvoiceSeeder::class);
     }
 }
