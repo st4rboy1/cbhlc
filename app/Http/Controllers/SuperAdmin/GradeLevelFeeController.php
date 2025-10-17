@@ -121,4 +121,33 @@ class GradeLevelFeeController extends Controller
         return redirect()->route('super-admin.grade-level-fees.index')
             ->with('success', 'Grade level fee deleted successfully.');
     }
+
+    /**
+     * Duplicate a grade level fee for a different school year.
+     */
+    public function duplicate(Request $request, GradeLevelFee $gradeLevelFee)
+    {
+        Gate::authorize('create', GradeLevelFee::class);
+
+        $validated = $request->validate([
+            'school_year' => ['required', 'regex:/^\d{4}-\d{4}$/'],
+        ]);
+
+        // Check if fee already exists for the target school year and grade level
+        $exists = GradeLevelFee::where('school_year', $validated['school_year'])
+            ->where('grade_level', $gradeLevelFee->grade_level)
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'Fee already exists for this grade level in the specified school year.');
+        }
+
+        // Create a copy with new school year
+        $newFee = $gradeLevelFee->replicate();
+        $newFee->school_year = $validated['school_year'];
+        $newFee->save();
+
+        return redirect()->route('super-admin.grade-level-fees.index')
+            ->with('success', 'Grade level fee duplicated successfully for school year '.$validated['school_year']);
+    }
 }

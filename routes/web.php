@@ -146,6 +146,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Grade Level Fees Management
         Route::resource('grade-level-fees', SuperAdminGradeLevelFeeController::class);
+        Route::post('/grade-level-fees/{gradeLevelFee}/duplicate', [SuperAdminGradeLevelFeeController::class, 'duplicate'])->name('grade-level-fees.duplicate');
 
         // Enrollment Periods Management
         Route::resource('enrollment-periods', SuperAdminEnrollmentPeriodController::class);
