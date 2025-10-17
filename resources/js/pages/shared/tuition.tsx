@@ -73,6 +73,8 @@ export default function Tuition({ enrollments, gradeLevelFees, settings }: Props
         },
     ];
 
+    const parseCurrency = (amount: number) => amount || 0;
+
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-PH', {
             style: 'currency',
@@ -149,14 +151,16 @@ export default function Tuition({ enrollments, gradeLevelFees, settings }: Props
                                         <div className="space-y-2">
                                             {enrollment.payment_status === 'pending' && (
                                                 <>
-                                                    <p className="text-red-700">Amount Due: {formatCurrency(enrollment.balance)}</p>
+                                                    <p className="text-red-700">Amount Due: {formatCurrency(parseCurrency(enrollment.balance))}</p>
                                                     <p className="text-red-700">Visit cashier on-site to finish the payment process.</p>
                                                 </>
                                             )}
                                             {enrollment.payment_status === 'partial' && (
                                                 <>
-                                                    <p className="text-yellow-700">Amount Paid: {formatCurrency(enrollment.amount_paid)}</p>
-                                                    <p className="text-yellow-700">Balance: {formatCurrency(enrollment.balance)}</p>
+                                                    <p className="text-yellow-700">
+                                                        Amount Paid: {formatCurrency(parseCurrency(enrollment.amount_paid))}
+                                                    </p>
+                                                    <p className="text-yellow-700">Balance: {formatCurrency(parseCurrency(enrollment.balance))}</p>
                                                     <p className="text-yellow-700">Visit cashier on-site to pay remaining balance.</p>
                                                 </>
                                             )}
@@ -236,39 +240,47 @@ export default function Tuition({ enrollments, gradeLevelFees, settings }: Props
                                             <div className="space-y-3">
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-sm font-medium text-muted-foreground">Tuition Fee</span>
-                                                    <span className="text-right font-semibold">{formatCurrency(enrollment.tuition_fee)}</span>
+                                                    <span className="text-right font-semibold">
+                                                        {formatCurrency(parseCurrency(enrollment.tuition_fee))}
+                                                    </span>
                                                 </div>
                                                 <Separator />
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-sm font-medium text-muted-foreground">Miscellaneous Fee</span>
-                                                    <span className="text-right font-semibold">{formatCurrency(enrollment.miscellaneous_fee)}</span>
+                                                    <span className="text-right font-semibold">
+                                                        {formatCurrency(parseCurrency(enrollment.miscellaneous_fee))}
+                                                    </span>
                                                 </div>
-                                                {enrollment.laboratory_fee > 0 && (
+                                                {parseCurrency(enrollment.laboratory_fee) > 0 && (
                                                     <>
                                                         <Separator />
                                                         <div className="flex items-center justify-between">
                                                             <span className="text-sm font-medium text-muted-foreground">Laboratory Fee</span>
                                                             <span className="text-right font-semibold">
-                                                                {formatCurrency(enrollment.laboratory_fee)}
+                                                                {formatCurrency(parseCurrency(enrollment.laboratory_fee))}
                                                             </span>
                                                         </div>
                                                     </>
                                                 )}
-                                                {enrollment.library_fee > 0 && (
+                                                {parseCurrency(enrollment.library_fee) > 0 && (
                                                     <>
                                                         <Separator />
                                                         <div className="flex items-center justify-between">
                                                             <span className="text-sm font-medium text-muted-foreground">Library Fee</span>
-                                                            <span className="text-right font-semibold">{formatCurrency(enrollment.library_fee)}</span>
+                                                            <span className="text-right font-semibold">
+                                                                {formatCurrency(parseCurrency(enrollment.library_fee))}
+                                                            </span>
                                                         </div>
                                                     </>
                                                 )}
-                                                {enrollment.sports_fee > 0 && (
+                                                {parseCurrency(enrollment.sports_fee) > 0 && (
                                                     <>
                                                         <Separator />
                                                         <div className="flex items-center justify-between">
                                                             <span className="text-sm font-medium text-muted-foreground">Sports Fee</span>
-                                                            <span className="text-right font-semibold">{formatCurrency(enrollment.sports_fee)}</span>
+                                                            <span className="text-right font-semibold">
+                                                                {formatCurrency(parseCurrency(enrollment.sports_fee))}
+                                                            </span>
                                                         </div>
                                                     </>
                                                 )}
@@ -279,30 +291,34 @@ export default function Tuition({ enrollments, gradeLevelFees, settings }: Props
                                             <div className="space-y-2">
                                                 <div className="flex items-center justify-between">
                                                     <span className="font-semibold">Subtotal:</span>
-                                                    <span className="font-semibold">{formatCurrency(enrollment.total_amount)}</span>
+                                                    <span className="font-semibold">{formatCurrency(parseCurrency(enrollment.total_amount))}</span>
                                                 </div>
-                                                {enrollment.discount > 0 && (
+                                                {parseCurrency(enrollment.discount) > 0 && (
                                                     <div className="flex items-center justify-between text-green-600">
                                                         <span className="font-semibold">Discount:</span>
-                                                        <span className="font-semibold">-{formatCurrency(enrollment.discount)}</span>
+                                                        <span className="font-semibold">-{formatCurrency(parseCurrency(enrollment.discount))}</span>
                                                     </div>
                                                 )}
                                             </div>
 
                                             <div className="flex items-center justify-between rounded-lg bg-primary/5 p-3">
                                                 <span className="text-lg font-bold">Net Amount:</span>
-                                                <span className="text-lg font-bold text-primary">{formatCurrency(enrollment.net_amount)}</span>
+                                                <span className="text-lg font-bold text-primary">
+                                                    {formatCurrency(parseCurrency(enrollment.net_amount))}
+                                                </span>
                                             </div>
 
-                                            {enrollment.amount_paid > 0 && (
+                                            {parseCurrency(enrollment.amount_paid) > 0 && (
                                                 <div className="space-y-2 border-t pt-3">
                                                     <div className="flex items-center justify-between text-green-600">
                                                         <span className="font-semibold">Amount Paid:</span>
-                                                        <span className="font-semibold">{formatCurrency(enrollment.amount_paid)}</span>
+                                                        <span className="font-semibold">{formatCurrency(parseCurrency(enrollment.amount_paid))}</span>
                                                     </div>
                                                     <div className="flex items-center justify-between">
                                                         <span className="font-bold">Balance:</span>
-                                                        <span className="font-bold text-red-600">{formatCurrency(enrollment.balance)}</span>
+                                                        <span className="font-bold text-red-600">
+                                                            {formatCurrency(parseCurrency(enrollment.balance))}
+                                                        </span>
                                                     </div>
                                                 </div>
                                             )}
@@ -335,11 +351,13 @@ export default function Tuition({ enrollments, gradeLevelFees, settings }: Props
                                 {Object.entries(gradeLevelFees).map(([level, fees]) => (
                                     <div key={level} className="rounded-lg border p-3">
                                         <p className="font-semibold">{level}</p>
-                                        <p className="text-sm text-muted-foreground">Tuition: {formatCurrency(fees.tuition)}</p>
-                                        <p className="text-sm text-muted-foreground">Miscellaneous: {formatCurrency(fees.miscellaneous)}</p>
+                                        <p className="text-sm text-muted-foreground">Tuition: {formatCurrency(parseCurrency(fees.tuition))}</p>
+                                        <p className="text-sm text-muted-foreground">
+                                            Miscellaneous: {formatCurrency(parseCurrency(fees.miscellaneous))}
+                                        </p>
                                     </div>
                                 ))}
-                            </div>
+                            </div>{' '}
                         </CardContent>
                     </Card>
                 )}
