@@ -24,6 +24,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: mbstring, dom, fileinfo, mysql, iconv
+          tools: composer:v2
+          coverage: none
+
+      # Cache Composer dependencies
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv --no-scripts
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -36,14 +56,15 @@ jobs:
       - name: Build Assets
         run: npm run build
 
-      # Upload built assets as artifact for other jobs
+      # Upload built assets and vendor as artifacts for other jobs
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: build-assets
+          name: build-artifacts
           path: |
             public/build
             resources/js/routes
+            vendor
           retention-days: 1
 
   # Run quality checks and tests in parallel after build
@@ -56,11 +77,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Download pre-built assets from build job
+      # Download pre-built assets and vendor from build job
       - name: Download Build Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-assets
+          name: build-artifacts
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -73,18 +94,6 @@ jobs:
       # Fast-fail: PHP Syntax Check
       - name: PHP Syntax Check
         run: find . -name "*.php" -not -path "./vendor/*" -not -path "./storage/*" | xargs -n1 php -l
-
-      # Cache Composer dependencies
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv --no-scripts
 
       # Cache PHPStan result cache for faster analysis
       - name: Cache PHPStan Results
@@ -120,11 +129,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Download pre-built assets from build job
+      # Download pre-built assets and vendor from build job
       - name: Download Build Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-assets
+          name: build-artifacts
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -133,18 +142,6 @@ jobs:
           extensions: mbstring, dom, fileinfo, mysql, iconv, sqlite3, pcov
           tools: composer:v2
           coverage: pcov # Use PCOV for fast coverage (faster than xdebug)
-
-      # Cache dependencies
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install PHP Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv --no-scripts
 
       - name: Copy Environment File
         run: cp .env.example .env
