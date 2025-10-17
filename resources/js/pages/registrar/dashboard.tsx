@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { AlertCircle, Calendar, CheckCircle, Clock, DollarSign, FileText, GraduationCap, Users, XCircle } from 'lucide-react';
+import { AlertCircle, Calendar, CheckCircle, Clock, DollarSign, FileText, Settings, Users, XCircle } from 'lucide-react';
 
 interface EnrollmentStats {
     pending: number;
@@ -405,11 +405,11 @@ export default function RegistrarDashboard({
                         </CardHeader>
                         <CardContent>
                             <div className="grid gap-2 md:grid-cols-4">
-                                <Button variant="outline" className="w-full" onClick={() => router.visit('/enrollments')}>
+                                <Button variant="outline" className="w-full" onClick={() => router.visit('/registrar/enrollments')}>
                                     <FileText className="mr-2 h-4 w-4" />
                                     View All Enrollments
                                 </Button>
-                                <Button variant="outline" className="w-full" onClick={() => router.visit('/students')}>
+                                <Button variant="outline" className="w-full" onClick={() => router.visit('/registrar/students')}>
                                     <Users className="mr-2 h-4 w-4" />
                                     Manage Students
                                 </Button>
@@ -417,9 +417,9 @@ export default function RegistrarDashboard({
                                     <AlertCircle className="mr-2 h-4 w-4" />
                                     Generate Reports
                                 </Button>
-                                <Button variant="outline" className="w-full" onClick={() => router.visit('/settings')}>
-                                    <GraduationCap className="mr-2 h-4 w-4" />
-                                    Academic Settings
+                                <Button variant="outline" className="w-full" onClick={() => router.visit('/settings/profile')}>
+                                    <Settings className="mr-2 h-4 w-4" />
+                                    Profile Settings
                                 </Button>
                             </div>
                         </CardContent>
