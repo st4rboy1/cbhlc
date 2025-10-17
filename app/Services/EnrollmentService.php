@@ -130,9 +130,11 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 'payment_status' => PaymentStatus::PENDING,
                 'tuition_fee_cents' => $fees['tuition'] * 100,
                 'miscellaneous_fee_cents' => $fees['miscellaneous'] * 100,
-                'laboratory_fee_cents' => 0, // Not included in calculateFees but needed for database
+                'laboratory_fee_cents' => $fees['laboratory'] * 100,
+                'library_fee_cents' => $fees['library'] * 100,
+                'sports_fee_cents' => $fees['sports'] * 100,
                 'total_amount_cents' => $fees['total'] * 100,
-                'net_amount_cents' => $fees['total'] * 100,
+                'net_amount_cents' => $fees['total'] * 100, // Assuming no discount at creation
                 'amount_paid_cents' => 0,
                 'balance_cents' => $fees['total'] * 100,
             ]);
@@ -303,24 +305,33 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 'tuition' => 0.0,
                 'registration' => 0.0,
                 'miscellaneous' => 0.0,
+                'laboratory' => 0.0,
+                'library' => 0.0,
+                'sports' => 0.0,
                 'total' => 0.0,
             ];
         }
 
-        $tuition = $gradeLevelFee->tuition_fee_cents / 100; // Convert from cents
+        $tuition = $gradeLevelFee->tuition_fee_cents / 100;
         $registration = $gradeLevelFee->registration_fee_cents / 100;
         $miscellaneous = $gradeLevelFee->miscellaneous_fee_cents / 100;
+        $laboratory = $gradeLevelFee->laboratory_fee_cents / 100;
+        $library = $gradeLevelFee->library_fee_cents / 100;
+        $sports = $gradeLevelFee->sports_fee_cents / 100;
 
         // Apply any discounts from options
         $discount = $options['discount'] ?? 0;
         $discountAmount = ($tuition + $registration + $miscellaneous) * ($discount / 100);
 
-        $total = $tuition + $registration + $miscellaneous - $discountAmount;
+        $total = $tuition + $registration + $miscellaneous + $laboratory + $library + $sports - $discountAmount;
 
         return [
             'tuition' => $tuition,
             'registration' => $registration,
             'miscellaneous' => $miscellaneous,
+            'laboratory' => $laboratory,
+            'library' => $library,
+            'sports' => $sports,
             'total' => $total,
         ];
     }
