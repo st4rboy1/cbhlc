@@ -38,7 +38,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Invoices',
-        href: '/invoices',
+        href: '/super-admin/invoices',
         icon: FileCheck,
     },
     {
