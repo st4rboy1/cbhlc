@@ -147,7 +147,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                                         {fromDate ? format(fromDate, 'PPP') : <span>Pick a date</span>}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
+                                <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar mode="single" selected={fromDate} onSelect={setFromDate} initialFocus />
                                 </PopoverContent>
                             </Popover>
@@ -164,7 +164,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                                         {toDate ? format(toDate, 'PPP') : <span>Pick a date</span>}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
+                                <PopoverContent className="w-auto p-0" align="start">
                                     <Calendar mode="single" selected={toDate} onSelect={setToDate} initialFocus />
                                 </PopoverContent>
                             </Popover>
