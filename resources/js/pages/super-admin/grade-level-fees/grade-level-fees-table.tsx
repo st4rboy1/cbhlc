@@ -12,7 +12,7 @@ import {
     useReactTable,
     VisibilityState,
 } from '@tanstack/react-table';
-import { ArrowUpDown, ChevronDown, Copy, Edit, MoreHorizontal, Trash } from 'lucide-react';
+import { ArrowUpDown, ChevronDown, Copy, Edit, Eye, MoreHorizontal, Trash } from 'lucide-react';
 import * as React from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -152,6 +152,10 @@ export const columns: ColumnDef<GradeLevelFee>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => router.visit(`/super-admin/grade-level-fees/${fee.id}`)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => router.visit(`/super-admin/grade-level-fees/${fee.id}/edit`)}>
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
