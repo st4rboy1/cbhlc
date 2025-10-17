@@ -65,25 +65,43 @@ jobs:
             public/build
             resources/js/routes
             vendor
+            node_modules
           retention-days: 1
 
-  # Run quality checks and tests in parallel after build
-  quality-checks:
+  # Fast-fail: PHP Syntax Check (fastest check, fails immediately on syntax errors)
+  php-syntax:
     needs: build
-    name: Code Quality Checks
+    name: PHP Syntax Check
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Download pre-built assets and vendor from build job
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: mbstring, dom, fileinfo, mysql, iconv
+          tools: composer:v2
+          coverage: none
+
+      - name: PHP Syntax Check
+        run: find . -name "*.php" -not -path "./vendor/*" -not -path "./storage/*" | xargs -n1 php -l
+
+  # PHP Code Style Check
+  php-style:
+    needs: build
+    name: PHP Code Style (Pint)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Download Build Artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
 
-      # Restore executable permissions for vendor binaries
       - name: Restore Executable Permissions
         run: chmod +x vendor/bin/*
 
@@ -95,18 +113,33 @@ jobs:
           tools: composer:v2
           coverage: none
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Code Style Check (Laravel Pint)
+        run: ./vendor/bin/pint --test
+
+  # PHP Static Analysis
+  php-analysis:
+    needs: build
+    name: PHP Static Analysis (PHPStan)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
         with:
-          node-version: '22'
-          cache: 'npm'
+          name: build-artifacts
 
-      - name: Install Node Dependencies
-        run: npm ci
+      - name: Restore Executable Permissions
+        run: chmod +x vendor/bin/*
 
-      # Fast-fail: PHP Syntax Check
-      - name: PHP Syntax Check
-        run: find . -name "*.php" -not -path "./vendor/*" -not -path "./storage/*" | xargs -n1 php -l
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: mbstring, dom, fileinfo, mysql, iconv
+          tools: composer:v2
+          coverage: none
 
       # Cache PHPStan result cache for faster analysis
       - name: Cache PHPStan Results
@@ -117,9 +150,28 @@ jobs:
           restore-keys: |
             phpstan-
 
-      # Code Quality Checks
-      - name: Code Style Check (Laravel Pint)
-        run: ./vendor/bin/pint --test
+      - name: Static Analysis (Larastan)
+        run: ./vendor/bin/phpstan analyse --memory-limit=2G
+
+  # Frontend Quality Checks
+  frontend-checks:
+    needs: build
+    name: Frontend Quality (Prettier + ESLint)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
 
       - name: Frontend Format Check (Prettier)
         run: npm run format:check
@@ -127,28 +179,45 @@ jobs:
       - name: Frontend Lint Check (ESLint)
         run: npm run lint:check
 
-      - name: Static Analysis (Larastan)
-        run: ./vendor/bin/phpstan analyse --memory-limit=2G
-
-      - name: Security Vulnerability Check
-        run: composer audit
-
-  tests:
-    name: Tests
+  # Security Vulnerability Check
+  security:
     needs: build
+    name: Security Audit
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Download pre-built assets and vendor from build job
       - name: Download Build Artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts
 
-      # Restore executable permissions for vendor binaries
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: mbstring, dom, fileinfo, mysql, iconv
+          tools: composer:v2
+          coverage: none
+
+      - name: Security Vulnerability Check
+        run: composer audit
+
+  # Tests with Coverage
+  tests:
+    needs: build
+    name: Tests (Pest + Coverage)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
       - name: Restore Executable Permissions
         run: chmod +x vendor/bin/*
 
