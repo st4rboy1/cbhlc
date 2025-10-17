@@ -1,3 +1,5 @@
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -29,43 +31,64 @@ export default function StudentShow({ student }: Props) {
             <Head title={`${student.first_name} ${student.last_name}`} />
             <div className="px-4 py-6">
                 <h1 className="mb-4 text-2xl font-bold">Student Details</h1>
-                <div className="space-y-4">
-                    <div>
-                        <h2 className="text-lg font-semibold">Personal Information</h2>
-                        <p>
-                            <strong>Student ID:</strong> {student.student_id}
-                        </p>
-                        <p>
-                            <strong>Name:</strong> {student.first_name} {student.middle_name} {student.last_name}
-                        </p>
-                        <p>
-                            <strong>Grade:</strong> {student.grade}
-                        </p>
-                        <p>
-                            <strong>Status:</strong> {student.status}
-                        </p>
-                        <p>
-                            <strong>Birth Date:</strong> {student.birth_date}
-                        </p>
-                        <p>
-                            <strong>Address:</strong> {student.address}
-                        </p>
-                    </div>
+
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Personal Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Student ID</p>
+                                <p className="text-lg font-semibold">{student.student_id}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Name</p>
+                                <p className="text-lg font-semibold">{`${student.first_name} ${student.middle_name ? student.middle_name + ' ' : ''}${student.last_name}`}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Birth Date</p>
+                                <p className="text-lg font-semibold">{student.birth_date}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Grade</p>
+                                <p className="text-lg font-semibold">{student.grade}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Status</p>
+                                <Badge variant="default">{student.status}</Badge>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Contact Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div>
+                                <p className="text-sm font-medium text-muted-foreground">Address</p>
+                                <p className="text-lg font-semibold">{student.address}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
 
                     {student.guardians.length > 0 && (
-                        <div>
-                            <h2 className="text-lg font-semibold">Guardians</h2>
-                            {student.guardians.map((guardian) => (
-                                <div key={guardian.id} className="ml-4">
-                                    <p>
-                                        <strong>Name:</strong> {guardian.user.name}
-                                    </p>
-                                    <p>
-                                        <strong>Email:</strong> {guardian.user.email}
-                                    </p>
-                                </div>
-                            ))}
-                        </div>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Guardians</CardTitle>
+                            </CardHeader>
+                            <CardContent className="grid gap-4">
+                                {student.guardians.map((guardian) => (
+                                    <div key={guardian.id} className="space-y-1">
+                                        <p className="text-sm font-medium text-muted-foreground">Name</p>
+                                        <p className="text-lg font-semibold">{guardian.user.name}</p>
+                                        <p className="text-sm font-medium text-muted-foreground">Email</p>
+                                        <p className="text-lg font-semibold">{guardian.user.email}</p>
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
                     )}
                 </div>
             </div>
