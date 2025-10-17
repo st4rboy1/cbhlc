@@ -81,8 +81,14 @@ class EnrollmentController extends Controller
         return Inertia::render('super-admin/enrollments/create', [
             'students' => $students,
             'guardians' => $guardians,
-            'gradelevels' => \App\Enums\GradeLevel::cases(),
-            'quarters' => \App\Enums\Quarter::cases(),
+            'gradelevels' => array_map(fn ($grade) => [
+                'label' => $grade->label(),
+                'value' => $grade->value,
+            ], \App\Enums\GradeLevel::cases()),
+            'quarters' => array_map(fn ($quarter) => [
+                'label' => $quarter->label(),
+                'value' => $quarter->value,
+            ], \App\Enums\Quarter::cases()),
         ]);
     }
 
@@ -144,9 +150,18 @@ class EnrollmentController extends Controller
             'enrollment' => $enrollment,
             'students' => $students,
             'guardians' => $guardians,
-            'gradelevels' => \App\Enums\GradeLevel::cases(),
-            'quarters' => \App\Enums\Quarter::cases(),
-            'statuses' => EnrollmentStatus::cases(),
+            'gradelevels' => array_map(fn ($grade) => [
+                'label' => $grade->label(),
+                'value' => $grade->value,
+            ], \App\Enums\GradeLevel::cases()),
+            'quarters' => array_map(fn ($quarter) => [
+                'label' => $quarter->label(),
+                'value' => $quarter->value,
+            ], \App\Enums\Quarter::cases()),
+            'statuses' => array_map(fn ($status) => [
+                'label' => $status->label(),
+                'value' => $status->value,
+            ], EnrollmentStatus::cases()),
         ]);
     }
 
