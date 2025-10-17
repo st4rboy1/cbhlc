@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { AlertCircle, Calendar, CheckCircle, Clock, DollarSign, FileText, Users, XCircle } from 'lucide-react';
+import { AlertCircle, Calendar, CheckCircle, Clock, DollarSign, FileText, Settings, Users, XCircle } from 'lucide-react';
 
 interface EnrollmentStats {
     pending: number;
