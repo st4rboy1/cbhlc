@@ -109,20 +109,22 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                 </div>
 
                 {/* Filters */}
-                <Card className="mb-6 p-4">
+                <Card className="mb-6 p-6">
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                        <div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Search</label>
                             <Input
-                                placeholder="Search by invoice # or student..."
+                                placeholder="Invoice # or student..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                             />
                         </div>
-                        <div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">Status</label>
                             <Select value={status} onValueChange={setStatus}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Filter by status" />
+                                    <SelectValue placeholder="All Statuses" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Statuses</SelectItem>
@@ -135,8 +137,8 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                                 </SelectContent>
                             </Select>
                         </div>
-                        <div>
-                            <label className="mb-1 block text-sm font-medium">From Date</label>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">From Date</label>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -158,8 +160,8 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                                 </PopoverContent>
                             </Popover>
                         </div>
-                        <div>
-                            <label className="mb-1 block text-sm font-medium">To Date</label>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium">To Date</label>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -182,7 +184,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                             </Popover>
                         </div>
                     </div>
-                    <div className="mt-4 flex gap-2">
+                    <div className="mt-6 flex gap-2">
                         <Button onClick={handleSearch} variant="secondary">
                             <Search className="mr-2 h-4 w-4" />
                             Search

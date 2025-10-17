@@ -139,4 +139,17 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    /* Override react-day-picker default blue colors with theme colors */
+    .rdp-day_button:focus-visible {
+        @apply ring-ring ring-offset-background;
+    }
+
+    .rdp-day_button[data-selected='true'] {
+        @apply bg-primary text-primary-foreground;
+    }
+
+    .rdp-day_button[data-today='true']:not([data-selected='true']) {
+        @apply bg-accent text-accent-foreground;
+    }
 }
