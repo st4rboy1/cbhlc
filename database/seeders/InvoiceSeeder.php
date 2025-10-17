@@ -26,14 +26,14 @@ class InvoiceSeeder extends Seeder
 
         $this->command->info('Seeding invoices...');
 
-        // Get approved enrollments without invoices
+        // Get enrollments without invoices (approved, enrolled, or completed status)
         $enrollments = Enrollment::with(['student', 'guardian'])
             ->whereNull('invoice_id')
-            ->where('status', 'approved')
+            ->whereIn('status', ['approved', 'enrolled', 'completed'])
             ->get();
 
         if ($enrollments->isEmpty()) {
-            $this->command->warn('No approved enrollments found without invoices. Please run EnrollmentSeeder first.');
+            $this->command->warn('No enrollments found without invoices (approved/enrolled/completed status). Please run EnrollmentSeeder first.');
 
             return;
         }
