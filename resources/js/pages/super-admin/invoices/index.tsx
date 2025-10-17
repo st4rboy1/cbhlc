@@ -132,10 +132,12 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                             </Select>
                         </div>
                         <div>
-                            <Input type="date" placeholder="From date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+                            <label className="mb-1 block text-sm font-medium">From Date</label>
+                            <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
                         </div>
                         <div>
-                            <Input type="date" placeholder="To date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+                            <label className="mb-1 block text-sm font-medium">To Date</label>
+                            <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
                         </div>
                     </div>
                     <div className="mt-4 flex gap-2">

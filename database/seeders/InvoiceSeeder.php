@@ -42,7 +42,16 @@ class InvoiceSeeder extends Seeder
         $invoiceCount = 0;
         $itemCount = 0;
 
-        foreach ($enrollments as $enrollment) {
+        // Define invoice statuses to distribute evenly
+        $statuses = [
+            InvoiceStatus::DRAFT,
+            InvoiceStatus::SENT,
+            InvoiceStatus::PARTIALLY_PAID,
+            InvoiceStatus::PAID,
+            InvoiceStatus::OVERDUE,
+        ];
+
+        foreach ($enrollments as $index => $enrollment) {
             // Create invoice data
             $invoiceData = [
                 'enrollment_id' => $enrollment->id,
@@ -112,23 +121,36 @@ class InvoiceSeeder extends Seeder
             // Update enrollment with invoice_id
             $enrollment->update(['invoice_id' => $invoice->id]);
 
-            // Randomly set invoice status based on enrollment payment status
-            $status = match ($enrollment->payment_status->value) {
-                'paid' => InvoiceStatus::PAID,
-                'partial' => InvoiceStatus::PARTIALLY_PAID,
-                default => fake()->randomElement([InvoiceStatus::SENT, InvoiceStatus::DRAFT]),
-            };
+            // Cycle through statuses to create variety
+            $status = $statuses[$index % count($statuses)];
 
-            // Update invoice status and paid amount
-            $invoice->update([
-                'status' => $status,
-                'paid_amount' => $enrollment->amount_paid,
-            ]);
+            // Set paid amount and paid_at based on status
+            $updateData = ['status' => $status];
 
-            // If invoice is paid, set paid_at
-            if ($status === InvoiceStatus::PAID) {
-                $invoice->update(['paid_at' => now()->subDays(rand(1, 20))]);
+            switch ($status) {
+                case InvoiceStatus::PAID:
+                    $updateData['paid_amount'] = $invoice->total_amount;
+                    $updateData['paid_at'] = now()->subDays(rand(1, 20));
+                    break;
+
+                case InvoiceStatus::PARTIALLY_PAID:
+                    $updateData['paid_amount'] = $invoice->total_amount * fake()->randomFloat(2, 0.3, 0.7);
+                    break;
+
+                case InvoiceStatus::OVERDUE:
+                    // Overdue invoices have past due dates
+                    $updateData['due_date'] = now()->subDays(rand(1, 30));
+                    $updateData['paid_amount'] = 0;
+                    break;
+
+                case InvoiceStatus::DRAFT:
+                case InvoiceStatus::SENT:
+                default:
+                    $updateData['paid_amount'] = 0;
+                    break;
             }
+
+            $invoice->update($updateData);
 
             $invoiceCount++;
         }
