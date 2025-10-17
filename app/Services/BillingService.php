@@ -84,6 +84,7 @@ class BillingService extends BaseService implements BillingServiceInterface
             $invoice = $this->model->create([
                 'invoice_number' => $this->generateInvoiceNumber(),
                 'enrollment_id' => $enrollment->id,
+                'invoice_date' => now(),
                 'total_amount' => $totalAmount,
                 'paid_amount' => 0,
                 'status' => InvoiceStatus::DRAFT,
