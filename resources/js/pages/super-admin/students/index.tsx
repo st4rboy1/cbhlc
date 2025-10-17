@@ -50,6 +50,8 @@ export default function StudentsIndex({ students, filters }: Props) {
         { title: 'Students', href: '/super-admin/students' },
     ];
 
+    const parseCurrency = (amount: number) => amount || 0;
+
     const formattedStudents = students.data.map((student) => ({
         id: student.id,
         studentId: student.student_id,
@@ -58,8 +60,8 @@ export default function StudentsIndex({ students, filters }: Props) {
         guardian: student.guardians.length > 0 ? `${student.guardians[0].first_name} ${student.guardians[0].last_name}` : 'N/A',
         enrollmentStatus: student.enrollments.length > 0 ? student.enrollments[0].status : 'N/A',
         paymentStatus: student.enrollments.length > 0 ? student.enrollments[0].payment_status : 'N/A',
-        balance: student.enrollments.length > 0 ? student.enrollments[0].balance : 0,
-        netAmount: student.enrollments.length > 0 ? student.enrollments[0].net_amount : 0,
+        balance: student.enrollments.length > 0 ? parseCurrency(student.enrollments[0].balance) : 0,
+        netAmount: student.enrollments.length > 0 ? parseCurrency(student.enrollments[0].net_amount) : 0,
     }));
 
     return (

@@ -44,11 +44,11 @@ export type Student = {
     netAmount: number;
 };
 
-function formatCurrency(cents: number) {
+function formatCurrency(amount: number) {
     return new Intl.NumberFormat('en-PH', {
         style: 'currency',
         currency: 'PHP',
-    }).format(cents / 100);
+    }).format(amount);
 }
 
 function getStatusVariant(status: string): 'default' | 'secondary' | 'destructive' | 'outline' {
@@ -129,6 +129,11 @@ export const columns: ColumnDef<Student>[] = [
         header: () => <div className="text-right">Balance</div>,
         cell: ({ row }) => {
             const amount = parseFloat(row.getValue('balance'));
+
+            if (!Number.isFinite(amount)) {
+                return <div className="text-right font-medium">N/A</div>;
+            }
+
             const formatted = formatCurrency(amount);
 
             return <div className="text-right font-medium">{formatted}</div>;
