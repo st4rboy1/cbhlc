@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\PaymentMethod;
 use App\Models\Invoice;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,6 +26,7 @@ class PaymentFactory extends Factory
             'payment_date' => fake()->dateTimeThisMonth(),
             'reference_number' => fake()->optional()->bothify('PAY-######'),
             'notes' => fake()->optional()->sentence(),
+            'processed_by' => User::factory(),
         ];
     }
 
