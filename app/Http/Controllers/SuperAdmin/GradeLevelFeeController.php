@@ -24,10 +24,7 @@ class GradeLevelFeeController extends Controller
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('grade_level', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
+            $query->where('grade_level', 'like', "%{$search}%");
         }
 
         // Filter by school year
@@ -45,6 +42,7 @@ class GradeLevelFeeController extends Controller
         return Inertia::render('super-admin/grade-level-fees/index', [
             'fees' => $fees,
             'filters' => $request->only(['search', 'school_year', 'active']),
+            'gradeLevels' => \App\Enums\GradeLevel::values(),
         ]);
     }
 
@@ -56,7 +54,7 @@ class GradeLevelFeeController extends Controller
         Gate::authorize('create', GradeLevelFee::class);
 
         return Inertia::render('super-admin/grade-level-fees/create', [
-            'gradelevels' => \App\Enums\GradeLevel::cases(),
+            'gradeLevels' => \App\Enums\GradeLevel::values(),
         ]);
     }
 
@@ -94,7 +92,7 @@ class GradeLevelFeeController extends Controller
 
         return Inertia::render('super-admin/grade-level-fees/edit', [
             'fee' => $gradeLevelFee,
-            'gradelevels' => \App\Enums\GradeLevel::cases(),
+            'gradeLevels' => \App\Enums\GradeLevel::values(),
         ]);
     }
 
