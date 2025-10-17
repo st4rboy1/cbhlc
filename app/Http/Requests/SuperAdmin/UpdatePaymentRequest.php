@@ -25,9 +25,8 @@ class UpdatePaymentRequest extends FormRequest
             'invoice_id' => ['required', 'exists:invoices,id'],
             'payment_date' => ['required', 'date'],
             'amount' => ['required', 'numeric', 'min:0.01'],
-            'payment_method' => ['required', 'in:cash,check,bank_transfer,online'],
+            'payment_method' => ['required', 'in:cash,bank_transfer,check,credit_card,gcash,paymaya'],
             'reference_number' => ['nullable', 'string', 'max:100'],
-            'status' => ['required', 'in:pending,completed,failed,refunded'],
             'notes' => ['nullable', 'string', 'max:500'],
         ];
     }
