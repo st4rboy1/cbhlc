@@ -122,7 +122,7 @@ class EnrollmentController extends Controller
     {
         Gate::authorize('view', $enrollment);
 
-        $enrollment->load(['student', 'guardian.user', 'documents']);
+        $enrollment->load(['student', 'guardian.user']);
 
         return Inertia::render('super-admin/enrollments/show', [
             'enrollment' => $enrollment,
