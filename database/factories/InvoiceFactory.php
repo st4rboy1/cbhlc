@@ -26,6 +26,7 @@ class InvoiceFactory extends Factory
         return [
             'invoice_number' => 'INV-'.fake()->unique()->numberBetween(100000, 999999),
             'enrollment_id' => Enrollment::factory(),
+            'invoice_date' => fake()->dateTimeBetween('-30 days', 'now'),
             'total_amount' => $totalAmount,
             'paid_amount' => $paidAmount,
             'status' => $status,
