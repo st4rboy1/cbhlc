@@ -10,15 +10,57 @@ on:
       - develop
       - feature/*
 
+# Cancel in-progress runs when a new workflow with the same group name is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  # Run quality checks and tests in parallel instead of sequentially
+  # Build job: Install dependencies and build assets once, share with other jobs
+  build:
+    name: Build Assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Assets
+        run: npm run build
+
+      # Upload built assets as artifact for other jobs
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-assets
+          path: |
+            public/build
+            resources/js/routes
+          retention-days: 1
+
+  # Run quality checks and tests in parallel after build
   quality-checks:
+    needs: build
     name: Code Quality Checks
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Download pre-built assets from build job
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-assets
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -44,24 +86,24 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv --no-scripts
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      # Cache PHPStan result cache for faster analysis
+      - name: Cache PHPStan Results
+        uses: actions/cache@v4
         with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install Node Dependencies
-        run: npm ci
+          path: .phpstan.cache
+          key: phpstan-${{ github.sha }}
+          restore-keys: |
+            phpstan-
 
       # Code Quality Checks
       - name: Code Style Check (Laravel Pint)
         run: ./vendor/bin/pint --test
 
       - name: Frontend Format Check (Prettier)
-        run: npm run format:check
+        run: npx prettier --check resources/
 
       - name: Frontend Lint Check (ESLint)
-        run: npm run lint:check
+        run: npx eslint .
 
       - name: Static Analysis (Larastan)
         run: ./vendor/bin/phpstan analyse --memory-limit=2G
@@ -71,13 +113,18 @@ jobs:
 
   tests:
     name: Tests
+    needs: build
     runs-on: ubuntu-latest
-    # Run tests in parallel with quality checks instead of waiting
-    # needs: quality-checks  # REMOVED to run in parallel
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Download pre-built assets from build job
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-assets
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -86,12 +133,6 @@ jobs:
           extensions: mbstring, dom, fileinfo, mysql, iconv, sqlite3, pcov
           tools: composer:v2
           coverage: pcov # Use PCOV for fast coverage (faster than xdebug)
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
 
       # Cache dependencies
       - name: Cache Composer dependencies
@@ -102,14 +143,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: Install Node Dependencies
-        run: npm ci
-
       - name: Install PHP Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --ignore-platform-req=ext-iconv --no-scripts
-
-      - name: Build Assets
-        run: npm run build
 
       - name: Copy Environment File
         run: cp .env.example .env
