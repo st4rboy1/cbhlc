@@ -27,6 +27,10 @@ export interface SharedData {
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
+    flash: {
+        success?: string;
+        error?: string;
+    };
     [key: string]: unknown;
 }
 
@@ -39,6 +43,7 @@ export interface User {
     dashboard_route?: string;
     roles?: Array<{ id: number; name: string }>;
     role?: string; // Added for the single role
+    student_id?: number; // Student profile ID if user is a student
     created_at: string;
     updated_at: string;
 }

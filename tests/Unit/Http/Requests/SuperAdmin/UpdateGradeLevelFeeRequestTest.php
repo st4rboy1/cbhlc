@@ -39,12 +39,7 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
         $this->assertArrayHasKey('tuition_fee', $rules);
         $this->assertArrayHasKey('miscellaneous_fee', $rules);
         $this->assertArrayHasKey('other_fees', $rules);
-        $this->assertArrayHasKey('total_fee', $rules);
-        $this->assertArrayHasKey('payment_plan_annual', $rules);
-        $this->assertArrayHasKey('payment_plan_semestral', $rules);
-        $this->assertArrayHasKey('payment_plan_quarterly', $rules);
-        $this->assertArrayHasKey('payment_plan_monthly', $rules);
-        $this->assertArrayHasKey('description', $rules);
+        $this->assertArrayHasKey('payment_terms', $rules);
         $this->assertArrayHasKey('is_active', $rules);
     }
 
@@ -56,12 +51,7 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
             'tuition_fee' => 30000,
             'miscellaneous_fee' => 5000,
             'other_fees' => 2000,
-            'total_fee' => 37000,
-            'payment_plan_annual' => 37000,
-            'payment_plan_semestral' => 19000,
-            'payment_plan_quarterly' => 9500,
-            'payment_plan_monthly' => 3700,
-            'description' => 'Grade 1 fees for school year 2024-2025',
+            'payment_terms' => 'ANNUAL',
             'is_active' => true,
         ];
 
@@ -78,12 +68,8 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
             'school_year' => '2024-2025',
             'tuition_fee' => 32000,
             'miscellaneous_fee' => 5000,
-            'total_fee' => 37000,
-            'payment_plan_annual' => 37000,
-            'payment_plan_semestral' => 19000,
-            'payment_plan_quarterly' => 9500,
-            'payment_plan_monthly' => 3700,
-            // No other_fees, description, or is_active
+            'payment_terms' => 'SEMESTRAL',
+            // No other_fees or is_active (optional)
         ];
 
         $request = new UpdateGradeLevelFeeRequest;
@@ -99,11 +85,7 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
             'school_year' => '2024/2025', // Invalid format
             'tuition_fee' => 30000,
             'miscellaneous_fee' => 5000,
-            'total_fee' => 35000,
-            'payment_plan_annual' => 35000,
-            'payment_plan_semestral' => 18000,
-            'payment_plan_quarterly' => 9000,
-            'payment_plan_monthly' => 3500,
+            'payment_terms' => 'ANNUAL',
         ];
 
         $request = new UpdateGradeLevelFeeRequest;
@@ -120,11 +102,7 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
             'school_year' => '2024-2025',
             'tuition_fee' => -1000, // Negative value
             'miscellaneous_fee' => 5000,
-            'total_fee' => 4000,
-            'payment_plan_annual' => 4000,
-            'payment_plan_semestral' => 2000,
-            'payment_plan_quarterly' => 1000,
-            'payment_plan_monthly' => 400,
+            'payment_terms' => 'ANNUAL',
         ];
 
         $request = new UpdateGradeLevelFeeRequest;
@@ -148,8 +126,7 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
         $this->assertFalse($validator->passes());
         $this->assertArrayHasKey('tuition_fee', $validator->errors()->toArray());
         $this->assertArrayHasKey('miscellaneous_fee', $validator->errors()->toArray());
-        $this->assertArrayHasKey('total_fee', $validator->errors()->toArray());
-        $this->assertArrayHasKey('payment_plan_annual', $validator->errors()->toArray());
+        $this->assertArrayHasKey('payment_terms', $validator->errors()->toArray());
     }
 
     public function test_custom_messages(): void
