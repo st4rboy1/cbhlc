@@ -10,6 +10,12 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+/**
+ * @property float $tuition_fee
+ * @property float $miscellaneous_fee
+ * @property float $other_fees
+ * @property float $total_amount
+ */
 class GradeLevelFee extends Model
 {
     use HasFactory;
@@ -17,14 +23,30 @@ class GradeLevelFee extends Model
 
     protected $fillable = [
         'grade_level',
+        'tuition_fee',
         'tuition_fee_cents',
+        'registration_fee',
         'registration_fee_cents',
+        'miscellaneous_fee',
         'miscellaneous_fee_cents',
+        'laboratory_fee',
         'laboratory_fee_cents',
+        'library_fee',
         'library_fee_cents',
+        'sports_fee',
         'sports_fee_cents',
+        'other_fees',
+        'other_fees_cents',
+        'payment_terms',
         'school_year',
         'is_active',
+    ];
+
+    protected $appends = [
+        'tuition_fee',
+        'miscellaneous_fee',
+        'other_fees',
+        'total_amount',
     ];
 
     protected $casts = [
@@ -37,6 +59,7 @@ class GradeLevelFee extends Model
         'laboratory_fee' => MoneyCast::class,
         'library_fee' => MoneyCast::class,
         'sports_fee' => MoneyCast::class,
+        'other_fees' => MoneyCast::class,
         // Formatted money casts - display formatted currency
         'formatted_tuition_fee' => FormattedMoneyCast::class,
         'formatted_registration_fee' => FormattedMoneyCast::class,
@@ -44,6 +67,7 @@ class GradeLevelFee extends Model
         'formatted_laboratory_fee' => FormattedMoneyCast::class,
         'formatted_library_fee' => FormattedMoneyCast::class,
         'formatted_sports_fee' => FormattedMoneyCast::class,
+        'formatted_other_fees' => FormattedMoneyCast::class,
         'formatted_total_fee' => FormattedMoneyCast::class,
     ];
 
@@ -71,7 +95,15 @@ class GradeLevelFee extends Model
     {
         return $this->tuition_fee + $this->registration_fee +
                $this->miscellaneous_fee + $this->laboratory_fee +
-               $this->library_fee + $this->sports_fee;
+               $this->library_fee + $this->sports_fee + $this->other_fees;
+    }
+
+    /**
+     * Accessor for total_amount (alias for total_fee)
+     */
+    public function getTotalAmountAttribute(): float
+    {
+        return $this->total_fee;
     }
 
     /**
