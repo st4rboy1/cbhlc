@@ -37,8 +37,8 @@ class StudentController extends Controller
         }
 
         // Filter by grade level
-        if ($request->filled('grade')) {
-            $query->where('grade', $request->get('grade'));
+        if ($request->filled('grade_level')) {
+            $query->where('grade_level', $request->get('grade_level'));
         }
 
         // Filter by enrollment status
@@ -54,7 +54,7 @@ class StudentController extends Controller
 
         return Inertia::render('super-admin/students/index', [
             'students' => $students,
-            'filters' => $request->only(['search', 'grade', 'status']),
+            'filters' => $request->only(['search', 'grade_level', 'status']),
         ]);
     }
 
@@ -95,7 +95,7 @@ class StudentController extends Controller
                 'address' => $validated['address'],
                 'phone' => $validated['phone'],
                 'email' => $validated['email'],
-                'grade' => $validated['grade'],
+                'grade_level' => $validated['grade_level'],
             ]);
 
             // Attach guardians
@@ -164,7 +164,7 @@ class StudentController extends Controller
                 'address' => $validated['address'],
                 'phone' => $validated['phone'],
                 'email' => $validated['email'],
-                'grade' => $validated['grade'],
+                'grade_level' => $validated['grade_level'],
             ]);
 
             // Sync guardians

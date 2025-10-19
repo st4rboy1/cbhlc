@@ -9,7 +9,7 @@ export type Student = {
     first_name: string;
     last_name: string;
     email: string;
-    grade: string;
+    grade_level: string;
     guardians: { first_name: string; last_name: string }[];
     enrollments: {
         status: string;
@@ -39,7 +39,7 @@ interface Props {
     students: PaginatedStudents;
     filters: {
         search: string | null;
-        grade: string | null;
+        grade_level: string | null;
         status: string | null;
     };
 }
@@ -56,7 +56,7 @@ export default function StudentsIndex({ students, filters }: Props) {
         id: student.id,
         studentId: student.student_id,
         name: `${student.first_name} ${student.last_name}`,
-        gradeLevel: student.grade,
+        gradeLevel: student.grade_level,
         guardian: student.guardians.length > 0 ? `${student.guardians[0].first_name} ${student.guardians[0].last_name}` : 'N/A',
         enrollmentStatus: student.enrollments.length > 0 ? student.enrollments[0].status : 'N/A',
         paymentStatus: student.enrollments.length > 0 ? student.enrollments[0].payment_status : 'N/A',
