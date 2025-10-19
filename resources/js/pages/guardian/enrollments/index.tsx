@@ -28,7 +28,7 @@ interface Props {
     };
 }
 
-const statusColors = {
+export const statusColors = {
     pending: 'secondary',
     approved: 'default',
     enrolled: 'default',
@@ -36,7 +36,7 @@ const statusColors = {
     completed: 'secondary',
 } as const;
 
-const paymentStatusColors = {
+export const paymentStatusColors = {
     pending: 'secondary',
     partial: 'outline',
     paid: 'default',
