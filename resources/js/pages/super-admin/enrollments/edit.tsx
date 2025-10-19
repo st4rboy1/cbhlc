@@ -27,7 +27,7 @@ interface Guardian {
 
 interface Enrollment {
     id: number;
-    reference_number: string;
+    enrollment_id: string;
     student_id: number;
     guardian_id: number;
     grade_level: string;
@@ -75,7 +75,7 @@ export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardi
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Enrollments', href: '/super-admin/enrollments' },
-        { title: `Edit ${enrollment.reference_number}`, href: `/super-admin/enrollments/${enrollment.id}/edit` },
+        { title: `Edit ${enrollment.enrollment_id}`, href: `/super-admin/enrollments/${enrollment.id}/edit` },
     ];
 
     const { data, setData, put, processing, errors } = useForm<FormData>({
@@ -94,7 +94,7 @@ export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardi
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Edit Enrollment ${enrollment.reference_number}`} />
+            <Head title={`Edit Enrollment ${enrollment.enrollment_id}`} />
             <div className="container mx-auto px-4 py-6">
                 <div className="mb-6 flex items-center gap-4">
                     <Link href="/super-admin/enrollments">
@@ -104,7 +104,7 @@ export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardi
                     </Link>
                     <div>
                         <h1 className="text-2xl font-bold">Edit Enrollment</h1>
-                        <p className="text-sm text-muted-foreground">Update enrollment details for {enrollment.reference_number}</p>
+                        <p className="text-sm text-muted-foreground">Update enrollment details for {enrollment.enrollment_id}</p>
                     </div>
                 </div>
 
@@ -254,8 +254,8 @@ export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardi
                                 <h3 className="mb-4 font-semibold">Current Enrollment</h3>
                                 <div className="space-y-3 text-sm">
                                     <div>
-                                        <p className="text-muted-foreground">Reference Number</p>
-                                        <p className="font-medium">{enrollment.reference_number}</p>
+                                        <p className="text-muted-foreground">Enrollment ID</p>
+                                        <p className="font-medium">{enrollment.enrollment_id}</p>
                                     </div>
                                     <div>
                                         <p className="text-muted-foreground">Current Student</p>
