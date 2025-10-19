@@ -334,6 +334,32 @@ export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
         setUpdatePaymentErrors({});
         setShowUpdatePaymentStatusModal(true);
     }, []);
+    const handleUpdatePaymentStatusSubmit = () => {
+        if (!enrollmentToUpdatePaymentStatus) return;
+
+        router.put(
+            `/registrar/enrollments/${enrollmentToUpdatePaymentStatus.id}/payment-status`,
+            {
+                amount_paid: parseFloat(amountPaid) * 100,
+                payment_status: paymentStatus,
+                remarks: updatePaymentRemarks,
+            },
+            {
+                onSuccess: () => {
+                    setShowUpdatePaymentStatusModal(false);
+                    setEnrollmentToUpdatePaymentStatus(null);
+                    setAmountPaid('');
+                    setPaymentStatus('');
+                    setUpdatePaymentRemarks('');
+                    setUpdatePaymentErrors({});
+                },
+                onError: (errors) => {
+                    setUpdatePaymentErrors(errors);
+                },
+            },
+        );
+    };
+
     const columns = React.useMemo(
         () =>
             createColumns({
