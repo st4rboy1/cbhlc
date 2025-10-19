@@ -73,7 +73,11 @@ export const columns: ColumnDef<Enrollment>[] = [
                 </Button>
             );
         },
-        cell: ({ row }) => <div className="font-medium">{row.getValue('enrollment_id')}</div>,
+        cell: ({ row }) => (
+            <Link href={`/super-admin/enrollments/${row.original.id}`} className="font-medium hover:underline">
+                {row.getValue('enrollment_id')}
+            </Link>
+        ),
     },
     {
         id: 'student',
@@ -143,7 +147,7 @@ export const columns: ColumnDef<Enrollment>[] = [
                 </Button>
             );
         },
-        cell: ({ row }) => <div>{row.getValue('school_year')}</div>,
+        cell: ({ row }) => <div>S.Y. {row.getValue('school_year')}</div>,
     },
     {
         accessorKey: 'status',

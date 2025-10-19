@@ -126,6 +126,7 @@ class UserController extends Controller
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'address' => $validated['address'] ?? $user->address,
         ]);
 
         if ($request->filled('password')) {

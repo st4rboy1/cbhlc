@@ -64,7 +64,11 @@ class EnrollmentController extends Controller
         return Inertia::render('super-admin/enrollments/index', [
             'enrollments' => $enrollments,
             'filters' => $request->only(['search', 'status', 'grade', 'school_year']),
-            'statuses' => EnrollmentStatus::cases(),
+            'statuses' => array_map(fn ($status) => [
+                'label' => $status->label(),
+                'value' => $status->value,
+            ], EnrollmentStatus::cases()),
+            'schoolYears' => Enrollment::distinct()->pluck('school_year'),
         ]);
     }
 

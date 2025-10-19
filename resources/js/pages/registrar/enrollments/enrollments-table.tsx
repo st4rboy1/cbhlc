@@ -46,14 +46,14 @@ interface EnrollmentsTableProps {
     enrollments: Enrollment[];
 }
 
-function formatCurrency(cents: number) {
+export function formatCurrency(cents: number) {
     return new Intl.NumberFormat('en-PH', {
         style: 'currency',
         currency: 'PHP',
     }).format(cents / 100);
 }
 
-function getStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
+export function getStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
     switch (status) {
         case 'completed':
             return 'default';
@@ -68,7 +68,7 @@ function getStatusVariant(status: string): 'default' | 'secondary' | 'outline' |
     }
 }
 
-function getPaymentStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
+export function getPaymentStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
     switch (status) {
         case 'paid':
             return 'default';
@@ -83,7 +83,7 @@ function getPaymentStatusVariant(status: string): 'default' | 'secondary' | 'out
     }
 }
 
-function formatStatusName(status: string) {
+export function formatStatusName(status: string) {
     return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
@@ -196,7 +196,9 @@ export const columns: ColumnDef<Enrollment>[] = [
                             Copy Enrollment ID
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View Enrollment</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => (window.location.href = `/registrar/enrollments/${enrollment.id}`)}>
+                            View Enrollment
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );
