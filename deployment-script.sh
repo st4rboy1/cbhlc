@@ -1,4 +1,4 @@
-cd /home/forge/cbhlc.com
+cd /home/forge/cbhlc.com/default
 
 $FORGE_PHP artisan down
 
