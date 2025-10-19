@@ -52,7 +52,7 @@ interface StudentsTableProps {
     students: Student[];
 }
 
-function getStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
+export function getStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
     switch (status) {
         case 'completed':
             return 'default';
@@ -67,7 +67,7 @@ function getStatusVariant(status: string): 'default' | 'secondary' | 'outline' |
     }
 }
 
-function getPaymentStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
+export function getPaymentStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
     switch (status) {
         case 'paid':
             return 'default';
@@ -82,11 +82,11 @@ function getPaymentStatusVariant(status: string): 'default' | 'secondary' | 'out
     }
 }
 
-function formatStatusName(status: string) {
+export function formatStatusName(status: string) {
     return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
-function calculateAge(birthdate: string) {
+export function calculateAge(birthdate: string) {
     const birth = new Date(birthdate);
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
@@ -206,7 +206,7 @@ export const columns: ColumnDef<Student>[] = [
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => navigator.clipboard.writeText(student.student_id)}>Copy Student ID</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View Student</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => (window.location.href = `/registrar/students/${student.id}`)}>View Student</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );
