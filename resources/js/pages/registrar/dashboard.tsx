@@ -413,9 +413,9 @@ export default function RegistrarDashboard({
                                     <Users className="mr-2 h-4 w-4" />
                                     Manage Students
                                 </Button>
-                                <Button variant="outline" className="w-full" onClick={() => router.visit('/reports')}>
+                                <Button variant="outline" className="w-full" onClick={() => router.visit('/registrar/documents/pending')}>
                                     <AlertCircle className="mr-2 h-4 w-4" />
-                                    Generate Reports
+                                    Pending Documents
                                 </Button>
                                 <Button variant="outline" className="w-full" onClick={() => router.visit('/settings/profile')}>
                                     <Settings className="mr-2 h-4 w-4" />
