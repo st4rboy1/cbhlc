@@ -2,10 +2,10 @@ import { EnrollmentFilters } from '@/components/enrollment-filters';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type Enrollment, type Paginated } from '@/types';
+import { type BreadcrumbItem, type Paginated } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import { columns } from './columns';
+import { Enrollment, columns } from './columns';
 
 interface Props {
     enrollments: Paginated<Enrollment>;
