@@ -8,6 +8,13 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { AlertCircle, Calendar, CheckCircle, Clock, DollarSign, FileText, Settings, Users, XCircle } from 'lucide-react';
+import * as React from 'react';
+
+// Dialog components for the modal
+import InputError from '@/components/input-error';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 interface EnrollmentStats {
     pending: number;
@@ -73,35 +80,70 @@ export default function RegistrarDashboard({
         },
     ];
 
-    const handleQuickApprove = (enrollmentId: number) => {
-        if (confirm('Are you sure you want to approve this enrollment application?')) {
-            router.post(
-                `/registrar/enrollments/${enrollmentId}/quick-approve`,
-                {},
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        // The page will be refreshed with updated data
-                    },
+    // State for Approve Enrollment Modal
+    const [showApproveModal, setShowApproveModal] = React.useState(false);
+    const [enrollmentToApprove, setEnrollmentToApprove] = React.useState<RecentApplication | null>(null);
+    const [approveRemarks, setApproveRemarks] = React.useState('');
+    const [approveErrors, setApproveErrors] = React.useState<Record<string, string>>({});
+
+    // State for Reject Enrollment Modal
+    const [showRejectModal, setShowRejectModal] = React.useState(false);
+    const [enrollmentToReject, setEnrollmentToReject] = React.useState<RecentApplication | null>(null);
+    const [rejectReason, setRejectReason] = React.useState('');
+    const [rejectErrors, setRejectErrors] = React.useState<Record<string, string>>({});
+
+    const handleQuickApproveClick = React.useCallback((application: RecentApplication) => {
+        setEnrollmentToApprove(application);
+        setApproveRemarks('');
+        setApproveErrors({});
+        setShowApproveModal(true);
+    }, []);
+
+    const handleQuickRejectClick = React.useCallback((application: RecentApplication) => {
+        setEnrollmentToReject(application);
+        setRejectReason('');
+        setRejectErrors({});
+        setShowRejectModal(true);
+    }, []);
+
+    const handleApproveSubmit = () => {
+        if (!enrollmentToApprove) return;
+
+        router.post(
+            `/registrar/enrollments/${enrollmentToApprove.id}/quick-approve`,
+            { remarks: approveRemarks },
+            {
+                onSuccess: () => {
+                    setShowApproveModal(false);
+                    setEnrollmentToApprove(null);
+                    setApproveRemarks('');
+                    setApproveErrors({});
                 },
-            );
-        }
+                onError: (errors) => {
+                    setApproveErrors(errors);
+                },
+            },
+        );
     };
 
-    const handleQuickReject = (enrollmentId: number) => {
-        const reason = prompt('Please provide a reason for rejection:');
-        if (reason) {
-            router.post(
-                `/registrar/enrollments/${enrollmentId}/quick-reject`,
-                { reason },
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        // The page will be refreshed with updated data
-                    },
+    const handleRejectSubmit = () => {
+        if (!enrollmentToReject) return;
+
+        router.post(
+            `/registrar/enrollments/${enrollmentToReject.id}/quick-reject`,
+            { reason: rejectReason },
+            {
+                onSuccess: () => {
+                    setShowRejectModal(false);
+                    setEnrollmentToReject(null);
+                    setRejectReason('');
+                    setRejectErrors({});
                 },
-            );
-        }
+                onError: (errors) => {
+                    setRejectErrors(errors);
+                },
+            },
+        );
     };
 
     const getStatusBadge = (status: string) => {
@@ -358,7 +400,7 @@ export default function RegistrarDashboard({
                                                         <Button
                                                             size="sm"
                                                             variant="outline"
-                                                            onClick={() => router.visit(`/enrollments/${application.id}`)}
+                                                            onClick={() => router.visit(`/registrar/enrollments/${application.id}`)}
                                                         >
                                                             View
                                                         </Button>
@@ -368,14 +410,14 @@ export default function RegistrarDashboard({
                                                                     size="sm"
                                                                     variant="default"
                                                                     className="bg-green-600 hover:bg-green-700"
-                                                                    onClick={() => handleQuickApprove(application.id)}
+                                                                    onClick={() => handleQuickApproveClick(application)}
                                                                 >
                                                                     Approve
                                                                 </Button>
                                                                 <Button
                                                                     size="sm"
                                                                     variant="destructive"
-                                                                    onClick={() => handleQuickReject(application.id)}
+                                                                    onClick={() => handleQuickRejectClick(application)}
                                                                 >
                                                                     Reject
                                                                 </Button>
@@ -426,6 +468,70 @@ export default function RegistrarDashboard({
                     </Card>
                 </div>
             </div>
+
+            {/* Approve Enrollment Modal */}
+            <Dialog open={showApproveModal} onOpenChange={setShowApproveModal}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Approve Enrollment Application</DialogTitle>
+                        <DialogDescription>
+                            Provide any remarks for approving enrollment #{enrollmentToApprove?.id} - {enrollmentToApprove?.student_name}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="remarks">Remarks (Optional)</Label>
+                            <Textarea
+                                id="remarks"
+                                placeholder="Enter remarks..."
+                                value={approveRemarks}
+                                onChange={(e) => setApproveRemarks(e.target.value)}
+                                className={approveErrors.remarks ? 'border-destructive' : ''}
+                            />
+                            <InputError message={approveErrors.remarks} className="mt-0" />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowApproveModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleApproveSubmit}>Approve</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Reject Enrollment Modal */}
+            <Dialog open={showRejectModal} onOpenChange={setShowRejectModal}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Reject Enrollment Application</DialogTitle>
+                        <DialogDescription>
+                            Provide a reason for rejecting enrollment #{enrollmentToReject?.id} - {enrollmentToReject?.student_name}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="reason">Reason</Label>
+                            <Textarea
+                                id="reason"
+                                placeholder="Enter rejection reason..."
+                                value={rejectReason}
+                                onChange={(e) => setRejectReason(e.target.value)}
+                                className={rejectErrors.reason ? 'border-destructive' : ''}
+                            />
+                            <InputError message={rejectErrors.reason} className="mt-0" />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowRejectModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleRejectSubmit} disabled={!rejectReason.trim()}>
+                            Reject
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }
