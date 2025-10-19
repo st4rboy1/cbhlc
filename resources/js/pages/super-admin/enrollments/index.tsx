@@ -31,13 +31,14 @@ interface Props {
         school_year?: string;
     };
     statuses: Array<{ label: string; value: string }>;
+    schoolYears: string[];
 }
 
-export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statuses }: Props) {
+export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statuses, schoolYears: schoolYearsData }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || 'all');
     const [grade, setGrade] = useState(filters.grade || 'all');
-    const [schoolYear, setSchoolYear] = useState(filters.school_year || '');
+    const [schoolYear, setSchoolYear] = useState(filters.school_year || 'all');
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
@@ -51,7 +52,7 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
                 search: search || undefined,
                 status: status && status !== 'all' ? status : undefined,
                 grade: grade && grade !== 'all' ? grade : undefined,
-                school_year: schoolYear || undefined,
+                school_year: schoolYear && schoolYear !== 'all' ? schoolYear : undefined,
             },
             {
                 preserveState: true,
@@ -64,7 +65,7 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
         setSearch('');
         setStatus('all');
         setGrade('all');
-        setSchoolYear('');
+        setSchoolYear('all');
         router.get('/super-admin/enrollments', {}, { preserveState: true, preserveScroll: true });
     };
 
@@ -150,12 +151,19 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium">School Year</label>
-                            <Input
-                                placeholder="YYYY-YYYY"
-                                value={schoolYear}
-                                onChange={(e) => setSchoolYear(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                            />
+                            <Select value={schoolYear} onValueChange={setSchoolYear}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="All School Years" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All School Years</SelectItem>
+                                    {schoolYearsData.map((sy) => (
+                                        <SelectItem key={sy} value={sy}>
+                                            S.Y. {sy}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
                     <div className="mt-6 flex gap-2">
@@ -163,7 +171,7 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
                             <Search className="mr-2 h-4 w-4" />
                             Search
                         </Button>
-                        {(search || (status && status !== 'all') || (grade && grade !== 'all') || schoolYear) && (
+                        {(search || (status && status !== 'all') || (grade && grade !== 'all') || (schoolYear && schoolYear !== 'all')) && (
                             <Button onClick={handleClearFilters} variant="outline">
                                 Clear Filters
                             </Button>
