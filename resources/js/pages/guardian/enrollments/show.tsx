@@ -1,20 +1,93 @@
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import { paymentStatusColors, statusColors } from '@/pages/guardian/enrollments/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
-export default function GuardianEnrollmentsShow({ enrollment }: { enrollment: unknown }) {
+interface Enrollment {
+    id: number;
+    student: {
+        first_name: string;
+        last_name: string;
+    };
+    school_year: string;
+    grade_level: string;
+    status: 'pending' | 'approved' | 'enrolled' | 'rejected' | 'completed';
+    payment_status: 'pending' | 'partial' | 'paid' | 'overdue';
+    created_at: string;
+}
+
+interface Props {
+    enrollment: Enrollment;
+}
+
+export default function GuardianEnrollmentsShow({ enrollment }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Enrollments', href: '/guardian/enrollments' },
-        { title: 'Enrollment Details', href: '#' },
+        { title: `Enrollment #${enrollment.id}`, href: `/guardian/enrollments/${enrollment.id}` },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Enrollment Details" />
+            <Head title={`Enrollment #${enrollment.id}`} />
             <div className="px-4 py-6">
                 <h1 className="mb-4 text-2xl font-bold">Enrollment Details</h1>
-                <pre className="overflow-auto rounded bg-gray-100 p-4">{JSON.stringify(enrollment, null, 2)}</pre>
+
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Enrollment Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Enrollment ID</p>
+                                <p className="text-lg font-semibold">{enrollment.id}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Status</p>
+                                <Badge variant={statusColors[enrollment.status] || 'default'}>{enrollment.status}</Badge>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">School Year</p>
+                                <p className="text-lg font-semibold">{enrollment.school_year}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Grade Level</p>
+                                <p className="text-lg font-semibold">{enrollment.grade_level}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Submission Date</p>
+                                <p className="text-lg font-semibold">{enrollment.created_at}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Student Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Student Name</p>
+                                <p className="text-lg font-semibold">{`${enrollment.student.first_name} ${enrollment.student.last_name}`}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Payment Information</CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-4">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Payment Status</p>
+                                <Badge variant={paymentStatusColors[enrollment.payment_status] || 'default'}>{enrollment.payment_status}</Badge>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </AppLayout>
     );
