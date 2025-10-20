@@ -93,6 +93,9 @@ class StudentController extends Controller
                 'email' => $student->email,
                 'grade_level' => $student->grade_level,
                 'section' => $student->section,
+                'birth_place' => $student->birth_place,
+                'nationality' => $student->nationality,
+                'religion' => $student->religion,
                 /** @phpstan-ignore-next-line */
                 'enrollments' => $student->enrollments->map(function (\App\Models\Enrollment $enrollment) {
                     return [
