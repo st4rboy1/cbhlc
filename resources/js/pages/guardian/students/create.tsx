@@ -79,8 +79,10 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                                     {errors.birthdate && <p className="text-sm text-destructive">{errors.birthdate}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="gender">Gender</Label>
-                                    <Select onValueChange={(value) => setData('gender', value)} value={data.gender} required>
+                                    <Label htmlFor="gender">
+                                        Gender <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Select onValueChange={(value) => setData('gender', value)} value={data.gender}>
                                         <SelectTrigger id="gender">
                                             <SelectValue placeholder="Select gender" />
                                         </SelectTrigger>
@@ -95,8 +97,10 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
 
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="grade_level">Grade Level</Label>
-                                    <Select onValueChange={(value) => setData('grade_level', value)} value={data.grade_level} required>
+                                    <Label htmlFor="grade_level">
+                                        Grade Level <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Select onValueChange={(value) => setData('grade_level', value)} value={data.grade_level}>
                                         <SelectTrigger id="grade_level">
                                             <SelectValue placeholder="Select grade level" />
                                         </SelectTrigger>
@@ -123,8 +127,10 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="address">Address</Label>
-                                <Textarea id="address" value={data.address} onChange={(e) => setData('address', e.target.value)} />
+                                <Label htmlFor="address">
+                                    Address <span className="text-destructive">*</span>
+                                </Label>
+                                <Textarea id="address" value={data.address} onChange={(e) => setData('address', e.target.value)} required />
                                 {errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
                             </div>
 
