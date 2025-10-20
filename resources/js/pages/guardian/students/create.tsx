@@ -22,16 +22,7 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
         { title: 'Create', href: '#' },
     ];
 
-    const { data, setData, post, processing, errors } = useForm<{
-        first_name: string;
-        last_name: string;
-        middle_name: string;
-        birthdate: string;
-        gender: string;
-        grade_level: string;
-        contact_number: string;
-        address: string;
-    }>({
+    const { data, setData, post, processing, errors } = useForm({
         first_name: '',
         last_name: '',
         middle_name: '',
@@ -60,10 +51,13 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={submit} className="space-y-4">
+                            {/* Name Fields */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 <div className="space-y-2">
-                                    <Label htmlFor="first_name">First Name</Label>
-                                    <Input id="first_name" value={data.first_name} onChange={(e) => setData('first_name', e.target.value)} required />
+                                    <Label htmlFor="first_name">
+                                        First Name <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input id="first_name" value={data.first_name} onChange={(e) => setData('first_name', e.target.value)} />
                                     {errors.first_name && <p className="text-sm text-destructive">{errors.first_name}</p>}
                                 </div>
                                 <div className="space-y-2">
@@ -72,12 +66,15 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                                     {errors.middle_name && <p className="text-sm text-destructive">{errors.middle_name}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="last_name">Last Name</Label>
-                                    <Input id="last_name" value={data.last_name} onChange={(e) => setData('last_name', e.target.value)} required />
+                                    <Label htmlFor="last_name">
+                                        Last Name <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input id="last_name" value={data.last_name} onChange={(e) => setData('last_name', e.target.value)} />
                                     {errors.last_name && <p className="text-sm text-destructive">{errors.last_name}</p>}
                                 </div>
                             </div>
 
+                            {/* Birthdate and Gender */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
                                     <Label htmlFor="birthdate">
@@ -109,6 +106,7 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                                 </div>
                             </div>
 
+                            {/* Grade Level and Contact Number */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
                                     <Label htmlFor="grade_level">
@@ -140,11 +138,12 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                                 </div>
                             </div>
 
+                            {/* Address */}
                             <div className="space-y-2">
                                 <Label htmlFor="address">
                                     Address <span className="text-destructive">*</span>
                                 </Label>
-                                <Textarea id="address" value={data.address} onChange={(e) => setData('address', e.target.value)} required />
+                                <Textarea id="address" value={data.address} onChange={(e) => setData('address', e.target.value)} />
                                 {errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
                             </div>
 
