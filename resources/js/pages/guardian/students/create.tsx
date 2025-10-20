@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,6 +9,7 @@ import AppLayout from '@/layouts/app-layout';
 import { store } from '@/routes/guardian/students';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
+import { format } from 'date-fns';
 
 interface Props {
     gradeLevels: string[];
@@ -20,7 +22,16 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
         { title: 'Create', href: '#' },
     ];
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm<{
+        first_name: string;
+        last_name: string;
+        middle_name: string;
+        birthdate: string;
+        gender: string;
+        grade_level: string;
+        contact_number: string;
+        address: string;
+    }>({
         first_name: '',
         last_name: '',
         middle_name: '',
@@ -69,13 +80,15 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
 
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="birthdate">Birthdate</Label>
-                                    <Input
+                                    <Label htmlFor="birthdate">
+                                        Birthdate <span className="text-destructive">*</span>
+                                    </Label>
+                                    <DatePicker
                                         id="birthdate"
-                                        type="date"
-                                        value={data.birthdate}
-                                        onChange={(e) => setData('birthdate', e.target.value)}
-                                        required
+                                        value={data.birthdate ? new Date(data.birthdate) : undefined}
+                                        onChange={(date) => setData('birthdate', date ? format(date, 'yyyy-MM-dd') : '')}
+                                        placeholder="Select birthdate"
+                                        error={!!errors.birthdate}
                                     />
                                     {errors.birthdate && <p className="text-sm text-destructive">{errors.birthdate}</p>}
                                 </div>
