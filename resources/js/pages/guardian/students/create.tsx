@@ -32,6 +32,7 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+        console.log('Form submitted with data:', data);
         post(route('guardian.students.store'));
     };
 
@@ -134,7 +135,7 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                                 {errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
                             </div>
 
-                            <Button type="submit" disabled={processing}>
+                            <Button type="submit" disabled={processing} onClick={() => console.log('Button clicked!')}>
                                 Add Student
                             </Button>
                         </form>
