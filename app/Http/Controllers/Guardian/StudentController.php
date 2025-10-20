@@ -82,7 +82,7 @@ class StudentController extends Controller
             abort(403, 'You do not have access to view this student.');
         }
 
-        $student->load('enrollments');
+        $student->load('enrollments', 'documents');
 
         return Inertia::render('guardian/students/show', [
             'student' => [
@@ -111,6 +111,18 @@ class StudentController extends Controller
                         'status' => $enrollment->status->value,
                         'payment_status' => $enrollment->payment_status->value,
                         'created_at' => $enrollment->created_at->format('Y-m-d'),
+                    ];
+                }),
+                /** @phpstan-ignore-next-line */
+                'documents' => $student->documents->map(function (\App\Models\Document $document) {
+                    return [
+                        'id' => $document->id,
+                        'document_type' => $document->document_type->value,
+                        'document_type_label' => $document->document_type->label(),
+                        'original_filename' => $document->original_filename,
+                        'file_size' => $document->file_size,
+                        'upload_date' => $document->upload_date->format('Y-m-d'),
+                        'verification_status' => $document->verification_status->value,
                     ];
                 }),
             ],

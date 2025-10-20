@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Calendar, Edit, GraduationCap, Mail, MapPin, Phone, User } from 'lucide-react';
+import { Calendar, CheckCircle2, Clock, Edit, FileText, GraduationCap, Mail, MapPin, Phone, Upload, User, XCircle } from 'lucide-react';
 
 interface Enrollment {
     id: number;
@@ -15,6 +15,16 @@ interface Enrollment {
     status: string;
     payment_status: string;
     created_at: string;
+}
+
+interface Document {
+    id: number;
+    document_type: string;
+    document_type_label: string;
+    original_filename: string;
+    file_size: number;
+    upload_date: string;
+    verification_status: string;
 }
 
 interface Student {
@@ -34,6 +44,7 @@ interface Student {
     nationality: string;
     religion: string;
     enrollments: Enrollment[];
+    documents: Document[];
 }
 
 interface Props {
@@ -284,6 +295,75 @@ export default function GuardianStudentsShow({ student }: Props) {
                                         Create First Enrollment
                                     </Button>
                                 </Link>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+
+                {/* Documents */}
+                <Card className="mt-6">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <FileText className="h-5 w-5" />
+                            Required Documents
+                        </CardTitle>
+                        <CardDescription>Uploaded documents for {student.first_name}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {student.documents && student.documents.length > 0 ? (
+                            <div className="space-y-3">
+                                {student.documents.map((document) => (
+                                    <div key={document.id} className="flex items-center justify-between rounded-lg border p-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                                <FileText className="h-5 w-5 text-primary" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium">{document.document_type_label}</p>
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                    <span>{document.original_filename}</span>
+                                                    <span>•</span>
+                                                    <span>{(document.file_size / 1024 / 1024).toFixed(2)} MB</span>
+                                                    <span>•</span>
+                                                    <span>
+                                                        Uploaded{' '}
+                                                        {new Date(document.upload_date).toLocaleDateString('en-US', {
+                                                            year: 'numeric',
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                        })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            {document.verification_status === 'pending' && (
+                                                <Badge variant="secondary" className="flex items-center gap-1">
+                                                    <Clock className="h-3 w-3" />
+                                                    Pending Review
+                                                </Badge>
+                                            )}
+                                            {document.verification_status === 'verified' && (
+                                                <Badge variant="default" className="flex items-center gap-1">
+                                                    <CheckCircle2 className="h-3 w-3" />
+                                                    Verified
+                                                </Badge>
+                                            )}
+                                            {document.verification_status === 'rejected' && (
+                                                <Badge variant="destructive" className="flex items-center gap-1">
+                                                    <XCircle className="h-3 w-3" />
+                                                    Rejected
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-12 text-center">
+                                <Upload className="mb-4 h-12 w-12 text-muted-foreground" />
+                                <p className="mb-2 text-lg font-semibold">No Documents Uploaded</p>
+                                <p className="text-sm text-muted-foreground">Documents are required for enrollment processing</p>
                             </div>
                         )}
                     </CardContent>
