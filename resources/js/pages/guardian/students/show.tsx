@@ -5,7 +5,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Calendar, CheckCircle2, Clock, Edit, FileText, GraduationCap, Mail, MapPin, Phone, Upload, User, XCircle } from 'lucide-react';
+import axios from 'axios';
+import { Calendar, CheckCircle2, Clock, Download, Edit, FileText, GraduationCap, Mail, MapPin, Phone, Upload, User, XCircle } from 'lucide-react';
+import { useState } from 'react';
 
 interface Enrollment {
     id: number;
@@ -66,6 +68,8 @@ const paymentStatusColors = {
 } as const;
 
 export default function GuardianStudentsShow({ student }: Props) {
+    const [downloadingId, setDownloadingId] = useState<number | null>(null);
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Students', href: '/guardian/students' },
@@ -73,6 +77,24 @@ export default function GuardianStudentsShow({ student }: Props) {
     ];
 
     const fullName = `${student.first_name} ${student.middle_name ? student.middle_name + ' ' : ''}${student.last_name}`;
+
+    const handleDownload = async (documentId: number) => {
+        try {
+            setDownloadingId(documentId);
+
+            // Get signed URL
+            const response = await axios.get(`/guardian/students/${student.id}/documents/${documentId}`);
+            const { url } = response.data;
+
+            // Trigger download
+            window.location.href = url;
+        } catch (error) {
+            console.error('Download failed:', error);
+            alert('Failed to download document. Please try again.');
+        } finally {
+            setDownloadingId(null);
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -355,6 +377,15 @@ export default function GuardianStudentsShow({ student }: Props) {
                                                     Rejected
                                                 </Badge>
                                             )}
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleDownload(document.id)}
+                                                disabled={downloadingId === document.id}
+                                            >
+                                                <Download className="mr-2 h-4 w-4" />
+                                                {downloadingId === document.id ? 'Downloading...' : 'Download'}
+                                            </Button>
                                         </div>
                                     </div>
                                 ))}
