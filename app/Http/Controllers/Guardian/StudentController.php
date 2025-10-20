@@ -180,4 +180,38 @@ class StudentController extends Controller
         return redirect()->route('guardian.students.show', $student->id)
             ->with('success', 'Student information updated successfully.');
     }
+
+    /**
+     * Remove the student from guardian's account.
+     */
+    public function destroy(Student $student)
+    {
+        // Get Guardian model for authenticated user
+        $guardian = Guardian::where('user_id', Auth::id())->firstOrFail();
+
+        // Verify this guardian has access to this student
+        $guardianStudent = GuardianStudent::where('guardian_id', $guardian->id)
+            ->where('student_id', $student->id)
+            ->first();
+
+        if (! $guardianStudent) {
+            abort(403, 'You do not have access to remove this student.');
+        }
+
+        // Check if student has any active enrollments
+        $hasActiveEnrollments = $student->enrollments()
+            ->whereIn('status', [\App\Enums\EnrollmentStatus::PENDING, \App\Enums\EnrollmentStatus::ENROLLED])
+            ->exists();
+
+        if ($hasActiveEnrollments) {
+            return redirect()->route('guardian.students.show', $student->id)
+                ->with('error', 'Cannot remove student with active or pending enrollments.');
+        }
+
+        // Remove the guardian-student relationship
+        $guardianStudent->delete();
+
+        return redirect()->route('guardian.students.index')
+            ->with('success', 'Student removed from your account successfully.');
+    }
 }
