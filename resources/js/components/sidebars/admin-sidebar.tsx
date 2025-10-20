@@ -2,7 +2,22 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { CreditCard, FileCheck, GraduationCap, LayoutGrid, Settings, UserCog, Users } from 'lucide-react';
+import {
+    Banknote,
+    CalendarDays,
+    CreditCard,
+    DollarSign,
+    FileCheck,
+    FileClock,
+    FilePieChart,
+    GraduationCap,
+    History,
+    LayoutGrid,
+    School,
+    Settings,
+    UserCog,
+    Users,
+} from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -30,6 +45,41 @@ const mainNavItems: NavItem[] = [
         title: 'Invoices',
         href: '/invoices',
         icon: FileCheck,
+    },
+    {
+        title: 'Payments',
+        href: '/admin/payments',
+        icon: Banknote,
+    },
+    {
+        title: 'Grade Level Fees',
+        href: '/admin/grade-level-fees',
+        icon: DollarSign,
+    },
+    {
+        title: 'Enrollment Periods',
+        href: '/admin/enrollment-periods',
+        icon: CalendarDays,
+    },
+    {
+        title: 'Pending Documents',
+        href: '/admin/documents/pending',
+        icon: FileClock,
+    },
+    {
+        title: 'Reports',
+        href: '/admin/reports',
+        icon: FilePieChart,
+    },
+    {
+        title: 'Audit Logs',
+        href: '/admin/audit-logs',
+        icon: History,
+    },
+    {
+        title: 'School Information',
+        href: '/admin/school-information',
+        icon: School,
     },
     {
         title: 'Tuition Fees',
