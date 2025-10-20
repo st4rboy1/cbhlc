@@ -34,6 +34,9 @@ class Student extends Model
         'email',
         'grade_level',
         'section',
+        'birth_place',
+        'nationality',
+        'religion',
         'user_id',
         'guardian_id',
     ];
