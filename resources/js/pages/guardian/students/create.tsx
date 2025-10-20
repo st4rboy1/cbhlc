@@ -1,14 +1,21 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { store } from '@/routes/guardian/students';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
+import { format } from 'date-fns';
 
-export default function GuardianStudentsCreate() {
+interface Props {
+    gradeLevels: string[];
+}
+
+export default function GuardianStudentsCreate({ gradeLevels }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Students', href: '/guardian/students' },
@@ -28,7 +35,7 @@ export default function GuardianStudentsCreate() {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('guardian.students.store'));
+        post(store().url);
     };
 
     return (
@@ -44,10 +51,13 @@ export default function GuardianStudentsCreate() {
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={submit} className="space-y-4">
+                            {/* Name Fields */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 <div className="space-y-2">
-                                    <Label htmlFor="first_name">First Name</Label>
-                                    <Input id="first_name" value={data.first_name} onChange={(e) => setData('first_name', e.target.value)} required />
+                                    <Label htmlFor="first_name">
+                                        First Name <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input id="first_name" value={data.first_name} onChange={(e) => setData('first_name', e.target.value)} />
                                     {errors.first_name && <p className="text-sm text-destructive">{errors.first_name}</p>}
                                 </div>
                                 <div className="space-y-2">
@@ -56,49 +66,64 @@ export default function GuardianStudentsCreate() {
                                     {errors.middle_name && <p className="text-sm text-destructive">{errors.middle_name}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="last_name">Last Name</Label>
-                                    <Input id="last_name" value={data.last_name} onChange={(e) => setData('last_name', e.target.value)} required />
+                                    <Label htmlFor="last_name">
+                                        Last Name <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input id="last_name" value={data.last_name} onChange={(e) => setData('last_name', e.target.value)} />
                                     {errors.last_name && <p className="text-sm text-destructive">{errors.last_name}</p>}
                                 </div>
                             </div>
 
+                            {/* Birthdate and Gender */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="birthdate">Birthdate</Label>
-                                    <Input
+                                    <Label htmlFor="birthdate">
+                                        Birthdate <span className="text-destructive">*</span>
+                                    </Label>
+                                    <DatePicker
                                         id="birthdate"
-                                        type="date"
-                                        value={data.birthdate}
-                                        onChange={(e) => setData('birthdate', e.target.value)}
-                                        required
+                                        value={data.birthdate ? new Date(data.birthdate) : undefined}
+                                        onChange={(date) => setData('birthdate', date ? format(date, 'yyyy-MM-dd') : '')}
+                                        placeholder="Select birthdate"
+                                        error={!!errors.birthdate}
                                     />
                                     {errors.birthdate && <p className="text-sm text-destructive">{errors.birthdate}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="gender">Gender</Label>
-                                    <Select onValueChange={(value) => setData('gender', value)} value={data.gender} required>
+                                    <Label htmlFor="gender">
+                                        Gender <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Select onValueChange={(value) => setData('gender', value)} value={data.gender}>
                                         <SelectTrigger id="gender">
                                             <SelectValue placeholder="Select gender" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="Male">Male</SelectItem>
                                             <SelectItem value="Female">Female</SelectItem>
-                                            <SelectItem value="Other">Other</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     {errors.gender && <p className="text-sm text-destructive">{errors.gender}</p>}
                                 </div>
                             </div>
 
+                            {/* Grade Level and Contact Number */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="grade_level">Grade Level</Label>
-                                    <Input
-                                        id="grade_level"
-                                        value={data.grade_level}
-                                        onChange={(e) => setData('grade_level', e.target.value)}
-                                        required
-                                    />
+                                    <Label htmlFor="grade_level">
+                                        Grade Level <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Select onValueChange={(value) => setData('grade_level', value)} value={data.grade_level}>
+                                        <SelectTrigger id="grade_level">
+                                            <SelectValue placeholder="Select grade level" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {gradeLevels.map((level) => (
+                                                <SelectItem key={level} value={level}>
+                                                    {level}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                     {errors.grade_level && <p className="text-sm text-destructive">{errors.grade_level}</p>}
                                 </div>
                                 <div className="space-y-2">
@@ -113,8 +138,11 @@ export default function GuardianStudentsCreate() {
                                 </div>
                             </div>
 
+                            {/* Address */}
                             <div className="space-y-2">
-                                <Label htmlFor="address">Address</Label>
+                                <Label htmlFor="address">
+                                    Address <span className="text-destructive">*</span>
+                                </Label>
                                 <Textarea id="address" value={data.address} onChange={(e) => setData('address', e.target.value)} />
                                 {errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
                             </div>
