@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { store } from '@/routes/guardian/students';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 
@@ -32,8 +33,7 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted with data:', data);
-        post(route('guardian.students.store'));
+        post(store().url);
     };
 
     return (
@@ -135,7 +135,7 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                                 {errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
                             </div>
 
-                            <Button type="submit" disabled={processing} onClick={() => console.log('Button clicked!')}>
+                            <Button type="submit" disabled={processing}>
                                 Add Student
                             </Button>
                         </form>
