@@ -51,6 +51,9 @@ test('guardian can visit guardian dashboard', function () {
     $user = User::factory()->create();
     $user->assignRole('guardian');
 
+    // Create Guardian record for the user
+    \App\Models\Guardian::factory()->create(['user_id' => $user->id]);
+
     $this->actingAs($user)->get(route('guardian.dashboard'))->assertOk();
 });
 
@@ -99,6 +102,9 @@ test('user without role is redirected to home', function () {
 test('users cannot access dashboards they do not have permission for', function () {
     $guardian = User::factory()->create();
     $guardian->assignRole('guardian');
+
+    // Create Guardian record for the user
+    \App\Models\Guardian::factory()->create(['user_id' => $guardian->id]);
 
     // Guardian should not be able to access admin dashboard
     $this->actingAs($guardian)->get(route('admin.dashboard'))->assertForbidden();
