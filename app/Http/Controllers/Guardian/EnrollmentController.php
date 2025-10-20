@@ -68,7 +68,16 @@ class EnrollmentController extends Controller
         // Get guardian's students with enrollment info
         $studentIds = GuardianStudent::where('guardian_id', $guardian->id)
             ->pluck('student_id');
-        $studentsQuery = Student::whereIn('id', $studentIds)->get();
+
+        // Get students who have pending or active enrollments
+        $studentsWithEnrollments = Enrollment::whereIn('student_id', $studentIds)
+            ->whereIn('status', [EnrollmentStatus::PENDING, EnrollmentStatus::ENROLLED])
+            ->pluck('student_id');
+
+        // Filter out students with pending or active enrollments
+        $eligibleStudentIds = $studentIds->diff($studentsWithEnrollments);
+
+        $studentsQuery = Student::whereIn('id', $eligibleStudentIds)->get();
 
         $students = $studentsQuery->map(function ($student) use ($currentSchoolYear) {
             return [
