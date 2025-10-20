@@ -30,7 +30,11 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
         gender: '',
         grade_level: '',
         contact_number: '',
+        email: '',
         address: '',
+        birth_place: '',
+        nationality: '',
+        religion: '',
     });
 
     const submit = (e: React.FormEvent) => {
@@ -106,26 +110,47 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                                 </div>
                             </div>
 
-                            {/* Grade Level and Contact Number */}
-                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                            {/* Grade Level */}
+                            <div className="space-y-2">
+                                <Label htmlFor="grade_level">
+                                    Grade Level <span className="text-destructive">*</span>
+                                </Label>
+                                <Select onValueChange={(value) => setData('grade_level', value)} value={data.grade_level}>
+                                    <SelectTrigger id="grade_level">
+                                        <SelectValue placeholder="Select grade level" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {gradeLevels.map((level) => (
+                                            <SelectItem key={level} value={level}>
+                                                {level}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {errors.grade_level && <p className="text-sm text-destructive">{errors.grade_level}</p>}
+                            </div>
+
+                            {/* Birth Place, Nationality, Religion */}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 <div className="space-y-2">
-                                    <Label htmlFor="grade_level">
-                                        Grade Level <span className="text-destructive">*</span>
-                                    </Label>
-                                    <Select onValueChange={(value) => setData('grade_level', value)} value={data.grade_level}>
-                                        <SelectTrigger id="grade_level">
-                                            <SelectValue placeholder="Select grade level" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {gradeLevels.map((level) => (
-                                                <SelectItem key={level} value={level}>
-                                                    {level}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.grade_level && <p className="text-sm text-destructive">{errors.grade_level}</p>}
+                                    <Label htmlFor="birth_place">Birth Place</Label>
+                                    <Input id="birth_place" value={data.birth_place} onChange={(e) => setData('birth_place', e.target.value)} />
+                                    {errors.birth_place && <p className="text-sm text-destructive">{errors.birth_place}</p>}
                                 </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="nationality">Nationality</Label>
+                                    <Input id="nationality" value={data.nationality} onChange={(e) => setData('nationality', e.target.value)} />
+                                    {errors.nationality && <p className="text-sm text-destructive">{errors.nationality}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="religion">Religion</Label>
+                                    <Input id="religion" value={data.religion} onChange={(e) => setData('religion', e.target.value)} />
+                                    {errors.religion && <p className="text-sm text-destructive">{errors.religion}</p>}
+                                </div>
+                            </div>
+
+                            {/* Contact Information */}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
                                     <Label htmlFor="contact_number">Contact Number</Label>
                                     <Input
@@ -135,6 +160,11 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                                         onChange={(e) => setData('contact_number', e.target.value)}
                                     />
                                     {errors.contact_number && <p className="text-sm text-destructive">{errors.contact_number}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="email">Email Address</Label>
+                                    <Input id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} />
+                                    {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
                                 </div>
                             </div>
 
