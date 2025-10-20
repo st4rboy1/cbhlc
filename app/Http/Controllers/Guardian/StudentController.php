@@ -164,7 +164,22 @@ class StudentController extends Controller
         }
 
         return Inertia::render('guardian/students/edit', [
-            'student' => $student,
+            'student' => [
+                'id' => $student->id,
+                'student_id' => $student->student_id,
+                'first_name' => $student->first_name,
+                'middle_name' => $student->middle_name,
+                'last_name' => $student->last_name,
+                'birthdate' => $student->birthdate,
+                'gender' => $student->gender,
+                'grade_level' => $student->grade_level,
+                'contact_number' => $student->contact_number,
+                'email' => $student->email,
+                'address' => $student->address,
+                'birth_place' => $student->birth_place,
+                'nationality' => $student->nationality,
+                'religion' => $student->religion,
+            ],
         ]);
     }
 
