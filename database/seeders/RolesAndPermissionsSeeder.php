@@ -47,6 +47,9 @@ class RolesAndPermissionsSeeder extends Seeder
 
             // Grade level fees management permissions
             'grade_level_fees.manage',
+
+            // Billing management permissions
+            'billing.view',
         ];
 
         foreach ($permissions as $permission) {
@@ -88,6 +91,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'enrollment.create',
             'enrollment.update',
             'documents.view',
+            'billing.view',
         ]);
 
         // Student - Limited access to own enrollment status and information

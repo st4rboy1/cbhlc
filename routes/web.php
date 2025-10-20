@@ -1,11 +1,19 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
 use App\Http\Controllers\Admin\EnrollmentController as AdminEnrollmentController;
+use App\Http\Controllers\Admin\EnrollmentPeriodController as AdminEnrollmentPeriodController;
+use App\Http\Controllers\Admin\GradeLevelFeeController as AdminGradeLevelFeeController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\SchoolInformationController as AdminSchoolInformationController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Guardian\BillingController as GuardianBillingController;
 use App\Http\Controllers\Guardian\DashboardController as GuardianDashboardController;
+use App\Http\Controllers\Guardian\DocumentController as GuardianDocumentController;
 use App\Http\Controllers\Guardian\EnrollmentController as GuardianEnrollmentController;
 use App\Http\Controllers\Guardian\StudentController as GuardianStudentController;
 use App\Http\Controllers\InvoiceController;
@@ -179,6 +187,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Users Management (limited compared to super-admin)
         Route::resource('users', AdminUserController::class);
+
+        // Payments Management
+        Route::resource('payments', AdminPaymentController::class);
+
+        // Grade Level Fees Management
+        Route::resource('grade-level-fees', AdminGradeLevelFeeController::class);
+
+        // Enrollment Periods Management
+        Route::resource('enrollment-periods', AdminEnrollmentPeriodController::class);
+
+        // Document Management
+        Route::get('/documents/pending', [AdminDocumentController::class, 'pending'])->name('documents.pending');
+
+        // Reports
+        Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+
+        // Audit Log Management
+        Route::get('/audit-logs', [AdminAuditLogController::class, 'index'])->name('audit-logs.index');
+
+        // School Information Management
+        Route::get('/school-information', [AdminSchoolInformationController::class, 'index'])->name('school-information.index');
     });
 
     // Registrar Routes
@@ -213,6 +242,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/documents/{document}', [RegistrarDocumentController::class, 'show'])->name('documents.show');
         Route::post('/documents/{document}/verify', [RegistrarDocumentController::class, 'verify'])->name('documents.verify');
         Route::post('/documents/{document}/reject', [RegistrarDocumentController::class, 'reject'])->name('documents.reject');
+
+        // Reports
+        Route::get('/reports', [RegistrarDashboardController::class, 'reports'])->name('reports');
     });
 
     // Guardian Routes
@@ -231,16 +263,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/billing/{enrollment}', [GuardianBillingController::class, 'show'])->name('billing.show');
 
         // Document Management
-        Route::get('/students/{student}/documents', [\App\Http\Controllers\Guardian\DocumentController::class, 'index'])->name('students.documents.index');
-        Route::post('/students/{student}/documents', [\App\Http\Controllers\Guardian\DocumentController::class, 'store'])->name('students.documents.store')->middleware('throttle:document-uploads');
-        Route::get('/students/{student}/documents/{document}', [\App\Http\Controllers\Guardian\DocumentController::class, 'show'])->name('students.documents.show');
-        Route::get('/students/{student}/documents/{document}/download', [\App\Http\Controllers\Guardian\DocumentController::class, 'download'])->name('students.documents.download');
-        Route::delete('/students/{student}/documents/{document}', [\App\Http\Controllers\Guardian\DocumentController::class, 'destroy'])->name('students.documents.destroy');
+        Route::get('/documents', [GuardianDocumentController::class, 'indexAll'])->name('documents.index');
+        Route::get('/students/{student}/documents', [GuardianDocumentController::class, 'index'])->name('students.documents.index');
+        Route::post('/students/{student}/documents', [GuardianDocumentController::class, 'store'])->name('students.documents.store')->middleware('throttle:document-uploads');
+        Route::get('/students/{student}/documents/{document}', [GuardianDocumentController::class, 'show'])->name('students.documents.show');
+        Route::get('/students/{student}/documents/{document}/download', [GuardianDocumentController::class, 'download'])->name('students.documents.download');
+        Route::delete('/students/{student}/documents/{document}', [GuardianDocumentController::class, 'destroy'])->name('students.documents.destroy');
     });
 
     // Student dashboard
     Route::prefix('student')->name('student.')->middleware('role:student')->group(function () {
         Route::get('/dashboard', [StudentDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/enrollments', [StudentDashboardController::class, 'enrollments'])->name('enrollments.index');
+        Route::get('/enrollments/{enrollment}', [StudentDashboardController::class, 'showEnrollment'])->name('enrollments.show');
     });
 });
 

@@ -2,198 +2,78 @@
 
 namespace App\Http\Controllers\Guardian;
 
-use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreDocumentRequest;
 use App\Models\Document;
 use App\Models\Student;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Str;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class DocumentController extends Controller
 {
-    use AuthorizesRequests;
-
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Student $student): JsonResponse
+    public function indexAll()
     {
-        $this->authorize('view', $student);
+        $guardian = Auth::user()->guardian;
+        $students = $guardian->children;
+        $documents = Document::whereIn('student_id', $students->pluck('id'))->with('student')->latest()->paginate(10);
 
-        $documents = $student->documents()
-            ->with('verifiedBy:id,name')
-            ->latest('upload_date')
-            ->get();
-
-        return response()->json([
+        return Inertia::render('guardian/documents/index', [
             'documents' => $documents,
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreDocumentRequest $request, Student $student): JsonResponse
+    public function index(Student $student)
     {
-        // Authorize user can upload documents for this student
-        $this->authorize('uploadDocument', [Document::class, $student]);
+        $this->authorize('view', $student);
 
-        try {
-            // Handle file upload
-            $file = $request->file('document');
-            $originalName = $file->getClientOriginalName();
-            $storedName = Str::random(40).'.'.$file->extension();
+        $documents = $student->documents()->latest()->paginate(10);
 
-            // Store file
-            $path = $file->storeAs(
-                "documents/{$student->id}",
-                $storedName,
-                'private'
-            );
-
-            // Create database record
-            $document = $student->documents()->create([
-                'document_type' => $request->document_type,
-                'original_filename' => $originalName,
-                'stored_filename' => $storedName,
-                'file_path' => $path,
-                'file_size' => $file->getSize(),
-                'mime_type' => $file->getMimeType(),
-                'upload_date' => now(),
-                'verification_status' => VerificationStatus::PENDING,
-            ]);
-
-            return response()->json([
-                'message' => 'Document uploaded successfully',
-                'document' => $document->load('student:id,first_name,last_name'),
-            ], 201);
-        } catch (\Exception $e) {
-            \Log::error('Document upload failed', [
-                'student_id' => $student->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return response()->json([
-                'message' => 'Failed to upload document. Please try again.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
-        }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Student $student, Document $document): JsonResponse
-    {
-        $this->authorize('view', $document);
-
-        // Ensure document belongs to student
-        if ($document->student_id !== $student->id) {
-            return response()->json([
-                'message' => 'Document not found for this student.',
-            ], 404);
-        }
-
-        // Generate signed URL valid for 5 minutes
-        $url = URL::temporarySignedRoute(
-            'guardian.students.documents.download',
-            now()->addMinutes(5),
-            ['student' => $student->id, 'document' => $document->id]
-        );
-
-        // Log document access
-        activity()
-            ->performedOn($document)
-            ->withProperties([
-                'action' => 'viewed',
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-            ])
-            ->log('Document accessed');
-
-        return response()->json([
-            'document' => $document->load(['student:id,first_name,last_name', 'verifiedBy:id,name']),
-            'url' => $url,
+        return Inertia::render('guardian/students/documents/index', [
+            'student' => $student,
+            'documents' => $documents,
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Student $student, Document $document): JsonResponse
+    public function store(Request $request, Student $student)
     {
-        $this->authorize('delete', $document);
+        $this->authorize('update', $student);
 
-        // Ensure document belongs to student
-        if ($document->student_id !== $student->id) {
-            return response()->json([
-                'message' => 'Document not found for this student.',
-            ], 404);
+        $request->validate([
+            'documents' => 'required|array',
+            'documents.*.file' => 'required|file|mimes:pdf,jpg,png|max:2048',
+            'documents.*.type' => 'required|string',
+        ]);
+
+        foreach ($request->file('documents') as $documentData) {
+            $student->addDocument($documentData['file'], $documentData['type']);
         }
 
-        try {
-            // Delete physical file
-            if (Storage::disk('private')->exists($document->file_path)) {
-                Storage::disk('private')->delete($document->file_path);
-            }
-
-            $document->delete();
-
-            return response()->json([
-                'message' => 'Document deleted successfully.',
-            ]);
-        } catch (\Exception $e) {
-            \Log::error('Document deletion failed', [
-                'document_id' => $document->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return response()->json([
-                'message' => 'Failed to delete document. Please try again.',
-            ], 500);
-        }
+        return back()->with('success', 'Documents uploaded successfully.');
     }
 
-    /**
-     * Download the document with signed URL verification.
-     */
-    public function download(Request $request, Student $student, Document $document): StreamedResponse|JsonResponse
+    public function show(Student $student, Document $document)
     {
-        // Verify signed URL
-        if (! $request->hasValidSignature()) {
-            return response()->json([
-                'message' => 'Invalid or expired download link.',
-            ], 403);
-        }
+        $this->authorize('view', $student);
 
-        $this->authorize('download', $document);
+        return Inertia::render('guardian/students/documents/show', [
+            'student' => $student,
+            'document' => $document,
+        ]);
+    }
 
-        // Ensure document belongs to student
-        if ($document->student_id !== $student->id) {
-            return response()->json([
-                'message' => 'Document not found for this student.',
-            ], 404);
-        }
+    public function download(Student $student, Document $document)
+    {
+        $this->authorize('view', $student);
 
-        // Log document download
-        activity()
-            ->performedOn($document)
-            ->withProperties([
-                'action' => 'downloaded',
-                'ip_address' => request()->ip(),
-                'user_agent' => request()->userAgent(),
-            ])
-            ->log('Document downloaded');
+        return $document->download();
+    }
 
-        return Storage::disk('private')->download(
-            $document->file_path,
-            $document->original_filename
-        );
+    public function destroy(Student $student, Document $document)
+    {
+        $this->authorize('update', $student);
+
+        $document->delete();
+
+        return back()->with('success', 'Document deleted successfully.');
     }
 }
