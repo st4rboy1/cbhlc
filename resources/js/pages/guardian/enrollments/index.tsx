@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { create, edit, show } from '@/routes/guardian/enrollments';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
@@ -56,7 +57,7 @@ export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
             <div className="px-4 py-6">
                 <div className="mb-4 flex items-center justify-between">
                     <h1 className="mb-4 text-2xl font-bold">My Children's Enrollments</h1>
-                    <Link href="/guardian/enrollments/create">
+                    <Link href={create().url}>
                         <Button>
                             <PlusCircle className="mr-2 h-4 w-4" />
                             New Enrollment
@@ -107,13 +108,13 @@ export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
                                         <TableCell>{enrollment.created_at}</TableCell>
                                         <TableCell>
                                             <div className="flex gap-2">
-                                                <Link href={`/guardian/enrollments/${enrollment.id}`}>
+                                                <Link href={show(enrollment.id).url}>
                                                     <Button size="sm" variant="outline">
                                                         View
                                                     </Button>
                                                 </Link>
                                                 {enrollment.status === 'pending' && (
-                                                    <Link href={`/guardian/enrollments/${enrollment.id}/edit`}>
+                                                    <Link href={edit(enrollment.id).url}>
                                                         <Button size="sm" variant="outline">
                                                             Edit
                                                         </Button>
