@@ -214,6 +214,7 @@ describe('Guardian StudentController', function () {
             'last_name' => 'Student',
             'birthdate' => '2012-05-20',
             'gender' => 'Female',
+            'grade_level' => 'Grade 3',
             'address' => '789 New Address',
             'contact_number' => '09876543210',
             'email' => 'new.student@example.com',
@@ -257,6 +258,7 @@ describe('Guardian StudentController', function () {
                 'last_name' => 'Student',
                 'birthdate' => '2012-05-20',
                 'gender' => 'Female',
+                'grade_level' => 'Grade 3',
                 'address' => '789 New Address',
             ]);
 
@@ -270,6 +272,7 @@ describe('Guardian StudentController', function () {
                 'last_name' => 'Student',
                 'birthdate' => now()->addDay()->format('Y-m-d'),  // Future date
                 'gender' => 'Male',
+                'grade_level' => 'Grade 3',
                 'address' => '123 Future St',
             ]);
 
@@ -283,6 +286,7 @@ describe('Guardian StudentController', function () {
                 'last_name' => 'Student',
                 'birthdate' => '2012-05-20',
                 'gender' => 'Other',  // Invalid value
+                'grade_level' => 'Grade 3',
                 'address' => '123 Test St',
             ]);
 
@@ -296,6 +300,7 @@ describe('Guardian StudentController', function () {
                 'last_name' => 'Student',
                 'birthdate' => '2012-05-20',
                 'gender' => 'Male',
+                'grade_level' => 'Grade 3',
                 'address' => '123 Test St',
                 'email' => 'invalid-email',  // Invalid email
             ]);
