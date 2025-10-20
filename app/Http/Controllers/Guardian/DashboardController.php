@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Guardian;
 use App\Enums\EnrollmentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Enrollment;
+use App\Models\Guardian;
 use App\Models\GuardianStudent;
 use App\Models\Student;
 use Illuminate\Support\Facades\Auth;
@@ -17,10 +18,11 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
+        // Get Guardian model for authenticated user
+        $guardian = Guardian::where('user_id', Auth::id())->firstOrFail();
 
         // Get all students for this guardian
-        $studentIds = GuardianStudent::where('guardian_id', $user->id)
+        $studentIds = GuardianStudent::where('guardian_id', $guardian->id)
             ->pluck('student_id');
 
         $students = Student::whereIn('id', $studentIds)->get();
@@ -86,12 +88,13 @@ class DashboardController extends Controller
         });
 
         // Format announcements for frontend
-        // Format announcements for frontend
         $formattedAnnouncements = collect($announcements)->map(function ($announcement) {
             return [
                 'id' => $announcement['id'],
                 'title' => $announcement['title'],
                 'message' => $announcement['content'],
+                'date' => $announcement['date'],
+                'type' => $announcement['priority'],
             ];
         });
 
