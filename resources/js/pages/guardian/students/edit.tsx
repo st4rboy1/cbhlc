@@ -25,6 +25,9 @@ interface Student {
     contact_number: string;
     email: string;
     address: string;
+    birth_place: string;
+    nationality: string;
+    religion: string;
 }
 
 interface Props {
@@ -49,6 +52,9 @@ export default function GuardianStudentsEdit({ student }: Props) {
         contact_number: student.contact_number || '',
         email: student.email || '',
         address: student.address || '',
+        birth_place: student.birth_place || '',
+        nationality: student.nationality || '',
+        religion: student.religion || '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -182,6 +188,25 @@ export default function GuardianStudentsEdit({ student }: Props) {
                                 <Label htmlFor="grade_level">Current Grade Level</Label>
                                 <div className="rounded-md border bg-muted px-3 py-2 text-sm">{student.grade_level || 'Not enrolled'}</div>
                                 <p className="text-xs text-muted-foreground">Grade level is determined by enrollment status</p>
+                            </div>
+
+                            {/* Birth Place, Nationality, Religion */}
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                                <div className="space-y-2">
+                                    <Label htmlFor="birth_place">Birth Place</Label>
+                                    <Input id="birth_place" value={data.birth_place} onChange={(e) => setData('birth_place', e.target.value)} />
+                                    {errors.birth_place && <p className="text-sm text-destructive">{errors.birth_place}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="nationality">Nationality</Label>
+                                    <Input id="nationality" value={data.nationality} onChange={(e) => setData('nationality', e.target.value)} />
+                                    {errors.nationality && <p className="text-sm text-destructive">{errors.nationality}</p>}
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="religion">Religion</Label>
+                                    <Input id="religion" value={data.religion} onChange={(e) => setData('religion', e.target.value)} />
+                                    {errors.religion && <p className="text-sm text-destructive">{errors.religion}</p>}
+                                </div>
                             </div>
 
                             {/* Contact Information */}
