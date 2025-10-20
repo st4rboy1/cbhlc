@@ -17,6 +17,7 @@ interface DatePickerProps {
     name?: string;
     minAge?: number;
     maxAge?: number;
+    allowFutureDates?: boolean;
 }
 
 export function DatePicker({
@@ -30,6 +31,7 @@ export function DatePicker({
     name,
     minAge,
     maxAge,
+    allowFutureDates = false,
 }: DatePickerProps) {
     const [open, setOpen] = React.useState(false);
 
@@ -37,8 +39,8 @@ export function DatePicker({
         const today = new Date();
         const minDate = new Date('1900-01-01');
 
-        // Future dates are always disabled
-        if (date > today) return true;
+        // Future dates are disabled unless allowFutureDates is true
+        if (!allowFutureDates && date > today) return true;
 
         // Dates before 1900 are disabled
         if (date < minDate) return true;
