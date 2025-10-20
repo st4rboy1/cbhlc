@@ -5,7 +5,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { AlertCircle, PlusCircle } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 interface Enrollment {
     id: number;
@@ -51,18 +53,17 @@ export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
         { title: 'Enrollments', href: '/guardian/enrollments' },
     ];
 
+    useEffect(() => {
+        if (errors.enrollment) {
+            toast.error(errors.enrollment);
+        }
+    }, [errors.enrollment]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="My Children's Enrollments" />
 
             <div className="px-4 py-6">
-                {errors.enrollment && (
-                    <div className="mb-4 flex items-center gap-2 rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive">
-                        <AlertCircle className="h-5 w-5" />
-                        <p>{errors.enrollment}</p>
-                    </div>
-                )}
-
                 <div className="mb-4 flex items-center justify-between">
                     <h1 className="mb-4 text-2xl font-bold">My Children's Enrollments</h1>
                     <Link href="/guardian/enrollments/create">
