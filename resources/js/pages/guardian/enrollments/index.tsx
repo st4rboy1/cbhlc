@@ -3,10 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { create, edit, show } from '@/routes/guardian/enrollments';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { PlusCircle } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { AlertCircle, PlusCircle } from 'lucide-react';
 
 interface Enrollment {
     id: number;
@@ -45,6 +44,8 @@ export const paymentStatusColors = {
 } as const;
 
 export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
+    const { errors } = usePage().props as { errors: Record<string, string> };
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Enrollments', href: '/guardian/enrollments' },
@@ -55,9 +56,16 @@ export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
             <Head title="My Children's Enrollments" />
 
             <div className="px-4 py-6">
+                {errors.enrollment && (
+                    <div className="mb-4 flex items-center gap-2 rounded-lg border border-destructive bg-destructive/10 p-4 text-destructive">
+                        <AlertCircle className="h-5 w-5" />
+                        <p>{errors.enrollment}</p>
+                    </div>
+                )}
+
                 <div className="mb-4 flex items-center justify-between">
                     <h1 className="mb-4 text-2xl font-bold">My Children's Enrollments</h1>
-                    <Link href={create().url}>
+                    <Link href="/guardian/enrollments/create">
                         <Button>
                             <PlusCircle className="mr-2 h-4 w-4" />
                             New Enrollment
@@ -108,13 +116,13 @@ export default function GuardianEnrollmentsIndex({ enrollments }: Props) {
                                         <TableCell>{enrollment.created_at}</TableCell>
                                         <TableCell>
                                             <div className="flex gap-2">
-                                                <Link href={show(enrollment.id).url}>
+                                                <Link href={`/guardian/enrollments/${enrollment.id}`}>
                                                     <Button size="sm" variant="outline">
                                                         View
                                                     </Button>
                                                 </Link>
                                                 {enrollment.status === 'pending' && (
-                                                    <Link href={edit(enrollment.id).url}>
+                                                    <Link href={`/guardian/enrollments/${enrollment.id}/edit`}>
                                                         <Button size="sm" variant="outline">
                                                             Edit
                                                         </Button>
