@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers\Guardian;
 
+use App\Enums\DocumentType;
+use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guardian\StoreStudentRequest;
 use App\Http\Requests\Guardian\UpdateStudentRequest;
+use App\Models\Document;
 use App\Models\Guardian;
 use App\Models\GuardianStudent;
 use App\Models\Student;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class StudentController extends Controller
@@ -129,10 +134,14 @@ class StudentController extends Controller
     {
         $validated = $request->validated();
 
-        // Generate student ID
-        $validated['student_id'] = 'CBHLC'.date('Y').str_pad((string) (Student::count() + 1), 4, '0', STR_PAD_LEFT);
+        // Remove document fields from student data
+        $documentFields = ['birth_certificate', 'report_card', 'form_138', 'good_moral'];
+        $studentData = collect($validated)->except($documentFields)->toArray();
 
-        $student = Student::create($validated);
+        // Generate student ID
+        $studentData['student_id'] = 'CBHLC'.date('Y').str_pad((string) (Student::count() + 1), 4, '0', STR_PAD_LEFT);
+
+        $student = Student::create($studentData);
 
         // Get Guardian model for authenticated user
         $guardian = Guardian::where('user_id', Auth::id())->firstOrFail();
@@ -145,8 +154,44 @@ class StudentController extends Controller
             'is_primary_contact' => true,
         ]);
 
+        // Handle document uploads
+        $documentMappings = [
+            'birth_certificate' => DocumentType::BIRTH_CERTIFICATE,
+            'report_card' => DocumentType::REPORT_CARD,
+            'form_138' => DocumentType::FORM_138,
+            'good_moral' => DocumentType::GOOD_MORAL,
+        ];
+
+        foreach ($documentMappings as $field => $documentType) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $originalName = $file->getClientOriginalName();
+                $storedName = Str::random(40).'.'.$file->extension();
+
+                // Store file in private storage
+                $path = $file->storeAs(
+                    "documents/{$student->id}",
+                    $storedName,
+                    'private'
+                );
+
+                // Create document record
+                Document::create([
+                    'student_id' => $student->id,
+                    'document_type' => $documentType,
+                    'original_filename' => $originalName,
+                    'stored_filename' => $storedName,
+                    'file_path' => $path,
+                    'file_size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType(),
+                    'upload_date' => now(),
+                    'verification_status' => VerificationStatus::PENDING,
+                ]);
+            }
+        }
+
         return redirect()->route('guardian.students.show', $student->id)
-            ->with('success', 'Student added successfully.');
+            ->with('success', 'Student and documents added successfully.');
     }
 
     /**
