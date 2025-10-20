@@ -30,6 +30,9 @@ interface Student {
     email: string;
     grade_level: string;
     section: string | null;
+    birth_place: string;
+    nationality: string;
+    religion: string;
     enrollments: Enrollment[];
 }
 
@@ -110,8 +113,20 @@ export default function GuardianStudentsShow({ student }: Props) {
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-muted-foreground">Birth Place:</span>
+                                    <span className="font-semibold">{student.birth_place || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
                                     <span className="text-sm font-medium text-muted-foreground">Gender:</span>
                                     <span className="font-semibold capitalize">{student.gender || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-muted-foreground">Nationality:</span>
+                                    <span className="font-semibold">{student.nationality || 'N/A'}</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-muted-foreground">Religion:</span>
+                                    <span className="font-semibold">{student.religion || 'N/A'}</span>
                                 </div>
                             </div>
                         </CardContent>
