@@ -105,6 +105,7 @@ export default function EnrollmentPeriodEdit({ period }: Props) {
                                         onChange={(date) => setData('start_date', date ? format(date, 'yyyy-MM-dd') : '')}
                                         placeholder="Select start date"
                                         error={!!errors.start_date}
+                                        allowFutureDates
                                     />
                                     {errors.start_date && <p className="text-sm text-destructive">{errors.start_date}</p>}
                                 </div>
@@ -119,6 +120,7 @@ export default function EnrollmentPeriodEdit({ period }: Props) {
                                         onChange={(date) => setData('end_date', date ? format(date, 'yyyy-MM-dd') : '')}
                                         placeholder="Select end date"
                                         error={!!errors.end_date}
+                                        allowFutureDates
                                     />
                                     {errors.end_date && <p className="text-sm text-destructive">{errors.end_date}</p>}
                                 </div>
@@ -137,6 +139,7 @@ export default function EnrollmentPeriodEdit({ period }: Props) {
                                             onChange={(date) => setData('early_registration_deadline', date ? format(date, 'yyyy-MM-dd') : '')}
                                             placeholder="Optional"
                                             error={!!errors.early_registration_deadline}
+                                            allowFutureDates
                                         />
                                         {errors.early_registration_deadline && (
                                             <p className="text-sm text-destructive">{errors.early_registration_deadline}</p>
@@ -153,6 +156,7 @@ export default function EnrollmentPeriodEdit({ period }: Props) {
                                             onChange={(date) => setData('regular_registration_deadline', date ? format(date, 'yyyy-MM-dd') : '')}
                                             placeholder="Select deadline"
                                             error={!!errors.regular_registration_deadline}
+                                            allowFutureDates
                                         />
                                         {errors.regular_registration_deadline && (
                                             <p className="text-sm text-destructive">{errors.regular_registration_deadline}</p>
@@ -167,6 +171,7 @@ export default function EnrollmentPeriodEdit({ period }: Props) {
                                             onChange={(date) => setData('late_registration_deadline', date ? format(date, 'yyyy-MM-dd') : '')}
                                             placeholder="Optional"
                                             error={!!errors.late_registration_deadline}
+                                            allowFutureDates
                                         />
                                         {errors.late_registration_deadline && (
                                             <p className="text-sm text-destructive">{errors.late_registration_deadline}</p>
