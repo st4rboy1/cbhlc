@@ -8,7 +8,11 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 
-export default function GuardianStudentsCreate() {
+interface Props {
+    gradeLevels: string[];
+}
+
+export default function GuardianStudentsCreate({ gradeLevels }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Students', href: '/guardian/students' },
@@ -83,7 +87,6 @@ export default function GuardianStudentsCreate() {
                                         <SelectContent>
                                             <SelectItem value="Male">Male</SelectItem>
                                             <SelectItem value="Female">Female</SelectItem>
-                                            <SelectItem value="Other">Other</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     {errors.gender && <p className="text-sm text-destructive">{errors.gender}</p>}
@@ -93,12 +96,18 @@ export default function GuardianStudentsCreate() {
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
                                     <Label htmlFor="grade_level">Grade Level</Label>
-                                    <Input
-                                        id="grade_level"
-                                        value={data.grade_level}
-                                        onChange={(e) => setData('grade_level', e.target.value)}
-                                        required
-                                    />
+                                    <Select onValueChange={(value) => setData('grade_level', value)} value={data.grade_level} required>
+                                        <SelectTrigger id="grade_level">
+                                            <SelectValue placeholder="Select grade level" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {gradeLevels.map((level) => (
+                                                <SelectItem key={level} value={level}>
+                                                    {level}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                     {errors.grade_level && <p className="text-sm text-destructive">{errors.grade_level}</p>}
                                 </div>
                                 <div className="space-y-2">
