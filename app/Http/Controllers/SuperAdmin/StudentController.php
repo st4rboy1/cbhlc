@@ -133,7 +133,7 @@ class StudentController extends Controller
             'last_name' => $student->last_name,
             'grade' => $student->grade_level?->label() ?? 'N/A',
             'status' => $status,
-            'birth_date' => $student->birthdate?->format('F d, Y') ?? 'N/A',
+            'birth_date' => $student->birthdate->format('F d, Y'),
             'address' => $student->address ?? 'N/A',
             'guardians' => $student->guardians,
         ];
