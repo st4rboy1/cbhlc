@@ -134,7 +134,9 @@ class InvoiceSeeder extends Seeder
                     break;
 
                 case InvoiceStatus::PARTIALLY_PAID:
-                    $updateData['paid_amount'] = $invoice->total_amount * fake()->randomFloat(2, 0.3, 0.7);
+                    // Random percentage between 30% and 70%
+                    $percentage = mt_rand(30, 70) / 100;
+                    $updateData['paid_amount'] = $invoice->total_amount * $percentage;
                     break;
 
                 case InvoiceStatus::OVERDUE:
