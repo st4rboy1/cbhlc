@@ -36,6 +36,12 @@ class StoreStudentRequest extends FormRequest
             'birth_place' => ['nullable', 'string', 'max:255'],
             'nationality' => ['nullable', 'string', 'max:100'],
             'religion' => ['nullable', 'string', 'max:100'],
+
+            // Document uploads
+            'birth_certificate' => ['required', 'file', 'mimes:jpeg,jpg,png', 'max:51200'], // 50MB in kilobytes
+            'report_card' => ['nullable', 'file', 'mimes:jpeg,jpg,png', 'max:51200'],
+            'form_138' => ['nullable', 'file', 'mimes:jpeg,jpg,png', 'max:51200'],
+            'good_moral' => ['nullable', 'file', 'mimes:jpeg,jpg,png', 'max:51200'],
         ];
     }
 
@@ -58,6 +64,17 @@ class StoreStudentRequest extends FormRequest
             'address.required' => 'Address is required.',
             'contact_number.regex' => 'Contact number format is invalid.',
             'email.email' => 'Please provide a valid email address.',
+
+            // Document validation messages
+            'birth_certificate.required' => 'Birth certificate is required.',
+            'birth_certificate.mimes' => 'Birth certificate must be a JPEG or PNG image.',
+            'birth_certificate.max' => 'Birth certificate file size must not exceed 50MB.',
+            'report_card.mimes' => 'Report card must be a JPEG or PNG image.',
+            'report_card.max' => 'Report card file size must not exceed 50MB.',
+            'form_138.mimes' => 'Form 138 must be a JPEG or PNG image.',
+            'form_138.max' => 'Form 138 file size must not exceed 50MB.',
+            'good_moral.mimes' => 'Good moral certificate must be a JPEG or PNG image.',
+            'good_moral.max' => 'Good moral certificate file size must not exceed 50MB.',
         ];
     }
 

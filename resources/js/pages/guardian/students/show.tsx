@@ -1,11 +1,29 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Calendar, Edit, GraduationCap, Mail, MapPin, Phone, User } from 'lucide-react';
+import axios from 'axios';
+import {
+    Calendar,
+    CheckCircle2,
+    Clock,
+    Download,
+    Edit,
+    Eye,
+    FileText,
+    GraduationCap,
+    Mail,
+    MapPin,
+    Phone,
+    Upload,
+    User,
+    XCircle,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Enrollment {
     id: number;
@@ -15,6 +33,16 @@ interface Enrollment {
     status: string;
     payment_status: string;
     created_at: string;
+}
+
+interface Document {
+    id: number;
+    document_type: string;
+    document_type_label: string;
+    original_filename: string;
+    file_size: number;
+    upload_date: string;
+    verification_status: string;
 }
 
 interface Student {
@@ -34,6 +62,7 @@ interface Student {
     nationality: string;
     religion: string;
     enrollments: Enrollment[];
+    documents: Document[];
 }
 
 interface Props {
@@ -55,6 +84,10 @@ const paymentStatusColors = {
 } as const;
 
 export default function GuardianStudentsShow({ student }: Props) {
+    const [downloadingId, setDownloadingId] = useState<number | null>(null);
+    const [imageUrls, setImageUrls] = useState<Record<number, string>>({});
+    const [viewingImageId, setViewingImageId] = useState<number | null>(null);
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Students', href: '/guardian/students' },
@@ -62,6 +95,46 @@ export default function GuardianStudentsShow({ student }: Props) {
     ];
 
     const fullName = `${student.first_name} ${student.middle_name ? student.middle_name + ' ' : ''}${student.last_name}`;
+
+    // Load signed URLs for all documents on mount
+    useEffect(() => {
+        const loadImageUrls = async () => {
+            if (!student.documents || student.documents.length === 0) return;
+
+            const urls: Record<number, string> = {};
+            await Promise.all(
+                student.documents.map(async (document) => {
+                    try {
+                        const response = await axios.get(`/guardian/students/${student.id}/documents/${document.id}`);
+                        urls[document.id] = response.data.url;
+                    } catch (error) {
+                        console.error(`Failed to load image for document ${document.id}:`, error);
+                    }
+                }),
+            );
+            setImageUrls(urls);
+        };
+
+        loadImageUrls();
+    }, [student.id, student.documents]);
+
+    const handleDownload = async (documentId: number) => {
+        try {
+            setDownloadingId(documentId);
+
+            // Get signed URL
+            const response = await axios.get(`/guardian/students/${student.id}/documents/${documentId}`);
+            const { url } = response.data;
+
+            // Trigger download
+            window.location.href = url;
+        } catch (error) {
+            console.error('Download failed:', error);
+            alert('Failed to download document. Please try again.');
+        } finally {
+            setDownloadingId(null);
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -288,7 +361,126 @@ export default function GuardianStudentsShow({ student }: Props) {
                         )}
                     </CardContent>
                 </Card>
+
+                {/* Documents */}
+                <Card className="mt-6">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <FileText className="h-5 w-5" />
+                            Required Documents
+                        </CardTitle>
+                        <CardDescription>Uploaded documents for {student.first_name}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {student.documents && student.documents.length > 0 ? (
+                            <div className="space-y-6">
+                                {student.documents.map((document) => (
+                                    <div key={document.id} className="space-y-3 rounded-lg border p-4">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                                    <FileText className="h-5 w-5 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium">{document.document_type_label}</p>
+                                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                                        <span>{document.original_filename}</span>
+                                                        <span>•</span>
+                                                        <span>{(document.file_size / 1024 / 1024).toFixed(2)} MB</span>
+                                                        <span>•</span>
+                                                        <span>
+                                                            Uploaded{' '}
+                                                            {new Date(document.upload_date).toLocaleDateString('en-US', {
+                                                                year: 'numeric',
+                                                                month: 'short',
+                                                                day: 'numeric',
+                                                            })}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                {document.verification_status === 'pending' && (
+                                                    <Badge variant="secondary" className="flex items-center gap-1">
+                                                        <Clock className="h-3 w-3" />
+                                                        Pending Review
+                                                    </Badge>
+                                                )}
+                                                {document.verification_status === 'verified' && (
+                                                    <Badge variant="default" className="flex items-center gap-1">
+                                                        <CheckCircle2 className="h-3 w-3" />
+                                                        Verified
+                                                    </Badge>
+                                                )}
+                                                {document.verification_status === 'rejected' && (
+                                                    <Badge variant="destructive" className="flex items-center gap-1">
+                                                        <XCircle className="h-3 w-3" />
+                                                        Rejected
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Image Preview */}
+                                        {imageUrls[document.id] ? (
+                                            <div className="space-y-2">
+                                                <img
+                                                    src={imageUrls[document.id]}
+                                                    alt={document.document_type_label}
+                                                    className="h-auto w-full max-w-2xl rounded-lg border object-contain"
+                                                />
+                                                <div className="flex gap-2">
+                                                    <Button variant="outline" size="sm" onClick={() => setViewingImageId(document.id)}>
+                                                        <Eye className="mr-2 h-4 w-4" />
+                                                        View Full Size
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handleDownload(document.id)}
+                                                        disabled={downloadingId === document.id}
+                                                    >
+                                                        <Download className="mr-2 h-4 w-4" />
+                                                        {downloadingId === document.id ? 'Downloading...' : 'Download'}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex h-32 items-center justify-center rounded-lg bg-muted">
+                                                <p className="text-sm text-muted-foreground">Loading image...</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-12 text-center">
+                                <Upload className="mb-4 h-12 w-12 text-muted-foreground" />
+                                <p className="mb-2 text-lg font-semibold">No Documents Uploaded</p>
+                                <p className="text-sm text-muted-foreground">Documents are required for enrollment processing</p>
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
             </div>
+
+            {/* Full Size Image Dialog */}
+            <Dialog open={viewingImageId !== null} onOpenChange={(open) => !open && setViewingImageId(null)}>
+                <DialogContent className="max-w-5xl">
+                    <DialogHeader>
+                        <DialogTitle>{viewingImageId && student.documents.find((d) => d.id === viewingImageId)?.document_type_label}</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex justify-center">
+                        {viewingImageId && imageUrls[viewingImageId] && (
+                            <img
+                                src={imageUrls[viewingImageId]}
+                                alt="Document"
+                                className="h-auto max-h-[80vh] w-auto max-w-full rounded-lg object-contain"
+                            />
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }
