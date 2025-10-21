@@ -13,26 +13,21 @@ import { useToast } from '@/hooks/use-toast';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 
-interface SchoolInformation {
-    id: number;
+interface FormField {
     key: string;
-    value: string | null;
-    type: string;
-    group: string;
     label: string;
-    description: string | null;
-    order: number;
+    type: 'text' | 'email' | 'phone' | 'url' | 'textarea';
+    placeholder?: string;
 }
 
-interface GroupedInformation {
-    contact?: SchoolInformation[];
-    hours?: SchoolInformation[];
-    social?: SchoolInformation[];
-    about?: SchoolInformation[];
+interface FormSection {
+    title: string;
+    description: string;
+    fields: FormField[];
 }
 
 interface Props {
-    information: GroupedInformation;
+    values: Record<string, string>;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -40,95 +35,99 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'School Information', href: '/super-admin/school-information' },
 ];
 
-const groupTitles: Record<string, { title: string; description: string }> = {
-    contact: {
+const formSections: FormSection[] = [
+    {
         title: 'Contact Information',
         description: 'Manage school contact details and address',
+        fields: [
+            { key: 'school_name', label: 'School Name', type: 'text', placeholder: 'Enter school name' },
+            { key: 'school_email', label: 'Email Address', type: 'email', placeholder: 'Enter email address' },
+            { key: 'school_phone', label: 'Phone Number', type: 'phone', placeholder: 'Enter phone number' },
+            { key: 'school_mobile', label: 'Mobile Number', type: 'phone', placeholder: 'Enter mobile number' },
+            { key: 'school_address', label: 'School Address', type: 'text', placeholder: 'Enter school address' },
+        ],
     },
-    hours: {
+    {
         title: 'Office Hours',
         description: 'Set office hours for different days of the week',
+        fields: [
+            { key: 'office_hours_weekday', label: 'Weekday Hours', type: 'text', placeholder: 'e.g., Monday to Friday: 8:00 AM - 5:00 PM' },
+            { key: 'office_hours_saturday', label: 'Saturday Hours', type: 'text', placeholder: 'e.g., Saturday: 8:00 AM - 12:00 PM' },
+            { key: 'office_hours_sunday', label: 'Sunday Hours', type: 'text', placeholder: 'e.g., Sunday: Closed' },
+        ],
     },
-    social: {
+    {
         title: 'Social Media',
         description: 'Update social media links and profiles',
+        fields: [
+            { key: 'facebook_url', label: 'Facebook URL', type: 'url', placeholder: 'https://facebook.com/...' },
+            { key: 'instagram_url', label: 'Instagram URL', type: 'url', placeholder: 'https://instagram.com/...' },
+            { key: 'youtube_url', label: 'YouTube URL', type: 'url', placeholder: 'https://youtube.com/...' },
+        ],
     },
-    about: {
+    {
         title: 'About School',
         description: 'School tagline and description',
+        fields: [
+            { key: 'school_tagline', label: 'School Tagline', type: 'text', placeholder: 'Enter school tagline or motto' },
+            { key: 'school_description', label: 'School Description', type: 'textarea', placeholder: 'Enter brief description of the school' },
+        ],
     },
-};
+];
 
-export default function SchoolInformationIndex({ information }: Props) {
+export default function SchoolInformationIndex({ values }: Props) {
     const { toast } = useToast();
-    const [formData, setFormData] = useState<Record<number, string>>(() => {
-        const initial: Record<number, string> = {};
-        Object.values(information).forEach((items) => {
-            items?.forEach((item: SchoolInformation) => {
-                initial[item.id] = item.value || '';
-            });
-        });
-        return initial;
-    });
+    const [formData, setFormData] = useState<Record<string, string>>(values || {});
     const [saving, setSaving] = useState(false);
 
-    const handleChange = (id: number, value: string) => {
-        setFormData((prev) => ({ ...prev, [id]: value }));
+    const handleChange = (key: string, value: string) => {
+        setFormData((prev) => ({ ...prev, [key]: value }));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
 
-        const updates = Object.entries(formData).map(([id, value]) => ({
-            id: parseInt(id),
-            value,
-        }));
-
-        router.put(
-            '/super-admin/school-information',
-            { updates },
-            {
-                onSuccess: () => {
-                    toast({
-                        title: 'Success',
-                        description: 'School information updated successfully',
-                    });
-                },
-                onError: (errors) => {
-                    toast({
-                        title: 'Error',
-                        description: errors.updates?.[0] || 'Failed to update school information',
-                        variant: 'destructive',
-                    });
-                },
-                onFinish: () => setSaving(false),
+        router.put('/super-admin/school-information', formData, {
+            onSuccess: () => {
+                toast({
+                    title: 'Success',
+                    description: 'School information updated successfully',
+                });
             },
-        );
+            onError: (errors) => {
+                toast({
+                    title: 'Error',
+                    description: (Object.values(errors)[0] as string) || 'Failed to update school information',
+                    variant: 'destructive',
+                });
+            },
+            onFinish: () => setSaving(false),
+        });
     };
 
-    const renderField = (item: SchoolInformation) => {
-        const value = formData[item.id] || '';
+    const renderField = (field: FormField) => {
+        const value = formData[field.key] || '';
 
-        if (item.type === 'text' && item.key.includes('description')) {
+        if (field.type === 'textarea') {
             return (
                 <Textarea
-                    id={item.key}
+                    id={field.key}
                     value={value}
-                    onChange={(e) => handleChange(item.id, e.target.value)}
+                    onChange={(e) => handleChange(field.key, e.target.value)}
                     rows={3}
-                    placeholder={item.description || ''}
+                    placeholder={field.placeholder}
                 />
             );
         }
 
         return (
             <Input
-                id={item.key}
-                type={item.type === 'email' ? 'email' : item.type === 'url' ? 'url' : 'text'}
+                id={field.key}
+                type={field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : 'text'}
                 value={value}
-                onChange={(e) => handleChange(item.id, e.target.value)}
-                placeholder={item.description || ''}
+                onChange={(e) => handleChange(field.key, e.target.value)}
+                placeholder={field.placeholder}
             />
         );
     };
@@ -141,30 +140,25 @@ export default function SchoolInformationIndex({ information }: Props) {
                 <Heading title="School Information" description="Manage school contact details, office hours, and social media links" />
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {Object.entries(information).map(([group, items]) => {
-                        if (!items || items.length === 0) return null;
-
-                        return (
-                            <Card key={group}>
-                                <CardHeader>
-                                    <CardTitle>{groupTitles[group]?.title || group}</CardTitle>
-                                    <CardDescription>{groupTitles[group]?.description || ''}</CardDescription>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    {items.map((item: SchoolInformation, index: number) => (
-                                        <div key={item.id}>
-                                            {index > 0 && <Separator className="my-4" />}
-                                            <div className="space-y-2">
-                                                <Label htmlFor={item.key}>{item.label}</Label>
-                                                {renderField(item)}
-                                                {item.description && <p className="text-sm text-muted-foreground">{item.description}</p>}
-                                            </div>
+                    {formSections.map((section) => (
+                        <Card key={section.title}>
+                            <CardHeader>
+                                <CardTitle>{section.title}</CardTitle>
+                                <CardDescription>{section.description}</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {section.fields.map((field, index) => (
+                                    <div key={field.key}>
+                                        {index > 0 && <Separator className="my-4" />}
+                                        <div className="space-y-2">
+                                            <Label htmlFor={field.key}>{field.label}</Label>
+                                            {renderField(field)}
                                         </div>
-                                    ))}
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    ))}
 
                     <div className="flex justify-end">
                         <Button type="submit" disabled={saving}>

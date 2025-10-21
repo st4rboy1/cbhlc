@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class SchoolInformationSeeder extends Seeder
@@ -145,5 +146,8 @@ class SchoolInformationSeeder extends Seeder
                 'updated_at' => now(),
             ]));
         }
+
+        // Clear the cache to ensure fresh data is loaded
+        Cache::forget('school_information');
     }
 }
