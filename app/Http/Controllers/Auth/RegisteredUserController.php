@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Guardian;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -44,6 +45,15 @@ class RegisteredUserController extends Controller
 
         // Registration is limited to guardians only
         $user->assignRole('guardian');
+
+        // Create Guardian profile with basic information from registration
+        // Split the name into first and last name (simple approach)
+        $nameParts = explode(' ', $request->name, 2);
+        Guardian::create([
+            'user_id' => $user->id,
+            'first_name' => $nameParts[0],
+            'last_name' => $nameParts[1] ?? '',
+        ]);
 
         event(new Registered($user));
 
