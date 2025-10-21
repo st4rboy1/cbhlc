@@ -55,11 +55,7 @@ class SchoolInformationTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('super-admin/school-information/index')
-            ->has('information')
-            ->has('information.contact')
-            ->has('information.hours')
-            ->has('information.social')
-            ->has('information.about')
+            ->has('values')
         );
     }
 
@@ -96,49 +92,31 @@ class SchoolInformationTest extends TestCase
 
     public function test_super_admin_can_update_school_information(): void
     {
-        $schoolName = SchoolInformation::where('key', 'school_name')->first();
-        $schoolEmail = SchoolInformation::where('key', 'school_email')->first();
-
         $response = $this->actingAs($this->superAdmin)
             ->put('/super-admin/school-information', [
-                'updates' => [
-                    [
-                        'id' => $schoolName->id,
-                        'value' => 'Updated School Name',
-                    ],
-                    [
-                        'id' => $schoolEmail->id,
-                        'value' => 'updated@school.edu',
-                    ],
-                ],
+                'school_name' => 'Updated School Name',
+                'school_email' => 'updated@school.edu',
             ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success', 'School information updated successfully.');
 
         $this->assertDatabaseHas('school_information', [
-            'id' => $schoolName->id,
+            'key' => 'school_name',
             'value' => 'Updated School Name',
         ]);
 
         $this->assertDatabaseHas('school_information', [
-            'id' => $schoolEmail->id,
+            'key' => 'school_email',
             'value' => 'updated@school.edu',
         ]);
     }
 
     public function test_administrator_cannot_update_school_information(): void
     {
-        $schoolName = SchoolInformation::where('key', 'school_name')->first();
-
         $response = $this->actingAs($this->administrator)
             ->put('/super-admin/school-information', [
-                'updates' => [
-                    [
-                        'id' => $schoolName->id,
-                        'value' => 'Admin Updated Name',
-                    ],
-                ],
+                'school_name' => 'Admin Updated Name',
             ]);
 
         $response->assertForbidden();
@@ -146,125 +124,103 @@ class SchoolInformationTest extends TestCase
 
     public function test_registrar_cannot_update_school_information(): void
     {
-        $schoolName = SchoolInformation::where('key', 'school_name')->first();
-
         $response = $this->actingAs($this->registrar)
             ->put('/super-admin/school-information', [
-                'updates' => [
-                    [
-                        'id' => $schoolName->id,
-                        'value' => 'Unauthorized Update',
-                    ],
-                ],
+                'school_name' => 'Unauthorized Update',
             ]);
 
         $response->assertForbidden();
     }
 
-    public function test_update_requires_valid_updates_array(): void
+    public function test_update_validates_email_format(): void
     {
         $response = $this->actingAs($this->superAdmin)
             ->put('/super-admin/school-information', [
-                'updates' => 'invalid',
+                'school_email' => 'invalid-email',
             ]);
 
-        $response->assertSessionHasErrors('updates');
+        $response->assertSessionHasErrors('school_email');
     }
 
-    public function test_update_requires_valid_school_information_id(): void
+    public function test_update_validates_url_format(): void
     {
         $response = $this->actingAs($this->superAdmin)
             ->put('/super-admin/school-information', [
-                'updates' => [
-                    [
-                        'id' => 99999, // Non-existent ID
-                        'value' => 'Test Value',
-                    ],
-                ],
+                'facebook_url' => 'not-a-url',
             ]);
 
-        $response->assertSessionHasErrors('updates.0.id');
+        $response->assertSessionHasErrors('facebook_url');
     }
 
     public function test_update_allows_null_values(): void
     {
-        $socialMedia = SchoolInformation::where('key', 'facebook_url')->first();
-
         $response = $this->actingAs($this->superAdmin)
             ->put('/super-admin/school-information', [
-                'updates' => [
-                    [
-                        'id' => $socialMedia->id,
-                        'value' => null,
-                    ],
-                ],
+                'facebook_url' => null,
             ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('school_information', [
-            'id' => $socialMedia->id,
+            'key' => 'facebook_url',
             'value' => null,
         ]);
     }
 
     public function test_update_allows_empty_string_values(): void
     {
-        $socialMedia = SchoolInformation::where('key', 'instagram_url')->first();
-
         $response = $this->actingAs($this->superAdmin)
             ->put('/super-admin/school-information', [
-                'updates' => [
-                    [
-                        'id' => $socialMedia->id,
-                        'value' => '',
-                    ],
-                ],
+                'instagram_url' => '',
             ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
         // Empty string may be stored as null by database, which is acceptable
-        $updated = SchoolInformation::find($socialMedia->id);
+        $updated = SchoolInformation::where('key', 'instagram_url')->first();
         $this->assertTrue($updated->value === '' || $updated->value === null);
     }
 
-    public function test_school_information_is_grouped_correctly(): void
+    public function test_values_are_returned_as_key_value_pairs(): void
     {
         $response = $this->actingAs($this->superAdmin)
             ->get('/super-admin/school-information');
 
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
-            ->where('information.contact.0.group', 'contact')
-            ->where('information.hours.0.group', 'hours')
-            ->where('information.social.0.group', 'social')
-            ->where('information.about.0.group', 'about')
+            ->has('values.school_name')
+            ->has('values.school_email')
+            ->has('values.school_phone')
         );
     }
 
     public function test_can_update_multiple_fields_at_once(): void
     {
-        $info = SchoolInformation::whereIn('key', ['school_name', 'school_email', 'school_phone'])->get();
-
         $response = $this->actingAs($this->superAdmin)
             ->put('/super-admin/school-information', [
-                'updates' => $info->map(fn ($item) => [
-                    'id' => $item->id,
-                    'value' => 'Updated '.$item->key,
-                ])->toArray(),
+                'school_name' => 'Updated School Name',
+                'school_email' => 'updated@school.edu',
+                'school_phone' => '(02) 9999-8888',
             ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        foreach ($info as $item) {
-            $this->assertDatabaseHas('school_information', [
-                'id' => $item->id,
-                'value' => 'Updated '.$item->key,
-            ]);
-        }
+        $this->assertDatabaseHas('school_information', [
+            'key' => 'school_name',
+            'value' => 'Updated School Name',
+        ]);
+
+        $this->assertDatabaseHas('school_information', [
+            'key' => 'school_email',
+            'value' => 'updated@school.edu',
+        ]);
+
+        $this->assertDatabaseHas('school_information', [
+            'key' => 'school_phone',
+            'value' => '(02) 9999-8888',
+        ]);
     }
 }
