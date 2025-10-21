@@ -1,9 +1,11 @@
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { paymentStatusColors, statusColors } from '@/pages/guardian/enrollments/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+import { Download } from 'lucide-react';
 
 interface Enrollment {
     id: number;
@@ -77,8 +79,14 @@ export default function GuardianEnrollmentsShow({ enrollment }: Props) {
                     </Card>
 
                     <Card>
-                        <CardHeader>
+                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle>Payment Information</CardTitle>
+                            <Button variant="outline" size="sm" asChild>
+                                <a href={`/guardian/enrollments/${enrollment.id}/payment-history-pdf`} download>
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Download Report
+                                </a>
+                            </Button>
                         </CardHeader>
                         <CardContent className="grid gap-4">
                             <div className="flex items-center justify-between">
