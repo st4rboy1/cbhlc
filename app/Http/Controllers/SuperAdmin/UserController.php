@@ -93,6 +93,11 @@ class UserController extends Controller
 
         $user->load('roles', 'permissions');
 
+        // Load guardian profile if user has guardian role
+        if ($user->hasRole('guardian')) {
+            $user->load('guardian');
+        }
+
         return Inertia::render('super-admin/users/show', [
             'user' => $user,
         ]);
@@ -106,6 +111,12 @@ class UserController extends Controller
         Gate::authorize('update', $user);
 
         $user->load('roles');
+
+        // Load guardian profile if user has guardian role
+        if ($user->hasRole('guardian')) {
+            $user->load('guardian');
+        }
+
         $roles = Role::all();
 
         return Inertia::render('super-admin/users/edit', [
