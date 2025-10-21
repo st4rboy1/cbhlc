@@ -67,7 +67,7 @@ export default function Landing() {
                                 <Button size="lg" className="px-8 py-3" asChild>
                                     <Link href={register()}>Start Enrollment</Link>
                                 </Button>
-                                <Button variant="outline" size="lg" className="px-8 py-3" asChild>
+                                <Button variant="default" size="lg" className="bg-black px-8 py-3 text-white hover:bg-black/90" asChild>
                                     <Link href="/about">Learn More</Link>
                                 </Button>
                             </div>
@@ -185,15 +185,15 @@ export default function Landing() {
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={Phone} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-slate-400">+63 123 456 7890</span>
+                                        <span className="text-sm text-white">+63 123 456 7890</span>
                                     </div>
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={Mail} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-slate-400">christianbibleheritage@gmail.com</span>
+                                        <span className="text-sm text-white">christianbibleheritage@gmail.com</span>
                                     </div>
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={MapPin} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-slate-400">Bayabas Ext. NAPICO Manggahan 1611 Pasig, Philippines</span>
+                                        <span className="text-sm text-white">Bayabas Ext. NAPICO Manggahan 1611 Pasig, Philippines</span>
                                     </div>
                                 </div>
                             </div>
