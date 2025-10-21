@@ -20,7 +20,7 @@ class EnrollmentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Enrollment::with(['student', 'guardian']);
+        $query = Enrollment::with(['student', 'guardian.user']);
 
         // Apply filters
         if ($request->filled('status')) {

@@ -264,6 +264,7 @@ export default function SuperAdminEnrollmentsShow({ enrollment }: Props) {
                         </Card>
 
                         {/* Guardian Information */}
+
                         <Card className="p-6">
                             <div className="mb-4 flex items-center gap-2">
                                 <Users className="h-4 w-4 text-muted-foreground" />

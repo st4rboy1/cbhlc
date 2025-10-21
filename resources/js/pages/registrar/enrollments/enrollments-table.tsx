@@ -27,11 +27,19 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { router } from '@inertiajs/react';
+
+// Dialog components for the modal
+import InputError from '@/components/input-error';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 interface Enrollment {
     id: number;
     student: { first_name: string; last_name: string; student_id: string };
-    guardian: { name: string };
+    guardian: { first_name: string; last_name: string; user?: { email: string } };
     school_year: string;
     quarter: string;
     grade_level: string;
@@ -87,7 +95,14 @@ export function formatStatusName(status: string) {
     return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
-export const columns: ColumnDef<Enrollment>[] = [
+// Define a type for the functions that will be passed to the columns
+interface ColumnActionProps {
+    onApproveClick: (enrollment: Enrollment) => void;
+    onRejectClick: (enrollment: Enrollment) => void;
+    onUpdatePaymentStatusClick: (enrollment: Enrollment) => void;
+}
+
+export const createColumns = ({ onApproveClick, onRejectClick, onUpdatePaymentStatusClick }: ColumnActionProps): ColumnDef<Enrollment>[] => [
     {
         id: 'select',
         header: ({ table }) => (
@@ -124,8 +139,8 @@ export const columns: ColumnDef<Enrollment>[] = [
         accessorKey: 'guardian',
         header: 'Guardian',
         cell: ({ row }) => {
-            const guardian = row.getValue('guardian') as { name: string };
-            return <div>{guardian.name}</div>;
+            const guardian = row.getValue('guardian') as { first_name: string; last_name: string; user?: { email: string } };
+            return <div>{`${guardian.first_name} ${guardian.last_name}`}</div>;
         },
     },
     {
@@ -182,6 +197,18 @@ export const columns: ColumnDef<Enrollment>[] = [
         cell: ({ row }) => {
             const enrollment = row.original;
 
+            const handleCompleteClick = (enrollment: Enrollment) => {
+                if (confirm(`Are you sure you want to complete enrollment ${enrollment.id}?`)) {
+                    router.post(`/registrar/enrollments/${enrollment.id}/complete`);
+                }
+            };
+
+            const handleConfirmPaymentClick = (enrollment: Enrollment) => {
+                if (confirm(`Are you sure you want to confirm payment for enrollment ${enrollment.id}?`)) {
+                    router.post(`/registrar/enrollments/${enrollment.id}/confirm-payment`);
+                }
+            };
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -199,6 +226,19 @@ export const columns: ColumnDef<Enrollment>[] = [
                         <DropdownMenuItem onClick={() => (window.location.href = `/registrar/enrollments/${enrollment.id}`)}>
                             View Enrollment
                         </DropdownMenuItem>
+                        {enrollment.status === 'pending' && (
+                            <DropdownMenuItem onClick={() => onApproveClick(enrollment)}>Approve Enrollment</DropdownMenuItem>
+                        )}
+                        {enrollment.status === 'pending' && (
+                            <DropdownMenuItem onClick={() => onRejectClick(enrollment)}>Reject Enrollment</DropdownMenuItem>
+                        )}
+                        {enrollment.status === 'approved' && enrollment.payment_status === 'paid' && (
+                            <DropdownMenuItem onClick={() => handleCompleteClick(enrollment)}>Complete Enrollment</DropdownMenuItem>
+                        )}
+                        {enrollment.payment_status === 'pending' && (
+                            <DropdownMenuItem onClick={() => handleConfirmPaymentClick(enrollment)}>Confirm Payment</DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem onClick={() => onUpdatePaymentStatusClick(enrollment)}>Update Payment Status</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );
@@ -211,6 +251,124 @@ export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
+
+    // State for Approve Enrollment Modal
+    const [showApproveModal, setShowApproveModal] = React.useState(false);
+    const [enrollmentToApprove, setEnrollmentToApprove] = React.useState<Enrollment | null>(null);
+    const [approveRemarks, setApproveRemarks] = React.useState('');
+    const [approveErrors, setApproveErrors] = React.useState<Record<string, string>>({});
+
+    // State for Reject Enrollment Modal
+    const [showRejectModal, setShowRejectModal] = React.useState(false);
+    const [enrollmentToReject, setEnrollmentToReject] = React.useState<Enrollment | null>(null);
+    const [rejectReason, setRejectReason] = React.useState('');
+    const [rejectErrors, setRejectErrors] = React.useState<Record<string, string>>({});
+
+    // State for Update Payment Status Modal
+    const [showUpdatePaymentStatusModal, setShowUpdatePaymentStatusModal] = React.useState(false);
+    const [enrollmentToUpdatePaymentStatus, setEnrollmentToUpdatePaymentStatus] = React.useState<Enrollment | null>(null);
+    const [amountPaid, setAmountPaid] = React.useState('');
+    const [paymentStatus, setPaymentStatus] = React.useState('');
+    const [updatePaymentRemarks, setUpdatePaymentRemarks] = React.useState('');
+    const [updatePaymentErrors, setUpdatePaymentErrors] = React.useState<Record<string, string>>({});
+
+    const handleApproveClick = React.useCallback((enrollment: Enrollment) => {
+        setEnrollmentToApprove(enrollment);
+        setApproveRemarks(''); // Clear previous remarks
+        setApproveErrors({}); // Clear previous errors
+        setShowApproveModal(true);
+    }, []);
+
+    const handleApproveSubmit = () => {
+        if (!enrollmentToApprove) return;
+
+        router.post(
+            `/registrar/enrollments/${enrollmentToApprove.id}/approve`,
+            { remarks: approveRemarks },
+            {
+                onSuccess: () => {
+                    setShowApproveModal(false);
+                    setEnrollmentToApprove(null);
+                    setApproveRemarks('');
+                    setApproveErrors({});
+                },
+                onError: (errors) => {
+                    setApproveErrors(errors);
+                },
+            },
+        );
+    };
+
+    const handleRejectClick = React.useCallback((enrollment: Enrollment) => {
+        setEnrollmentToReject(enrollment);
+        setRejectReason(''); // Clear previous reason
+        setRejectErrors({}); // Clear previous errors
+        setShowRejectModal(true);
+    }, []);
+
+    const handleRejectSubmit = () => {
+        if (!enrollmentToReject) return;
+
+        router.post(
+            `/registrar/enrollments/${enrollmentToReject.id}/reject`,
+            { reason: rejectReason },
+            {
+                onSuccess: () => {
+                    setShowRejectModal(false);
+                    setEnrollmentToReject(null);
+                    setRejectReason('');
+                    setRejectErrors({});
+                },
+                onError: (errors) => {
+                    setRejectErrors(errors);
+                },
+            },
+        );
+    };
+
+    const handleUpdatePaymentStatusClick = React.useCallback((enrollment: Enrollment) => {
+        setEnrollmentToUpdatePaymentStatus(enrollment);
+        setAmountPaid((enrollment.amount_paid_cents / 100).toFixed(2));
+        setPaymentStatus(enrollment.payment_status);
+        setUpdatePaymentRemarks('');
+        setUpdatePaymentErrors({});
+        setShowUpdatePaymentStatusModal(true);
+    }, []);
+    const handleUpdatePaymentStatusSubmit = () => {
+        if (!enrollmentToUpdatePaymentStatus) return;
+
+        router.put(
+            `/registrar/enrollments/${enrollmentToUpdatePaymentStatus.id}/payment-status`,
+            {
+                amount_paid: parseFloat(amountPaid) * 100,
+                payment_status: paymentStatus,
+                remarks: updatePaymentRemarks,
+            },
+            {
+                onSuccess: () => {
+                    setShowUpdatePaymentStatusModal(false);
+                    setEnrollmentToUpdatePaymentStatus(null);
+                    setAmountPaid('');
+                    setPaymentStatus('');
+                    setUpdatePaymentRemarks('');
+                    setUpdatePaymentErrors({});
+                },
+                onError: (errors) => {
+                    setUpdatePaymentErrors(errors);
+                },
+            },
+        );
+    };
+
+    const columns = React.useMemo(
+        () =>
+            createColumns({
+                onApproveClick: handleApproveClick,
+                onRejectClick: handleRejectClick,
+                onUpdatePaymentStatusClick: handleUpdatePaymentStatusClick,
+            }),
+        [handleApproveClick, handleRejectClick, handleUpdatePaymentStatusClick],
+    );
 
     const table = useReactTable({
         data: enrollments,
@@ -312,6 +470,130 @@ export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
                     </Button>
                 </div>
             </div>
+
+            {/* Approve Enrollment Modal */}
+            <Dialog open={showApproveModal} onOpenChange={setShowApproveModal}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Approve Enrollment Application</DialogTitle>
+                        <DialogDescription>
+                            Provide any remarks for approving enrollment #{enrollmentToApprove?.id} - {enrollmentToApprove?.student.first_name}{' '}
+                            {enrollmentToApprove?.student.last_name}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="remarks">Remarks (Optional)</Label>
+                            <Textarea
+                                id="remarks"
+                                placeholder="Enter remarks..."
+                                value={approveRemarks}
+                                onChange={(e) => setApproveRemarks(e.target.value)}
+                                className={approveErrors.remarks ? 'border-destructive' : ''}
+                            />
+                            <InputError message={approveErrors.remarks} className="mt-0" />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowApproveModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleApproveSubmit}>Approve</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Reject Enrollment Modal */}
+            <Dialog open={showRejectModal} onOpenChange={setShowRejectModal}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Reject Enrollment Application</DialogTitle>
+                        <DialogDescription>
+                            Provide a reason for rejecting enrollment #{enrollmentToReject?.id} - {enrollmentToReject?.student.first_name}{' '}
+                            {enrollmentToReject?.student.last_name}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="reason">Reason</Label>
+                            <Textarea
+                                id="reason"
+                                placeholder="Enter rejection reason..."
+                                value={rejectReason}
+                                onChange={(e) => setRejectReason(e.target.value)}
+                                className={rejectErrors.reason ? 'border-destructive' : ''}
+                            />
+                            <InputError message={rejectErrors.reason} className="mt-0" />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowRejectModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleRejectSubmit} disabled={!rejectReason.trim()}>
+                            Reject
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Update Payment Status Modal */}
+            <Dialog open={showUpdatePaymentStatusModal} onOpenChange={setShowUpdatePaymentStatusModal}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Update Payment Status</DialogTitle>
+                        <DialogDescription>
+                            Update payment status for enrollment #{enrollmentToUpdatePaymentStatus?.id} -{' '}
+                            {enrollmentToUpdatePaymentStatus?.student.first_name} {enrollmentToUpdatePaymentStatus?.student.last_name}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="amount_paid">Amount Paid</Label>
+                            <Input
+                                id="amount_paid"
+                                type="number"
+                                step="0.01"
+                                placeholder="Enter amount paid..."
+                                value={amountPaid}
+                                onChange={(e) => setAmountPaid(e.target.value)}
+                                className={updatePaymentErrors.amount_paid ? 'border-destructive' : ''}
+                            />
+                            <InputError message={updatePaymentErrors.amount_paid} className="mt-0" />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="payment_status">Payment Status</Label>
+                            <Select value={paymentStatus} onValueChange={setPaymentStatus}>
+                                <SelectTrigger className={updatePaymentErrors.payment_status ? 'border-destructive' : ''}>
+                                    <SelectValue placeholder="Select payment status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="pending">Pending</SelectItem>
+                                    <SelectItem value="partial">Partial</SelectItem>
+                                    <SelectItem value="paid">Paid</SelectItem>
+                                    <SelectItem value="overdue">Overdue</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <InputError message={updatePaymentErrors.payment_status} className="mt-0" />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="update_remarks">Remarks (Optional)</Label>
+                            <Textarea
+                                id="update_remarks"
+                                placeholder="Enter remarks..."
+                                value={updatePaymentRemarks}
+                                onChange={(e) => setUpdatePaymentRemarks(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowUpdatePaymentStatusModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleUpdatePaymentStatusSubmit}>Update</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
