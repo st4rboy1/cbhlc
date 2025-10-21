@@ -125,14 +125,20 @@ export const createColumns = ({ onApproveClick, onRejectClick, onUpdatePaymentSt
     {
         accessorKey: 'student',
         header: 'Student',
+        accessorFn: (row) => `${row.student.first_name} ${row.student.last_name}`,
         cell: ({ row }) => {
-            const student = row.getValue('student') as { first_name: string; last_name: string; student_id: string };
+            const student = row.original.student;
             return (
                 <div>
                     <div>{`${student.first_name} ${student.last_name}`}</div>
                     <div className="text-xs text-muted-foreground">{student.student_id}</div>
                 </div>
             );
+        },
+        filterFn: (row, id, value) => {
+            const student = row.original.student;
+            const fullName = `${student.first_name} ${student.last_name}`.toLowerCase();
+            return fullName.includes(value.toLowerCase());
         },
     },
     {

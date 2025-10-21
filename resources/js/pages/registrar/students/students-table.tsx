@@ -120,6 +120,7 @@ export const columns: ColumnDef<Student>[] = [
     {
         accessorKey: 'name',
         header: 'Name',
+        accessorFn: (row) => `${row.first_name} ${row.middle_name.charAt(0)}. ${row.last_name}`,
         cell: ({ row }) => {
             const student = row.original;
             return (
@@ -128,6 +129,11 @@ export const columns: ColumnDef<Student>[] = [
                     <div className="text-xs text-muted-foreground">{student.address}</div>
                 </div>
             );
+        },
+        filterFn: (row, id, value) => {
+            const student = row.original;
+            const fullName = `${student.first_name} ${student.middle_name.charAt(0)}. ${student.last_name}`.toLowerCase();
+            return fullName.includes(value.toLowerCase());
         },
     },
     {
