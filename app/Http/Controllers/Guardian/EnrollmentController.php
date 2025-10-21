@@ -451,4 +451,41 @@ class EnrollmentController extends Controller
 
         return $pdf->download("enrollment-certificate-{$enrollment->enrollment_id}.pdf");
     }
+
+    /**
+     * Respond to information request from registrar.
+     */
+    public function respondToInfoRequest(Request $request, Enrollment $enrollment)
+    {
+        // Verify guardian has access to this enrollment
+        $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
+        $hasAccess = GuardianStudent::where('guardian_id', $guardian->id)
+            ->where('student_id', $enrollment->student_id)
+            ->exists();
+
+        if (! $hasAccess) {
+            abort(404);
+        }
+
+        // Validate that info was requested
+        if (! $enrollment->info_requested) {
+            return back()->with('error', 'No information request found for this enrollment.');
+        }
+
+        // Validate that info hasn't been responded to yet
+        if ($enrollment->info_response_date) {
+            return back()->with('error', 'You have already responded to this information request.');
+        }
+
+        $validated = $request->validate([
+            'response_message' => 'required|string|max:2000',
+        ]);
+
+        $enrollment->update([
+            'info_response_message' => $validated['response_message'],
+            'info_response_date' => now(),
+        ]);
+
+        return back()->with('success', 'Your response has been submitted successfully. The registrar will review your information.');
+    }
 }
