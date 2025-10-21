@@ -79,7 +79,17 @@ class EnrollmentController extends Controller
     {
         Gate::authorize('create', Enrollment::class);
 
-        $students = Student::with('guardians')->get();
+        $currentYear = date('Y');
+        $nextYear = $currentYear + 1;
+        $currentSchoolYear = "{$currentYear}-{$nextYear}";
+
+        // Exclude students who already have enrollments for current school year
+        $students = Student::with('guardians')
+            ->whereDoesntHave('enrollments', function ($query) use ($currentSchoolYear) {
+                $query->where('school_year', $currentSchoolYear);
+            })
+            ->get();
+
         $guardians = Guardian::with('user')->get();
 
         return Inertia::render('super-admin/enrollments/create', [
