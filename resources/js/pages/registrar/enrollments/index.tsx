@@ -6,7 +6,7 @@ import { Head } from '@inertiajs/react';
 interface Enrollment {
     id: number;
     student: { first_name: string; last_name: string; student_id: string };
-    guardian: { name: string };
+    guardian: { first_name: string; last_name: string; user?: { email: string } };
     school_year: string;
     quarter: string;
     grade_level: string;
