@@ -92,6 +92,9 @@ Route::middleware(['auth'])->group(function () {
     // Invoice Routes - Using resource controller (only index and show actions)
     Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
 
+    // Payment Routes
+    Route::get('/payments/{payment}/receipt', [\App\Http\Controllers\PaymentController::class, 'downloadReceipt'])->name('payments.receipt');
+
     // Tuition Routes
     Route::get('/tuition', [TuitionController::class, 'index'])->name('tuition');
 
