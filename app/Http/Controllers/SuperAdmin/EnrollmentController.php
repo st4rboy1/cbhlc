@@ -114,12 +114,14 @@ class EnrollmentController extends Controller
         }
 
         // Automatically get primary guardian from student
+        /** @var Guardian|null $primaryGuardian */
         $primaryGuardian = $student->guardians()
             ->wherePivot('is_primary_contact', true)
             ->first();
 
         if (! $primaryGuardian) {
             // If no primary guardian, get any guardian
+            /** @var Guardian|null $primaryGuardian */
             $primaryGuardian = $student->guardians()->first();
         }
 
