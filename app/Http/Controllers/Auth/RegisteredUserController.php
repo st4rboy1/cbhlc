@@ -35,6 +35,10 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'contact_number' => 'required|string|max:50',
+            'address' => 'required|string|max:500',
+            'occupation' => 'required|string|max:100',
+            'employer' => 'nullable|string|max:255',
         ]);
 
         $user = User::create([
@@ -46,13 +50,17 @@ class RegisteredUserController extends Controller
         // Registration is limited to guardians only
         $user->assignRole('guardian');
 
-        // Create Guardian profile with basic information from registration
+        // Create Guardian profile with complete information from registration
         // Split the name into first and last name (simple approach)
         $nameParts = explode(' ', $request->name, 2);
         Guardian::create([
             'user_id' => $user->id,
             'first_name' => $nameParts[0],
             'last_name' => $nameParts[1] ?? '',
+            'contact_number' => $request->contact_number,
+            'address' => $request->address,
+            'occupation' => $request->occupation,
+            'employer' => $request->employer,
         ]);
 
         event(new Registered($user));
