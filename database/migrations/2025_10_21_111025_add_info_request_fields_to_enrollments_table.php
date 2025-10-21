@@ -15,7 +15,7 @@ return new class extends Migration
             $table->boolean('info_requested')->default(false)->after('approved_by');
             $table->text('info_request_message')->nullable()->after('info_requested');
             $table->timestamp('info_request_date')->nullable()->after('info_request_message');
-            $table->foreignId('info_requested_by')->nullable()->constrained('users')->after('info_request_date');
+            $table->foreignId('info_requested_by')->nullable()->after('info_request_date')->constrained('users');
             $table->text('info_response_message')->nullable()->after('info_requested_by');
             $table->timestamp('info_response_date')->nullable()->after('info_response_message');
         });
