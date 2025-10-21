@@ -87,7 +87,7 @@ function formatStatusName(status: string) {
     return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
-export const columns: ColumnDef<Enrollment>[] = [
+const columns: ColumnDef<Enrollment>[] = [
     {
         id: 'select',
         header: ({ table }) => (
@@ -108,10 +108,10 @@ export const columns: ColumnDef<Enrollment>[] = [
         header: 'Enrollment ID',
     },
     {
-        accessorKey: 'student',
+        accessorFn: (row) => `${row.student.first_name} ${row.student.last_name}`,
         header: 'Student',
         cell: ({ row }) => {
-            const student = row.getValue('student') as { first_name: string; last_name: string; student_id: string };
+            const student = row.original.student;
             return (
                 <div>
                     <div>{`${student.first_name} ${student.last_name}`}</div>
@@ -121,10 +121,10 @@ export const columns: ColumnDef<Enrollment>[] = [
         },
     },
     {
-        accessorKey: 'guardian',
+        accessorFn: (row) => row.guardian.name,
         header: 'Guardian',
         cell: ({ row }) => {
-            const guardian = row.getValue('guardian') as { name: string };
+            const guardian = row.original.guardian;
             return <div>{guardian.name}</div>;
         },
     },
@@ -204,11 +204,12 @@ export const columns: ColumnDef<Enrollment>[] = [
     },
 ];
 
-export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
+export default function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
+    const [globalFilter, setGlobalFilter] = React.useState('');
 
     const table = useReactTable({
         data: enrollments,
@@ -221,11 +222,13 @@ export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
         onRowSelectionChange: setRowSelection,
+        onGlobalFilterChange: setGlobalFilter,
         state: {
             sorting,
             columnFilters,
             columnVisibility,
             rowSelection,
+            globalFilter,
         },
     });
 
@@ -234,8 +237,8 @@ export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Filter by student name..."
-                    value={(table.getColumn('student')?.getFilterValue() as string) ?? ''}
-                    onChange={(event) => table.getColumn('student')?.setFilterValue(event.target.value)}
+                    value={globalFilter ?? ''}
+                    onChange={(event) => setGlobalFilter(event.target.value)}
                     className="max-w-sm"
                 />
                 <DropdownMenu>

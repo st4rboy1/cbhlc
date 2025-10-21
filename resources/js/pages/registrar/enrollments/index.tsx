@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { EnrollmentsTable } from '@/pages/registrar/enrollments/enrollments-table';
+import EnrollmentsTable from '@/pages/registrar/enrollments/enrollments-table';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
