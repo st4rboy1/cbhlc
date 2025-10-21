@@ -34,6 +34,9 @@ interface Enrollment {
     quarter: string;
     school_year: string;
     status: string;
+    type: string;
+    previous_school: string | null;
+    payment_plan: string;
     tuition_fee_cents: number;
     miscellaneous_fee_cents: number;
     laboratory_fee_cents: number;
@@ -177,6 +180,29 @@ export default function SuperAdminEnrollmentsShow({ enrollment }: Props) {
                                         Payment Status
                                     </div>
                                     <div>{getPaymentStatusBadge(enrollment.payment_status)}</div>
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <FileText className="h-4 w-4" />
+                                        Enrollment Type
+                                    </div>
+                                    <p className="text-lg font-medium capitalize">{enrollment.type.replace('_', ' ')}</p>
+                                </div>
+                                {enrollment.previous_school && (
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <BookOpen className="h-4 w-4" />
+                                            Previous School
+                                        </div>
+                                        <p className="text-lg font-medium">{enrollment.previous_school}</p>
+                                    </div>
+                                )}
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <CreditCard className="h-4 w-4" />
+                                        Payment Plan
+                                    </div>
+                                    <p className="text-lg font-medium capitalize">{enrollment.payment_plan}</p>
                                 </div>
                             </div>
                         </Card>
