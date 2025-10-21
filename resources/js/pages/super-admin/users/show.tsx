@@ -4,6 +4,20 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
+interface Guardian {
+    id: number;
+    first_name: string;
+    middle_name: string | null;
+    last_name: string;
+    contact_number: string | null;
+    address: string | null;
+    occupation: string | null;
+    employer: string | null;
+    emergency_contact_name: string | null;
+    emergency_contact_phone: string | null;
+    emergency_contact_relationship: string | null;
+}
+
 interface Props {
     user: {
         id: string | number;
@@ -13,6 +27,7 @@ interface Props {
         roles: Array<{ id: number; name: string }>;
         created_at: string;
         permissions: unknown[];
+        guardian?: Guardian;
     };
 }
 
@@ -63,14 +78,71 @@ export default function UserShow({ user }: Props) {
                             <CardTitle>Contact Information</CardTitle>
                         </CardHeader>
                         <CardContent className="grid gap-4">
-                            {user.address && (
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Address</p>
-                                    <p className="text-lg font-semibold">{user.address}</p>
-                                </div>
+                            {user.guardian ? (
+                                <>
+                                    {user.guardian.contact_number && (
+                                        <div>
+                                            <p className="text-sm font-medium text-muted-foreground">Contact Number</p>
+                                            <p className="text-lg font-semibold">{user.guardian.contact_number}</p>
+                                        </div>
+                                    )}
+                                    {user.guardian.address && (
+                                        <div>
+                                            <p className="text-sm font-medium text-muted-foreground">Address</p>
+                                            <p className="text-lg font-semibold">{user.guardian.address}</p>
+                                        </div>
+                                    )}
+                                    {user.guardian.occupation && (
+                                        <div>
+                                            <p className="text-sm font-medium text-muted-foreground">Occupation</p>
+                                            <p className="text-lg font-semibold">{user.guardian.occupation}</p>
+                                        </div>
+                                    )}
+                                    {user.guardian.employer && (
+                                        <div>
+                                            <p className="text-sm font-medium text-muted-foreground">Employer</p>
+                                            <p className="text-lg font-semibold">{user.guardian.employer}</p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                user.address && (
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">Address</p>
+                                        <p className="text-lg font-semibold">{user.address}</p>
+                                    </div>
+                                )
                             )}
                         </CardContent>
                     </Card>
+
+                    {user.guardian && (user.guardian.emergency_contact_name || user.guardian.emergency_contact_phone) && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Emergency Contact</CardTitle>
+                            </CardHeader>
+                            <CardContent className="grid gap-4">
+                                {user.guardian.emergency_contact_name && (
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">Name</p>
+                                        <p className="text-lg font-semibold">{user.guardian.emergency_contact_name}</p>
+                                    </div>
+                                )}
+                                {user.guardian.emergency_contact_phone && (
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">Phone</p>
+                                        <p className="text-lg font-semibold">{user.guardian.emergency_contact_phone}</p>
+                                    </div>
+                                )}
+                                {user.guardian.emergency_contact_relationship && (
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">Relationship</p>
+                                        <p className="text-lg font-semibold">{user.guardian.emergency_contact_relationship}</p>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    )}
 
                     {user.roles.length > 0 && (
                         <Card>
