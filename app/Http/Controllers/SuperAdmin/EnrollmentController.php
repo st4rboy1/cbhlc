@@ -109,8 +109,30 @@ class EnrollmentController extends Controller
         $student = Student::findOrFail($validated['student_id']);
         if (! $this->enrollmentService->canEnroll($student, $validated['school_year'])) {
             return redirect()->back()
-                ->withErrors(['student_id' => 'Student already has a pending enrollment for this school year.']);
+                ->withErrors(['student_id' => 'Student already has a pending enrollment for this school year.'])
+                ->withInput();
         }
+
+        // Automatically get primary guardian from student
+        /** @var Guardian|null $primaryGuardian */
+        $primaryGuardian = $student->guardians()
+            ->wherePivot('is_primary_contact', true)
+            ->first();
+
+        if (! $primaryGuardian) {
+            // If no primary guardian, get any guardian
+            /** @var Guardian|null $primaryGuardian */
+            $primaryGuardian = $student->guardians()->first();
+        }
+
+        if (! $primaryGuardian) {
+            return redirect()->back()
+                ->withErrors(['student_id' => 'Selected student has no associated guardian.'])
+                ->withInput();
+        }
+
+        // Add guardian_id to validated data
+        $validated['guardian_id'] = $primaryGuardian->id;
 
         DB::transaction(function () use ($validated) {
             $enrollment = $this->enrollmentService->createEnrollment($validated);
