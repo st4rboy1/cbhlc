@@ -56,7 +56,13 @@ export function PublicNav({ currentPage }: PublicNavProps) {
                             <Link href={getDashboardUrl()}>Dashboard</Link>
                         </Button>
                     ) : (
-                        <LoginDialog trigger={<Button variant="outline">Login</Button>} />
+                        <LoginDialog
+                            trigger={
+                                <Button variant="default" className="bg-black text-white hover:bg-black/90">
+                                    Login
+                                </Button>
+                            }
+                        />
                     )}
                 </nav>
             </div>
