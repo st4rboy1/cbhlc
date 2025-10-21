@@ -20,6 +20,7 @@ interface Student {
 }
 
 interface Enrollment {
+    id: number;
     enrollment_id: string;
     student: Student;
     school_year: string;
@@ -123,11 +124,9 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
     };
 
     const handleDownloadPDF = () => {
-        // For now, we'll use the browser's print to PDF functionality.
-        // In a production environment, this should ideally trigger a backend service
-        // to generate a PDF using a library like DomPDF or Snappy (based on wkhtmltopdf)
-        // to ensure consistent output and professional formatting.
-        handlePrint();
+        if (!enrollment) return;
+        // Navigate to server-side PDF download endpoint
+        window.location.href = `/invoices/${enrollment.id}/download`;
     };
 
     if (!enrollment) {
