@@ -35,7 +35,17 @@ export default function GuardianEnrollmentsShow({ enrollment }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Enrollment #${enrollment.id}`} />
             <div className="px-4 py-6">
-                <h1 className="mb-4 text-2xl font-bold">Enrollment Details</h1>
+                <div className="mb-4 flex items-center justify-between">
+                    <h1 className="text-2xl font-bold">Enrollment Details</h1>
+                    {enrollment.status === 'enrolled' && (
+                        <Button variant="default" asChild>
+                            <a href={`/guardian/enrollments/${enrollment.id}/certificate`} download>
+                                <Download className="mr-2 h-4 w-4" />
+                                Download Certificate
+                            </a>
+                        </Button>
+                    )}
+                </div>
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <Card>

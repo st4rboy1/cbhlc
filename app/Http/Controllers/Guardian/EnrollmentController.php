@@ -23,7 +23,7 @@ class EnrollmentController extends Controller
     /**
      * Display a listing of guardian's children enrollments.
      */
-    public function index()
+    public function index(Request $request)
     {
         // Get Guardian model for authenticated user
         $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
@@ -32,13 +32,81 @@ class EnrollmentController extends Controller
         $studentIds = GuardianStudent::where('guardian_id', $guardian->id)
             ->pluck('student_id');
 
-        $enrollments = Enrollment::with(['student', 'guardian'])
-            ->whereIn('student_id', $studentIds)
-            ->latest('created_at')
-            ->paginate(10);
+        // Build query with filters
+        $query = Enrollment::with(['student', 'guardian'])
+            ->whereIn('student_id', $studentIds);
+
+        // Filter by school year
+        if ($request->filled('school_year')) {
+            $query->where('school_year', $request->school_year);
+        }
+
+        // Filter by student
+        if ($request->filled('student_id')) {
+            $query->where('student_id', $request->student_id);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Search by student name or enrollment ID
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('student', function ($studentQuery) use ($search) {
+                    $studentQuery->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%");
+                })->orWhere('enrollment_id', 'like', "%{$search}%");
+            });
+        }
+
+        // Sorting
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $enrollments = $query->paginate(10)->withQueryString();
+
+        // Get filter options
+        $students = Student::whereIn('id', $studentIds)
+            ->select('id', 'first_name', 'last_name')
+            ->get()
+            ->map(fn ($student) => [
+                'value' => (string) $student->id,
+                'label' => "{$student->first_name} {$student->last_name}",
+            ]);
+
+        $schoolYears = Enrollment::whereIn('student_id', $studentIds)
+            ->select('school_year')
+            ->distinct()
+            ->orderBy('school_year', 'desc')
+            ->pluck('school_year')
+            ->map(fn ($year) => [
+                'value' => $year,
+                'label' => $year,
+            ]);
+
+        $statuses = collect(EnrollmentStatus::cases())
+            ->map(fn ($status) => [
+                'value' => $status->value,
+                'label' => ucfirst($status->value),
+            ]);
 
         return Inertia::render('guardian/enrollments/index', [
             'enrollments' => $enrollments,
+            'filters' => [
+                'school_year' => $request->school_year,
+                'student_id' => $request->student_id,
+                'status' => $request->status,
+                'search' => $request->search,
+            ],
+            'filterOptions' => [
+                'students' => $students,
+                'schoolYears' => $schoolYears,
+                'statuses' => $statuses,
+            ],
         ]);
     }
 
@@ -350,6 +418,38 @@ class EnrollmentController extends Controller
             ->setPaper('a4', 'portrait');
 
         return $pdf->download("payment-history-{$enrollment->enrollment_id}.pdf");
+    }
+
+    /**
+     * Download enrollment certificate PDF
+     */
+    public function downloadCertificate(Enrollment $enrollment)
+    {
+        // Get Guardian model for authenticated user
+        $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
+
+        // Verify this guardian has access to this enrollment
+        $hasAccess = GuardianStudent::where('guardian_id', $guardian->id)
+            ->where('student_id', $enrollment->student_id)
+            ->exists();
+
+        if (! $hasAccess) {
+            abort(404);
+        }
+
+        // Only allow certificate download for enrolled status
+        if ($enrollment->status !== EnrollmentStatus::ENROLLED) {
+            abort(403, 'Certificate only available for enrolled students.');
+        }
+
+        $enrollment->load('student', 'guardian');
+
+        $pdf = Pdf::loadView('pdf.enrollment-certificate', [
+            'enrollment' => $enrollment,
+        ])
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download("enrollment-certificate-{$enrollment->enrollment_id}.pdf");
     }
 
     /**
