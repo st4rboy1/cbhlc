@@ -13,3 +13,10 @@ Schedule::command('enrollment-periods:update-status --notify')
     ->daily()
     ->at('00:00')
     ->timezone('Asia/Manila');
+
+// Payment reminder scheduler - runs daily at 8 AM
+Schedule::command('enrollment:send-payment-reminders')
+    ->dailyAt('08:00')
+    ->timezone('Asia/Manila')
+    ->withoutOverlapping()
+    ->onOneServer();
