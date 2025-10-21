@@ -229,6 +229,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Enrollments Management
         Route::resource('enrollments', GuardianEnrollmentController::class);
         Route::get('/enrollments/{enrollment}/payment-history-pdf', [GuardianEnrollmentController::class, 'downloadPaymentHistory'])->name('enrollments.payment-history-pdf');
+        Route::get('/enrollments/{enrollment}/certificate', [GuardianEnrollmentController::class, 'downloadCertificate'])->name('enrollments.certificate');
 
         // Billing Information
         Route::get('/billing', [GuardianBillingController::class, 'index'])->name('billing.index');

@@ -351,4 +351,36 @@ class EnrollmentController extends Controller
 
         return $pdf->download("payment-history-{$enrollment->enrollment_id}.pdf");
     }
+
+    /**
+     * Download enrollment certificate PDF
+     */
+    public function downloadCertificate(Enrollment $enrollment)
+    {
+        // Get Guardian model for authenticated user
+        $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
+
+        // Verify this guardian has access to this enrollment
+        $hasAccess = GuardianStudent::where('guardian_id', $guardian->id)
+            ->where('student_id', $enrollment->student_id)
+            ->exists();
+
+        if (! $hasAccess) {
+            abort(404);
+        }
+
+        // Only allow certificate download for enrolled status
+        if ($enrollment->status !== EnrollmentStatus::ENROLLED) {
+            abort(403, 'Certificate only available for enrolled students.');
+        }
+
+        $enrollment->load('student', 'guardian');
+
+        $pdf = Pdf::loadView('pdf.enrollment-certificate', [
+            'enrollment' => $enrollment,
+        ])
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download("enrollment-certificate-{$enrollment->enrollment_id}.pdf");
+    }
 }
