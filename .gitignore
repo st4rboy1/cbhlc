@@ -33,5 +33,6 @@ coverage.xml
 *.md
 !README.md
 !CLAUDE.md
+!TESTING_GUIDE.md
 /tickets/*
 !/tickets/.gitkeep
