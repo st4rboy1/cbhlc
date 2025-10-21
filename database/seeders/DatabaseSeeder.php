@@ -21,6 +21,9 @@ class DatabaseSeeder extends Seeder
         // Seed settings
         $this->call(SettingsSeeder::class);
 
+        // Seed school information
+        $this->call(SchoolInformationSeeder::class);
+
         // Seed enrollments (includes students and guardians if needed)
         $this->call(EnrollmentSeeder::class);
 
