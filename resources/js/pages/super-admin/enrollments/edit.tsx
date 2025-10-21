@@ -34,6 +34,9 @@ interface Enrollment {
     quarter: string;
     school_year: string;
     status: string;
+    type: string;
+    previous_school: string | null;
+    payment_plan: string;
     student: Student;
     guardian: Guardian;
 }
@@ -53,6 +56,16 @@ interface Status {
     value: string;
 }
 
+interface Type {
+    label: string;
+    value: string;
+}
+
+interface PaymentPlan {
+    label: string;
+    value: string;
+}
+
 interface Props {
     enrollment: Enrollment;
     students: Student[];
@@ -60,6 +73,8 @@ interface Props {
     gradelevels: GradeLevel[];
     quarters: Quarter[];
     statuses: Status[];
+    types: Type[];
+    paymentPlans: PaymentPlan[];
 }
 
 interface FormData {
@@ -69,9 +84,12 @@ interface FormData {
     quarter: string;
     school_year: string;
     status: string;
+    type: string;
+    previous_school: string;
+    payment_plan: string;
 }
 
-export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardians, gradelevels, quarters, statuses }: Props) {
+export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardians, gradelevels, quarters, statuses, types, paymentPlans }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Enrollments', href: '/super-admin/enrollments' },
@@ -85,6 +103,9 @@ export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardi
         quarter: enrollment.quarter,
         school_year: enrollment.school_year,
         status: enrollment.status,
+        type: enrollment.type,
+        previous_school: enrollment.previous_school || '',
+        payment_plan: enrollment.payment_plan,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -243,6 +264,59 @@ export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardi
                                         </Select>
                                         {errors.status && <p className="text-sm text-destructive">{errors.status}</p>}
                                         <p className="text-sm text-muted-foreground">Changing status will trigger appropriate workflows</p>
+                                    </div>
+
+                                    {/* Type */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="type">
+                                            Enrollment Type <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Select value={data.type} onValueChange={(value) => setData('type', value)}>
+                                            <SelectTrigger id="type">
+                                                <SelectValue placeholder="Select type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {types.map((type) => (
+                                                    <SelectItem key={type.value} value={type.value}>
+                                                        {type.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
+                                    </div>
+
+                                    {/* Previous School */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="previous_school">Previous School</Label>
+                                        <Input
+                                            id="previous_school"
+                                            value={data.previous_school}
+                                            onChange={(e) => setData('previous_school', e.target.value)}
+                                            placeholder="Enter previous school (if transferee)"
+                                        />
+                                        {errors.previous_school && <p className="text-sm text-destructive">{errors.previous_school}</p>}
+                                        <p className="text-sm text-muted-foreground">Required for transferee students</p>
+                                    </div>
+
+                                    {/* Payment Plan */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="payment_plan">
+                                            Payment Plan <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Select value={data.payment_plan} onValueChange={(value) => setData('payment_plan', value)}>
+                                            <SelectTrigger id="payment_plan">
+                                                <SelectValue placeholder="Select payment plan" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {paymentPlans.map((plan) => (
+                                                    <SelectItem key={plan.value} value={plan.value}>
+                                                        {plan.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.payment_plan && <p className="text-sm text-destructive">{errors.payment_plan}</p>}
                                     </div>
                                 </CardContent>
                             </Card>

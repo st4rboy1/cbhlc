@@ -198,6 +198,18 @@ class EnrollmentController extends Controller
                 'label' => $status->label(),
                 'value' => $status->value,
             ], EnrollmentStatus::cases()),
+            'types' => [
+                ['label' => 'New Student', 'value' => 'new'],
+                ['label' => 'Continuing Student', 'value' => 'continuing'],
+                ['label' => 'Returnee', 'value' => 'returnee'],
+                ['label' => 'Transferee', 'value' => 'transferee'],
+            ],
+            'paymentPlans' => [
+                ['label' => 'Annual', 'value' => 'annual'],
+                ['label' => 'Semestral', 'value' => 'semestral'],
+                ['label' => 'Quarterly', 'value' => 'quarterly'],
+                ['label' => 'Monthly', 'value' => 'monthly'],
+            ],
         ]);
     }
 
