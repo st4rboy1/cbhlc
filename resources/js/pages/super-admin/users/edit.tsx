@@ -37,7 +37,7 @@ export default function UserEdit({ user, roles }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(route('super-admin.users.update', { user: user.id }));
+        put(`/super-admin/users/${user.id}`);
     };
 
     useEffect(() => {
