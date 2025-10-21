@@ -13,17 +13,6 @@ interface Student {
     student_id: string;
     first_name: string;
     last_name: string;
-    guardians: Guardian[];
-}
-
-interface Guardian {
-    id: number;
-    first_name: string;
-    last_name: string;
-    user: {
-        name: string;
-        email: string;
-    };
 }
 
 interface GradeLevel {
@@ -38,20 +27,21 @@ interface Quarter {
 
 interface Props {
     students: Student[];
-    guardians: Guardian[];
     gradelevels: GradeLevel[];
     quarters: Quarter[];
 }
 
 interface FormData {
     student_id: string;
-    guardian_id: string;
     grade_level: string;
     quarter: string;
     school_year: string;
+    type: string;
+    previous_school: string;
+    payment_plan: string;
 }
 
-export default function SuperAdminEnrollmentsCreate({ students, guardians, gradelevels, quarters }: Props) {
+export default function SuperAdminEnrollmentsCreate({ students, gradelevels, quarters }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Enrollments', href: '/super-admin/enrollments' },
@@ -63,10 +53,12 @@ export default function SuperAdminEnrollmentsCreate({ students, guardians, grade
 
     const { data, setData, post, processing, errors } = useForm<FormData>({
         student_id: '',
-        guardian_id: '',
         grade_level: '',
         quarter: '',
         school_year: `${currentYear}-${nextYear}`,
+        type: '',
+        previous_school: '',
+        payment_plan: '',
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -94,11 +86,11 @@ export default function SuperAdminEnrollmentsCreate({ students, guardians, grade
                     <div className="grid gap-6 lg:grid-cols-3">
                         {/* Main Form */}
                         <div className="space-y-6 lg:col-span-2">
-                            {/* Student and Guardian Selection */}
+                            {/* Student Selection */}
                             <Card>
                                 <CardHeader>
-                                    <CardTitle>Student and Guardian Information</CardTitle>
-                                    <CardDescription>Select the student and guardian for this enrollment</CardDescription>
+                                    <CardTitle>Student Information</CardTitle>
+                                    <CardDescription>Select the student for this enrollment</CardDescription>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     {/* Student Selection */}
@@ -119,26 +111,9 @@ export default function SuperAdminEnrollmentsCreate({ students, guardians, grade
                                             </SelectContent>
                                         </Select>
                                         {errors.student_id && <p className="text-sm text-destructive">{errors.student_id}</p>}
-                                    </div>
-
-                                    {/* Guardian Selection */}
-                                    <div className="space-y-2">
-                                        <Label htmlFor="guardian_id">
-                                            Guardian <span className="text-destructive">*</span>
-                                        </Label>
-                                        <Select value={data.guardian_id} onValueChange={(value) => setData('guardian_id', value)}>
-                                            <SelectTrigger id="guardian_id">
-                                                <SelectValue placeholder="Select a guardian" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {guardians.map((guardian) => (
-                                                    <SelectItem key={guardian.id} value={guardian.id.toString()}>
-                                                        {guardian.first_name} {guardian.last_name} ({guardian.user.email})
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        {errors.guardian_id && <p className="text-sm text-destructive">{errors.guardian_id}</p>}
+                                        <p className="text-sm text-muted-foreground">
+                                            Guardian will be automatically selected from student&apos;s primary contact
+                                        </p>
                                     </div>
                                 </CardContent>
                             </Card>
@@ -204,6 +179,60 @@ export default function SuperAdminEnrollmentsCreate({ students, guardians, grade
                                         {errors.school_year && <p className="text-sm text-destructive">{errors.school_year}</p>}
                                         <p className="text-sm text-muted-foreground">Format: YYYY-YYYY (e.g., 2024-2025)</p>
                                     </div>
+
+                                    {/* Student Type */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="type">
+                                            Student Type <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Select value={data.type} onValueChange={(value) => setData('type', value)}>
+                                            <SelectTrigger id="type">
+                                                <SelectValue placeholder="Select student type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="new">New Student</SelectItem>
+                                                <SelectItem value="continuing">Continuing Student</SelectItem>
+                                                <SelectItem value="returnee">Returnee Student</SelectItem>
+                                                <SelectItem value="transferee">Transferee</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.type && <p className="text-sm text-destructive">{errors.type}</p>}
+                                    </div>
+
+                                    {/* Previous School - shown only for transferees */}
+                                    {data.type === 'transferee' && (
+                                        <div className="space-y-2">
+                                            <Label htmlFor="previous_school">
+                                                Previous School <span className="text-destructive">*</span>
+                                            </Label>
+                                            <Input
+                                                id="previous_school"
+                                                value={data.previous_school}
+                                                onChange={(e) => setData('previous_school', e.target.value)}
+                                                placeholder="Enter previous school name"
+                                            />
+                                            {errors.previous_school && <p className="text-sm text-destructive">{errors.previous_school}</p>}
+                                        </div>
+                                    )}
+
+                                    {/* Payment Plan */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="payment_plan">
+                                            Payment Plan <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Select value={data.payment_plan} onValueChange={(value) => setData('payment_plan', value)}>
+                                            <SelectTrigger id="payment_plan">
+                                                <SelectValue placeholder="Select payment plan" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="annual">Annual (Full Payment)</SelectItem>
+                                                <SelectItem value="semestral">Semestral (2 Payments)</SelectItem>
+                                                <SelectItem value="quarterly">Quarterly (4 Payments)</SelectItem>
+                                                <SelectItem value="monthly">Monthly (10 Payments)</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.payment_plan && <p className="text-sm text-destructive">{errors.payment_plan}</p>}
+                                    </div>
                                 </CardContent>
                             </Card>
                         </div>
@@ -215,7 +244,7 @@ export default function SuperAdminEnrollmentsCreate({ students, guardians, grade
                                 <div className="space-y-3 text-sm text-muted-foreground">
                                     <p>• A unique reference number will be generated automatically</p>
                                     <p>• Enrollment will be auto-approved upon creation</p>
-                                    <p>• Student and guardian must be registered in the system</p>
+                                    <p>• Guardian will be automatically selected from student&apos;s primary contact</p>
                                     <p>• All fields marked with * are required</p>
                                 </div>
                             </Card>
