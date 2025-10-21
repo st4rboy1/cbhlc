@@ -42,7 +42,7 @@ class SendPaymentReminders extends Command
 
         foreach ($enrollments as $enrollment) {
             $dueDate = $enrollment->payment_due_date;
-            $daysUntilDue = $today->diffInDays($dueDate, false);
+            $daysUntilDue = (int) $today->diffInDays($dueDate, false);
 
             $reminderType = $this->determineReminderType($daysUntilDue);
 
