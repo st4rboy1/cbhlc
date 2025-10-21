@@ -26,6 +26,12 @@ test('new users can register and are assigned guardian role', function () {
     expect($user)->not->toBeNull();
     expect($user->hasRole('guardian'))->toBeTrue();
 
+    // Check if Guardian record was created
+    $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
+    expect($guardian)->not->toBeNull();
+    expect($guardian->first_name)->toBe('Test');
+    expect($guardian->last_name)->toBe('Parent');
+
     $this->assertAuthenticated();
     // All registered users get redirected to guardian dashboard
     $response->assertRedirect(route('guardian.dashboard', absolute: false));
@@ -66,4 +72,20 @@ test('registration validates email format', function () {
     ]);
 
     $response->assertSessionHasErrors('email');
+});
+
+test('registration handles single-word names correctly', function () {
+    $response = $this->post(route('register.store'), [
+        'name' => 'Madonna',
+        'email' => 'madonna@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+    ]);
+
+    $user = \App\Models\User::where('email', 'madonna@example.com')->first();
+    $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
+
+    expect($guardian)->not->toBeNull();
+    expect($guardian->first_name)->toBe('Madonna');
+    expect($guardian->last_name)->toBe('');
 });
