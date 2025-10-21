@@ -21,6 +21,9 @@ test('registration does not require role field', function () {
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Engineer',
     ]);
 
     $response->assertSessionHasNoErrors();
@@ -36,6 +39,9 @@ test('new users are automatically assigned guardian role', function () {
         'email' => 'guardian@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Teacher',
     ]);
 
     $user = User::where('email', 'guardian@example.com')->first();
@@ -54,6 +60,9 @@ test('role parameter is ignored if provided', function () {
         'email' => 'student@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Student',
         'role' => 'student', // This should be ignored
     ]);
 
@@ -74,6 +83,9 @@ test('invalid role parameter is ignored', function () {
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Engineer',
         'role' => 'invalid_role', // This should be ignored
     ]);
 
@@ -93,6 +105,9 @@ test('registration requires unique email', function () {
         'email' => 'existing@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Engineer',
     ]);
 
     $response->assertSessionHasErrors(['email']);
@@ -105,6 +120,9 @@ test('registration requires password confirmation', function () {
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'different_password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Engineer',
     ]);
 
     $response->assertSessionHasErrors(['password']);
@@ -118,6 +136,9 @@ test('all users are redirected to guardian dashboard after registration', functi
         'email' => 'first@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Engineer',
     ]);
 
     $response->assertRedirect('/guardian/dashboard');
@@ -130,6 +151,9 @@ test('all users are redirected to guardian dashboard after registration', functi
         'email' => 'second@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345679',
+        'address' => '456 Test Street, Manila',
+        'occupation' => 'Teacher',
     ]);
 
     $response->assertRedirect('/guardian/dashboard');
@@ -138,7 +162,7 @@ test('all users are redirected to guardian dashboard after registration', functi
 test('registration validates all required fields', function () {
     $response = $this->post('/register', []);
 
-    $response->assertSessionHasErrors(['name', 'email', 'password']);
+    $response->assertSessionHasErrors(['name', 'email', 'password', 'contact_number', 'address', 'occupation']);
     $this->assertGuest();
 });
 
@@ -148,6 +172,9 @@ test('registration requires lowercase email', function () {
         'email' => 'TEST@EXAMPLE.COM',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Engineer',
     ]);
 
     $response->assertSessionHasErrors(['email']);
@@ -160,6 +187,9 @@ test('registration accepts lowercase email', function () {
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Engineer',
     ]);
 
     $response->assertSessionHasNoErrors();
