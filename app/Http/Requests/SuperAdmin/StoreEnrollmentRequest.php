@@ -23,12 +23,11 @@ class StoreEnrollmentRequest extends FormRequest
     {
         return [
             'student_id' => ['required', 'exists:students,id'],
-            'guardian_id' => ['required', 'exists:guardians,id'],
             'grade_level' => ['required', 'string'],
             'school_year' => ['required', 'string', 'regex:/^\d{4}-\d{4}$/'],
             'quarter' => ['required', 'string'],
             'type' => ['required', 'in:new,continuing,returnee,transferee'],
-            'previous_school' => ['nullable', 'string', 'max:255'],
+            'previous_school' => ['nullable', 'required_if:type,transferee', 'string', 'max:255'],
             'payment_plan' => ['required', 'in:annual,semestral,quarterly,monthly'],
         ];
     }
