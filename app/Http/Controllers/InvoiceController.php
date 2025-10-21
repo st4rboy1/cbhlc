@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Enrollment;
+use App\Models\Payment;
 use App\Models\Setting;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -89,5 +91,51 @@ class InvoiceController extends Controller
             'currentDate' => now()->format('F d, Y'),
             'settings' => $settings,
         ]);
+    }
+
+    /**
+     * Download invoice as PDF
+     */
+    public function download(Enrollment $invoice)
+    {
+        $user = auth()->user();
+
+        // Authorization check (same as show method)
+        if ($user->hasRole(['super_admin', 'administrator', 'registrar'])) {
+            // Admin users can download any invoice
+        } elseif ($user->hasRole('guardian')) {
+            $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
+            if ($guardian) {
+                $studentIds = $guardian->children()->pluck('students.id');
+                if (! $studentIds->contains($invoice->student_id)) {
+                    abort(404);
+                }
+            } else {
+                abort(404, 'Guardian profile not found.');
+            }
+        } else {
+            abort(403, 'You do not have permission to download invoices.');
+        }
+
+        // Load relationships
+        $invoice->load(['student', 'guardian']);
+
+        // Get payments for this enrollment
+        $payments = Payment::where('invoice_id', $invoice->id)
+            ->orderBy('payment_date', 'asc')
+            ->get();
+
+        // Get school settings
+        $settings = Setting::pluck('value', 'key');
+
+        // Generate PDF
+        $pdf = Pdf::loadView('pdf.invoice', [
+            'enrollment' => $invoice,
+            'payments' => $payments,
+            'settings' => $settings,
+            'invoiceDate' => now()->format('F d, Y'),
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download("invoice-{$invoice->enrollment_id}.pdf");
     }
 }
