@@ -37,7 +37,7 @@ class EnrollmentController extends Controller
                 $q->where('first_name', 'like', "%{$search}%")
                     ->orWhere('last_name', 'like', "%{$search}%")
                     ->orWhere('student_id', 'like', "%{$search}%");
-            })->orWhere('reference_number', 'like', "%{$search}%");
+            })->orWhere('enrollment_id', 'like', "%{$search}%");
         }
 
         // Filter by status

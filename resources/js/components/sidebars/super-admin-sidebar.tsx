@@ -2,7 +2,20 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { BadgeDollarSign, CreditCard, FileCheck, GraduationCap, LayoutGrid, Receipt, Settings, ShieldCheck, UserCog, Users } from 'lucide-react';
+import {
+    BadgeDollarSign,
+    Building2,
+    Calendar,
+    ClipboardList,
+    FileCheck,
+    GraduationCap,
+    LayoutGrid,
+    Receipt,
+    Settings,
+    ShieldCheck,
+    UserCog,
+    Users,
+} from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -15,6 +28,11 @@ const mainNavItems: NavItem[] = [
         title: 'Enrollments',
         href: '/super-admin/enrollments',
         icon: GraduationCap,
+    },
+    {
+        title: 'Enrollment Periods',
+        href: '/super-admin/enrollment-periods',
+        icon: Calendar,
     },
     {
         title: 'Students',
@@ -47,9 +65,14 @@ const mainNavItems: NavItem[] = [
         icon: Receipt,
     },
     {
-        title: 'Tuition Fees',
-        href: '/tuition',
-        icon: CreditCard,
+        title: 'School Information',
+        href: '/super-admin/school-information',
+        icon: Building2,
+    },
+    {
+        title: 'Audit Logs',
+        href: '/super-admin/audit-logs',
+        icon: ClipboardList,
     },
     {
         title: 'Profile Settings',

@@ -60,6 +60,12 @@ class Enrollment extends Model
         'payment_reference',
         'ready_for_payment_at',
         'paid_at',
+        'info_requested',
+        'info_request_message',
+        'info_request_date',
+        'info_requested_by',
+        'info_response_message',
+        'info_response_date',
     ];
 
     protected $casts = [
@@ -68,6 +74,9 @@ class Enrollment extends Model
         'ready_for_payment_at' => 'datetime',
         'paid_at' => 'datetime',
         'payment_due_date' => 'date',
+        'info_request_date' => 'datetime',
+        'info_response_date' => 'datetime',
+        'info_requested' => 'boolean',
         'quarter' => Quarter::class,
         'grade_level' => \App\Enums\GradeLevel::class,
         'status' => EnrollmentStatus::class,
@@ -124,6 +133,14 @@ class Enrollment extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Get the user who requested more information
+     */
+    public function infoRequester(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'info_requested_by');
     }
 
     /**

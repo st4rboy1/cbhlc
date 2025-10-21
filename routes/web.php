@@ -92,6 +92,9 @@ Route::middleware(['auth'])->group(function () {
     // Invoice Routes - Using resource controller (only index and show actions)
     Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
 
+    // Payment Routes
+    Route::get('/payments/{payment}/receipt', [\App\Http\Controllers\PaymentController::class, 'downloadReceipt'])->name('payments.receipt');
+
     // Tuition Routes
     Route::get('/tuition', [TuitionController::class, 'index'])->name('tuition');
 
@@ -194,6 +197,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('enrollments', RegistrarEnrollmentController::class)->only(['index', 'show']);
         Route::post('/enrollments/{enrollment}/approve', [RegistrarEnrollmentController::class, 'approve'])->name('enrollments.approve');
         Route::post('/enrollments/{enrollment}/reject', [RegistrarEnrollmentController::class, 'reject'])->name('enrollments.reject');
+        Route::post('/enrollments/{enrollment}/request-info', [RegistrarEnrollmentController::class, 'requestInfo'])->name('enrollments.request-info');
         Route::post('/enrollments/{enrollment}/complete', [RegistrarEnrollmentController::class, 'complete'])->name('enrollments.complete');
         Route::post('/enrollments/{enrollment}/confirm-payment', [RegistrarEnrollmentController::class, 'confirmPayment'])->name('enrollments.confirm-payment');
         Route::put('/enrollments/{enrollment}/payment-status', [RegistrarEnrollmentController::class, 'updatePaymentStatus'])->name('enrollments.update-payment-status');
@@ -225,6 +229,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Enrollments Management
         Route::resource('enrollments', GuardianEnrollmentController::class);
+        Route::get('/enrollments/{enrollment}/payment-history-pdf', [GuardianEnrollmentController::class, 'downloadPaymentHistory'])->name('enrollments.payment-history-pdf');
+        Route::get('/enrollments/{enrollment}/certificate', [GuardianEnrollmentController::class, 'downloadCertificate'])->name('enrollments.certificate');
+        Route::post('/enrollments/{enrollment}/respond-to-info-request', [GuardianEnrollmentController::class, 'respondToInfoRequest'])->name('enrollments.respond-to-info-request');
 
         // Billing Information
         Route::get('/billing', [GuardianBillingController::class, 'index'])->name('billing.index');

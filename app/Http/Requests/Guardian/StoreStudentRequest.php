@@ -27,14 +27,21 @@ class StoreStudentRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:100'],
             'middle_name' => ['nullable', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'birthdate' => ['required', 'date', 'before:today', 'after:'.now()->subYears(18)->format('Y-m-d')],
+            'birthdate' => ['required', 'date', 'before:today'],
             'gender' => ['required', 'in:Male,Female'],
             'address' => ['required', 'string', 'max:500'],
             'contact_number' => ['nullable', 'string', 'max:20', 'regex:/^[0-9+\-\(\)\s]+$/'],
             'email' => ['nullable', 'email', 'max:255'],
+            'grade_level' => ['required', 'string', 'in:Kinder,Grade 1,Grade 2,Grade 3,Grade 4,Grade 5,Grade 6'],
             'birth_place' => ['nullable', 'string', 'max:255'],
             'nationality' => ['nullable', 'string', 'max:100'],
             'religion' => ['nullable', 'string', 'max:100'],
+
+            // Document uploads
+            'birth_certificate' => ['required', 'file', 'mimes:jpeg,jpg,png', 'max:51200'], // 50MB in kilobytes
+            'report_card' => ['nullable', 'file', 'mimes:jpeg,jpg,png', 'max:51200'],
+            'form_138' => ['nullable', 'file', 'mimes:jpeg,jpg,png', 'max:51200'],
+            'good_moral' => ['nullable', 'file', 'mimes:jpeg,jpg,png', 'max:51200'],
         ];
     }
 
@@ -52,12 +59,22 @@ class StoreStudentRequest extends FormRequest
             'last_name.max' => 'Last name must not exceed 100 characters.',
             'birthdate.required' => 'Birthdate is required.',
             'birthdate.before' => 'Birthdate must be in the past.',
-            'birthdate.after' => 'Student must be less than 18 years old.',
             'gender.required' => 'Gender is required.',
             'gender.in' => 'Gender must be either Male or Female.',
             'address.required' => 'Address is required.',
             'contact_number.regex' => 'Contact number format is invalid.',
             'email.email' => 'Please provide a valid email address.',
+
+            // Document validation messages
+            'birth_certificate.required' => 'Birth certificate is required.',
+            'birth_certificate.mimes' => 'Birth certificate must be a JPEG or PNG image.',
+            'birth_certificate.max' => 'Birth certificate file size must not exceed 50MB.',
+            'report_card.mimes' => 'Report card must be a JPEG or PNG image.',
+            'report_card.max' => 'Report card file size must not exceed 50MB.',
+            'form_138.mimes' => 'Form 138 must be a JPEG or PNG image.',
+            'form_138.max' => 'Form 138 file size must not exceed 50MB.',
+            'good_moral.mimes' => 'Good moral certificate must be a JPEG or PNG image.',
+            'good_moral.max' => 'Good moral certificate file size must not exceed 50MB.',
         ];
     }
 

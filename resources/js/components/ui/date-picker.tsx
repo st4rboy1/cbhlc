@@ -15,6 +15,9 @@ interface DatePickerProps {
     error?: boolean;
     id?: string;
     name?: string;
+    minAge?: number;
+    maxAge?: number;
+    allowFutureDates?: boolean;
 }
 
 export function DatePicker({
@@ -26,8 +29,38 @@ export function DatePicker({
     error = false,
     id,
     name,
+    minAge,
+    maxAge,
+    allowFutureDates = false,
 }: DatePickerProps) {
     const [open, setOpen] = React.useState(false);
+
+    const getDisabledDates = (date: Date) => {
+        const today = new Date();
+        const minDate = new Date('1900-01-01');
+
+        // Future dates are disabled unless allowFutureDates is true
+        if (!allowFutureDates && date > today) return true;
+
+        // Dates before 1900 are disabled
+        if (date < minDate) return true;
+
+        // If minAge is set, disable dates that would make the person younger than minAge
+        if (minAge !== undefined) {
+            const maxBirthDate = new Date();
+            maxBirthDate.setFullYear(maxBirthDate.getFullYear() - minAge);
+            if (date > maxBirthDate) return true;
+        }
+
+        // If maxAge is set, disable dates that would make the person older than maxAge
+        if (maxAge !== undefined) {
+            const minBirthDate = new Date();
+            minBirthDate.setFullYear(minBirthDate.getFullYear() - maxAge);
+            if (date < minBirthDate) return true;
+        }
+
+        return false;
+    };
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -57,7 +90,8 @@ export function DatePicker({
                         setOpen(false);
                     }}
                     initialFocus
-                    disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                    disabled={getDisabledDates}
+                    defaultMonth={minAge ? new Date(new Date().setFullYear(new Date().getFullYear() - minAge)) : undefined}
                 />
             </PopoverContent>
         </Popover>

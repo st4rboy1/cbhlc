@@ -68,11 +68,15 @@ describe('Registrar StudentController', function () {
         Student::factory()->create([
             'first_name' => 'John',
             'last_name' => 'Doe',
+            'email' => 'john.doe@example.com',
+            'student_id' => 'STU-JOHN-001',
         ]);
 
         Student::factory()->create([
             'first_name' => 'Jane',
             'last_name' => 'Smith',
+            'email' => 'jane.smith@example.com',
+            'student_id' => 'STU-JANE-001',
         ]);
 
         $response = $this->actingAs($this->registrar)
