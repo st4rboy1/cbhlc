@@ -10,6 +10,7 @@ import { store } from '@/routes/guardian/students';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
+import { FileText, Upload, X } from 'lucide-react';
 
 interface Props {
     gradeLevels: string[];
@@ -22,7 +23,24 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
         { title: 'Create', href: '#' },
     ];
 
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors } = useForm<{
+        first_name: string;
+        last_name: string;
+        middle_name: string;
+        birthdate: string;
+        gender: string;
+        grade_level: string;
+        contact_number: string;
+        email: string;
+        address: string;
+        birth_place: string;
+        nationality: string;
+        religion: string;
+        birth_certificate?: File | null;
+        report_card?: File | null;
+        form_138?: File | null;
+        good_moral?: File | null;
+    }>({
         first_name: '',
         last_name: '',
         middle_name: '',
@@ -35,6 +53,10 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
         birth_place: '',
         nationality: '',
         religion: '',
+        birth_certificate: null,
+        report_card: null,
+        form_138: null,
+        good_moral: null,
     });
 
     const submit = (e: React.FormEvent) => {
@@ -177,7 +199,128 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                                 {errors.address && <p className="text-sm text-destructive">{errors.address}</p>}
                             </div>
 
+                            {/* Documents Section */}
+                            <div className="space-y-4 border-t pt-4">
+                                <div>
+                                    <h3 className="text-lg font-semibold">Required Documents</h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        Upload scanned copies of the following documents (JPEG/PNG, max 50MB each)
+                                    </p>
+                                </div>
+
+                                {/* Birth Certificate */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="birth_certificate">
+                                        Birth Certificate <span className="text-destructive">*</span>
+                                    </Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            id="birth_certificate"
+                                            type="file"
+                                            accept=".jpg,.jpeg,.png"
+                                            onChange={(e) => setData('birth_certificate', e.target.files?.[0] || null)}
+                                            className="cursor-pointer"
+                                        />
+                                        {data.birth_certificate && (
+                                            <Button type="button" variant="ghost" size="icon" onClick={() => setData('birth_certificate', null)}>
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                    {data.birth_certificate && (
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <FileText className="h-4 w-4" />
+                                            <span>{data.birth_certificate.name}</span>
+                                            <span className="text-xs">({(data.birth_certificate.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                        </div>
+                                    )}
+                                    {errors.birth_certificate && <p className="text-sm text-destructive">{errors.birth_certificate}</p>}
+                                </div>
+
+                                {/* Report Card */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="report_card">Report Card (Latest)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            id="report_card"
+                                            type="file"
+                                            accept=".jpg,.jpeg,.png"
+                                            onChange={(e) => setData('report_card', e.target.files?.[0] || null)}
+                                            className="cursor-pointer"
+                                        />
+                                        {data.report_card && (
+                                            <Button type="button" variant="ghost" size="icon" onClick={() => setData('report_card', null)}>
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                    {data.report_card && (
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <FileText className="h-4 w-4" />
+                                            <span>{data.report_card.name}</span>
+                                            <span className="text-xs">({(data.report_card.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                        </div>
+                                    )}
+                                    {errors.report_card && <p className="text-sm text-destructive">{errors.report_card}</p>}
+                                </div>
+
+                                {/* Form 138 */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="form_138">Form 138 (School Records)</Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            id="form_138"
+                                            type="file"
+                                            accept=".jpg,.jpeg,.png"
+                                            onChange={(e) => setData('form_138', e.target.files?.[0] || null)}
+                                            className="cursor-pointer"
+                                        />
+                                        {data.form_138 && (
+                                            <Button type="button" variant="ghost" size="icon" onClick={() => setData('form_138', null)}>
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                    {data.form_138 && (
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <FileText className="h-4 w-4" />
+                                            <span>{data.form_138.name}</span>
+                                            <span className="text-xs">({(data.form_138.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                        </div>
+                                    )}
+                                    {errors.form_138 && <p className="text-sm text-destructive">{errors.form_138}</p>}
+                                </div>
+
+                                {/* Good Moral Certificate */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="good_moral">Good Moral Certificate</Label>
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            id="good_moral"
+                                            type="file"
+                                            accept=".jpg,.jpeg,.png"
+                                            onChange={(e) => setData('good_moral', e.target.files?.[0] || null)}
+                                            className="cursor-pointer"
+                                        />
+                                        {data.good_moral && (
+                                            <Button type="button" variant="ghost" size="icon" onClick={() => setData('good_moral', null)}>
+                                                <X className="h-4 w-4" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                    {data.good_moral && (
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <FileText className="h-4 w-4" />
+                                            <span>{data.good_moral.name}</span>
+                                            <span className="text-xs">({(data.good_moral.size / 1024 / 1024).toFixed(2)} MB)</span>
+                                        </div>
+                                    )}
+                                    {errors.good_moral && <p className="text-sm text-destructive">{errors.good_moral}</p>}
+                                </div>
+                            </div>
+
                             <Button type="submit" disabled={processing}>
+                                <Upload className="mr-2 h-4 w-4" />
                                 Add Student
                             </Button>
                         </form>

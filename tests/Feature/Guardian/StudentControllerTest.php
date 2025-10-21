@@ -10,6 +10,8 @@ use App\Models\GuardianStudent;
 use App\Models\Student;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
@@ -208,6 +210,8 @@ describe('Guardian StudentController', function () {
     });
 
     test('guardian can create new student', function () {
+        Storage::fake('private');
+
         $studentData = [
             'first_name' => 'New',
             'middle_name' => 'Test',
@@ -218,6 +222,7 @@ describe('Guardian StudentController', function () {
             'address' => '789 New Address',
             'contact_number' => '09876543210',
             'email' => 'new.student@example.com',
+            'birth_certificate' => UploadedFile::fake()->image('birth_certificate.jpg'),
         ];
 
         $response = $this->actingAs($this->guardian)
@@ -228,7 +233,7 @@ describe('Guardian StudentController', function () {
             ->first();
 
         $response->assertRedirect(route('guardian.students.show', $student->id));
-        $response->assertSessionHas('success', 'Student added successfully.');
+        $response->assertSessionHas('success', 'Student and documents added successfully.');
 
         $this->assertDatabaseHas('students', [
             'first_name' => 'New',
@@ -249,6 +254,16 @@ describe('Guardian StudentController', function () {
 
         // Check student ID was generated
         $this->assertStringStartsWith('CBHLC'.date('Y'), $student->student_id);
+
+        // Check document was stored
+        $this->assertDatabaseHas('documents', [
+            'student_id' => $student->id,
+            'document_type' => 'birth_certificate',
+        ]);
+
+        // Verify file was stored
+        $document = $student->documents()->where('document_type', 'birth_certificate')->first();
+        Storage::disk('private')->assertExists($document->file_path);
     });
 
     test('creating student validates required fields', function () {
@@ -260,17 +275,21 @@ describe('Guardian StudentController', function () {
                 'gender' => 'Female',
                 'grade_level' => 'Grade 3',
                 'address' => '789 New Address',
+                // Missing birth_certificate
             ]);
 
-        $response->assertSessionHasErrors(['first_name']);
+        $response->assertSessionHasErrors(['first_name', 'birth_certificate']);
     });
 
     test('creating student validates birthdate is in past', function () {
+        Storage::fake('private');
+
         $response = $this->actingAs($this->guardian)
             ->post(route('guardian.students.store'), [
                 'first_name' => 'Future',
                 'last_name' => 'Student',
                 'birthdate' => now()->addDay()->format('Y-m-d'),  // Future date
+                'birth_certificate' => UploadedFile::fake()->image('birth_certificate.jpg'),
                 'gender' => 'Male',
                 'grade_level' => 'Grade 3',
                 'address' => '123 Future St',
