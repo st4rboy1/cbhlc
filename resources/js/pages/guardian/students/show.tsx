@@ -96,6 +96,17 @@ export default function GuardianStudentsShow({ student }: Props) {
 
     const fullName = `${student.first_name} ${student.middle_name ? student.middle_name + ' ' : ''}${student.last_name}`;
 
+    const getDocumentStats = () => {
+        const total = student.documents?.length || 0;
+        const verified = student.documents?.filter((d) => d.verification_status === 'verified').length || 0;
+        const pending = student.documents?.filter((d) => d.verification_status === 'pending').length || 0;
+        const rejected = student.documents?.filter((d) => d.verification_status === 'rejected').length || 0;
+
+        return { total, verified, pending, rejected };
+    };
+
+    const stats = getDocumentStats();
+
     // Load signed URLs for all documents on mount
     useEffect(() => {
         const loadImageUrls = async () => {
@@ -372,6 +383,42 @@ export default function GuardianStudentsShow({ student }: Props) {
                         <CardDescription>Uploaded documents for {student.first_name}</CardDescription>
                     </CardHeader>
                     <CardContent>
+                        {/* Document Statistics */}
+                        <div className="mb-6 grid gap-4 md:grid-cols-4">
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardDescription>Total Documents</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold">{stats.total}</div>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardDescription>Verified</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold text-green-600">{stats.verified}</div>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardDescription>Pending</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+                                </CardContent>
+                            </Card>
+                            <Card>
+                                <CardHeader className="pb-2">
+                                    <CardDescription>Rejected</CardDescription>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
+                                </CardContent>
+                            </Card>
+                        </div>
+
                         {student.documents && student.documents.length > 0 ? (
                             <div className="space-y-6">
                                 {student.documents.map((document) => (
