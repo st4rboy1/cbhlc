@@ -23,7 +23,7 @@ export interface Guardian {
 
 export interface Enrollment {
     id: number;
-    enrollment_id: string; // Changed from reference_number
+    enrollment_id: string;
     student: Student;
     guardian: Guardian;
     grade_level: string;
@@ -64,11 +64,11 @@ const handleDelete = (id: number, enrollmentId: string) => {
 
 export const columns: ColumnDef<Enrollment>[] = [
     {
-        accessorKey: 'enrollment_id', // Changed from reference_number
+        accessorKey: 'enrollment_id',
         header: ({ column }) => {
             return (
                 <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                    Reference #
+                    Enrollment ID
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             );

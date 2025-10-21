@@ -130,6 +130,34 @@ class EnrollmentController extends Controller
     }
 
     /**
+     * Request more information from guardian.
+     */
+    public function requestInfo(Request $request, Enrollment $enrollment)
+    {
+        $validated = $request->validate([
+            'message' => 'required|string|max:2000',
+        ]);
+
+        if ($enrollment->status !== EnrollmentStatus::PENDING) {
+            return back()->with('error', 'Only pending enrollments can have information requested.');
+        }
+
+        $enrollment->update([
+            'info_requested' => true,
+            'info_request_message' => $validated['message'],
+            'info_request_date' => now(),
+            'info_requested_by' => Auth::id(),
+        ]);
+
+        // Send email notification to guardian
+        $enrollment->load(['student', 'guardian.user']);
+        \Illuminate\Support\Facades\Mail::to($enrollment->guardian->user->email)
+            ->send(new \App\Mail\EnrollmentInfoRequested($enrollment));
+
+        return back()->with('success', 'Information request sent to guardian successfully.');
+    }
+
+    /**
      * Update enrollment payment status.
      */
     public function updatePaymentStatus(UpdatePaymentStatusRequest $request, Enrollment $enrollment)

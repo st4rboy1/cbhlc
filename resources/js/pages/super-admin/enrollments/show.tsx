@@ -27,7 +27,7 @@ interface Guardian {
 
 interface Enrollment {
     id: number;
-    reference_number: string;
+    enrollment_id: string;
     student_id: number;
     guardian_id: number;
     grade_level: string;
@@ -105,12 +105,12 @@ export default function SuperAdminEnrollmentsShow({ enrollment }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Enrollments', href: '/super-admin/enrollments' },
-        { title: enrollment.reference_number, href: `/super-admin/enrollments/${enrollment.id}` },
+        { title: enrollment.enrollment_id, href: `/super-admin/enrollments/${enrollment.id}` },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Enrollment ${enrollment.reference_number}`} />
+            <Head title={`Enrollment ${enrollment.enrollment_id}`} />
             <div className="container mx-auto px-4 py-6">
                 <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -121,7 +121,7 @@ export default function SuperAdminEnrollmentsShow({ enrollment }: Props) {
                         </Link>
                         <div>
                             <h1 className="text-2xl font-bold">Enrollment Details</h1>
-                            <p className="text-sm text-muted-foreground">Reference: {enrollment.reference_number}</p>
+                            <p className="text-sm text-muted-foreground">ID: {enrollment.enrollment_id}</p>
                         </div>
                     </div>
                     <Link href={`/super-admin/enrollments/${enrollment.id}/edit`}>
@@ -139,9 +139,9 @@ export default function SuperAdminEnrollmentsShow({ enrollment }: Props) {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                         <Hash className="h-4 w-4" />
-                                        Reference Number
+                                        Enrollment ID
                                     </div>
-                                    <p className="text-lg font-bold">{enrollment.reference_number}</p>
+                                    <p className="text-lg font-bold">{enrollment.enrollment_id}</p>
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">

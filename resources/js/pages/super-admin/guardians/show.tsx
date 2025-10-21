@@ -110,22 +110,22 @@ export default function SuperAdminGuardiansShow({ guardian, students, enrollment
                                     <h3 className="mb-3 font-semibold">Personal Information</h3>
                                     <dl className="space-y-2 text-sm">
                                         <div className="flex justify-between">
-                                            <dt className="text-gray-600">First Name:</dt>
-                                            <dd className="font-medium">{guardian.first_name}</dd>
+                                            <dt className="text-muted-foreground">First Name:</dt>
+                                            <dd className="font-medium text-foreground">{guardian.first_name}</dd>
                                         </div>
                                         {guardian.middle_name && (
                                             <div className="flex justify-between">
-                                                <dt className="text-gray-600">Middle Name:</dt>
-                                                <dd className="font-medium">{guardian.middle_name}</dd>
+                                                <dt className="text-muted-foreground">Middle Name:</dt>
+                                                <dd className="font-medium text-foreground">{guardian.middle_name}</dd>
                                             </div>
                                         )}
                                         <div className="flex justify-between">
-                                            <dt className="text-gray-600">Last Name:</dt>
-                                            <dd className="font-medium">{guardian.last_name}</dd>
+                                            <dt className="text-muted-foreground">Last Name:</dt>
+                                            <dd className="font-medium text-foreground">{guardian.last_name}</dd>
                                         </div>
                                         <div className="flex justify-between">
-                                            <dt className="text-gray-600">Relationship:</dt>
-                                            <dd className="font-medium capitalize">{guardian.relationship.replace('_', ' ')}</dd>
+                                            <dt className="text-muted-foreground">Relationship:</dt>
+                                            <dd className="font-medium text-foreground capitalize">{guardian.relationship.replace('_', ' ')}</dd>
                                         </div>
                                     </dl>
                                 </div>
@@ -135,16 +135,16 @@ export default function SuperAdminGuardiansShow({ guardian, students, enrollment
                                     <h3 className="mb-3 font-semibold">Contact Information</h3>
                                     <dl className="space-y-2 text-sm">
                                         <div className="flex justify-between">
-                                            <dt className="text-gray-600">Email:</dt>
-                                            <dd className="font-medium">{guardian.email}</dd>
+                                            <dt className="text-muted-foreground">Email:</dt>
+                                            <dd className="font-medium text-foreground">{guardian.email}</dd>
                                         </div>
                                         <div className="flex justify-between">
-                                            <dt className="text-gray-600">Phone:</dt>
-                                            <dd className="font-medium">{guardian.phone}</dd>
+                                            <dt className="text-muted-foreground">Phone:</dt>
+                                            <dd className="font-medium text-foreground">{guardian.phone}</dd>
                                         </div>
                                         <div className="flex justify-between">
-                                            <dt className="text-gray-600">Address:</dt>
-                                            <dd className="max-w-xs text-right font-medium">{guardian.address}</dd>
+                                            <dt className="text-muted-foreground">Address:</dt>
+                                            <dd className="max-w-xs text-right font-medium text-foreground">{guardian.address}</dd>
                                         </div>
                                     </dl>
                                 </div>
@@ -157,14 +157,14 @@ export default function SuperAdminGuardiansShow({ guardian, students, enrollment
                                     <dl className="grid gap-2 text-sm md:grid-cols-2">
                                         {guardian.occupation && (
                                             <div className="flex justify-between">
-                                                <dt className="text-gray-600">Occupation:</dt>
-                                                <dd className="font-medium">{guardian.occupation}</dd>
+                                                <dt className="text-muted-foreground">Occupation:</dt>
+                                                <dd className="font-medium text-foreground">{guardian.occupation}</dd>
                                             </div>
                                         )}
                                         {guardian.employer && (
                                             <div className="flex justify-between">
-                                                <dt className="text-gray-600">Employer:</dt>
-                                                <dd className="font-medium">{guardian.employer}</dd>
+                                                <dt className="text-muted-foreground">Employer:</dt>
+                                                <dd className="font-medium text-foreground">{guardian.employer}</dd>
                                             </div>
                                         )}
                                     </dl>
@@ -176,8 +176,8 @@ export default function SuperAdminGuardiansShow({ guardian, students, enrollment
                                 <h3 className="mb-3 font-semibold">Audit Information</h3>
                                 <dl className="grid gap-2 text-sm md:grid-cols-2">
                                     <div>
-                                        <dt className="text-gray-600">Created:</dt>
-                                        <dd className="font-medium">
+                                        <dt className="text-muted-foreground">Created:</dt>
+                                        <dd className="font-medium text-foreground">
                                             {new Date(guardian.created_at).toLocaleDateString('en-US', {
                                                 year: 'numeric',
                                                 month: 'long',
@@ -189,8 +189,8 @@ export default function SuperAdminGuardiansShow({ guardian, students, enrollment
                                         </dd>
                                     </div>
                                     <div>
-                                        <dt className="text-gray-600">Last Updated:</dt>
-                                        <dd className="font-medium">
+                                        <dt className="text-muted-foreground">Last Updated:</dt>
+                                        <dd className="font-medium text-foreground">
                                             {new Date(guardian.updated_at).toLocaleDateString('en-US', {
                                                 year: 'numeric',
                                                 month: 'long',
@@ -214,7 +214,7 @@ export default function SuperAdminGuardiansShow({ guardian, students, enrollment
                         </CardHeader>
                         <CardContent>
                             {students.length === 0 ? (
-                                <p className="text-center text-gray-500">No students associated with this guardian.</p>
+                                <p className="text-center text-muted-foreground">No students associated with this guardian.</p>
                             ) : (
                                 <Table>
                                     <TableHeader>
@@ -258,7 +258,7 @@ export default function SuperAdminGuardiansShow({ guardian, students, enrollment
                         </CardHeader>
                         <CardContent>
                             {enrollments.length === 0 ? (
-                                <p className="text-center text-gray-500">No enrollment records found.</p>
+                                <p className="text-center text-muted-foreground">No enrollment records found.</p>
                             ) : (
                                 <Table>
                                     <TableHeader>

@@ -138,8 +138,66 @@ class GuardianController extends Controller
 
         $guardian->load(['user', 'children.enrollments']);
 
+        // Get primary relationship from first child if exists
+        $relationship = 'guardian';
+        $emergencyContact = false;
+        if ($guardian->children->isNotEmpty()) {
+            $firstChild = $guardian->children->first();
+            $relationship = $firstChild->pivot->relationship_type ?? 'guardian';
+            $emergencyContact = $firstChild->pivot->is_primary_contact ?? false;
+        }
+
+        // Transform guardian data to match frontend expectations
+        $guardianData = [
+            'id' => $guardian->id,
+            'first_name' => $guardian->first_name,
+            'middle_name' => $guardian->middle_name,
+            'last_name' => $guardian->last_name,
+            'email' => $guardian->user->email,
+            'phone' => $guardian->contact_number,
+            'address' => $guardian->address,
+            'relationship' => $relationship,
+            'occupation' => $guardian->occupation,
+            'employer' => $guardian->employer,
+            'emergency_contact' => $emergencyContact,
+            'created_at' => $guardian->created_at,
+            'updated_at' => $guardian->updated_at,
+        ];
+
+        // Transform students data
+        /** @phpstan-ignore argument.unresolvableType */
+        $students = $guardian->children->map(function ($student) {
+            return [
+                'id' => $student->id,
+                'student_id' => $student->student_id,
+                'first_name' => $student->first_name,
+                'last_name' => $student->last_name,
+                'grade_level' => $student->grade_level,
+                'email' => $student->email,
+            ];
+        });
+
+        // Transform enrollments data
+        $enrollments = $guardian->children->flatMap(function ($student) {
+            return $student->enrollments->map(function ($enrollment) use ($student) {
+                return [
+                    'id' => $enrollment->id,
+                    'student' => [
+                        'first_name' => $student->first_name,
+                        'last_name' => $student->last_name,
+                    ],
+                    'school_year' => $enrollment->school_year,
+                    'grade_level' => $enrollment->grade_level,
+                    'status' => $enrollment->status,
+                    'enrollment_date' => $enrollment->created_at,
+                ];
+            });
+        });
+
         return Inertia::render('super-admin/guardians/show', [
-            'guardian' => $guardian,
+            'guardian' => $guardianData,
+            'students' => $students,
+            'enrollments' => $enrollments,
         ]);
     }
 
