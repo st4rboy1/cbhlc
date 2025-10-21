@@ -11,7 +11,9 @@ use App\Http\Requests\Guardian\StoreEnrollmentRequest;
 use App\Models\Enrollment;
 use App\Models\EnrollmentPeriod;
 use App\Models\GuardianStudent;
+use App\Models\Payment;
 use App\Models\Student;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -315,5 +317,38 @@ class EnrollmentController extends Controller
 
         return redirect()->route('guardian.enrollments.index')
             ->with('success', 'Enrollment application canceled successfully.');
+    }
+
+    /**
+     * Download payment history report PDF
+     */
+    public function downloadPaymentHistory(Enrollment $enrollment)
+    {
+        // Get Guardian model for authenticated user
+        $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
+
+        // Verify this guardian has access to this enrollment
+        $hasAccess = GuardianStudent::where('guardian_id', $guardian->id)
+            ->where('student_id', $enrollment->student_id)
+            ->exists();
+
+        if (! $hasAccess) {
+            abort(404);
+        }
+
+        $enrollment->load('student');
+
+        // Get all payments for this enrollment via invoice
+        $payments = Payment::where('invoice_id', $enrollment->id)
+            ->orderBy('payment_date', 'asc')
+            ->get();
+
+        $pdf = Pdf::loadView('pdf.payment-history', [
+            'enrollment' => $enrollment,
+            'payments' => $payments,
+        ])
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download("payment-history-{$enrollment->enrollment_id}.pdf");
     }
 }
