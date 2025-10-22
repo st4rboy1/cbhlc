@@ -33,6 +33,8 @@ class StoreEnrollmentRequest extends FormRequest
     {
         return [
             'enrollment_period' => [
+                'nullable',
+                'string',
                 function ($attribute, $value, $fail) {
                     // Validate active enrollment period exists
                     $activePeriod = EnrollmentPeriod::active()->first();
