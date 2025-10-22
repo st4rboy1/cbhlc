@@ -52,7 +52,7 @@ export default function UsersIndex({ users, filters }: Props) {
             <div className="px-4 py-6">
                 <div className="mb-4 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Users Index</h1>
-                    <Link href={route('super-admin.users.create')}>
+                    <Link href="/super-admin/users/create">
                         <Button>
                             <Plus className="mr-2 h-4 w-4" />
                             Create User
