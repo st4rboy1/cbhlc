@@ -13,9 +13,11 @@ interface GradeLevelFee {
     id: number;
     grade_level: string;
     school_year: string;
-    tuition_fee: number;
-    miscellaneous_fee: number;
-    other_fees: number;
+    tuition_fee_cents: number;
+    miscellaneous_fee_cents: number;
+    laboratory_fee_cents: number;
+    library_fee_cents: number;
+    sports_fee_cents: number;
     payment_terms: string;
     is_active: boolean;
 }
@@ -25,7 +27,9 @@ interface FormData {
     school_year: string;
     tuition_fee: string;
     miscellaneous_fee: string;
-    other_fees: string;
+    laboratory_fee: string;
+    library_fee: string;
+    sports_fee: string;
     payment_terms: string;
     is_active: boolean;
 }
@@ -39,17 +43,18 @@ export default function SuperAdminGradeLevelFeesEdit({ fee, gradeLevels = [] }: 
     const { data, setData, put, processing, errors } = useForm<FormData>({
         grade_level: fee.grade_level,
         school_year: fee.school_year,
-        tuition_fee: (fee.tuition_fee ?? 0).toString(),
-        miscellaneous_fee: (fee.miscellaneous_fee ?? 0).toString(),
-        other_fees: (fee.other_fees ?? 0).toString(),
+        tuition_fee: (fee.tuition_fee_cents / 100).toFixed(2),
+        miscellaneous_fee: (fee.miscellaneous_fee_cents / 100).toFixed(2),
+        laboratory_fee: (fee.laboratory_fee_cents / 100).toFixed(2),
+        library_fee: (fee.library_fee_cents / 100).toFixed(2),
+        sports_fee: (fee.sports_fee_cents / 100).toFixed(2),
         payment_terms: fee.payment_terms,
         is_active: fee.is_active,
     });
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Grade Level Fees', href: '/super-admin/grade-level-fees' },
-        { title: 'Edit', href: '#' },
+        { title: 'Grade Levelfees', href: '/super-admin/grade-level-fees' },
     ];
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -139,16 +144,44 @@ export default function SuperAdminGradeLevelFeesEdit({ fee, gradeLevels = [] }: 
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="other_fees">Other Fees</Label>
+                                    <Label htmlFor="laboratory_fee">Laboratory Fee</Label>
                                     <Input
-                                        id="other_fees"
+                                        id="laboratory_fee"
                                         type="number"
                                         step="0.01"
                                         placeholder="0.00"
-                                        value={data.other_fees}
-                                        onChange={(e) => setData('other_fees', e.target.value)}
+                                        value={data.laboratory_fee}
+                                        onChange={(e) => setData('laboratory_fee', e.target.value)}
                                     />
-                                    {errors.other_fees && <p className="text-sm text-red-600">{errors.other_fees}</p>}
+                                    {errors.laboratory_fee && <p className="text-sm text-red-600">{errors.laboratory_fee}</p>}
+                                </div>
+                            </div>
+
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label htmlFor="library_fee">Library Fee</Label>
+                                    <Input
+                                        id="library_fee"
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        value={data.library_fee}
+                                        onChange={(e) => setData('library_fee', e.target.value)}
+                                    />
+                                    {errors.library_fee && <p className="text-sm text-red-600">{errors.library_fee}</p>}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="sports_fee">Sports Fee</Label>
+                                    <Input
+                                        id="sports_fee"
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        value={data.sports_fee}
+                                        onChange={(e) => setData('sports_fee', e.target.value)}
+                                    />
+                                    {errors.sports_fee && <p className="text-sm text-red-600">{errors.sports_fee}</p>}
                                 </div>
                             </div>
 
