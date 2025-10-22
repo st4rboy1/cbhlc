@@ -311,6 +311,7 @@ export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
                     setEnrollmentToApprove(null);
                     setApproveRemarks('');
                     setApproveErrors({});
+                    router.reload({ only: ['enrollments'] });
                 },
                 onError: (errors) => {
                     setApproveErrors(errors);
@@ -338,6 +339,7 @@ export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
                     setEnrollmentToReject(null);
                     setRejectReason('');
                     setRejectErrors({});
+                    router.reload({ only: ['enrollments'] });
                 },
                 onError: (errors) => {
                     setRejectErrors(errors);
