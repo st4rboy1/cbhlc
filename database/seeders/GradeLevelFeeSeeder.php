@@ -14,7 +14,7 @@ class GradeLevelFeeSeeder extends Seeder
     {
         $schoolYear = '2025-2026';
 
-        // KINDER - ANNUAL (Nursery and Kinder have same fees per CSV)
+        // NURSERY AND KINDER - ANNUAL
         GradeLevelFee::create([
             'grade_level' => 'Kinder',
             'school_year' => $schoolYear,
@@ -26,11 +26,11 @@ class GradeLevelFeeSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // KINDER - SEMESTRAL
+        // NURSERY AND KINDER - SEMESTRAL
         GradeLevelFee::create([
             'grade_level' => 'Kinder',
             'school_year' => $schoolYear,
-            'tuition_fee_cents' => 1900000, // ₱9,500 x 2 = ₱19,000 (tuition only)
+            'tuition_fee_cents' => 1900000, // ₱9,500 x 2 = ₱19,000
             'miscellaneous_fee_cents' => 550000, // ₱5,500.00
             'other_fees_cents' => 0,
             'down_payment_cents' => 1500000, // ₱15,000.00 on enrollment
@@ -38,11 +38,11 @@ class GradeLevelFeeSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // KINDER - MONTHLY
+        // NURSERY AND KINDER - MONTHLY
         GradeLevelFee::create([
             'grade_level' => 'Kinder',
             'school_year' => $schoolYear,
-            'tuition_fee_cents' => 1950000, // ₱1,950 x 10 = ₱19,500 (tuition only)
+            'tuition_fee_cents' => 1950000, // ₱1,950 x 10 = ₱19,500
             'miscellaneous_fee_cents' => 550000, // ₱5,500.00
             'other_fees_cents' => 0,
             'down_payment_cents' => 745000, // ₱7,450.00 on enrollment
@@ -69,7 +69,7 @@ class GradeLevelFeeSeeder extends Seeder
             GradeLevelFee::create([
                 'grade_level' => $gradeLevel,
                 'school_year' => $schoolYear,
-                'tuition_fee_cents' => 2100000, // ₱10,500 x 2 = ₱21,000 (tuition only)
+                'tuition_fee_cents' => 2100000, // ₱10,500 x 2 = ₱21,000
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
                 'down_payment_cents' => 1700000, // ₱17,000.00 on enrollment
@@ -83,10 +83,52 @@ class GradeLevelFeeSeeder extends Seeder
             GradeLevelFee::create([
                 'grade_level' => $gradeLevel,
                 'school_year' => $schoolYear,
-                'tuition_fee_cents' => 2150000, // ₱2,150 x 10 = ₱21,500 (tuition only)
+                'tuition_fee_cents' => 2150000, // ₱2,150 x 10 = ₱21,500
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
-                'down_payment_cents' => 865000, // ₱8,650.00 on enrollment (₱2,150 + ₱6,500)
+                'down_payment_cents' => 865000, // ₱8,650.00 on enrollment
+                'payment_terms' => 'MONTHLY',
+                'is_active' => true,
+            ]);
+        }
+
+        // GRADES 4, 5, 6 - ANNUAL
+        foreach (['Grade 4', 'Grade 5', 'Grade 6'] as $gradeLevel) {
+            GradeLevelFee::create([
+                'grade_level' => $gradeLevel,
+                'school_year' => $schoolYear,
+                'tuition_fee_cents' => 2100000, // ₱21,000.00
+                'miscellaneous_fee_cents' => 650000, // ₱6,500.00
+                'other_fees_cents' => 0,
+                'down_payment_cents' => 0, // Full payment upfront
+                'payment_terms' => 'ANNUAL',
+                'is_active' => true,
+            ]);
+        }
+
+        // GRADES 4, 5, 6 - SEMESTRAL
+        foreach (['Grade 4', 'Grade 5', 'Grade 6'] as $gradeLevel) {
+            GradeLevelFee::create([
+                'grade_level' => $gradeLevel,
+                'school_year' => $schoolYear,
+                'tuition_fee_cents' => 2150000, // ₱10,500 x 2 = ₱21,500
+                'miscellaneous_fee_cents' => 650000, // ₱6,500.00
+                'other_fees_cents' => 0,
+                'down_payment_cents' => 1700000, // ₱17,000.00 on enrollment
+                'payment_terms' => 'SEMESTRAL',
+                'is_active' => true,
+            ]);
+        }
+
+        // GRADES 4, 5, 6 - MONTHLY
+        foreach (['Grade 4', 'Grade 5', 'Grade 6'] as $gradeLevel) {
+            GradeLevelFee::create([
+                'grade_level' => $gradeLevel,
+                'school_year' => $schoolYear,
+                'tuition_fee_cents' => 2200000, // ₱2,200 x 10 = ₱22,000
+                'miscellaneous_fee_cents' => 650000, // ₱6,500.00
+                'other_fees_cents' => 0,
+                'down_payment_cents' => 870000, // ₱8,700.00 on enrollment
                 'payment_terms' => 'MONTHLY',
                 'is_active' => true,
             ]);
