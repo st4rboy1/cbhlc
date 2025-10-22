@@ -21,7 +21,18 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
+interface Guardian {
+    id: number;
+    first_name: string;
+    middle_name: string | null;
+    last_name: string;
+    contact_number: string | null;
+    address: string | null;
+    occupation: string | null;
+    employer: string | null;
+}
+
+export default function Profile({ mustVerifyEmail, status, guardian }: { mustVerifyEmail: boolean; status?: string; guardian?: Guardian | null }) {
     const { auth } = usePage<SharedData>().props;
 
     return (
@@ -30,7 +41,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Profile information" description="Update your name and email address" />
+                    <HeadingSmall title="Account Information" description="Update your account details" />
 
                     <Form
                         action={ProfileController.update.url()}
@@ -74,6 +85,86 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
                                     <InputError className="mt-2" message={errors.email} />
                                 </div>
+
+                                {guardian && (
+                                    <>
+                                        <div className="border-t pt-6">
+                                            <h3 className="mb-4 text-lg font-semibold">Guardian Profile</h3>
+                                            <p className="mb-4 text-sm text-muted-foreground">Update your guardian information</p>
+                                        </div>
+
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="first_name">First Name</Label>
+                                                <Input
+                                                    id="first_name"
+                                                    name="first_name"
+                                                    defaultValue={guardian.first_name}
+                                                    placeholder="First name"
+                                                />
+                                                <InputError message={errors.first_name} />
+                                            </div>
+
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="middle_name">Middle Name</Label>
+                                                <Input
+                                                    id="middle_name"
+                                                    name="middle_name"
+                                                    defaultValue={guardian.middle_name || ''}
+                                                    placeholder="Middle name (optional)"
+                                                />
+                                                <InputError message={errors.middle_name} />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="last_name">Last Name</Label>
+                                            <Input id="last_name" name="last_name" defaultValue={guardian.last_name} placeholder="Last name" />
+                                            <InputError message={errors.last_name} />
+                                        </div>
+
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="contact_number">Contact Number</Label>
+                                            <Input
+                                                id="contact_number"
+                                                name="contact_number"
+                                                defaultValue={guardian.contact_number || ''}
+                                                placeholder="Phone number"
+                                            />
+                                            <InputError message={errors.contact_number} />
+                                        </div>
+
+                                        <div className="grid gap-2">
+                                            <Label htmlFor="address">Address</Label>
+                                            <Input id="address" name="address" defaultValue={guardian.address || ''} placeholder="Complete address" />
+                                            <InputError message={errors.address} />
+                                        </div>
+
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="occupation">Occupation</Label>
+                                                <Input
+                                                    id="occupation"
+                                                    name="occupation"
+                                                    defaultValue={guardian.occupation || ''}
+                                                    placeholder="Your occupation"
+                                                />
+                                                <InputError message={errors.occupation} />
+                                            </div>
+
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="employer">Employer</Label>
+                                                <Input
+                                                    id="employer"
+                                                    name="employer"
+                                                    defaultValue={guardian.employer || ''}
+                                                    placeholder="Company name (optional)"
+                                                />
+                                                <InputError message={errors.employer} />
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
 
                                 {mustVerifyEmail && auth.user.email_verified_at === null && (
                                     <div>

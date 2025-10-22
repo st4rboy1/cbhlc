@@ -18,7 +18,6 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-
             'email' => [
                 'required',
                 'string',
@@ -27,6 +26,14 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            // Guardian-specific fields (optional)
+            'first_name' => ['nullable', 'string', 'max:100'],
+            'middle_name' => ['nullable', 'string', 'max:100'],
+            'last_name' => ['nullable', 'string', 'max:100'],
+            'contact_number' => ['nullable', 'string', 'max:50'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'occupation' => ['nullable', 'string', 'max:100'],
+            'employer' => ['nullable', 'string', 'max:255'],
         ];
     }
 }
