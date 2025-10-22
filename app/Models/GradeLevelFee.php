@@ -37,6 +37,7 @@ class GradeLevelFee extends Model
         'sports_fee_cents',
         'other_fees',
         'other_fees_cents',
+        'down_payment_cents',
         'payment_terms',
         'school_year',
         'is_active',
@@ -46,6 +47,7 @@ class GradeLevelFee extends Model
         'tuition_fee',
         'miscellaneous_fee',
         'other_fees',
+        'down_payment',
         'total_amount',
     ];
 
@@ -60,6 +62,7 @@ class GradeLevelFee extends Model
         'library_fee' => MoneyCast::class,
         'sports_fee' => MoneyCast::class,
         'other_fees' => MoneyCast::class,
+        'down_payment' => MoneyCast::class,
         // Formatted money casts - display formatted currency
         'formatted_tuition_fee' => FormattedMoneyCast::class,
         'formatted_registration_fee' => FormattedMoneyCast::class,
