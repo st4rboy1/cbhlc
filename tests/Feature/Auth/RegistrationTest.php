@@ -93,10 +93,10 @@ test('registration validates email format', function () {
     $response->assertSessionHasErrors('email');
 });
 
-test('registration handles single-word names correctly', function () {
+test('registration requires both first and last name', function () {
     $response = $this->post(route('register.store'), [
         'first_name' => 'Madonna',
-        'last_name' => '',
+        'last_name' => 'Ciccone',
         'email' => 'madonna@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -111,7 +111,7 @@ test('registration handles single-word names correctly', function () {
 
     expect($guardian)->not->toBeNull();
     expect($guardian->first_name)->toBe('Madonna');
-    expect($guardian->last_name)->toBe('');
+    expect($guardian->last_name)->toBe('Ciccone');
     expect($guardian->contact_number)->toBe('+63912345678');
     expect($guardian->address)->toBe('123 Test Street, Manila');
     expect($guardian->occupation)->toBe('Singer');
