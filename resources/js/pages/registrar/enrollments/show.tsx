@@ -104,7 +104,7 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                             </div>
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Guardian Name</p>
-                                <p className="text-lg font-semibold">{enrollment.guardian.name}</p>
+                                <p className="text-lg font-semibold">{enrollment.guardian?.name || 'N/A'}</p>
                             </div>
                         </CardContent>
                     </Card>
