@@ -59,7 +59,6 @@ class UpdateGuardianRequestTest extends TestCase
         $this->assertArrayHasKey('password', $rules);
         $this->assertArrayHasKey('first_name', $rules);
         $this->assertArrayHasKey('last_name', $rules);
-        $this->assertArrayHasKey('relationship_type', $rules);
         $this->assertArrayHasKey('phone', $rules);
         $this->assertArrayHasKey('address', $rules);
 
@@ -77,7 +76,6 @@ class UpdateGuardianRequestTest extends TestCase
             'first_name' => 'Updated',
             'middle_name' => 'Middle',
             'last_name' => 'Guardian',
-            'relationship_type' => 'father',
             'phone' => '09123456789',
             'occupation' => 'Engineer',
             'employer' => 'Tech Company',
@@ -118,7 +116,6 @@ class UpdateGuardianRequestTest extends TestCase
             'email' => 'test@example.com', // Same email
             'first_name' => 'Updated',
             'last_name' => 'Guardian',
-            'relationship_type' => 'mother',
             'phone' => '09123456789',
             'address' => '123 Updated Street',
             'emergency_contact' => false,
@@ -156,7 +153,6 @@ class UpdateGuardianRequestTest extends TestCase
             'email' => 'updated@example.com',
             'first_name' => 'Updated',
             'last_name' => 'Guardian',
-            'relationship_type' => 'guardian',
             'phone' => '09123456789',
             'address' => '123 Updated Street',
             'emergency_contact' => false,
@@ -185,44 +181,5 @@ class UpdateGuardianRequestTest extends TestCase
         $validator = Validator::make($data, $request->rules());
 
         $this->assertTrue($validator->passes());
-    }
-
-    public function test_validation_fails_with_invalid_relationship_type(): void
-    {
-        $existingGuardian = Guardian::factory()->create();
-
-        $data = [
-            'email' => 'updated@example.com',
-            'first_name' => 'Updated',
-            'last_name' => 'Guardian',
-            'relationship_type' => 'invalid_type',
-            'phone' => '09123456789',
-            'address' => '123 Updated Street',
-            'emergency_contact' => false,
-        ];
-
-        $request = new class($existingGuardian) extends UpdateGuardianRequest
-        {
-            private $guardian;
-
-            public function __construct($guardian)
-            {
-                $this->guardian = $guardian;
-            }
-
-            public function route($param = null, $default = null)
-            {
-                if ($param === 'guardian') {
-                    return $this->guardian;
-                }
-
-                return parent::route($param, $default);
-            }
-        };
-
-        $validator = Validator::make($data, $request->rules());
-
-        $this->assertFalse($validator->passes());
-        $this->assertArrayHasKey('relationship_type', $validator->errors()->toArray());
     }
 }
