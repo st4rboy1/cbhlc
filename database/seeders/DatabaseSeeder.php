@@ -27,6 +27,9 @@ class DatabaseSeeder extends Seeder
         // Seed enrollment periods
         $this->call(EnrollmentPeriodSeeder::class);
 
+        // Seed grade level fees
+        $this->call(GradeLevelFeeSeeder::class);
+
         // Seed enrollments (includes students and guardians if needed)
         $this->call(EnrollmentSeeder::class);
 
