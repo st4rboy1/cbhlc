@@ -67,7 +67,8 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        // Redirect to guardian dashboard
-        return redirect()->route('guardian.dashboard');
+        // Redirect to guardian dashboard with success message
+        return redirect()->route('guardian.dashboard')
+            ->with('success', 'Account created successfully! Please check your email to verify your account.');
     }
 }
