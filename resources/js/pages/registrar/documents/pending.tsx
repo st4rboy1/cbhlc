@@ -91,7 +91,18 @@ export default function PendingDocuments({ documents }: Props) {
                                             {new Date(document.upload_date).toLocaleDateString()}
                                         </td>
                                         <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
-                                            <button onClick={() => verifyDocument(document.id)} className="text-indigo-600 hover:text-indigo-900">
+                                            <a
+                                                href={`/registrar/documents/${document.id}/view`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-900"
+                                            >
+                                                View
+                                            </a>
+                                            <button
+                                                onClick={() => verifyDocument(document.id)}
+                                                className="ml-4 text-indigo-600 hover:text-indigo-900"
+                                            >
                                                 Verify
                                             </button>
                                             <button onClick={() => rejectDocument(document.id)} className="ml-4 text-red-600 hover:text-red-900">

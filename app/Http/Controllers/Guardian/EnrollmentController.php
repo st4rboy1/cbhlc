@@ -224,15 +224,16 @@ class EnrollmentController extends Controller
             ->where('school_year', $activePeriod->school_year)
             ->first();
 
-        $tuitionFeeCents = ($gradeLevelFee ? $gradeLevelFee->tuition_fee : 0) * 100;
-        $miscFeeCents = ($gradeLevelFee ? $gradeLevelFee->miscellaneous_fee : 0) * 100;
-        $laboratoryFeeCents = 0;
-        $libraryFeeCents = 0;
-        $sportsFeeCents = 0;
+        $tuitionFeeCents = $gradeLevelFee ? $gradeLevelFee->tuition_fee_cents : 0;
+        $miscFeeCents = $gradeLevelFee ? $gradeLevelFee->miscellaneous_fee_cents : 0;
+        $laboratoryFeeCents = $gradeLevelFee ? $gradeLevelFee->laboratory_fee_cents : 0;
+        $libraryFeeCents = $gradeLevelFee ? $gradeLevelFee->library_fee_cents : 0;
+        $sportsFeeCents = $gradeLevelFee ? $gradeLevelFee->sports_fee_cents : 0;
+        $otherFeeCents = $gradeLevelFee ? $gradeLevelFee->other_fees_cents : 0;
         $discountCents = 0;
 
         // Calculate totals
-        $totalAmountCents = $tuitionFeeCents + $miscFeeCents + $laboratoryFeeCents + $libraryFeeCents + $sportsFeeCents;
+        $totalAmountCents = $tuitionFeeCents + $miscFeeCents + $laboratoryFeeCents + $libraryFeeCents + $sportsFeeCents + $otherFeeCents;
         $netAmountCents = $totalAmountCents - $discountCents;
         $amountPaidCents = 0;
         $balanceCents = $netAmountCents - $amountPaidCents;
@@ -253,6 +254,7 @@ class EnrollmentController extends Controller
             'laboratory_fee_cents' => $laboratoryFeeCents,
             'library_fee_cents' => $libraryFeeCents,
             'sports_fee_cents' => $sportsFeeCents,
+            'other_fees_cents' => $otherFeeCents,
             'total_amount_cents' => $totalAmountCents,
             'discount_cents' => $discountCents,
             'net_amount_cents' => $netAmountCents,
