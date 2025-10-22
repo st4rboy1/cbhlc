@@ -80,7 +80,7 @@ class UpdateStudentRequestTest extends TestCase
             'last_name' => 'Name',
             'birth_date' => '2010-01-01',
             'birth_place' => 'Manila',
-            'gender' => 'male',
+            'gender' => 'Male',
             'nationality' => 'Filipino',
             'religion' => 'Christian',
             'address' => '123 Updated Street',
@@ -123,7 +123,7 @@ class UpdateStudentRequestTest extends TestCase
             'first_name' => 'Updated',
             'last_name' => 'Name',
             'birth_date' => '2010-01-01',
-            'gender' => 'male',
+            'gender' => 'Male',
             'address' => '123 Updated Street',
             'email' => 'test@example.com', // Same email
             'grade' => 'grade_2',
