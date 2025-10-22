@@ -31,7 +31,6 @@ class StoreGuardianRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:100'],
             'middle_name' => ['nullable', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'relationship_type' => ['required', 'string', 'in:father,mother,guardian,other'],
             'phone' => ['required', 'string', 'max:20'],
             'occupation' => ['nullable', 'string', 'max:100'],
             'employer' => ['nullable', 'string', 'max:255'],
