@@ -255,7 +255,8 @@ export const createColumns = ({ onApproveClick, onRejectClick, onUpdatePaymentSt
 ];
 
 export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
-    const { flash } = usePage().props as { flash: { success?: string; error?: string } };
+    const page = usePage();
+    const flash = page.props.flash as { success?: string; error?: string } | undefined;
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
