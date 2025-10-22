@@ -9,7 +9,9 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -41,34 +43,54 @@ class RegisteredUserController extends Controller
             'employer' => 'nullable|string|max:255',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        try {
+            DB::beginTransaction();
 
-        // Registration is limited to guardians only
-        $user->assignRole('guardian');
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        // Create Guardian profile with complete information from registration
-        // Split the name into first and last name (simple approach)
-        $nameParts = explode(' ', $request->name, 2);
-        Guardian::create([
-            'user_id' => $user->id,
-            'first_name' => $nameParts[0],
-            'last_name' => $nameParts[1] ?? '',
-            'contact_number' => $request->contact_number,
-            'address' => $request->address,
-            'occupation' => $request->occupation,
-            'employer' => $request->employer,
-        ]);
+            // Registration is limited to guardians only
+            $user->assignRole('guardian');
 
-        event(new Registered($user));
+            // Create Guardian profile with complete information from registration
+            // Split the name into first and last name (handle single names)
+            $nameParts = explode(' ', trim($request->name), 2);
+            $firstName = $nameParts[0];
+            $lastName = $nameParts[1] ?? $nameParts[0]; // Use first name as last name if no last name provided
 
-        Auth::login($user);
+            Guardian::create([
+                'user_id' => $user->id,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'contact_number' => $request->contact_number,
+                'address' => $request->address,
+                'occupation' => $request->occupation,
+                'employer' => $request->employer,
+            ]);
 
-        // Redirect to guardian dashboard with success message
-        return redirect()->route('guardian.dashboard')
-            ->with('success', 'Account created successfully! Please check your email to verify your account.');
+            DB::commit();
+
+            event(new Registered($user));
+
+            Auth::login($user);
+
+            // Redirect to guardian dashboard with success message
+            return redirect()->route('guardian.dashboard')
+                ->with('success', 'Account created successfully! Please check your email to verify your account.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Guardian registration failed', [
+                'email' => $request->email,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()->withErrors([
+                'email' => 'Registration failed. Please try again or contact support if the problem persists.',
+            ])->withInput($request->except('password', 'password_confirmation'));
+        }
     }
 }
