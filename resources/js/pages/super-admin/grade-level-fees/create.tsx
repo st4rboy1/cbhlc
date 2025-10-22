@@ -14,7 +14,9 @@ interface FormData {
     school_year: string;
     tuition_fee: string;
     miscellaneous_fee: string;
-    other_fees: string;
+    laboratory_fee: string;
+    library_fee: string;
+    sports_fee: string;
     payment_terms: string;
     is_active: boolean;
 }
@@ -29,7 +31,9 @@ export default function SuperAdminGradeLevelFeesCreate({ gradeLevels = [] }: Pro
         school_year: '',
         tuition_fee: '',
         miscellaneous_fee: '',
-        other_fees: '',
+        laboratory_fee: '',
+        library_fee: '',
+        sports_fee: '',
         payment_terms: 'ANNUAL',
         is_active: true,
     });
@@ -125,16 +129,44 @@ export default function SuperAdminGradeLevelFeesCreate({ gradeLevels = [] }: Pro
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="other_fees">Other Fees</Label>
+                                    <Label htmlFor="laboratory_fee">Laboratory Fee</Label>
                                     <Input
-                                        id="other_fees"
+                                        id="laboratory_fee"
                                         type="number"
                                         step="0.01"
                                         placeholder="0.00"
-                                        value={data.other_fees}
-                                        onChange={(e) => setData('other_fees', e.target.value)}
+                                        value={data.laboratory_fee}
+                                        onChange={(e) => setData('laboratory_fee', e.target.value)}
                                     />
-                                    {errors.other_fees && <p className="text-sm text-red-600">{errors.other_fees}</p>}
+                                    {errors.laboratory_fee && <p className="text-sm text-red-600">{errors.laboratory_fee}</p>}
+                                </div>
+                            </div>
+
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label htmlFor="library_fee">Library Fee</Label>
+                                    <Input
+                                        id="library_fee"
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        value={data.library_fee}
+                                        onChange={(e) => setData('library_fee', e.target.value)}
+                                    />
+                                    {errors.library_fee && <p className="text-sm text-red-600">{errors.library_fee}</p>}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="sports_fee">Sports Fee</Label>
+                                    <Input
+                                        id="sports_fee"
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="0.00"
+                                        value={data.sports_fee}
+                                        onChange={(e) => setData('sports_fee', e.target.value)}
+                                    />
+                                    {errors.sports_fee && <p className="text-sm text-red-600">{errors.sports_fee}</p>}
                                 </div>
                             </div>
 
