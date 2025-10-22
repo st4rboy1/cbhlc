@@ -39,6 +39,8 @@ class Enrollment extends Model
         'enrollment_period_id',
         'quarter',
         'grade_level',
+        'section',
+        'adviser',
         'status',
         'type',
         'previous_school',
