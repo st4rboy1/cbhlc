@@ -18,9 +18,13 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $user = $request->user();
+        $guardian = $user->hasRole('guardian') ? $user->guardian : null;
+
         return Inertia::render('settings/profile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
             'status' => $request->session()->get('status'),
+            'guardian' => $guardian,
         ]);
     }
 
@@ -29,15 +33,35 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $validated = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Update user account info
+        $user->fill([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
 
-        return to_route('profile.edit');
+        // Update guardian profile if user is a guardian
+        if ($user->hasRole('guardian') && $user->guardian) {
+            $user->guardian->update([
+                'first_name' => $validated['first_name'] ?? $user->guardian->first_name,
+                'middle_name' => $validated['middle_name'] ?? $user->guardian->middle_name,
+                'last_name' => $validated['last_name'] ?? $user->guardian->last_name,
+                'contact_number' => $validated['contact_number'] ?? $user->guardian->contact_number,
+                'address' => $validated['address'] ?? $user->guardian->address,
+                'occupation' => $validated['occupation'] ?? $user->guardian->occupation,
+                'employer' => $validated['employer'] ?? $user->guardian->employer,
+            ]);
+        }
+
+        return to_route('profile.edit')->with('success', 'Profile updated successfully!');
     }
 
     /**
