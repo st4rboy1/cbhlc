@@ -29,7 +29,7 @@ class UpdateStudentRequest extends FormRequest
             'last_name' => ['required', 'string', 'max:100'],
             'birth_date' => ['required', 'date', 'before:today'],
             'birth_place' => ['nullable', 'string', 'max:255'],
-            'gender' => ['required', 'in:male,female'],
+            'gender' => ['required', 'in:Male,Female,Other'],
             'nationality' => ['nullable', 'string', 'max:100'],
             'religion' => ['nullable', 'string', 'max:100'],
             'address' => ['required', 'string', 'max:500'],

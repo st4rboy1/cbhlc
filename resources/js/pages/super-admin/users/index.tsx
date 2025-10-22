@@ -1,7 +1,9 @@
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { UsersTable } from '@/pages/super-admin/users/users-table';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { Plus } from 'lucide-react';
 
 // From the controller, the User model has these properties
 export type User = {
@@ -48,8 +50,14 @@ export default function UsersIndex({ users, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
             <div className="px-4 py-6">
-                <div className="flex items-center justify-between">
-                    <h1 className="mb-4 text-2xl font-bold">Users Index</h1>
+                <div className="mb-4 flex items-center justify-between">
+                    <h1 className="text-2xl font-bold">Users Index</h1>
+                    <Link href={route('super-admin.users.create')}>
+                        <Button>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Create User
+                        </Button>
+                    </Link>
                 </div>
                 <UsersTable users={users.data} filters={filters} />
             </div>
