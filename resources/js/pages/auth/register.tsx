@@ -25,19 +25,34 @@ export default function Register() {
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Name</Label>
-                                <Input
-                                    id="name"
-                                    type="text"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="name"
-                                    name="name"
-                                    placeholder="Full name"
-                                />
-                                <InputError message={errors.name} className="mt-2" />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="grid gap-2">
+                                    <Label htmlFor="first_name">First Name</Label>
+                                    <Input
+                                        id="first_name"
+                                        type="text"
+                                        required
+                                        autoFocus
+                                        tabIndex={1}
+                                        autoComplete="given-name"
+                                        name="first_name"
+                                        placeholder="First name"
+                                    />
+                                    <InputError message={errors.first_name} className="mt-2" />
+                                </div>
+                                <div className="grid gap-2">
+                                    <Label htmlFor="last_name">Last Name</Label>
+                                    <Input
+                                        id="last_name"
+                                        type="text"
+                                        required
+                                        tabIndex={2}
+                                        autoComplete="family-name"
+                                        name="last_name"
+                                        placeholder="Last name"
+                                    />
+                                    <InputError message={errors.last_name} className="mt-2" />
+                                </div>
                             </div>
 
                             {/* Registration is now limited to parents only (handled by backend) */}
@@ -48,7 +63,7 @@ export default function Register() {
                                     id="email"
                                     type="email"
                                     required
-                                    tabIndex={2}
+                                    tabIndex={3}
                                     autoComplete="email"
                                     name="email"
                                     placeholder="email@example.com"
@@ -62,7 +77,7 @@ export default function Register() {
                                     id="password"
                                     type="password"
                                     required
-                                    tabIndex={3}
+                                    tabIndex={4}
                                     autoComplete="new-password"
                                     name="password"
                                     placeholder="Password"
@@ -76,7 +91,7 @@ export default function Register() {
                                     id="password_confirmation"
                                     type="password"
                                     required
-                                    tabIndex={4}
+                                    tabIndex={5}
                                     autoComplete="new-password"
                                     name="password_confirmation"
                                     placeholder="Confirm password"
@@ -86,29 +101,29 @@ export default function Register() {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="contact_number">Contact Number</Label>
-                                <Input id="contact_number" type="tel" required tabIndex={5} name="contact_number" placeholder="+63 XXX XXX XXXX" />
+                                <Input id="contact_number" type="tel" required tabIndex={6} name="contact_number" placeholder="+63 XXX XXX XXXX" />
                                 <InputError message={errors.contact_number} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="address">Address</Label>
-                                <Textarea id="address" required tabIndex={6} name="address" placeholder="Enter your complete address" rows={3} />
+                                <Textarea id="address" required tabIndex={7} name="address" placeholder="Enter your complete address" rows={3} />
                                 <InputError message={errors.address} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="occupation">Occupation</Label>
-                                <Input id="occupation" type="text" required tabIndex={7} name="occupation" placeholder="Your occupation" />
+                                <Input id="occupation" type="text" required tabIndex={8} name="occupation" placeholder="Your occupation" />
                                 <InputError message={errors.occupation} />
                             </div>
 
                             <div className="grid gap-2">
                                 <Label htmlFor="employer">Employer</Label>
-                                <Input id="employer" type="text" tabIndex={8} name="employer" placeholder="Your employer (optional)" />
+                                <Input id="employer" type="text" tabIndex={9} name="employer" placeholder="Your employer (optional)" />
                                 <InputError message={errors.employer} />
                             </div>
 
-                            <Button type="submit" className="mt-2 w-full" tabIndex={9} disabled={processing}>
+                            <Button type="submit" className="mt-2 w-full" tabIndex={10} disabled={processing}>
                                 {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
                                 {processing ? 'Creating account...' : 'Create account'}
                             </Button>

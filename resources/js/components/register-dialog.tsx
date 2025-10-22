@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Form } from '@inertiajs/react';
-import { LoaderCircle, UserCircle } from 'lucide-react';
+import { LoaderCircle } from 'lucide-react';
 
 interface RegisterDialogProps {
     isOpen: boolean;
@@ -30,32 +31,34 @@ export function RegisterDialog({ isOpen, onOpenChange, onLoginClick }: RegisterD
                 >
                     {({ processing, errors }) => (
                         <>
-                            <div className="grid gap-6">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input
-                                        id="name"
-                                        type="text"
-                                        required
-                                        autoFocus
-                                        tabIndex={1}
-                                        autoComplete="name"
-                                        name="name"
-                                        placeholder="Full name"
-                                    />
-                                    <InputError message={errors.name} className="mt-2" />
-                                </div>
-
-                                {/* Registration is now limited to parents only */}
-                                <div className="rounded-lg border border-input bg-muted/50 p-3">
-                                    <div className="flex items-center space-x-2">
-                                        <UserCircle className="h-5 w-5 text-muted-foreground" />
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-medium">Parent/Guardian Registration</span>
-                                            <span className="text-xs text-muted-foreground">
-                                                Registration is limited to parents and guardians only
-                                            </span>
-                                        </div>
+                            <div className="grid gap-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="first_name">First Name</Label>
+                                        <Input
+                                            id="first_name"
+                                            type="text"
+                                            required
+                                            autoFocus
+                                            tabIndex={1}
+                                            autoComplete="given-name"
+                                            name="first_name"
+                                            placeholder="First name"
+                                        />
+                                        <InputError message={errors.first_name} />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="last_name">Last Name</Label>
+                                        <Input
+                                            id="last_name"
+                                            type="text"
+                                            required
+                                            tabIndex={2}
+                                            autoComplete="family-name"
+                                            name="last_name"
+                                            placeholder="Last name"
+                                        />
+                                        <InputError message={errors.last_name} />
                                     </div>
                                 </div>
 
@@ -101,9 +104,40 @@ export function RegisterDialog({ isOpen, onOpenChange, onLoginClick }: RegisterD
                                     <InputError message={errors.password_confirmation} />
                                 </div>
 
-                                <Button type="submit" className="mt-2 w-full" tabIndex={6} disabled={processing}>
-                                    {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                    Create account
+                                <div className="grid gap-2">
+                                    <Label htmlFor="contact_number">Contact Number</Label>
+                                    <Input
+                                        id="contact_number"
+                                        type="tel"
+                                        required
+                                        tabIndex={6}
+                                        name="contact_number"
+                                        placeholder="+63 XXX XXX XXXX"
+                                    />
+                                    <InputError message={errors.contact_number} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="address">Address</Label>
+                                    <Textarea id="address" required tabIndex={7} name="address" placeholder="Enter your complete address" rows={2} />
+                                    <InputError message={errors.address} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="occupation">Occupation</Label>
+                                    <Input id="occupation" type="text" required tabIndex={8} name="occupation" placeholder="Your occupation" />
+                                    <InputError message={errors.occupation} />
+                                </div>
+
+                                <div className="grid gap-2">
+                                    <Label htmlFor="employer">Employer</Label>
+                                    <Input id="employer" type="text" tabIndex={9} name="employer" placeholder="Your employer (optional)" />
+                                    <InputError message={errors.employer} />
+                                </div>
+
+                                <Button type="submit" className="mt-2 w-full" tabIndex={10} disabled={processing}>
+                                    {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                                    {processing ? 'Creating account...' : 'Create account'}
                                 </Button>
                             </div>
 

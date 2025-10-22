@@ -9,7 +9,9 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -31,8 +33,17 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        Log::info('Registration attempt started', [
+            'email' => $request->email,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'has_password' => ! empty($request->password),
+            'has_password_confirmation' => ! empty($request->password_confirmation),
+        ]);
+
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'contact_number' => 'required|string|max:50',
@@ -41,34 +52,56 @@ class RegisteredUserController extends Controller
             'employer' => 'nullable|string|max:255',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+        Log::info('Registration validation passed', ['email' => $request->email]);
 
-        // Registration is limited to guardians only
-        $user->assignRole('guardian');
+        try {
+            DB::beginTransaction();
 
-        // Create Guardian profile with complete information from registration
-        // Split the name into first and last name (simple approach)
-        $nameParts = explode(' ', $request->name, 2);
-        Guardian::create([
-            'user_id' => $user->id,
-            'first_name' => $nameParts[0],
-            'last_name' => $nameParts[1] ?? '',
-            'contact_number' => $request->contact_number,
-            'address' => $request->address,
-            'occupation' => $request->occupation,
-            'employer' => $request->employer,
-        ]);
+            Log::info('Creating user', ['email' => $request->email]);
 
-        event(new Registered($user));
+            // Create full name from first and last name
+            $fullName = trim($request->first_name.' '.$request->last_name);
 
-        Auth::login($user);
+            $user = User::create([
+                'name' => $fullName,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        // Redirect to guardian dashboard with success message
-        return redirect()->route('guardian.dashboard')
-            ->with('success', 'Account created successfully! Please check your email to verify your account.');
+            // Registration is limited to guardians only
+            $user->assignRole('guardian');
+
+            // Create Guardian profile with complete information from registration
+            Guardian::create([
+                'user_id' => $user->id,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'contact_number' => $request->contact_number,
+                'address' => $request->address,
+                'occupation' => $request->occupation,
+                'employer' => $request->employer,
+            ]);
+
+            DB::commit();
+
+            event(new Registered($user));
+
+            Auth::login($user);
+
+            // Redirect to guardian dashboard with success message
+            return redirect()->route('guardian.dashboard')
+                ->with('success', 'Account created successfully! Please check your email to verify your account.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Guardian registration failed', [
+                'email' => $request->email,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return back()->withErrors([
+                'email' => 'Registration failed. Please try again or contact support if the problem persists.',
+            ])->withInput($request->except('password', 'password_confirmation'));
+        }
     }
 }

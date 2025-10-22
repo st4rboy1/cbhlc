@@ -15,7 +15,8 @@ test('registration page can be rendered', function () {
 
 test('new users can register and are assigned guardian role', function () {
     $response = $this->post(route('register.store'), [
-        'name' => 'Test Parent',
+        'first_name' => 'Test',
+        'last_name' => 'Parent',
         'email' => 'guardian@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -48,6 +49,8 @@ test('new users can register and are assigned guardian role', function () {
 test('registration no longer accepts role parameter', function () {
     // Even if role is provided, it should be ignored and guardian role assigned
     $response = $this->post(route('register.store'), [
+        'first_name' => 'Test',
+        'last_name' => 'User',
         'name' => 'Test User',
         'email' => 'test@example.com',
         'password' => 'password',
@@ -72,12 +75,13 @@ test('registration no longer accepts role parameter', function () {
 test('registration validates required fields', function () {
     $response = $this->post(route('register.store'), []);
 
-    $response->assertSessionHasErrors(['name', 'email', 'password', 'contact_number', 'address', 'occupation']);
+    $response->assertSessionHasErrors(['first_name', 'last_name', 'email', 'password', 'contact_number', 'address', 'occupation']);
 });
 
 test('registration validates email format', function () {
     $response = $this->post(route('register.store'), [
-        'name' => 'Test User',
+        'first_name' => 'Test',
+        'last_name' => 'User',
         'email' => 'not-an-email',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -89,9 +93,10 @@ test('registration validates email format', function () {
     $response->assertSessionHasErrors('email');
 });
 
-test('registration handles single-word names correctly', function () {
+test('registration requires both first and last name', function () {
     $response = $this->post(route('register.store'), [
-        'name' => 'Madonna',
+        'first_name' => 'Madonna',
+        'last_name' => 'Ciccone',
         'email' => 'madonna@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -106,7 +111,7 @@ test('registration handles single-word names correctly', function () {
 
     expect($guardian)->not->toBeNull();
     expect($guardian->first_name)->toBe('Madonna');
-    expect($guardian->last_name)->toBe('');
+    expect($guardian->last_name)->toBe('Ciccone');
     expect($guardian->contact_number)->toBe('+63912345678');
     expect($guardian->address)->toBe('123 Test Street, Manila');
     expect($guardian->occupation)->toBe('Singer');
@@ -115,7 +120,8 @@ test('registration handles single-word names correctly', function () {
 
 test('employer field is optional', function () {
     $response = $this->post(route('register.store'), [
-        'name' => 'Test User',
+        'first_name' => 'Test',
+        'last_name' => 'User',
         'email' => 'optional@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
