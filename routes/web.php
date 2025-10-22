@@ -216,6 +216,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Document Management
         Route::get('/documents/pending', [RegistrarDocumentController::class, 'pending'])->name('documents.pending');
         Route::get('/documents/{document}', [RegistrarDocumentController::class, 'show'])->name('documents.show');
+        Route::get('/documents/{document}/view', [RegistrarDocumentController::class, 'view'])->name('documents.view');
         Route::post('/documents/{document}/verify', [RegistrarDocumentController::class, 'verify'])->name('documents.verify');
         Route::post('/documents/{document}/reject', [RegistrarDocumentController::class, 'reject'])->name('documents.reject');
     });
