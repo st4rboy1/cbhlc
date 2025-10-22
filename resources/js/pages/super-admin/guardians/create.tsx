@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -18,7 +17,6 @@ interface FormData {
     password_confirmation: string;
     phone: string;
     address: string;
-    relationship_type: string;
     occupation: string;
     employer: string;
     emergency_contact: boolean;
@@ -34,7 +32,6 @@ export default function SuperAdminGuardiansCreate() {
         password_confirmation: '',
         phone: '',
         address: '',
-        relationship_type: '',
         occupation: '',
         employer: '',
         emergency_contact: false,
@@ -111,24 +108,6 @@ export default function SuperAdminGuardiansCreate() {
                                         />
                                         {errors.last_name && <p className="text-sm text-red-600">{errors.last_name}</p>}
                                     </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="relationship_type">
-                                        Relationship <span className="text-red-600">*</span>
-                                    </Label>
-                                    <Select value={data.relationship_type} onValueChange={(value) => setData('relationship_type', value)}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select relationship" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="father">Father</SelectItem>
-                                            <SelectItem value="mother">Mother</SelectItem>
-                                            <SelectItem value="guardian">Guardian</SelectItem>
-                                            <SelectItem value="other">Other</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.relationship_type && <p className="text-sm text-red-600">{errors.relationship_type}</p>}
                                 </div>
                             </CardContent>
                         </Card>
