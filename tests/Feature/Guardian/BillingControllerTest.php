@@ -100,6 +100,9 @@ describe('Guardian BillingController', function () {
             'grade_level' => GradeLevel::GRADE_2,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
+            'tuition_fee_cents' => 2200000,
+            'miscellaneous_fee_cents' => 550000,
+            'total_amount_cents' => 2750000,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -162,6 +165,9 @@ describe('Guardian BillingController', function () {
             'grade_level' => GradeLevel::GRADE_1,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
+            'tuition_fee_cents' => 2000000,
+            'miscellaneous_fee_cents' => 500000,
+            'total_amount_cents' => 2500000,
         ]);
 
         // Create another student for the same guardian
@@ -179,6 +185,9 @@ describe('Guardian BillingController', function () {
             'grade_level' => GradeLevel::GRADE_1,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PAID,
+            'tuition_fee_cents' => 2000000,
+            'miscellaneous_fee_cents' => 500000,
+            'total_amount_cents' => 2500000,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -256,6 +265,9 @@ describe('Guardian BillingController', function () {
             'grade_level' => GradeLevel::GRADE_4,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PARTIAL,
+            'tuition_fee_cents' => 2600000,
+            'miscellaneous_fee_cents' => 650000,
+            'total_amount_cents' => 3250000,
         ]);
 
         $response = $this->actingAs($this->guardian)
