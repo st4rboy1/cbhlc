@@ -33,6 +33,16 @@ class Guardian extends Model
         'full_name' => FullNameCast::class,
     ];
 
+    protected $appends = ['name'];
+
+    /**
+     * Get the guardian's full name.
+     */
+    public function getNameAttribute(): string
+    {
+        return trim("{$this->first_name} {$this->last_name}");
+    }
+
     /**
      * Get the activity log options for this model.
      */
