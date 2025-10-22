@@ -175,14 +175,14 @@ class StudentController extends Controller
                 'middle_name' => $validated['middle_name'],
                 'last_name' => $validated['last_name'],
                 'birth_date' => $validated['birth_date'],
-                'birth_place' => $validated['birth_place'],
+                'birth_place' => $validated['birth_place'] ?? null,
                 'gender' => $validated['gender'],
                 'nationality' => $validated['nationality'],
                 'religion' => $validated['religion'],
                 'address' => $validated['address'],
                 'phone' => $validated['phone'],
                 'email' => $validated['email'],
-                'grade_level' => $validated['grade_level'],
+                'grade_level' => $validated['grade'],
             ]);
 
             // Sync guardians

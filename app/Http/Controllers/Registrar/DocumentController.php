@@ -54,6 +54,17 @@ class DocumentController extends Controller
     }
 
     /**
+     * View/download the specified document file.
+     */
+    public function view(Document $document)
+    {
+        $this->authorize('view', $document);
+
+        // Return the file for viewing in browser
+        return Storage::disk('private')->response($document->file_path, $document->original_filename);
+    }
+
+    /**
      * Verify the specified document.
      */
     public function verify(Document $document)

@@ -63,7 +63,7 @@ class EnrollmentController extends Controller
      */
     public function show(Enrollment $enrollment)
     {
-        $enrollment->load(['student', 'guardian']);
+        $enrollment->load(['student.documents', 'guardian']);
 
         return Inertia::render('registrar/enrollments/show', [
             'enrollment' => $enrollment,

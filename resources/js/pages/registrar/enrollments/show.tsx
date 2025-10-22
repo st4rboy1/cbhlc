@@ -1,18 +1,42 @@
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency, formatStatusName, getPaymentStatusVariant, getStatusVariant } from '@/pages/registrar/enrollments/enrollments-table';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { ExternalLink, FileText } from 'lucide-react';
+
+interface Document {
+    id: number;
+    document_type: string;
+    original_filename: string;
+    file_path: string;
+    verification_status: string;
+    upload_date: string;
+}
 
 interface Enrollment {
     id: number;
-    student: { first_name: string; last_name: string; student_id: string };
+    student: {
+        first_name: string;
+        last_name: string;
+        student_id: string;
+        documents: Document[];
+    };
     guardian: { name: string };
     school_year: string;
     quarter: string;
     grade_level: string;
     status: string;
+    tuition_fee_cents: number;
+    miscellaneous_fee_cents: number;
+    laboratory_fee_cents: number;
+    library_fee_cents: number;
+    other_fees_cents: number;
+    total_amount_cents: number;
+    discount_cents: number;
     net_amount_cents: number;
     amount_paid_cents: number;
     balance_cents: number;
@@ -96,10 +120,52 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                                     {formatStatusName(enrollment.payment_status)}
                                 </Badge>
                             </div>
+                            <Separator />
+                            <div className="space-y-2">
+                                <p className="text-sm font-semibold">Fee Breakdown</p>
+                                <div className="flex items-center justify-between text-sm">
+                                    <p className="text-muted-foreground">Tuition Fee</p>
+                                    <p>{formatCurrency(enrollment.tuition_fee_cents)}</p>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <p className="text-muted-foreground">Miscellaneous Fee</p>
+                                    <p>{formatCurrency(enrollment.miscellaneous_fee_cents)}</p>
+                                </div>
+                                {enrollment.laboratory_fee_cents > 0 && (
+                                    <div className="flex items-center justify-between text-sm">
+                                        <p className="text-muted-foreground">Laboratory Fee</p>
+                                        <p>{formatCurrency(enrollment.laboratory_fee_cents)}</p>
+                                    </div>
+                                )}
+                                {enrollment.library_fee_cents > 0 && (
+                                    <div className="flex items-center justify-between text-sm">
+                                        <p className="text-muted-foreground">Library Fee</p>
+                                        <p>{formatCurrency(enrollment.library_fee_cents)}</p>
+                                    </div>
+                                )}
+                                {enrollment.other_fees_cents > 0 && (
+                                    <div className="flex items-center justify-between text-sm">
+                                        <p className="text-muted-foreground">Other Fees</p>
+                                        <p>{formatCurrency(enrollment.other_fees_cents)}</p>
+                                    </div>
+                                )}
+                            </div>
+                            <Separator />
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Total Amount</p>
+                                <p className="text-lg font-semibold">{formatCurrency(enrollment.total_amount_cents)}</p>
+                            </div>
+                            {enrollment.discount_cents > 0 && (
+                                <div className="flex items-center justify-between">
+                                    <p className="text-sm font-medium text-muted-foreground">Discount</p>
+                                    <p className="text-lg font-semibold text-green-600">-{formatCurrency(enrollment.discount_cents)}</p>
+                                </div>
+                            )}
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Net Amount</p>
                                 <p className="text-lg font-semibold">{formatCurrency(enrollment.net_amount_cents)}</p>
                             </div>
+                            <Separator />
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Amount Paid</p>
                                 <p className="text-lg font-semibold">{formatCurrency(enrollment.amount_paid_cents)}</p>
@@ -111,6 +177,50 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                         </CardContent>
                     </Card>
                 </div>
+
+                {enrollment.student.documents && enrollment.student.documents.length > 0 && (
+                    <Card className="mt-4">
+                        <CardHeader>
+                            <CardTitle>Uploaded Documents</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-3">
+                                {enrollment.student.documents.map((doc) => (
+                                    <div key={doc.id} className="flex items-center justify-between rounded-lg border p-3">
+                                        <div className="flex items-center gap-3">
+                                            <FileText className="h-5 w-5 text-muted-foreground" />
+                                            <div>
+                                                <p className="font-medium">
+                                                    {doc.document_type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">{doc.original_filename}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Badge
+                                                variant={
+                                                    doc.verification_status === 'verified'
+                                                        ? 'default'
+                                                        : doc.verification_status === 'rejected'
+                                                          ? 'destructive'
+                                                          : 'secondary'
+                                                }
+                                            >
+                                                {doc.verification_status}
+                                            </Badge>
+                                            <Link href={route('documents.view', { document: doc.id })} target="_blank">
+                                                <Button variant="outline" size="sm">
+                                                    <ExternalLink className="mr-2 h-4 w-4" />
+                                                    View
+                                                </Button>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </AppLayout>
     );

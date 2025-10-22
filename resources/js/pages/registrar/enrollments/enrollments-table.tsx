@@ -27,7 +27,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 // Dialog components for the modal
 import InputError from '@/components/input-error';
@@ -253,10 +255,22 @@ export const createColumns = ({ onApproveClick, onRejectClick, onUpdatePaymentSt
 ];
 
 export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
+    const page = usePage();
+    const flash = page.props.flash as { success?: string; error?: string } | undefined;
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = React.useState({});
+
+    // Show toast notifications for flash messages
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
 
     // State for Approve Enrollment Modal
     const [showApproveModal, setShowApproveModal] = React.useState(false);
