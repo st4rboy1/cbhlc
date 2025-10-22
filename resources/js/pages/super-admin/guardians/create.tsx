@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -14,9 +13,10 @@ interface FormData {
     middle_name: string;
     last_name: string;
     email: string;
+    password: string;
+    password_confirmation: string;
     phone: string;
     address: string;
-    relationship: string;
     occupation: string;
     employer: string;
     emergency_contact: boolean;
@@ -28,9 +28,10 @@ export default function SuperAdminGuardiansCreate() {
         middle_name: '',
         last_name: '',
         email: '',
+        password: '',
+        password_confirmation: '',
         phone: '',
         address: '',
-        relationship: '',
         occupation: '',
         employer: '',
         emergency_contact: false,
@@ -108,25 +109,6 @@ export default function SuperAdminGuardiansCreate() {
                                         {errors.last_name && <p className="text-sm text-red-600">{errors.last_name}</p>}
                                     </div>
                                 </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="relationship">
-                                        Relationship <span className="text-red-600">*</span>
-                                    </Label>
-                                    <Select value={data.relationship} onValueChange={(value) => setData('relationship', value)}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select relationship" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="father">Father</SelectItem>
-                                            <SelectItem value="mother">Mother</SelectItem>
-                                            <SelectItem value="legal_guardian">Legal Guardian</SelectItem>
-                                            <SelectItem value="grandparent">Grandparent</SelectItem>
-                                            <SelectItem value="other">Other</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.relationship && <p className="text-sm text-red-600">{errors.relationship}</p>}
-                                </div>
                             </CardContent>
                         </Card>
 
@@ -146,6 +128,34 @@ export default function SuperAdminGuardiansCreate() {
                                         {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
                                     </div>
 
+                                    <div className="space-y-2">
+                                        <Label htmlFor="password">
+                                            Password <span className="text-red-600">*</span>
+                                        </Label>
+                                        <Input
+                                            id="password"
+                                            type="password"
+                                            value={data.password}
+                                            onChange={(e) => setData('password', e.target.value)}
+                                        />
+                                        {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="password_confirmation">
+                                        Confirm Password <span className="text-red-600">*</span>
+                                    </Label>
+                                    <Input
+                                        id="password_confirmation"
+                                        type="password"
+                                        value={data.password_confirmation}
+                                        onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    />
+                                    {errors.password_confirmation && <p className="text-sm text-red-600">{errors.password_confirmation}</p>}
+                                </div>
+
+                                <div className="grid gap-4 md:grid-cols-2">
                                     <div className="space-y-2">
                                         <Label htmlFor="phone">
                                             Phone <span className="text-red-600">*</span>
