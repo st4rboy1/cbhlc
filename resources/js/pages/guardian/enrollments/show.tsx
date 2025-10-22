@@ -21,6 +21,8 @@ interface Enrollment {
     };
     school_year: string;
     grade_level: string;
+    section: string | null;
+    adviser: string | null;
     quarter: string;
     status: 'pending' | 'approved' | 'enrolled' | 'rejected' | 'completed';
     payment_status: 'pending' | 'partial' | 'paid' | 'overdue';
@@ -109,6 +111,18 @@ export default function GuardianEnrollmentsShow({ enrollment }: Props) {
                                 <p className="text-sm font-medium text-muted-foreground">Quarter</p>
                                 <p className="text-lg font-semibold">{enrollment.quarter}</p>
                             </div>
+                            {enrollment.section && (
+                                <div className="flex items-center justify-between">
+                                    <p className="text-sm font-medium text-muted-foreground">Section</p>
+                                    <p className="text-lg font-semibold">{enrollment.section}</p>
+                                </div>
+                            )}
+                            {enrollment.adviser && (
+                                <div className="flex items-center justify-between">
+                                    <p className="text-sm font-medium text-muted-foreground">Adviser</p>
+                                    <p className="text-lg font-semibold">{enrollment.adviser}</p>
+                                </div>
+                            )}
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Submission Date</p>
                                 <p className="text-sm font-semibold">{formatDate(enrollment.created_at)}</p>
