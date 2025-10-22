@@ -7,8 +7,8 @@ on:
       - develop
   push:
     branches:
+      - main
       - develop
-      - feature/*
 
 # Cancel in-progress runs when a new workflow with the same group name is triggered
 concurrency:
