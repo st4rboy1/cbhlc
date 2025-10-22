@@ -108,9 +108,9 @@ export default function Register() {
                                 <InputError message={errors.employer} />
                             </div>
 
-                            <Button type="submit" className="mt-2 w-full" tabIndex={9}>
-                                {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                                Create account
+                            <Button type="submit" className="mt-2 w-full" tabIndex={9} disabled={processing}>
+                                {processing && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                                {processing ? 'Creating account...' : 'Create account'}
                             </Button>
                         </div>
 
