@@ -40,7 +40,10 @@ class Guardian extends Model
      */
     public function getNameAttribute(): string
     {
-        return trim("{$this->first_name} {$this->last_name}");
+        $firstName = $this->first_name ?? '';
+        $lastName = $this->last_name ?? '';
+
+        return trim("{$firstName} {$lastName}") ?: 'Unknown';
     }
 
     /**
