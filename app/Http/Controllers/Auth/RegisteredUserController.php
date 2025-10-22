@@ -33,8 +33,17 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        Log::info('Registration attempt started', [
+            'email' => $request->email,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'has_password' => ! empty($request->password),
+            'has_password_confirmation' => ! empty($request->password_confirmation),
+        ]);
+
         $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'contact_number' => 'required|string|max:50',
@@ -43,11 +52,18 @@ class RegisteredUserController extends Controller
             'employer' => 'nullable|string|max:255',
         ]);
 
+        Log::info('Registration validation passed', ['email' => $request->email]);
+
         try {
             DB::beginTransaction();
 
+            Log::info('Creating user', ['email' => $request->email]);
+
+            // Create full name from first and last name
+            $fullName = trim($request->first_name.' '.$request->last_name);
+
             $user = User::create([
-                'name' => $request->name,
+                'name' => $fullName,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
@@ -56,15 +72,10 @@ class RegisteredUserController extends Controller
             $user->assignRole('guardian');
 
             // Create Guardian profile with complete information from registration
-            // Split the name into first and last name (handle single names)
-            $nameParts = explode(' ', trim($request->name), 2);
-            $firstName = $nameParts[0];
-            $lastName = $nameParts[1] ?? ''; // Empty string if no last name provided
-
             Guardian::create([
                 'user_id' => $user->id,
-                'first_name' => $firstName,
-                'last_name' => $lastName,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
                 'contact_number' => $request->contact_number,
                 'address' => $request->address,
                 'occupation' => $request->occupation,
