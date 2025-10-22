@@ -71,7 +71,7 @@ class InvoiceController extends Controller
         Gate::authorize('create', Invoice::class);
 
         $enrollments = Enrollment::with(['student', 'guardian.user'])
-            ->where('status', 'approved')
+            ->whereIn('status', [\App\Enums\EnrollmentStatus::APPROVED, \App\Enums\EnrollmentStatus::READY_FOR_PAYMENT, \App\Enums\EnrollmentStatus::ENROLLED])
             ->get();
 
         return Inertia::render('super-admin/invoices/create', [
