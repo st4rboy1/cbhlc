@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { paymentStatusColors, statusColors } from '@/pages/guardian/enrollments/index';
 import { type BreadcrumbItem } from '@/types';
@@ -12,17 +13,52 @@ interface Enrollment {
     student: {
         first_name: string;
         last_name: string;
+        student_id: string;
+        birth_date: string;
+        gender: string;
+        address: string;
+        phone: string;
     };
     school_year: string;
     grade_level: string;
+    quarter: string;
     status: 'pending' | 'approved' | 'enrolled' | 'rejected' | 'completed';
     payment_status: 'pending' | 'partial' | 'paid' | 'overdue';
+    tuition_fee_cents: number;
+    miscellaneous_fee_cents: number;
+    laboratory_fee_cents: number;
+    library_fee_cents: number;
+    other_fees_cents: number;
+    total_amount_cents: number;
+    discount_cents: number;
+    net_amount_cents: number;
+    amount_paid_cents: number;
+    balance_cents: number;
     created_at: string;
 }
 
 interface Props {
     enrollment: Enrollment;
 }
+
+const formatCurrency = (cents: number) => {
+    return new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+    }).format(cents / 100);
+};
+
+const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+    }).format(date);
+};
 
 export default function GuardianEnrollmentsShow({ enrollment }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -70,8 +106,12 @@ export default function GuardianEnrollmentsShow({ enrollment }: Props) {
                                 <p className="text-lg font-semibold">{enrollment.grade_level}</p>
                             </div>
                             <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Quarter</p>
+                                <p className="text-lg font-semibold">{enrollment.quarter}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Submission Date</p>
-                                <p className="text-lg font-semibold">{enrollment.created_at}</p>
+                                <p className="text-sm font-semibold">{formatDate(enrollment.created_at)}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -84,6 +124,32 @@ export default function GuardianEnrollmentsShow({ enrollment }: Props) {
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Student Name</p>
                                 <p className="text-lg font-semibold">{`${enrollment.student.first_name} ${enrollment.student.last_name}`}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Student ID</p>
+                                <p className="text-sm">{enrollment.student.student_id}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Birthdate</p>
+                                <p className="text-sm">
+                                    {new Date(enrollment.student.birth_date).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                    })}
+                                </p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Gender</p>
+                                <p className="text-sm">{enrollment.student.gender}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Contact Number</p>
+                                <p className="text-sm">{enrollment.student.phone}</p>
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <p className="text-sm font-medium text-muted-foreground">Address</p>
+                                <p className="text-sm">{enrollment.student.address}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -102,6 +168,60 @@ export default function GuardianEnrollmentsShow({ enrollment }: Props) {
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Payment Status</p>
                                 <Badge variant={paymentStatusColors[enrollment.payment_status] || 'default'}>{enrollment.payment_status}</Badge>
+                            </div>
+                            <Separator />
+                            <div className="space-y-2">
+                                <p className="text-sm font-semibold">Fee Breakdown</p>
+                                <div className="flex items-center justify-between text-sm">
+                                    <p className="text-muted-foreground">Tuition Fee</p>
+                                    <p>{formatCurrency(enrollment.tuition_fee_cents)}</p>
+                                </div>
+                                <div className="flex items-center justify-between text-sm">
+                                    <p className="text-muted-foreground">Miscellaneous Fee</p>
+                                    <p>{formatCurrency(enrollment.miscellaneous_fee_cents)}</p>
+                                </div>
+                                {enrollment.laboratory_fee_cents > 0 && (
+                                    <div className="flex items-center justify-between text-sm">
+                                        <p className="text-muted-foreground">Laboratory Fee</p>
+                                        <p>{formatCurrency(enrollment.laboratory_fee_cents)}</p>
+                                    </div>
+                                )}
+                                {enrollment.library_fee_cents > 0 && (
+                                    <div className="flex items-center justify-between text-sm">
+                                        <p className="text-muted-foreground">Library Fee</p>
+                                        <p>{formatCurrency(enrollment.library_fee_cents)}</p>
+                                    </div>
+                                )}
+                                {enrollment.other_fees_cents > 0 && (
+                                    <div className="flex items-center justify-between text-sm">
+                                        <p className="text-muted-foreground">Other Fees</p>
+                                        <p>{formatCurrency(enrollment.other_fees_cents)}</p>
+                                    </div>
+                                )}
+                            </div>
+                            <Separator />
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Total Amount</p>
+                                <p className="font-semibold">{formatCurrency(enrollment.total_amount_cents)}</p>
+                            </div>
+                            {enrollment.discount_cents > 0 && (
+                                <div className="flex items-center justify-between">
+                                    <p className="text-sm font-medium text-muted-foreground">Discount</p>
+                                    <p className="font-semibold text-green-600">-{formatCurrency(enrollment.discount_cents)}</p>
+                                </div>
+                            )}
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Net Amount</p>
+                                <p className="text-lg font-bold">{formatCurrency(enrollment.net_amount_cents)}</p>
+                            </div>
+                            <Separator />
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Amount Paid</p>
+                                <p className="font-semibold">{formatCurrency(enrollment.amount_paid_cents)}</p>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium text-muted-foreground">Balance</p>
+                                <p className="text-lg font-bold">{formatCurrency(enrollment.balance_cents)}</p>
                             </div>
                         </CardContent>
                     </Card>
