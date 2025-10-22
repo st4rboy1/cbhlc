@@ -301,6 +301,9 @@ describe('Guardian BillingController', function () {
             'guardian_id' => $this->guardianModel->id,
             'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_5,
+            'tuition_fee_cents' => 2800000,
+            'miscellaneous_fee_cents' => 700000,
+            'total_amount_cents' => 3500000,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -324,6 +327,9 @@ describe('Guardian BillingController', function () {
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
             'status' => EnrollmentStatus::PENDING->value,
+            'tuition_fee_cents' => 2000000,
+            'miscellaneous_fee_cents' => 500000,
+            'total_amount_cents' => 2500000,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -355,12 +361,15 @@ describe('Guardian BillingController', function () {
     });
 
     test('billing handles missing grade level fees', function () {
-        // Create enrollment without corresponding grade level fee
+        // Create enrollment without corresponding grade level fee and without amounts
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
             'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_6,
+            'tuition_fee_cents' => 0,
+            'miscellaneous_fee_cents' => 0,
+            'total_amount_cents' => 0,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -381,6 +390,9 @@ describe('Guardian BillingController', function () {
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
             'status' => EnrollmentStatus::PENDING->value,
+            'tuition_fee_cents' => 2000000,
+            'miscellaneous_fee_cents' => 500000,
+            'total_amount_cents' => 2500000,
         ]);
 
         // Create another student and enrollment for different guardian
