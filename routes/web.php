@@ -84,6 +84,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/', [NotificationController::class, 'destroyAll'])->name('destroy-all');
     });
 
+    // Notification routes (for Inertia)
+    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::post('/notifications/mark-all-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
+
     /*
     |--------------------------------------------------------------------------
     | Shared Routes (Temporarily - will be refactored per role)

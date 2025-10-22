@@ -55,6 +55,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
             ],
+            'notifications' => $request->user() ? $request->user()->notifications()->latest()->limit(10)->get() : [],
         ];
     }
 }
