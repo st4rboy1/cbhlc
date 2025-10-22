@@ -17,7 +17,8 @@ test('registration page can be rendered', function () {
 
 test('registration does not require role field', function () {
     $response = $this->post('/register', [
-        'name' => 'Test User',
+        'first_name' => 'Test',
+        'last_name' => 'User',
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -35,7 +36,8 @@ test('registration does not require role field', function () {
 
 test('new users are automatically assigned guardian role', function () {
     $response = $this->post('/register', [
-        'name' => 'Test Guardian',
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
         'email' => 'guardian@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -56,7 +58,8 @@ test('new users are automatically assigned guardian role', function () {
 
 test('role parameter is ignored if provided', function () {
     $response = $this->post('/register', [
-        'name' => 'Test Student',
+        'first_name' => 'Test',
+        'last_name' => 'Student',
         'email' => 'student@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -79,7 +82,8 @@ test('role parameter is ignored if provided', function () {
 
 test('invalid role parameter is ignored', function () {
     $response = $this->post('/register', [
-        'name' => 'Test User',
+        'first_name' => 'Test',
+        'last_name' => 'User',
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -101,7 +105,8 @@ test('registration requires unique email', function () {
     User::factory()->create(['email' => 'existing@example.com']);
 
     $response = $this->post('/register', [
-        'name' => 'Test User',
+        'first_name' => 'Test',
+        'last_name' => 'User',
         'email' => 'existing@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -116,7 +121,8 @@ test('registration requires unique email', function () {
 
 test('registration requires password confirmation', function () {
     $response = $this->post('/register', [
-        'name' => 'Test User',
+        'first_name' => 'Test',
+        'last_name' => 'User',
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'different_password',
@@ -132,7 +138,8 @@ test('registration requires password confirmation', function () {
 test('all users are redirected to guardian dashboard after registration', function () {
     // Test first registration
     $response = $this->post('/register', [
-        'name' => 'First User',
+        'first_name' => 'First',
+        'last_name' => 'User',
         'email' => 'first@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -147,7 +154,8 @@ test('all users are redirected to guardian dashboard after registration', functi
     $this->post('/logout');
 
     $response = $this->post('/register', [
-        'name' => 'Second User',
+        'first_name' => 'Second',
+        'last_name' => 'User',
         'email' => 'second@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -162,13 +170,14 @@ test('all users are redirected to guardian dashboard after registration', functi
 test('registration validates all required fields', function () {
     $response = $this->post('/register', []);
 
-    $response->assertSessionHasErrors(['name', 'email', 'password', 'contact_number', 'address', 'occupation']);
+    $response->assertSessionHasErrors(['first_name', 'last_name', 'email', 'password', 'contact_number', 'address', 'occupation']);
     $this->assertGuest();
 });
 
 test('registration requires lowercase email', function () {
     $response = $this->post('/register', [
-        'name' => 'Test User',
+        'first_name' => 'Test',
+        'last_name' => 'User',
         'email' => 'TEST@EXAMPLE.COM',
         'password' => 'password',
         'password_confirmation' => 'password',
@@ -183,7 +192,8 @@ test('registration requires lowercase email', function () {
 
 test('registration accepts lowercase email', function () {
     $response = $this->post('/register', [
-        'name' => 'Test User',
+        'first_name' => 'Test',
+        'last_name' => 'User',
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
