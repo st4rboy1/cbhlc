@@ -102,10 +102,15 @@ class EnrollmentController extends Controller
                 'ready_for_payment_at' => now(),
             ]);
 
-            // TODO: Send notification to guardian about approval and payment requirements
+            // Send notification to guardian about approval and payment requirements
+            $enrollment->load(['student', 'guardian.user']);
+            if ($enrollment->guardian && $enrollment->guardian->user) {
+                \Illuminate\Support\Facades\Mail::to($enrollment->guardian->user->email)
+                    ->send(new \App\Mail\EnrollmentApproved($enrollment));
+            }
         });
 
-        return back()->with('success', 'Enrollment approved successfully. Invoice has been generated and sent to the parent.');
+        return back()->with('success', 'Enrollment approved successfully. Invoice has been generated and notification sent to the guardian.');
     }
 
     /**
