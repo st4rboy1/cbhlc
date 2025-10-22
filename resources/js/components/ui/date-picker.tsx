@@ -92,7 +92,7 @@ export function DatePicker({
                     initialFocus
                     disabled={getDisabledDates}
                     defaultMonth={minAge ? new Date(new Date().setFullYear(new Date().getFullYear() - minAge)) : undefined}
-                    captionLayout="dropdown-months"
+                    captionLayout="dropdown"
                     fromYear={1900}
                     toYear={new Date().getFullYear()}
                 />
