@@ -59,7 +59,7 @@ class RegisteredUserController extends Controller
             // Split the name into first and last name (handle single names)
             $nameParts = explode(' ', trim($request->name), 2);
             $firstName = $nameParts[0];
-            $lastName = $nameParts[1] ?? $nameParts[0]; // Use first name as last name if no last name provided
+            $lastName = $nameParts[1] ?? ''; // Empty string if no last name provided
 
             Guardian::create([
                 'user_id' => $user->id,
