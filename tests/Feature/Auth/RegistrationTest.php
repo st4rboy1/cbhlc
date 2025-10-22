@@ -19,6 +19,10 @@ test('new users can register and are assigned guardian role', function () {
         'email' => 'guardian@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Teacher',
+        'employer' => 'Test School',
     ]);
 
     // Check if user was created and has guardian role
@@ -26,11 +30,15 @@ test('new users can register and are assigned guardian role', function () {
     expect($user)->not->toBeNull();
     expect($user->hasRole('guardian'))->toBeTrue();
 
-    // Check if Guardian record was created
+    // Check if Guardian record was created with contact information
     $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
     expect($guardian)->not->toBeNull();
     expect($guardian->first_name)->toBe('Test');
     expect($guardian->last_name)->toBe('Parent');
+    expect($guardian->contact_number)->toBe('+63912345678');
+    expect($guardian->address)->toBe('123 Test Street, Manila');
+    expect($guardian->occupation)->toBe('Teacher');
+    expect($guardian->employer)->toBe('Test School');
 
     $this->assertAuthenticated();
     // All registered users get redirected to guardian dashboard
@@ -44,6 +52,10 @@ test('registration no longer accepts role parameter', function () {
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Engineer',
+        'employer' => 'Tech Company',
         'role' => 'student', // This should be ignored
     ]);
 
@@ -60,7 +72,7 @@ test('registration no longer accepts role parameter', function () {
 test('registration validates required fields', function () {
     $response = $this->post(route('register.store'), []);
 
-    $response->assertSessionHasErrors(['name', 'email', 'password']);
+    $response->assertSessionHasErrors(['name', 'email', 'password', 'contact_number', 'address', 'occupation']);
 });
 
 test('registration validates email format', function () {
@@ -69,6 +81,9 @@ test('registration validates email format', function () {
         'email' => 'not-an-email',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Engineer',
     ]);
 
     $response->assertSessionHasErrors('email');
@@ -80,6 +95,10 @@ test('registration handles single-word names correctly', function () {
         'email' => 'madonna@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Singer',
+        'employer' => 'Self-employed',
     ]);
 
     $user = \App\Models\User::where('email', 'madonna@example.com')->first();
@@ -88,4 +107,30 @@ test('registration handles single-word names correctly', function () {
     expect($guardian)->not->toBeNull();
     expect($guardian->first_name)->toBe('Madonna');
     expect($guardian->last_name)->toBe('');
+    expect($guardian->contact_number)->toBe('+63912345678');
+    expect($guardian->address)->toBe('123 Test Street, Manila');
+    expect($guardian->occupation)->toBe('Singer');
+    expect($guardian->employer)->toBe('Self-employed');
+});
+
+test('employer field is optional', function () {
+    $response = $this->post(route('register.store'), [
+        'name' => 'Test User',
+        'email' => 'optional@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Freelancer',
+        // employer intentionally omitted
+    ]);
+
+    $user = \App\Models\User::where('email', 'optional@example.com')->first();
+    $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
+
+    expect($guardian)->not->toBeNull();
+    expect($guardian->employer)->toBeNull();
+
+    $this->assertAuthenticated();
+    $response->assertRedirect(route('guardian.dashboard', absolute: false));
 });
