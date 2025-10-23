@@ -31,11 +31,11 @@ class UpdateGradeLevelFeeRequest extends FormRequest
                 \Illuminate\Validation\Rule::unique('grade_level_fees')
                     ->ignore($gradeLevelFeeId)
                     ->where(function ($query) {
-                        return $query->where('school_year', $this->school_year)
+                        return $query->where('school_year_id', $this->school_year_id)
                             ->where('payment_terms', $this->payment_terms);
                     }),
             ],
-            'school_year' => ['required', 'string', 'regex:/^\d{4}-\d{4}$/'],
+            'school_year_id' => ['required', 'exists:school_years,id'],
             'tuition_fee' => ['required', 'numeric', 'min:0'],
             'miscellaneous_fee' => ['required', 'numeric', 'min:0'],
             'other_fees' => ['nullable', 'numeric', 'min:0'],
@@ -52,7 +52,6 @@ class UpdateGradeLevelFeeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'school_year.regex' => 'School year must be in the format YYYY-YYYY (e.g., 2024-2025).',
             'grade_level.unique' => 'A fee structure for this grade level, school year, and payment term already exists.',
         ];
     }
