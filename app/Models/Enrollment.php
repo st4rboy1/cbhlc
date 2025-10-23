@@ -36,6 +36,7 @@ class Enrollment extends Model
         'student_id',
         'guardian_id',
         'school_year',
+        'school_year_id',
         'enrollment_period_id',
         'quarter',
         'grade_level',
@@ -154,6 +155,14 @@ class Enrollment extends Model
     public function enrollmentPeriod(): BelongsTo
     {
         return $this->belongsTo(EnrollmentPeriod::class);
+    }
+
+    /**
+     * Get the school year associated with the enrollment
+     */
+    public function schoolYear(): BelongsTo
+    {
+        return $this->belongsTo(SchoolYear::class);
     }
 
     /**
