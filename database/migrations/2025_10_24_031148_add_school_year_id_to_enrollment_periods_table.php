@@ -31,6 +31,7 @@ return new class extends Migration
                     WHERE school_years.name = enrollment_periods.school_year
                     LIMIT 1
                 )
+                WHERE school_year IS NOT NULL
             ');
         } else {
             DB::statement('
@@ -40,13 +41,9 @@ return new class extends Migration
                     WHERE sy.name = ep.school_year
                     LIMIT 1
                 )
+                WHERE ep.school_year IS NOT NULL
             ');
         }
-
-        // Make school_year_id non-nullable after data migration
-        Schema::table('enrollment_periods', function (Blueprint $table) {
-            $table->foreignId('school_year_id')->nullable(false)->change();
-        });
     }
 
     /**
