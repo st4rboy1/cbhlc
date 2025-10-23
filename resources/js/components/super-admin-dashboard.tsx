@@ -235,7 +235,7 @@ export function SuperAdminDashboard({ stats }: Props) {
                 </div>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="mt-6 grid gap-6 md:grid-cols-2">
                 {/* Quick Actions */}
                 <Card>
                     <CardHeader>
