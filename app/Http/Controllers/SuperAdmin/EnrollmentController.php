@@ -241,6 +241,10 @@ class EnrollmentController extends Controller
 
         $validated = $request->validated();
 
+        // Get school year and populate school_year string for backward compatibility
+        $schoolYear = SchoolYear::findOrFail($validated['school_year_id']);
+        $validated['school_year'] = $schoolYear->name;
+
         DB::transaction(function () use ($validated, $enrollment) {
             $oldStatus = $enrollment->status;
 
