@@ -3,6 +3,7 @@
 namespace Tests\Unit\Http\Requests\SuperAdmin;
 
 use App\Http\Requests\SuperAdmin\StoreEnrollmentRequest;
+use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -38,7 +39,7 @@ class StoreEnrollmentRequestTest extends TestCase
         $this->assertArrayHasKey('student_id', $rules);
         $this->assertArrayNotHasKey('guardian_id', $rules); // Guardian is now automatically selected
         $this->assertArrayHasKey('grade_level', $rules);
-        $this->assertArrayHasKey('school_year', $rules);
+        $this->assertArrayHasKey('school_year_id', $rules);
         $this->assertArrayHasKey('quarter', $rules);
         $this->assertArrayHasKey('type', $rules);
         $this->assertArrayHasKey('payment_plan', $rules);
@@ -48,11 +49,12 @@ class StoreEnrollmentRequestTest extends TestCase
     public function test_validation_passes_with_valid_data(): void
     {
         $student = Student::factory()->create();
+        $schoolYear = SchoolYear::factory()->create();
 
         $data = [
             'student_id' => $student->id,
             'grade_level' => 'grade_1',
-            'school_year' => '2024-2025',
+            'school_year_id' => $schoolYear->id,
             'quarter' => 'first_quarter',
             'type' => 'new',
             'previous_school' => 'Previous School Name',
@@ -65,14 +67,14 @@ class StoreEnrollmentRequestTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public function test_validation_fails_with_invalid_school_year_format(): void
+    public function test_validation_fails_with_invalid_school_year_id(): void
     {
         $student = Student::factory()->create();
 
         $data = [
             'student_id' => $student->id,
             'grade_level' => 'grade_1',
-            'school_year' => '2024', // Invalid format
+            'school_year_id' => 99999, // Non-existent ID
             'quarter' => 'first_quarter',
             'type' => 'new',
             'payment_plan' => 'monthly',
@@ -82,17 +84,18 @@ class StoreEnrollmentRequestTest extends TestCase
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
-        $this->assertArrayHasKey('school_year', $validator->errors()->toArray());
+        $this->assertArrayHasKey('school_year_id', $validator->errors()->toArray());
     }
 
     public function test_validation_fails_with_invalid_type(): void
     {
         $student = Student::factory()->create();
+        $schoolYear = SchoolYear::factory()->create();
 
         $data = [
             'student_id' => $student->id,
             'grade_level' => 'grade_1',
-            'school_year' => '2024-2025',
+            'school_year_id' => $schoolYear->id,
             'quarter' => 'first_quarter',
             'type' => 'invalid_type',
             'payment_plan' => 'monthly',
@@ -108,11 +111,12 @@ class StoreEnrollmentRequestTest extends TestCase
     public function test_validation_fails_with_invalid_payment_plan(): void
     {
         $student = Student::factory()->create();
+        $schoolYear = SchoolYear::factory()->create();
 
         $data = [
             'student_id' => $student->id,
             'grade_level' => 'grade_1',
-            'school_year' => '2024-2025',
+            'school_year_id' => $schoolYear->id,
             'quarter' => 'first_quarter',
             'type' => 'new',
             'payment_plan' => 'weekly', // Invalid
@@ -125,12 +129,12 @@ class StoreEnrollmentRequestTest extends TestCase
         $this->assertArrayHasKey('payment_plan', $validator->errors()->toArray());
     }
 
-    public function test_custom_messages(): void
+    public function test_no_custom_messages_needed(): void
     {
         $request = new StoreEnrollmentRequest;
-        $messages = $request->messages();
+        $rules = $request->rules();
 
-        $this->assertArrayHasKey('school_year.regex', $messages);
-        $this->assertStringContainsString('YYYY-YYYY', $messages['school_year.regex']);
+        // Verify school_year_id uses standard exists validation
+        $this->assertContains('exists:school_years,id', $rules['school_year_id']);
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Requests\SuperAdmin\StoreEnrollmentRequest;
 use App\Http\Requests\SuperAdmin\UpdateEnrollmentRequest;
 use App\Models\Enrollment;
 use App\Models\Guardian;
+use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Services\EnrollmentService;
 use Illuminate\Http\Request;
@@ -79,22 +80,30 @@ class EnrollmentController extends Controller
     {
         Gate::authorize('create', Enrollment::class);
 
-        $currentYear = date('Y');
-        $nextYear = $currentYear + 1;
-        $currentSchoolYear = "{$currentYear}-{$nextYear}";
+        // Get active school year for filtering
+        $activeSchoolYear = SchoolYear::active();
+        $activeSchoolYearId = $activeSchoolYear?->id;
 
-        // Exclude students who already have enrollments for current school year
+        // Exclude students who already have enrollments for active school year
         $students = Student::with('guardians')
-            ->whereDoesntHave('enrollments', function ($query) use ($currentSchoolYear) {
-                $query->where('school_year', $currentSchoolYear);
+            ->when($activeSchoolYearId, function ($query) use ($activeSchoolYearId) {
+                $query->whereDoesntHave('enrollments', function ($q) use ($activeSchoolYearId) {
+                    $q->where('school_year_id', $activeSchoolYearId);
+                });
             })
             ->get();
 
         $guardians = Guardian::with('user')->get();
 
+        // Get available school years (active and upcoming)
+        $schoolYears = SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
+
         return Inertia::render('super-admin/enrollments/create', [
             'students' => $students,
             'guardians' => $guardians,
+            'schoolYears' => $schoolYears,
             'gradelevels' => array_map(fn ($grade) => [
                 'label' => $grade->label(),
                 'value' => $grade->value,
@@ -114,6 +123,10 @@ class EnrollmentController extends Controller
         Gate::authorize('create', Enrollment::class);
 
         $validated = $request->validated();
+
+        // Get school year and populate school_year string for backward compatibility
+        $schoolYear = SchoolYear::findOrFail($validated['school_year_id']);
+        $validated['school_year'] = $schoolYear->name;
 
         // Check if student can enroll
         $student = Student::findOrFail($validated['student_id']);
@@ -178,14 +191,20 @@ class EnrollmentController extends Controller
     {
         Gate::authorize('update', $enrollment);
 
-        $enrollment->load(['student', 'guardian']);
+        $enrollment->load(['student', 'guardian', 'schoolYear']);
         $students = Student::with('guardians')->get();
         $guardians = Guardian::with('user')->get();
+
+        // Get available school years (active and upcoming)
+        $schoolYears = SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
 
         return Inertia::render('super-admin/enrollments/edit', [
             'enrollment' => $enrollment,
             'students' => $students,
             'guardians' => $guardians,
+            'schoolYears' => $schoolYears,
             'gradelevels' => array_map(fn ($grade) => [
                 'label' => $grade->label(),
                 'value' => $grade->value,
