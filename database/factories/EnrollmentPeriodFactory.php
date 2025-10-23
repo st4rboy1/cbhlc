@@ -17,8 +17,8 @@ class EnrollmentPeriodFactory extends Factory
     public function definition(): array
     {
         $year = fake()->numberBetween(2024, 2030);
-        $startDate = fake()->dateTimeBetween("$year-06-01", "$year-08-01");
-        $endDate = fake()->dateTimeBetween($startDate, "$year-12-31");
+        $startDate = fake()->dateTimeBetween("$year-06-01", "$year-07-01");
+        $endDate = fake()->dateTimeBetween("$year-08-01", ($year + 1).'-05-31');
         $schoolYearName = "$year-".($year + 1);
 
         // Find or create the school year
