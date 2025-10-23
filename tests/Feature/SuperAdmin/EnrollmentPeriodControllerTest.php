@@ -32,8 +32,7 @@ beforeEach(function () {
 // ========================================
 
 test('super admin can view enrollment periods index', function () {
-    EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now(),
         'end_date' => now()->addMonths(10),
@@ -119,8 +118,7 @@ test('school year must be in correct format', function () {
 });
 
 test('school year must be unique', function () {
-    EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now(),
         'end_date' => now()->addMonths(10),
@@ -198,8 +196,7 @@ test('late registration deadline must be after regular deadline', function () {
 // ========================================
 
 test('super admin can update enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -233,8 +230,7 @@ test('super admin can update enrollment period', function () {
 });
 
 test('updating enrollment period logs activity', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -267,8 +263,7 @@ test('updating enrollment period logs activity', function () {
 // ========================================
 
 test('super admin can delete enrollment period without enrollments', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -289,8 +284,7 @@ test('super admin can delete enrollment period without enrollments', function ()
 });
 
 test('cannot delete active enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->addMonths(10),
@@ -310,8 +304,7 @@ test('cannot delete active enrollment period', function () {
 });
 
 test('cannot delete period with existing enrollments', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'closed',
         'start_date' => now()->subYear(),
         'end_date' => now()->subMonths(2),
@@ -340,8 +333,7 @@ test('cannot delete period with existing enrollments', function () {
 // ========================================
 
 test('super admin can activate enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonths(10),
@@ -361,8 +353,7 @@ test('super admin can activate enrollment period', function () {
 });
 
 test('activating period closes other active periods', function () {
-    $oldPeriod = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+    $oldPeriod = EnrollmentPeriod::factory()->schoolYear('2024-2025')->create([
         'status' => 'active',
         'start_date' => now()->subYear(),
         'end_date' => now()->addMonth(),
@@ -371,8 +362,7 @@ test('activating period closes other active periods', function () {
         'allow_returning_students' => true,
     ]);
 
-    $newPeriod = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $newPeriod = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonths(10),
@@ -392,8 +382,7 @@ test('activating period closes other active periods', function () {
 });
 
 test('activating period logs activity', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonths(10),
@@ -417,8 +406,7 @@ test('activating period logs activity', function () {
 // ========================================
 
 test('super admin can close active enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->addMonths(10),
@@ -438,8 +426,7 @@ test('super admin can close active enrollment period', function () {
 });
 
 test('cannot close non-active enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -458,8 +445,7 @@ test('cannot close non-active enrollment period', function () {
 });
 
 test('closing period logs activity', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->addMonths(10),
@@ -506,8 +492,7 @@ test('non super admin cannot create enrollment period', function () {
 });
 
 test('non super admin cannot update enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -532,8 +517,7 @@ test('non super admin cannot update enrollment period', function () {
 });
 
 test('non super admin cannot delete enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -549,8 +533,7 @@ test('non super admin cannot delete enrollment period', function () {
 });
 
 test('non super admin cannot activate enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonths(10),
@@ -566,8 +549,7 @@ test('non super admin cannot activate enrollment period', function () {
 });
 
 test('non super admin cannot close enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->addMonths(10),
