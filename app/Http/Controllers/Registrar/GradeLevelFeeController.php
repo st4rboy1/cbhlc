@@ -25,10 +25,7 @@ class GradeLevelFeeController extends Controller
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('grade_level', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
-            });
+            $query->where('grade_level', 'like', "%{$search}%");
         }
 
         // Filter by school year
@@ -43,9 +40,14 @@ class GradeLevelFeeController extends Controller
 
         $fees = $query->latest()->paginate(15)->withQueryString();
 
+        // Get all school years
+        $schoolYears = \App\Models\SchoolYear::orderBy('start_year', 'desc')->get();
+
         return Inertia::render('registrar/grade-level-fees/index', [
             'fees' => $fees,
             'filters' => $request->only(['search', 'school_year', 'active']),
+            'gradeLevels' => \App\Enums\GradeLevel::values(),
+            'schoolYears' => $schoolYears,
         ]);
     }
 
@@ -59,8 +61,14 @@ class GradeLevelFeeController extends Controller
             abort(403, 'Unauthorized to manage grade level fees');
         }
 
+        // Get available school years (active and upcoming)
+        $schoolYears = \App\Models\SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
+
         return Inertia::render('registrar/grade-level-fees/create', [
-            'gradelevels' => GradeLevel::cases(),
+            'gradeLevels' => GradeLevel::values(),
+            'schoolYears' => $schoolYears,
         ]);
     }
 
@@ -124,9 +132,15 @@ class GradeLevelFeeController extends Controller
             abort(403, 'Unauthorized to manage grade level fees');
         }
 
+        // Get available school years (active and upcoming)
+        $schoolYears = \App\Models\SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
+
         return Inertia::render('registrar/grade-level-fees/edit', [
             'fee' => $gradeLevelFee,
-            'gradelevels' => GradeLevel::cases(),
+            'gradeLevels' => GradeLevel::values(),
+            'schoolYears' => $schoolYears,
         ]);
     }
 

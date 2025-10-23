@@ -101,9 +101,8 @@ test('grade level fee model handles zero amounts correctly', function () {
 });
 
 test('grade level fee model active scope works correctly', function () {
-    GradeLevelFee::create([
+    GradeLevelFee::factory()->create([
         'grade_level' => GradeLevel::KINDER,
-        'school_year' => '2024-2025',
         'tuition_fee_cents' => 100000,
         'miscellaneous_fee_cents' => 5000,
         'laboratory_fee_cents' => 0,
@@ -112,9 +111,8 @@ test('grade level fee model active scope works correctly', function () {
         'is_active' => true,
     ]);
 
-    GradeLevelFee::create([
+    GradeLevelFee::factory()->create([
         'grade_level' => GradeLevel::GRADE_1,
-        'school_year' => '2024-2025',
         'tuition_fee_cents' => 100000,
         'miscellaneous_fee_cents' => 5000,
         'laboratory_fee_cents' => 0,
@@ -135,9 +133,8 @@ test('grade level fee model current school year scope works correctly', function
     $currentSchoolYear = "{$currentYear}-{$nextYear}";
     $pastSchoolYear = ($currentYear - 1).'-'.$currentYear;
 
-    GradeLevelFee::create([
+    GradeLevelFee::factory()->schoolYear($currentSchoolYear)->create([
         'grade_level' => GradeLevel::KINDER,
-        'school_year' => $currentSchoolYear,
         'tuition_fee_cents' => 100000,
         'miscellaneous_fee_cents' => 5000,
         'laboratory_fee_cents' => 0,
@@ -146,9 +143,8 @@ test('grade level fee model current school year scope works correctly', function
         'is_active' => true,
     ]);
 
-    GradeLevelFee::create([
+    GradeLevelFee::factory()->schoolYear($pastSchoolYear)->create([
         'grade_level' => GradeLevel::GRADE_1,
-        'school_year' => $pastSchoolYear,
         'tuition_fee_cents' => 100000,
         'miscellaneous_fee_cents' => 5000,
         'laboratory_fee_cents' => 0,
@@ -168,9 +164,8 @@ test('grade level fee model getFeesForGrade method works correctly', function ()
     $nextYear = $currentYear + 1;
     $currentSchoolYear = "{$currentYear}-{$nextYear}";
 
-    $kindergartenFee = GradeLevelFee::create([
+    $kindergartenFee = GradeLevelFee::factory()->schoolYear($currentSchoolYear)->create([
         'grade_level' => GradeLevel::KINDER,
-        'school_year' => $currentSchoolYear,
         'tuition_fee_cents' => 100000,
         'miscellaneous_fee_cents' => 5000,
         'laboratory_fee_cents' => 0,
@@ -179,9 +174,8 @@ test('grade level fee model getFeesForGrade method works correctly', function ()
         'is_active' => true,
     ]);
 
-    GradeLevelFee::create([
+    GradeLevelFee::factory()->schoolYear($currentSchoolYear)->create([
         'grade_level' => GradeLevel::GRADE_1,
-        'school_year' => $currentSchoolYear,
         'tuition_fee_cents' => 110000,
         'miscellaneous_fee_cents' => 5500,
         'laboratory_fee_cents' => 0,
@@ -192,9 +186,8 @@ test('grade level fee model getFeesForGrade method works correctly', function ()
 
     // Inactive fee for same grade in different school year
     $pastSchoolYear = ($currentYear - 1).'-'.$currentYear;
-    GradeLevelFee::create([
+    GradeLevelFee::factory()->schoolYear($pastSchoolYear)->create([
         'grade_level' => GradeLevel::KINDER,
-        'school_year' => $pastSchoolYear,
         'tuition_fee_cents' => 95000,
         'miscellaneous_fee_cents' => 4500,
         'laboratory_fee_cents' => 0,
@@ -220,9 +213,8 @@ test('grade level fee model getFeesForGrade returns null for non-existent grade'
 test('grade level fee model getFeesForGrade works with specific school year', function () {
     $specificSchoolYear = '2024-2025';
 
-    $fee = GradeLevelFee::create([
+    $fee = GradeLevelFee::factory()->schoolYear($specificSchoolYear)->create([
         'grade_level' => GradeLevel::KINDER,
-        'school_year' => $specificSchoolYear,
         'tuition_fee_cents' => 100000,
         'miscellaneous_fee_cents' => 5000,
         'laboratory_fee_cents' => 0,
