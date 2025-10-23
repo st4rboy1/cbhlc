@@ -1,3 +1,4 @@
+import { SchoolYearSelect } from '@/components/school-year-select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -13,17 +14,18 @@ interface GradeLevelFee {
     id: number;
     grade_level: string;
     school_year: string;
+    school_year_id: number;
     tuition_fee: number;
     miscellaneous_fee: number;
     other_fees: number;
     payment_terms: string;
-    notes?: string;
+    notes: string;
     is_active: boolean;
 }
 
 interface FormData {
     grade_level: string;
-    school_year: string;
+    school_year_id: string;
     tuition_fee: string;
     miscellaneous_fee: string;
     other_fees: string;
@@ -32,15 +34,23 @@ interface FormData {
     is_active: boolean;
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    status: string;
+    is_active: boolean;
+}
+
 interface Props {
     fee: GradeLevelFee;
     gradeLevels: string[];
+    schoolYears: SchoolYear[];
 }
 
-export default function RegistrarGradeLevelFeesEdit({ fee, gradeLevels }: Props) {
+export default function RegistrarGradeLevelFeesEdit({ fee, gradeLevels, schoolYears }: Props) {
     const { data, setData, put, processing, errors } = useForm<FormData>({
         grade_level: fee.grade_level,
-        school_year: fee.school_year,
+        school_year_id: fee.school_year_id?.toString() || '',
         tuition_fee: fee.tuition_fee.toString(),
         miscellaneous_fee: fee.miscellaneous_fee.toString(),
         other_fees: fee.other_fees.toString(),
@@ -101,17 +111,14 @@ export default function RegistrarGradeLevelFeesEdit({ fee, gradeLevels }: Props)
                                     {errors.grade_level && <p className="text-sm text-red-600">{errors.grade_level}</p>}
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="school_year">School Year</Label>
-                                    <Input
-                                        id="school_year"
-                                        type="text"
-                                        placeholder="e.g., 2024-2025"
-                                        value={data.school_year}
-                                        onChange={(e) => setData('school_year', e.target.value)}
-                                    />
-                                    {errors.school_year && <p className="text-sm text-red-600">{errors.school_year}</p>}
-                                </div>
+                                {/* School Year */}
+                                <SchoolYearSelect
+                                    value={data.school_year_id}
+                                    onChange={(value) => setData('school_year_id', value)}
+                                    schoolYears={schoolYears}
+                                    error={errors.school_year_id}
+                                    required
+                                />
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-3">
