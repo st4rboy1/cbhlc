@@ -42,19 +42,13 @@ describe('tuition controller', function () {
                 'total_amount_cents' => 27000,
                 'net_amount_cents' => 27000,
                 'amount_paid_cents' => 0,
-                'balance_cents' => 27000,
                 'payment_status' => PaymentStatus::PENDING,
             ]);
         }
 
         // Create grade level fees for current school year
-        $currentYear = date('Y');
-        $nextYear = $currentYear + 1;
-        $schoolYear = "{$currentYear}-{$nextYear}";
-
-        GradeLevelFee::create([
+        GradeLevelFee::factory()->create([
             'grade_level' => GradeLevel::GRADE_1,
-            'school_year' => $schoolYear,
             'tuition_fee_cents' => 2000000,  // 20000 * 100
             'miscellaneous_fee_cents' => 500000,  // 5000 * 100
             'laboratory_fee_cents' => 200000,  // 2000 * 100
