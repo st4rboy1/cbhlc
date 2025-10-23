@@ -86,11 +86,15 @@ class RegisteredUserController extends Controller
 
             event(new Registered($user));
 
+            // Send email verification notification
+            $user->sendEmailVerificationNotification();
+
+            // Log in the user but they will be redirected to verification notice
             Auth::login($user);
 
-            // Redirect to guardian dashboard with success message
-            return redirect()->route('guardian.dashboard')
-                ->with('success', 'Account created successfully! Please check your email to verify your account.');
+            // Redirect to email verification notice page
+            return redirect()->route('verification.notice')
+                ->with('status', 'registration-success');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Guardian registration failed', [

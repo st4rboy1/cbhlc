@@ -1,8 +1,8 @@
 <?php
 
 use App\Models\User;
+use App\Notifications\CustomVerifyEmailNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\Notification;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
@@ -23,7 +23,7 @@ test('sends verification notification', function () {
         ->post(route('verification.send'))
         ->assertRedirect(route('home'));
 
-    Notification::assertSentTo($user, VerifyEmail::class);
+    Notification::assertSentTo($user, CustomVerifyEmailNotification::class);
 });
 
 test('does not send verification notification if email is verified', function () {
