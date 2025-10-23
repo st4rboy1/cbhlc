@@ -12,6 +12,7 @@ use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Services\EnrollmentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
