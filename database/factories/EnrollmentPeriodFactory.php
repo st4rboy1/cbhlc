@@ -33,14 +33,23 @@ class EnrollmentPeriodFactory extends Factory
             ]
         );
 
+        // Calculate deadlines within the period
+        $startTimestamp = $startDate->getTimestamp();
+        $endTimestamp = $endDate->getTimestamp();
+        $duration = $endTimestamp - $startTimestamp;
+
+        $earlyDeadline = date('Y-m-d', $startTimestamp + ($duration * 0.2));
+        $regularDeadline = date('Y-m-d', $startTimestamp + ($duration * 0.5));
+        $lateDeadline = date('Y-m-d', $startTimestamp + ($duration * 0.8));
+
         return [
             'school_year_id' => $schoolYear->id,
             'school_year' => $schoolYearName,
             'start_date' => $startDate,
             'end_date' => $endDate,
-            'early_registration_deadline' => fake()->dateTimeBetween($startDate, '+30 days'),
-            'regular_registration_deadline' => fake()->dateTimeBetween($startDate, '+60 days'),
-            'late_registration_deadline' => fake()->dateTimeBetween($startDate, '+90 days'),
+            'early_registration_deadline' => $earlyDeadline,
+            'regular_registration_deadline' => $regularDeadline,
+            'late_registration_deadline' => $lateDeadline,
             'status' => fake()->randomElement(['upcoming', 'active', 'closed']),
             'description' => fake()->sentence(),
             'allow_new_students' => true,
