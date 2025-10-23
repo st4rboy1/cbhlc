@@ -3,6 +3,7 @@
 namespace Tests\Unit\Http\Requests\SuperAdmin;
 
 use App\Http\Requests\SuperAdmin\UpdateGradeLevelFeeRequest;
+use App\Models\SchoolYear;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
@@ -35,7 +36,7 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
         $rules = $request->rules();
 
         $this->assertArrayHasKey('grade_level', $rules);
-        $this->assertArrayHasKey('school_year', $rules);
+        $this->assertArrayHasKey('school_year_id', $rules);
         $this->assertArrayHasKey('tuition_fee', $rules);
         $this->assertArrayHasKey('miscellaneous_fee', $rules);
         $this->assertArrayHasKey('other_fees', $rules);
@@ -45,9 +46,11 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
 
     public function test_validation_passes_with_valid_data(): void
     {
+        $schoolYear = SchoolYear::factory()->create();
+
         $data = [
             'grade_level' => 'Grade 1',
-            'school_year' => '2024-2025',
+            'school_year_id' => $schoolYear->id,
             'tuition_fee' => 30000,
             'miscellaneous_fee' => 5000,
             'other_fees' => 2000,
@@ -63,9 +66,11 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
 
     public function test_validation_passes_without_optional_fields(): void
     {
+        $schoolYear = SchoolYear::factory()->create();
+
         $data = [
             'grade_level' => 'Grade 2',
-            'school_year' => '2024-2025',
+            'school_year_id' => $schoolYear->id,
             'tuition_fee' => 32000,
             'miscellaneous_fee' => 5000,
             'payment_terms' => 'SEMESTRAL',
@@ -78,11 +83,11 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public function test_validation_fails_with_invalid_school_year_format(): void
+    public function test_validation_fails_with_invalid_school_year_id(): void
     {
         $data = [
             'grade_level' => 'Grade 1',
-            'school_year' => '2024/2025', // Invalid format
+            'school_year_id' => 99999, // Non-existent ID
             'tuition_fee' => 30000,
             'miscellaneous_fee' => 5000,
             'payment_terms' => 'ANNUAL',
@@ -92,14 +97,16 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
-        $this->assertArrayHasKey('school_year', $validator->errors()->toArray());
+        $this->assertArrayHasKey('school_year_id', $validator->errors()->toArray());
     }
 
     public function test_validation_fails_with_negative_fees(): void
     {
+        $schoolYear = SchoolYear::factory()->create();
+
         $data = [
             'grade_level' => 'Grade 1',
-            'school_year' => '2024-2025',
+            'school_year_id' => $schoolYear->id,
             'tuition_fee' => -1000, // Negative value
             'miscellaneous_fee' => 5000,
             'payment_terms' => 'ANNUAL',
@@ -114,9 +121,11 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
 
     public function test_validation_fails_with_missing_required_fields(): void
     {
+        $schoolYear = SchoolYear::factory()->create();
+
         $data = [
             'grade_level' => 'Grade 1',
-            'school_year' => '2024-2025',
+            'school_year_id' => $schoolYear->id,
             // Missing required fee fields
         ];
 
@@ -134,7 +143,7 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
         $request = new UpdateGradeLevelFeeRequest;
         $messages = $request->messages();
 
-        $this->assertArrayHasKey('school_year.regex', $messages);
-        $this->assertEquals('School year must be in the format YYYY-YYYY (e.g., 2024-2025).', $messages['school_year.regex']);
+        $this->assertArrayHasKey('grade_level.unique', $messages);
+        $this->assertEquals('A fee structure for this grade level, school year, and payment term already exists.', $messages['grade_level.unique']);
     }
 }

@@ -12,15 +12,13 @@ import {
     useReactTable,
     VisibilityState,
 } from '@tanstack/react-table';
-import { ArrowUpDown, ChevronDown, Copy, Edit, Eye, MoreHorizontal, Trash } from 'lucide-react';
+import { ArrowUpDown, Copy, Edit, MoreHorizontal, Trash } from 'lucide-react';
 import * as React from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
     DropdownMenu,
-    DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
@@ -46,21 +44,6 @@ export type GradeLevelFee = {
 
 export const columns: ColumnDef<GradeLevelFee>[] = [
     {
-        id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
         accessorKey: 'gradeLevel',
         header: ({ column }) => {
             return (
@@ -70,72 +53,71 @@ export const columns: ColumnDef<GradeLevelFee>[] = [
                 </Button>
             );
         },
+        cell: ({ row }) => <div className="font-medium">{row.getValue('gradeLevel')}</div>,
     },
     {
         accessorKey: 'schoolYear',
+        header: 'School Year',
+        cell: ({ row }) => <div>{row.getValue('schoolYear')}</div>,
+    },
+    {
+        accessorKey: 'tuitionFee',
         header: ({ column }) => {
             return (
                 <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                    School Year
+                    Tuition Fee
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             );
         },
-    },
-    {
-        accessorKey: 'tuitionFee',
-        header: () => <div className="text-right">Tuition Fee</div>,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue('tuitionFee'));
-            return <div className="text-right font-medium">{formatCurrency(amount)}</div>;
-        },
+        cell: ({ row }) => <div>{formatCurrency(row.getValue('tuitionFee'))}</div>,
     },
     {
         accessorKey: 'miscellaneousFee',
-        header: () => <div className="text-right">Misc. Fee</div>,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue('miscellaneousFee'));
-            return <div className="text-right font-medium">{formatCurrency(amount)}</div>;
-        },
+        header: 'Misc. Fee',
+        cell: ({ row }) => <div>{formatCurrency(row.getValue('miscellaneousFee'))}</div>,
     },
     {
         accessorKey: 'otherFees',
-        header: () => <div className="text-right">Other Fees</div>,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue('otherFees'));
-            return <div className="text-right font-medium">{formatCurrency(amount)}</div>;
-        },
+        header: 'Other Fees',
+        cell: ({ row }) => <div>{formatCurrency(row.getValue('otherFees'))}</div>,
     },
     {
         accessorKey: 'totalAmount',
-        header: () => <div className="text-right">Total</div>,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue('totalAmount'));
-            return <div className="text-right font-semibold">{formatCurrency(amount)}</div>;
+        header: ({ column }) => {
+            return (
+                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                    Total
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            );
         },
+        cell: ({ row }) => <div className="font-semibold">{formatCurrency(row.getValue('totalAmount'))}</div>,
     },
     {
         accessorKey: 'isActive',
         header: 'Status',
-        cell: ({ row }) => (
-            <Badge variant={row.getValue('isActive') ? 'default' : 'secondary'}>{row.getValue('isActive') ? 'Active' : 'Inactive'}</Badge>
-        ),
+        cell: ({ row }) => {
+            const isActive = row.getValue('isActive') as boolean;
+            return <Badge variant={isActive ? 'default' : 'secondary'}>{isActive ? 'Active' : 'Inactive'}</Badge>;
+        },
     },
     {
         id: 'actions',
+        enableHiding: false,
         cell: ({ row }) => {
             const fee = row.original;
 
             const handleDelete = () => {
                 if (confirm('Are you sure you want to delete this fee structure?')) {
-                    router.delete(`/super-admin/grade-level-fees/${fee.id}`);
+                    router.delete(`/registrar/grade-level-fees/${fee.id}`);
                 }
             };
 
             const handleDuplicate = () => {
                 const newSchoolYear = prompt('Enter the school year to duplicate to (e.g., 2025-2026):');
                 if (newSchoolYear) {
-                    router.post(`/super-admin/grade-level-fees/${fee.id}/duplicate`, {
+                    router.post(`/registrar/grade-level-fees/${fee.id}/duplicate`, {
                         school_year: newSchoolYear,
                     });
                 }
@@ -151,11 +133,7 @@ export const columns: ColumnDef<GradeLevelFee>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => router.visit(`/super-admin/grade-level-fees/${fee.id}`)}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.visit(`/super-admin/grade-level-fees/${fee.id}/edit`)}>
+                        <DropdownMenuItem onClick={() => router.visit(`/registrar/grade-level-fees/${fee.id}/edit`)}>
                             <Edit className="mr-2 h-4 w-4" />
                             Edit
                         </DropdownMenuItem>
@@ -164,7 +142,7 @@ export const columns: ColumnDef<GradeLevelFee>[] = [
                             Duplicate
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+                        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
                             <Trash className="mr-2 h-4 w-4" />
                             Delete
                         </DropdownMenuItem>
@@ -218,21 +196,20 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
         },
     });
 
-    const [gradeLevelFilter, setGradeLevelFilter] = React.useState(filters.search || 'all');
+    const [gradeLevelFilter, setGradeLevelFilter] = React.useState(filters.search || '');
     const [schoolYear, setSchoolYear] = React.useState(filters.school_year || '');
-    const [activeFilter, setActiveFilter] = React.useState(filters.active || 'all');
+    const [activeFilter, setActiveFilter] = React.useState(filters.active || '');
 
     const applyFilters = (gradeLevel?: string, year?: string, active?: string) => {
         router.get(
-            '/super-admin/grade-level-fees',
+            '/registrar/grade-level-fees',
             {
-                search: (gradeLevel ?? gradeLevelFilter) !== 'all' ? (gradeLevel ?? gradeLevelFilter) : undefined,
+                search: (gradeLevel ?? gradeLevelFilter) || undefined,
                 school_year: (year ?? schoolYear) || undefined,
-                active: (active ?? activeFilter) !== 'all' ? (active ?? activeFilter) : undefined,
+                active: (active ?? activeFilter) || undefined,
             },
             {
                 preserveState: true,
-                replace: true,
                 preserveScroll: true,
             },
         );
@@ -242,10 +219,11 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
         <div className="w-full">
             <div className="flex items-center gap-4 py-4">
                 <Select
-                    value={gradeLevelFilter}
+                    value={gradeLevelFilter || 'all'}
                     onValueChange={(value) => {
-                        setGradeLevelFilter(value);
-                        applyFilters(value, undefined, undefined);
+                        const newValue = value === 'all' ? '' : value;
+                        setGradeLevelFilter(newValue);
+                        applyFilters(newValue, undefined, undefined);
                     }}
                 >
                     <SelectTrigger className="w-[200px]">
@@ -281,10 +259,11 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
                     </SelectContent>
                 </Select>
                 <Select
-                    value={activeFilter}
+                    value={activeFilter || 'all'}
                     onValueChange={(value) => {
-                        setActiveFilter(value);
-                        applyFilters(undefined, undefined, value);
+                        const newValue = value === 'all' ? '' : value;
+                        setActiveFilter(newValue);
+                        applyFilters(undefined, undefined, newValue);
                     }}
                 >
                     <SelectTrigger className="w-[180px]">
@@ -296,32 +275,8 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
                         <SelectItem value="false">Inactive</SelectItem>
                     </SelectContent>
                 </Select>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
-                            Columns <ChevronDown className="ml-2 h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {table
-                            .getAllColumns()
-                            .filter((column) => column.getCanHide())
-                            .map((column) => {
-                                return (
-                                    <DropdownMenuCheckboxItem
-                                        key={column.id}
-                                        className="capitalize"
-                                        checked={column.getIsVisible()}
-                                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                                    >
-                                        {column.id}
-                                    </DropdownMenuCheckboxItem>
-                                );
-                            })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
             </div>
-            <div className="overflow-hidden rounded-md border">
+            <div className="rounded-md border">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -348,7 +303,7 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No grade level fees found.
+                                    No results.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -356,9 +311,7 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
                 </Table>
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
-                </div>
+                <div className="flex-1 text-sm text-muted-foreground">{table.getFilteredRowModel().rows.length} row(s) total.</div>
                 <div className="space-x-2">
                     <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
                         Previous

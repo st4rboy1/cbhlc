@@ -234,12 +234,15 @@ test('updatePaymentStatus logs activity', function () {
 
 test('calculateFees returns fee breakdown for enrollment', function () {
     // Create a grade level fee for testing
-    \App\Models\GradeLevelFee::create([
+    \App\Models\GradeLevelFee::factory()->create([
         'grade_level' => 'Grade 1',
-        'school_year' => date('Y').'-'.(date('Y') + 1),
         'tuition_fee_cents' => 5000000, // 50000 * 100
         'registration_fee_cents' => 500000, // 5000 * 100
         'miscellaneous_fee_cents' => 1000000, // 10000 * 100
+        'laboratory_fee_cents' => 0,
+        'library_fee_cents' => 0,
+        'sports_fee_cents' => 0,
+        'other_fees_cents' => 0,
     ]);
 
     $result = $this->service->calculateFees('Grade 1');

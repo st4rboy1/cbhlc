@@ -43,9 +43,8 @@ beforeEach(function () {
     ]);
 
     // Create grade level fee
-    GradeLevelFee::create([
+    GradeLevelFee::factory()->create([
         'grade_level' => GradeLevel::GRADE_1->value,
-        'school_year' => '2024-2025',
         'tuition_fee_cents' => 2000000,
         'miscellaneous_fee_cents' => 500000,
     ]);

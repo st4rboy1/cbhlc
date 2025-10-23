@@ -23,6 +23,8 @@ class GradeLevelFee extends Model
 
     protected $fillable = [
         'grade_level',
+        'school_year',
+        'school_year_id',
         'tuition_fee',
         'tuition_fee_cents',
         'registration_fee',
@@ -39,7 +41,6 @@ class GradeLevelFee extends Model
         'other_fees_cents',
         'down_payment_cents',
         'payment_terms',
-        'school_year',
         'is_active',
     ];
 
@@ -73,6 +74,14 @@ class GradeLevelFee extends Model
         'formatted_other_fees' => FormattedMoneyCast::class,
         'formatted_total_fee' => FormattedMoneyCast::class,
     ];
+
+    /**
+     * Get the school year that this fee belongs to.
+     */
+    public function schoolYear()
+    {
+        return $this->belongsTo(SchoolYear::class);
+    }
 
     /**
      * Get the activity log options for this model.

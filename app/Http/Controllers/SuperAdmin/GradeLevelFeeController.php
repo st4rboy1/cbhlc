@@ -39,10 +39,14 @@ class GradeLevelFeeController extends Controller
 
         $fees = $query->latest()->paginate(15)->withQueryString();
 
+        // Get all unique school years from grade level fees
+        $schoolYears = \App\Models\SchoolYear::orderBy('start_year', 'desc')->get();
+
         return Inertia::render('super-admin/grade-level-fees/index', [
             'fees' => $fees,
             'filters' => $request->only(['search', 'school_year', 'active']),
             'gradeLevels' => \App\Enums\GradeLevel::values(),
+            'schoolYears' => $schoolYears,
         ]);
     }
 
@@ -53,8 +57,14 @@ class GradeLevelFeeController extends Controller
     {
         Gate::authorize('create', GradeLevelFee::class);
 
+        // Get available school years (active and upcoming)
+        $schoolYears = \App\Models\SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
+
         return Inertia::render('super-admin/grade-level-fees/create', [
             'gradeLevels' => \App\Enums\GradeLevel::values(),
+            'schoolYears' => $schoolYears,
         ]);
     }
 
@@ -65,7 +75,13 @@ class GradeLevelFeeController extends Controller
     {
         Gate::authorize('create', GradeLevelFee::class);
 
-        GradeLevelFee::create($request->validated());
+        $validated = $request->validated();
+
+        // Get school year and populate school_year string for backward compatibility
+        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
+        $validated['school_year'] = $schoolYear->name;
+
+        GradeLevelFee::create($validated);
 
         return redirect()->route('super-admin.grade-level-fees.index')
             ->with('success', 'Grade level fee created successfully.');
@@ -90,9 +106,15 @@ class GradeLevelFeeController extends Controller
     {
         Gate::authorize('update', $gradeLevelFee);
 
+        // Get available school years (active and upcoming)
+        $schoolYears = \App\Models\SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
+
         return Inertia::render('super-admin/grade-level-fees/edit', [
             'fee' => $gradeLevelFee,
             'gradeLevels' => \App\Enums\GradeLevel::values(),
+            'schoolYears' => $schoolYears,
         ]);
     }
 
@@ -103,7 +125,13 @@ class GradeLevelFeeController extends Controller
     {
         Gate::authorize('update', $gradeLevelFee);
 
-        $gradeLevelFee->update($request->validated());
+        $validated = $request->validated();
+
+        // Get school year and populate school_year string for backward compatibility
+        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
+        $validated['school_year'] = $schoolYear->name;
+
+        $gradeLevelFee->update($validated);
 
         return redirect()->route('super-admin.grade-level-fees.index')
             ->with('success', 'Grade level fee updated successfully.');

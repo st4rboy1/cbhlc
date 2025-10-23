@@ -26,6 +26,13 @@ interface PaginationLink {
     active: boolean;
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    status: string;
+    is_active: boolean;
+}
+
 interface Props {
     fees: {
         data: GradeLevelFee[];
@@ -40,9 +47,10 @@ interface Props {
         active?: string;
     };
     gradeLevels: string[];
+    schoolYears: SchoolYear[];
 }
 
-export default function SuperAdminGradeLevelFeesIndex({ fees, filters, gradeLevels }: Props) {
+export default function SuperAdminGradeLevelFeesIndex({ fees, filters, gradeLevels, schoolYears }: Props) {
     const { flash } = usePage<{ flash: { success?: string; error?: string } }>().props;
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -95,6 +103,7 @@ export default function SuperAdminGradeLevelFeesIndex({ fees, filters, gradeLeve
                         active: filters.active || null,
                     }}
                     gradeLevels={gradeLevels}
+                    schoolYears={schoolYears}
                 />
             </div>
         </AppLayout>
