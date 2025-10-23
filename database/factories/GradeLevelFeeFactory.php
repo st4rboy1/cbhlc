@@ -38,17 +38,17 @@ class GradeLevelFeeFactory extends Factory
         );
 
         return [
-            'grade_level' => $this->faker->randomElement(GradeLevel::values()),
+            'grade_level' => fake()->randomElement(GradeLevel::values()),
             'school_year' => $schoolYear,
             'school_year_id' => $schoolYearModel->id,
-            'tuition_fee_cents' => $this->faker->numberBetween(2000000, 5000000), // 20,000 to 50,000 pesos
-            'registration_fee_cents' => $this->faker->numberBetween(100000, 300000), // 1,000 to 3,000 pesos
-            'miscellaneous_fee_cents' => $this->faker->numberBetween(50000, 150000), // 500 to 1,500 pesos
-            'laboratory_fee_cents' => $this->faker->numberBetween(0, 100000), // 0 to 1,000 pesos
-            'library_fee_cents' => $this->faker->numberBetween(20000, 50000), // 200 to 500 pesos
-            'sports_fee_cents' => $this->faker->numberBetween(10000, 30000), // 100 to 300 pesos
-            'other_fees_cents' => $this->faker->numberBetween(0, 50000), // 0 to 500 pesos
-            'payment_terms' => $this->faker->randomElement(['ANNUAL', 'SEMESTRAL', 'QUARTERLY', 'MONTHLY']),
+            'tuition_fee_cents' => fake()->numberBetween(2000000, 5000000), // 20,000 to 50,000 pesos
+            'registration_fee_cents' => fake()->numberBetween(100000, 300000), // 1,000 to 3,000 pesos
+            'miscellaneous_fee_cents' => fake()->numberBetween(50000, 150000), // 500 to 1,500 pesos
+            'laboratory_fee_cents' => fake()->numberBetween(0, 100000), // 0 to 1,000 pesos
+            'library_fee_cents' => fake()->numberBetween(20000, 50000), // 200 to 500 pesos
+            'sports_fee_cents' => fake()->numberBetween(10000, 30000), // 100 to 300 pesos
+            'other_fees_cents' => fake()->numberBetween(0, 50000), // 0 to 500 pesos
+            'payment_terms' => fake()->randomElement(['ANNUAL', 'SEMESTRAL', 'QUARTERLY', 'MONTHLY']),
             'is_active' => true,
         ];
     }
