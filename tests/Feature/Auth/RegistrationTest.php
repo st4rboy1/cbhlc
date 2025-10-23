@@ -41,9 +41,12 @@ test('new users can register and are assigned guardian role', function () {
     expect($guardian->occupation)->toBe('Teacher');
     expect($guardian->employer)->toBe('Test School');
 
+    // Check that email is not verified yet
+    expect($user->hasVerifiedEmail())->toBeFalse();
+
     $this->assertAuthenticated();
-    // All registered users get redirected to guardian dashboard
-    $response->assertRedirect(route('guardian.dashboard', absolute: false));
+    // All registered users get redirected to email verification notice
+    $response->assertRedirect(route('verification.notice', absolute: false));
 });
 
 test('registration no longer accepts role parameter', function () {
@@ -69,7 +72,7 @@ test('registration no longer accepts role parameter', function () {
     expect($user->hasRole('student'))->toBeFalse();
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('guardian.dashboard', absolute: false));
+    $response->assertRedirect(route('verification.notice', absolute: false));
 });
 
 test('registration validates required fields', function () {
@@ -138,5 +141,65 @@ test('employer field is optional', function () {
     expect($guardian->employer)->toBeNull();
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('guardian.dashboard', absolute: false));
+    $response->assertRedirect(route('verification.notice', absolute: false));
+});
+
+test('registration sends email verification notification', function () {
+    \Illuminate\Support\Facades\Notification::fake();
+
+    $response = $this->post(route('register.store'), [
+        'first_name' => 'Test',
+        'last_name' => 'User',
+        'email' => 'verify@example.com',
+        'password' => 'password',
+        'password_confirmation' => 'password',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street, Manila',
+        'occupation' => 'Engineer',
+    ]);
+
+    $user = \App\Models\User::where('email', 'verify@example.com')->first();
+    expect($user)->not->toBeNull();
+
+    // Verify that email verification notification was sent
+    \Illuminate\Support\Facades\Notification::assertSentTo(
+        $user,
+        \App\Notifications\CustomVerifyEmailNotification::class
+    );
+
+    $response->assertRedirect(route('verification.notice', absolute: false));
+});
+
+test('unverified users cannot access guardian dashboard', function () {
+    $user = \App\Models\User::factory()->create([
+        'email_verified_at' => null,
+    ]);
+    $user->assignRole('guardian');
+
+    $response = $this->actingAs($user)->get(route('guardian.dashboard'));
+
+    // Should be redirected to verification notice
+    $response->assertRedirect(route('verification.notice'));
+});
+
+test('verified users can access guardian dashboard', function () {
+    $user = \App\Models\User::factory()->create([
+        'email_verified_at' => now(),
+    ]);
+    $user->assignRole('guardian');
+
+    // Create guardian profile
+    \App\Models\Guardian::create([
+        'user_id' => $user->id,
+        'first_name' => 'Test',
+        'last_name' => 'Guardian',
+        'contact_number' => '+63912345678',
+        'address' => '123 Test Street',
+        'occupation' => 'Teacher',
+    ]);
+
+    $response = $this->actingAs($user)->get(route('guardian.dashboard'));
+
+    // Should be able to access dashboard
+    $response->assertStatus(200);
 });
