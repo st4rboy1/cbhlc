@@ -1,4 +1,4 @@
-import { ComprehensiveDashboard } from '@/components/comprehensive-dashboard';
+import { ExpandedDashboard } from '@/components/expanded-dashboard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
@@ -14,14 +14,26 @@ interface Props {
         pending_enrollments: number;
         total_revenue: number;
 
-        // User metrics
+        // User Journey Metrics
         total_users: number;
+        verified_users: number;
+        unverified_users: number;
+
+        // Guardian Journey Metrics
         total_guardians: number;
+        guardians_with_students: number;
+        guardians_without_students: number;
+        guardians_with_students_no_enrollments: number;
+
+        // Student Journey Metrics
+        students_with_enrollments: number;
+        students_without_enrollments: number;
 
         // Enrollment metrics
         approved_enrollments: number;
         completed_enrollments: number;
         rejected_enrollments: number;
+        enrollments_needing_payment: number;
 
         // Payment metrics
         total_invoices: number;
@@ -31,6 +43,10 @@ interface Props {
         total_collected: number;
         total_balance: number;
         collection_rate: number;
+
+        // Financial Projections
+        total_expected_revenue: number;
+        potential_incoming_revenue: number;
 
         // Transaction metrics
         total_payments: number;
@@ -47,10 +63,18 @@ export default function SuperAdminDashboardPage({ stats }: Props) {
         activeEnrollments: stats.active_enrollments,
         pendingApplications: stats.pending_enrollments,
         totalUsers: stats.total_users,
+        verifiedUsers: stats.verified_users,
+        unverifiedUsers: stats.unverified_users,
         totalGuardians: stats.total_guardians,
+        guardiansWithStudents: stats.guardians_with_students,
+        guardiansWithoutStudents: stats.guardians_without_students,
+        guardiansWithStudentsNoEnrollments: stats.guardians_with_students_no_enrollments,
+        studentsWithEnrollments: stats.students_with_enrollments,
+        studentsWithoutEnrollments: stats.students_without_enrollments,
         approvedEnrollments: stats.approved_enrollments,
         completedEnrollments: stats.completed_enrollments,
         rejectedEnrollments: stats.rejected_enrollments,
+        enrollmentsNeedingPayment: stats.enrollments_needing_payment,
         totalInvoices: stats.total_invoices,
         paidInvoices: stats.paid_invoices,
         partialPayments: stats.partial_payments,
@@ -58,6 +82,8 @@ export default function SuperAdminDashboardPage({ stats }: Props) {
         totalCollected: stats.total_collected,
         totalBalance: stats.total_balance,
         collectionRate: stats.collection_rate,
+        totalExpectedRevenue: stats.total_expected_revenue,
+        potentialIncomingRevenue: stats.potential_incoming_revenue,
         totalPayments: stats.total_payments,
         recentPaymentsCount: stats.recent_payments_count,
         totalRevenue: stats.total_revenue,
@@ -69,7 +95,7 @@ export default function SuperAdminDashboardPage({ stats }: Props) {
             <div className="px-4 py-6">
                 <h1 className="mb-4 text-2xl font-bold">Super Admin Dashboard</h1>
 
-                <ComprehensiveDashboard stats={dashboardStats} />
+                <ExpandedDashboard stats={dashboardStats} />
 
                 <div className="mt-6 grid gap-6 md:grid-cols-2">
                     {/* Quick Actions */}
