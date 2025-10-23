@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\SuperAdmin;
 
+use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Document;
 use App\Models\Enrollment;
 use App\Models\Guardian;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\DashboardService;
@@ -52,6 +55,31 @@ class DashboardController extends Controller
         $potentialRevenue = Enrollment::where('school_year', $currentYear)
             ->sum('balance_cents') / 100;
 
+        // Document Verification Metrics
+        $totalDocuments = Document::count();
+        $pendingDocuments = Document::where('verification_status', VerificationStatus::PENDING)->count();
+        $verifiedDocuments = Document::where('verification_status', VerificationStatus::VERIFIED)->count();
+        $rejectedDocuments = Document::where('verification_status', VerificationStatus::REJECTED)->count();
+
+        // Students with document statuses
+        $studentsWithAllDocsVerified = Student::whereHas('documents')
+            ->whereDoesntHave('documents', function ($query) {
+                $query->where('verification_status', '!=', VerificationStatus::VERIFIED);
+            })
+            ->count();
+
+        $studentsWithPendingDocs = Student::whereHas('documents', function ($query) {
+            $query->where('verification_status', VerificationStatus::PENDING);
+        })->count();
+
+        $studentsWithRejectedDocs = Student::whereHas('documents', function ($query) {
+            $query->where('verification_status', VerificationStatus::REJECTED);
+        })->count();
+
+        // School Years
+        $activeSchoolYear = SchoolYear::active();
+        $allSchoolYears = SchoolYear::orderBy('start_year', 'desc')->get();
+
         $stats = [
             // Core metrics
             'total_students' => $quickStats['total_students'],
@@ -96,10 +124,21 @@ class DashboardController extends Controller
             // Transaction metrics
             'total_payments' => Payment::count(),
             'recent_payments_count' => Payment::where('created_at', '>=', now()->subDays(7))->count(),
+
+            // Document Verification Metrics
+            'total_documents' => $totalDocuments,
+            'pending_documents' => $pendingDocuments,
+            'verified_documents' => $verifiedDocuments,
+            'rejected_documents' => $rejectedDocuments,
+            'students_all_docs_verified' => $studentsWithAllDocsVerified,
+            'students_pending_docs' => $studentsWithPendingDocs,
+            'students_rejected_docs' => $studentsWithRejectedDocs,
         ];
 
         return Inertia::render('super-admin/super-admin-dashboard', [
             'stats' => $stats,
+            'activeSchoolYear' => $activeSchoolYear,
+            'schoolYears' => $allSchoolYears,
         ]);
     }
 }
