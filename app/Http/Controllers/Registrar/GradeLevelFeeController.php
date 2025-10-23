@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Registrar;
 
 use App\Enums\GradeLevel;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SuperAdmin\StoreGradeLevelFeeRequest;
+use App\Http\Requests\SuperAdmin\UpdateGradeLevelFeeRequest;
 use App\Models\GradeLevelFee;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -75,28 +77,18 @@ class GradeLevelFeeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreGradeLevelFeeRequest $request)
     {
         // Check if user has permission to manage fees
         if (! auth()->user()->can('grade_level_fees.manage')) {
             abort(403, 'Unauthorized to manage grade level fees');
         }
 
-        $validated = $request->validate([
-            'grade_level' => ['required', 'string'],
-            'school_year' => ['required', 'regex:/^\d{4}-\d{4}$/'],
-            'enrollment_fee' => ['required', 'numeric', 'min:0'],
-            'tuition_fee' => ['required', 'numeric', 'min:0'],
-            'miscellaneous_fee' => ['required', 'numeric', 'min:0'],
-            'computer_fee' => ['nullable', 'numeric', 'min:0'],
-            'library_fee' => ['nullable', 'numeric', 'min:0'],
-            'laboratory_fee' => ['nullable', 'numeric', 'min:0'],
-            'pe_uniform_fee' => ['nullable', 'numeric', 'min:0'],
-            'school_uniform_fee' => ['nullable', 'numeric', 'min:0'],
-            'books_fee' => ['nullable', 'numeric', 'min:0'],
-            'description' => ['nullable', 'string', 'max:500'],
-            'is_active' => ['boolean'],
-        ]);
+        $validated = $request->validated();
+
+        // Get the school year to populate the school_year string field
+        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
+        $validated['school_year'] = $schoolYear->name;
 
         // Set created_by to track who created the fee
         $validated['created_by'] = auth()->id();
@@ -147,28 +139,18 @@ class GradeLevelFeeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, GradeLevelFee $gradeLevelFee)
+    public function update(UpdateGradeLevelFeeRequest $request, GradeLevelFee $gradeLevelFee)
     {
         // Check if user has permission to manage fees
         if (! auth()->user()->can('grade_level_fees.manage')) {
             abort(403, 'Unauthorized to manage grade level fees');
         }
 
-        $validated = $request->validate([
-            'grade_level' => ['required', 'string'],
-            'school_year' => ['required', 'regex:/^\d{4}-\d{4}$/'],
-            'enrollment_fee' => ['required', 'numeric', 'min:0'],
-            'tuition_fee' => ['required', 'numeric', 'min:0'],
-            'miscellaneous_fee' => ['required', 'numeric', 'min:0'],
-            'computer_fee' => ['nullable', 'numeric', 'min:0'],
-            'library_fee' => ['nullable', 'numeric', 'min:0'],
-            'laboratory_fee' => ['nullable', 'numeric', 'min:0'],
-            'pe_uniform_fee' => ['nullable', 'numeric', 'min:0'],
-            'school_uniform_fee' => ['nullable', 'numeric', 'min:0'],
-            'books_fee' => ['nullable', 'numeric', 'min:0'],
-            'description' => ['nullable', 'string', 'max:500'],
-            'is_active' => ['boolean'],
-        ]);
+        $validated = $request->validated();
+
+        // Get the school year to populate the school_year string field
+        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
+        $validated['school_year'] = $schoolYear->name;
 
         // Set updated_by to track who updated the fee
         $validated['updated_by'] = auth()->id();
