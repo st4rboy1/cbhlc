@@ -24,6 +24,9 @@ class DatabaseSeeder extends Seeder
         // Seed school information
         $this->call(SchoolInformationSeeder::class);
 
+        // Seed school years (must come before enrollments)
+        $this->call(SchoolYearSeeder::class);
+
         // Seed enrollment periods
         $this->call(EnrollmentPeriodSeeder::class);
 
