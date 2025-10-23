@@ -5,6 +5,7 @@ namespace Tests\Unit\Http\Requests\SuperAdmin;
 use App\Enums\EnrollmentStatus;
 use App\Http\Requests\SuperAdmin\UpdateEnrollmentRequest;
 use App\Models\Guardian;
+use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -40,7 +41,7 @@ class UpdateEnrollmentRequestTest extends TestCase
         $this->assertArrayHasKey('student_id', $rules);
         $this->assertArrayHasKey('guardian_id', $rules);
         $this->assertArrayHasKey('grade_level', $rules);
-        $this->assertArrayHasKey('school_year', $rules);
+        $this->assertArrayHasKey('school_year_id', $rules);
         $this->assertArrayHasKey('quarter', $rules);
         $this->assertArrayHasKey('type', $rules);
         $this->assertArrayHasKey('payment_plan', $rules);
@@ -51,12 +52,13 @@ class UpdateEnrollmentRequestTest extends TestCase
     {
         $student = Student::factory()->create();
         $guardian = Guardian::factory()->create();
+        $schoolYear = SchoolYear::factory()->create();
 
         $data = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
             'grade_level' => 'grade_1',
-            'school_year' => '2024-2025',
+            'school_year_id' => $schoolYear->id,
             'quarter' => '1st',
             'type' => 'new',
             'previous_school' => 'Previous School',
@@ -74,12 +76,13 @@ class UpdateEnrollmentRequestTest extends TestCase
     {
         $student = Student::factory()->create();
         $guardian = Guardian::factory()->create();
+        $schoolYear = SchoolYear::factory()->create();
 
         $data = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
             'grade_level' => 'grade_2',
-            'school_year' => '2024-2025',
+            'school_year_id' => $schoolYear->id,
             'quarter' => '2nd',
             'type' => 'continuing',
             'payment_plan' => 'annual',
@@ -92,7 +95,7 @@ class UpdateEnrollmentRequestTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public function test_validation_fails_with_invalid_school_year_format(): void
+    public function test_validation_fails_with_invalid_school_year_id(): void
     {
         $student = Student::factory()->create();
         $guardian = Guardian::factory()->create();
@@ -101,7 +104,7 @@ class UpdateEnrollmentRequestTest extends TestCase
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
             'grade_level' => 'grade_1',
-            'school_year' => '2024/2025', // Invalid format
+            'school_year_id' => 99999, // Non-existent ID
             'quarter' => '1st',
             'type' => 'new',
             'payment_plan' => 'monthly',
@@ -112,19 +115,20 @@ class UpdateEnrollmentRequestTest extends TestCase
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
-        $this->assertArrayHasKey('school_year', $validator->errors()->toArray());
+        $this->assertArrayHasKey('school_year_id', $validator->errors()->toArray());
     }
 
     public function test_validation_fails_with_invalid_type(): void
     {
         $student = Student::factory()->create();
         $guardian = Guardian::factory()->create();
+        $schoolYear = SchoolYear::factory()->create();
 
         $data = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
             'grade_level' => 'grade_1',
-            'school_year' => '2024-2025',
+            'school_year_id' => $schoolYear->id,
             'quarter' => '1st',
             'type' => 'invalid_type',
             'payment_plan' => 'monthly',
@@ -142,12 +146,13 @@ class UpdateEnrollmentRequestTest extends TestCase
     {
         $student = Student::factory()->create();
         $guardian = Guardian::factory()->create();
+        $schoolYear = SchoolYear::factory()->create();
 
         $data = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
             'grade_level' => 'grade_1',
-            'school_year' => '2024-2025',
+            'school_year_id' => $schoolYear->id,
             'quarter' => '1st',
             'type' => 'new',
             'payment_plan' => 'invalid_plan',
@@ -161,12 +166,12 @@ class UpdateEnrollmentRequestTest extends TestCase
         $this->assertArrayHasKey('payment_plan', $validator->errors()->toArray());
     }
 
-    public function test_custom_messages(): void
+    public function test_no_custom_messages_needed(): void
     {
         $request = new UpdateEnrollmentRequest;
-        $messages = $request->messages();
+        $rules = $request->rules();
 
-        $this->assertArrayHasKey('school_year.regex', $messages);
-        $this->assertEquals('School year must be in the format YYYY-YYYY (e.g., 2024-2025).', $messages['school_year.regex']);
+        // Verify school_year_id uses standard exists validation
+        $this->assertContains('exists:school_years,id', $rules['school_year_id']);
     }
 }
