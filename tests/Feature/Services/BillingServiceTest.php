@@ -80,9 +80,8 @@ test('findWithPayments returns invoice with payment history', function () {
 
 test('generateInvoice creates invoice for enrollment', function () {
     // Create a grade level fee for testing
-    \App\Models\GradeLevelFee::create([
+    \App\Models\GradeLevelFee::factory()->create([
         'grade_level' => 'Grade 1',
-        'school_year' => date('Y').'-'.(date('Y') + 1),
         'tuition_fee_cents' => 5000000,
         'registration_fee_cents' => 500000,
         'miscellaneous_fee_cents' => 1000000,
@@ -100,9 +99,8 @@ test('generateInvoice creates invoice for enrollment', function () {
 
 test('generateInvoice creates invoice items', function () {
     // Create a grade level fee for testing
-    \App\Models\GradeLevelFee::create([
+    \App\Models\GradeLevelFee::factory()->create([
         'grade_level' => 'Grade 1',
-        'school_year' => date('Y').'-'.(date('Y') + 1),
         'tuition_fee_cents' => 5000000,
         'registration_fee_cents' => 500000,
         'miscellaneous_fee_cents' => 1000000,
