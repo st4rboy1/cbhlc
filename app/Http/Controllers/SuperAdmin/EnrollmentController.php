@@ -124,6 +124,10 @@ class EnrollmentController extends Controller
 
         $validated = $request->validated();
 
+        // Get school year and populate school_year string for backward compatibility
+        $schoolYear = SchoolYear::findOrFail($validated['school_year_id']);
+        $validated['school_year'] = $schoolYear->name;
+
         // Check if student can enroll
         $student = Student::findOrFail($validated['student_id']);
         if (! $this->enrollmentService->canEnroll($student, $validated['school_year'])) {
