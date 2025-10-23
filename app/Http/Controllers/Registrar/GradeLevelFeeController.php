@@ -43,9 +43,13 @@ class GradeLevelFeeController extends Controller
 
         $fees = $query->latest()->paginate(15)->withQueryString();
 
+        // Get all school years
+        $schoolYears = \App\Models\SchoolYear::orderBy('start_year', 'desc')->get();
+
         return Inertia::render('registrar/grade-level-fees/index', [
             'fees' => $fees,
             'filters' => $request->only(['search', 'school_year', 'active']),
+            'schoolYears' => $schoolYears,
         ]);
     }
 

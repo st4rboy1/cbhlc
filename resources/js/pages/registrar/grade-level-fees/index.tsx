@@ -30,6 +30,13 @@ interface PaginationLink {
     active: boolean;
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    status: string;
+    is_active: boolean;
+}
+
 interface Props {
     fees: {
         data: GradeLevelFee[];
@@ -43,9 +50,10 @@ interface Props {
         school_year?: string;
         active?: string;
     };
+    schoolYears: SchoolYear[];
 }
 
-export default function RegistrarGradeLevelFeesIndex({ fees, filters }: Props) {
+export default function RegistrarGradeLevelFeesIndex({ fees, filters, schoolYears }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [schoolYear, setSchoolYear] = useState(filters.school_year || '');
     const [activeFilter, setActiveFilter] = useState(filters.active || '');
@@ -106,18 +114,25 @@ export default function RegistrarGradeLevelFeesIndex({ fees, filters }: Props) {
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     />
-                    <Input
-                        placeholder="School year (e.g., 2024-2025)"
-                        value={schoolYear}
-                        onChange={(e) => setSchoolYear(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    />
-                    <Select value={activeFilter} onValueChange={setActiveFilter}>
+                    <Select value={schoolYear || 'all'} onValueChange={(value) => setSchoolYear(value === 'all' ? '' : value)}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Filter by school year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All School Years</SelectItem>
+                            {schoolYears.map((sy) => (
+                                <SelectItem key={sy.id} value={sy.name}>
+                                    {sy.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Select value={activeFilter || 'all'} onValueChange={(value) => setActiveFilter(value === 'all' ? '' : value)}>
                         <SelectTrigger>
                             <SelectValue placeholder="Filter by status" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="">All</SelectItem>
+                            <SelectItem value="all">All</SelectItem>
                             <SelectItem value="true">Active</SelectItem>
                             <SelectItem value="false">Inactive</SelectItem>
                         </SelectContent>
