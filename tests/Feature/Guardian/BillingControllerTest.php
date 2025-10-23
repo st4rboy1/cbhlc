@@ -54,9 +54,8 @@ beforeEach(function () {
 describe('Guardian BillingController', function () {
     test('guardian can view billing index', function () {
         // Create grade level fee
-        GradeLevelFee::create([
+        GradeLevelFee::factory()->create([
             'grade_level' => GradeLevel::GRADE_1->value,
-            'school_year' => '2024-2025',
             'tuition_fee_cents' => 2000000,  // 20000 * 100
             'miscellaneous_fee_cents' => 500000,  // 5000 * 100
         ]);
@@ -65,7 +64,6 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_1,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
@@ -85,9 +83,8 @@ describe('Guardian BillingController', function () {
 
     test('billing index shows correct enrollment data', function () {
         // Create grade level fee
-        GradeLevelFee::create([
+        GradeLevelFee::factory()->create([
             'grade_level' => GradeLevel::GRADE_2->value,
-            'school_year' => '2024-2025',
             'tuition_fee_cents' => 2200000,  // 22000 * 100
             'miscellaneous_fee_cents' => 550000,  // 5500 * 100
         ]);
@@ -96,7 +93,6 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_2,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
@@ -150,9 +146,8 @@ describe('Guardian BillingController', function () {
 
     test('billing index calculates summary correctly', function () {
         // Create grade level fees
-        GradeLevelFee::create([
+        GradeLevelFee::factory()->create([
             'grade_level' => GradeLevel::GRADE_1->value,
-            'school_year' => '2024-2025',
             'tuition_fee_cents' => 2000000,  // 20000 * 100
             'miscellaneous_fee_cents' => 500000,  // 5000 * 100
         ]);
@@ -161,7 +156,6 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_1,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
@@ -181,7 +175,6 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $student2->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_1,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PAID,
@@ -221,9 +214,8 @@ describe('Guardian BillingController', function () {
 
     test('guardian can view billing details for enrollment', function () {
         // Create grade level fee
-        GradeLevelFee::create([
+        GradeLevelFee::factory()->create([
             'grade_level' => GradeLevel::GRADE_3->value,
-            'school_year' => '2024-2025',
             'tuition_fee_cents' => 2400000,  // 24000 * 100
             'miscellaneous_fee_cents' => 600000,  // 6000 * 100
         ]);
@@ -231,7 +223,6 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_3,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
@@ -251,9 +242,8 @@ describe('Guardian BillingController', function () {
 
     test('billing show displays correct data', function () {
         // Create grade level fee
-        GradeLevelFee::create([
+        GradeLevelFee::factory()->create([
             'grade_level' => GradeLevel::GRADE_4->value,
-            'school_year' => '2024-2025',
             'tuition_fee_cents' => 2600000,  // 26000 * 100
             'miscellaneous_fee_cents' => 650000,  // 6500 * 100
         ]);
@@ -261,7 +251,6 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_4,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PARTIAL,
@@ -289,9 +278,8 @@ describe('Guardian BillingController', function () {
 
     test('billing show generates quarterly payment schedule', function () {
         // Create grade level fee
-        GradeLevelFee::create([
+        GradeLevelFee::factory()->create([
             'grade_level' => GradeLevel::GRADE_5->value,
-            'school_year' => '2024-2025',
             'tuition_fee_cents' => 2800000,  // 28000 * 100
             'miscellaneous_fee_cents' => 700000,  // 7000 * 100
         ]);
@@ -299,7 +287,6 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_5,
             'tuition_fee_cents' => 2800000,
             'miscellaneous_fee_cents' => 700000,
@@ -365,7 +352,6 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_6,
             'tuition_fee_cents' => 0,
             'miscellaneous_fee_cents' => 0,
@@ -465,7 +451,6 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 
