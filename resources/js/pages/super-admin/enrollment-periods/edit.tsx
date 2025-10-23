@@ -2,11 +2,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DatePicker } from '@/components/ui/date-picker';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import SchoolYearSelect from '@/components/ui/school-year-select';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, type SchoolYear } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 export type EnrollmentPeriod = {
     id: number;
     school_year: string;
+    school_year_id: number;
     status: string;
     start_date: string;
     end_date: string;
@@ -27,9 +28,10 @@ export type EnrollmentPeriod = {
 
 interface Props {
     period: EnrollmentPeriod;
+    schoolYears: SchoolYear[];
 }
 
-export default function EnrollmentPeriodEdit({ period }: Props) {
+export default function EnrollmentPeriodEdit({ period, schoolYears }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Enrollment Periods', href: '/super-admin/enrollment-periods' },
@@ -38,7 +40,7 @@ export default function EnrollmentPeriodEdit({ period }: Props) {
     ];
 
     const { data, setData, put, processing, errors } = useForm({
-        school_year: period.school_year,
+        school_year_id: period.school_year_id?.toString() || '',
         start_date: period.start_date,
         end_date: period.end_date,
         early_registration_deadline: period.early_registration_deadline || '',
@@ -78,20 +80,13 @@ export default function EnrollmentPeriodEdit({ period }: Props) {
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             {/* School Year */}
-                            <div className="space-y-2">
-                                <Label htmlFor="school_year">
-                                    School Year <span className="text-destructive">*</span>
-                                </Label>
-                                <Input
-                                    id="school_year"
-                                    placeholder="2025-2026"
-                                    value={data.school_year}
-                                    onChange={(e) => setData('school_year', e.target.value)}
-                                    className={errors.school_year ? 'border-destructive' : ''}
-                                />
-                                {errors.school_year && <p className="text-sm text-destructive">{errors.school_year}</p>}
-                                <p className="text-sm text-muted-foreground">Format: YYYY-YYYY (e.g., 2025-2026)</p>
-                            </div>
+                            <SchoolYearSelect
+                                value={data.school_year_id}
+                                onChange={(value) => setData('school_year_id', value)}
+                                schoolYears={schoolYears}
+                                error={errors.school_year_id}
+                                required
+                            />
 
                             {/* Period Dates */}
                             <div className="grid gap-4 md:grid-cols-2">

@@ -22,7 +22,7 @@ class StoreEnrollmentPeriodRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'school_year' => 'required|string|regex:/^\d{4}-\d{4}$/|unique:enrollment_periods,school_year',
+            'school_year_id' => 'required|exists:school_years,id|unique:enrollment_periods,school_year_id',
             'start_date' => 'required|date|after:yesterday',
             'end_date' => 'required|date|after:start_date',
             'early_registration_deadline' => 'nullable|date|after_or_equal:start_date|before:end_date',
@@ -42,9 +42,9 @@ class StoreEnrollmentPeriodRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'school_year.required' => 'The school year is required.',
-            'school_year.regex' => 'The school year must be in the format YYYY-YYYY (e.g., 2025-2026).',
-            'school_year.unique' => 'An enrollment period for this school year already exists.',
+            'school_year_id.required' => 'The school year is required.',
+            'school_year_id.exists' => 'The selected school year is invalid.',
+            'school_year_id.unique' => 'An enrollment period for this school year already exists.',
             'start_date.required' => 'The start date is required.',
             'start_date.after' => 'The start date must be today or a future date.',
             'end_date.required' => 'The end date is required.',
