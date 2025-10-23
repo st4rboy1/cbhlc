@@ -15,9 +15,8 @@ class GradeLevelFeeSeeder extends Seeder
         $schoolYear = '2025-2026';
 
         // NURSERY AND KINDER - ANNUAL
-        GradeLevelFee::create([
+        GradeLevelFee::factory()->schoolYear($schoolYear)->create([
             'grade_level' => 'Kinder',
-            'school_year' => $schoolYear,
             'tuition_fee_cents' => 1850000, // ₱18,500.00
             'miscellaneous_fee_cents' => 550000, // ₱5,500.00
             'other_fees_cents' => 0,
@@ -27,9 +26,8 @@ class GradeLevelFeeSeeder extends Seeder
         ]);
 
         // NURSERY AND KINDER - SEMESTRAL
-        GradeLevelFee::create([
+        GradeLevelFee::factory()->schoolYear($schoolYear)->create([
             'grade_level' => 'Kinder',
-            'school_year' => $schoolYear,
             'tuition_fee_cents' => 1900000, // ₱9,500 x 2 = ₱19,000
             'miscellaneous_fee_cents' => 550000, // ₱5,500.00
             'other_fees_cents' => 0,
@@ -39,9 +37,8 @@ class GradeLevelFeeSeeder extends Seeder
         ]);
 
         // NURSERY AND KINDER - MONTHLY
-        GradeLevelFee::create([
+        GradeLevelFee::factory()->schoolYear($schoolYear)->create([
             'grade_level' => 'Kinder',
-            'school_year' => $schoolYear,
             'tuition_fee_cents' => 1950000, // ₱1,950 x 10 = ₱19,500
             'miscellaneous_fee_cents' => 550000, // ₱5,500.00
             'other_fees_cents' => 0,
@@ -52,9 +49,8 @@ class GradeLevelFeeSeeder extends Seeder
 
         // GRADES 1, 2, 3 - ANNUAL
         foreach (['Grade 1', 'Grade 2', 'Grade 3'] as $gradeLevel) {
-            GradeLevelFee::create([
+            GradeLevelFee::factory()->schoolYear($schoolYear)->create([
                 'grade_level' => $gradeLevel,
-                'school_year' => $schoolYear,
                 'tuition_fee_cents' => 2050000, // ₱20,500.00
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
@@ -66,9 +62,8 @@ class GradeLevelFeeSeeder extends Seeder
 
         // GRADES 1, 2, 3 - SEMESTRAL
         foreach (['Grade 1', 'Grade 2', 'Grade 3'] as $gradeLevel) {
-            GradeLevelFee::create([
+            GradeLevelFee::factory()->schoolYear($schoolYear)->create([
                 'grade_level' => $gradeLevel,
-                'school_year' => $schoolYear,
                 'tuition_fee_cents' => 2100000, // ₱10,500 x 2 = ₱21,000
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
@@ -80,9 +75,8 @@ class GradeLevelFeeSeeder extends Seeder
 
         // GRADES 1, 2, 3 - MONTHLY
         foreach (['Grade 1', 'Grade 2', 'Grade 3'] as $gradeLevel) {
-            GradeLevelFee::create([
+            GradeLevelFee::factory()->schoolYear($schoolYear)->create([
                 'grade_level' => $gradeLevel,
-                'school_year' => $schoolYear,
                 'tuition_fee_cents' => 2150000, // ₱2,150 x 10 = ₱21,500
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
@@ -94,9 +88,8 @@ class GradeLevelFeeSeeder extends Seeder
 
         // GRADES 4, 5, 6 - ANNUAL
         foreach (['Grade 4', 'Grade 5', 'Grade 6'] as $gradeLevel) {
-            GradeLevelFee::create([
+            GradeLevelFee::factory()->schoolYear($schoolYear)->create([
                 'grade_level' => $gradeLevel,
-                'school_year' => $schoolYear,
                 'tuition_fee_cents' => 2100000, // ₱21,000.00
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
@@ -108,9 +101,8 @@ class GradeLevelFeeSeeder extends Seeder
 
         // GRADES 4, 5, 6 - SEMESTRAL
         foreach (['Grade 4', 'Grade 5', 'Grade 6'] as $gradeLevel) {
-            GradeLevelFee::create([
+            GradeLevelFee::factory()->schoolYear($schoolYear)->create([
                 'grade_level' => $gradeLevel,
-                'school_year' => $schoolYear,
                 'tuition_fee_cents' => 2150000, // ₱10,500 x 2 = ₱21,500
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
@@ -122,9 +114,8 @@ class GradeLevelFeeSeeder extends Seeder
 
         // GRADES 4, 5, 6 - MONTHLY
         foreach (['Grade 4', 'Grade 5', 'Grade 6'] as $gradeLevel) {
-            GradeLevelFee::create([
+            GradeLevelFee::factory()->schoolYear($schoolYear)->create([
                 'grade_level' => $gradeLevel,
-                'school_year' => $schoolYear,
                 'tuition_fee_cents' => 2200000, // ₱2,200 x 10 = ₱22,000
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
