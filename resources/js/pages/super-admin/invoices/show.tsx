@@ -49,7 +49,7 @@ interface InvoiceItem {
 
 interface Payment {
     id: number;
-    payment_number: string;
+    receipt_number?: string;
     amount: number;
     payment_method: string;
     payment_date: string;
@@ -323,7 +323,7 @@ export default function SuperAdminInvoicesShow({ invoice }: Props) {
                                     <TableBody>
                                         {invoice.payments.map((payment) => (
                                             <TableRow key={payment.id}>
-                                                <TableCell className="font-medium">{payment.payment_number}</TableCell>
+                                                <TableCell className="font-medium">{payment.receipt_number || `#${payment.id}`}</TableCell>
                                                 <TableCell>{formatDate(payment.payment_date)}</TableCell>
                                                 <TableCell className="capitalize">{payment.payment_method.replace('_', ' ')}</TableCell>
                                                 <TableCell>{payment.reference_number || 'N/A'}</TableCell>

@@ -83,12 +83,13 @@ class PaymentSeeder extends Seeder
                 }
 
                 // Create payment
+                $faker = \Faker\Factory::create();
                 $payment = Payment::create([
                     'invoice_id' => $invoice->id,
                     'amount' => $paymentAmountCents / 100, // Convert cents to decimal
-                    'payment_method' => fake()->randomElement($paymentMethods),
+                    'payment_method' => $paymentMethods[array_rand($paymentMethods)],
                     'payment_date' => now()->subDays(rand(1, 60)),
-                    'reference_number' => 'REF-'.strtoupper(fake()->bothify('???###???')),
+                    'reference_number' => 'REF-'.strtoupper($faker->bothify('???###???')),
                     'receipt_number' => 'RCP-'.now()->format('Ym').'-'.str_pad((string) ($paymentCount + 1), 6, '0', STR_PAD_LEFT),
                     'notes' => $i === 0 ? 'Initial payment' : 'Installment payment '.($i + 1),
                     'processed_by' => $enrollment->approved_by,
