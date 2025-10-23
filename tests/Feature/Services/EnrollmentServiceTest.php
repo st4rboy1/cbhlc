@@ -239,6 +239,10 @@ test('calculateFees returns fee breakdown for enrollment', function () {
         'tuition_fee_cents' => 5000000, // 50000 * 100
         'registration_fee_cents' => 500000, // 5000 * 100
         'miscellaneous_fee_cents' => 1000000, // 10000 * 100
+        'laboratory_fee_cents' => 0,
+        'library_fee_cents' => 0,
+        'sports_fee_cents' => 0,
+        'other_fees_cents' => 0,
     ]);
 
     $result = $this->service->calculateFees('Grade 1');

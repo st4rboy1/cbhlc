@@ -83,7 +83,7 @@ describe('Guardian BillingController', function () {
 
     test('billing index shows correct enrollment data', function () {
         // Create grade level fee
-        GradeLevelFee::factory()->create([
+        GradeLevelFee::factory()->schoolYear('2024-2025')->create([
             'grade_level' => GradeLevel::GRADE_2->value,
             'tuition_fee_cents' => 2200000,  // 22000 * 100
             'miscellaneous_fee_cents' => 550000,  // 5500 * 100
@@ -242,7 +242,7 @@ describe('Guardian BillingController', function () {
 
     test('billing show displays correct data', function () {
         // Create grade level fee
-        GradeLevelFee::factory()->create([
+        GradeLevelFee::factory()->schoolYear('2024-2025')->create([
             'grade_level' => GradeLevel::GRADE_4->value,
             'tuition_fee_cents' => 2600000,  // 26000 * 100
             'miscellaneous_fee_cents' => 650000,  // 6500 * 100

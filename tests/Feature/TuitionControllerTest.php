@@ -42,6 +42,7 @@ describe('tuition controller', function () {
                 'total_amount_cents' => 27000,
                 'net_amount_cents' => 27000,
                 'amount_paid_cents' => 0,
+                'balance_cents' => 27000,
                 'payment_status' => PaymentStatus::PENDING,
             ]);
         }
