@@ -1,3 +1,4 @@
+import { DocumentMetrics } from '@/components/document-metrics';
 import { ExpandedDashboard } from '@/components/expanded-dashboard';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
@@ -52,19 +53,42 @@ interface Stats {
     totalPayments: number;
     recentPaymentsCount: number;
     totalRevenue: number;
+
+    // Document Verification Metrics
+    totalDocuments: number;
+    pendingDocuments: number;
+    verifiedDocuments: number;
+    rejectedDocuments: number;
+    studentsAllDocsVerified: number;
+    studentsPendingDocs: number;
+    studentsRejectedDocs: number;
 }
+
 interface Activity {
     id: number;
     message: string;
     time: string;
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    start_year: number;
+    end_year: number;
+    start_date: string;
+    end_date: string;
+    status: string;
+    is_active: boolean;
+}
+
 interface Props {
     stats: Stats;
     recentActivities: Activity[];
+    activeSchoolYear: SchoolYear | null;
+    schoolYears: SchoolYear[];
 }
 
-export default function AdminDashboard({ stats, recentActivities }: Props) {
+export default function AdminDashboard({ stats, recentActivities, activeSchoolYear }: Props) {
     const { auth } = usePage<SharedData>().props;
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -74,14 +98,31 @@ export default function AdminDashboard({ stats, recentActivities }: Props) {
         },
     ];
 
+    const documentMetrics = {
+        totalDocuments: stats.totalDocuments,
+        pendingDocuments: stats.pendingDocuments,
+        verifiedDocuments: stats.verifiedDocuments,
+        rejectedDocuments: stats.rejectedDocuments,
+        studentsAllDocsVerified: stats.studentsAllDocsVerified,
+        studentsPendingDocs: stats.studentsPendingDocs,
+        studentsRejectedDocs: stats.studentsRejectedDocs,
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Admin Dashboard" />
 
             <div className="px-4 py-6">
-                <Heading title={`Welcome back, ${auth.user?.name}!`} description="Here's an overview of your school's current status" />
+                <Heading
+                    title={`Welcome back, ${auth.user?.name}!`}
+                    description={`Here's an overview of your school's current status${activeSchoolYear ? ` for ${activeSchoolYear.name}` : ''}`}
+                />
 
                 <ExpandedDashboard stats={stats} />
+
+                <div className="mt-6">
+                    <DocumentMetrics metrics={documentMetrics} />
+                </div>
 
                 <div className="mt-6 grid gap-6 md:grid-cols-2">
                     {/* Quick Actions */}

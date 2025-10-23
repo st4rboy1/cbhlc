@@ -1,3 +1,4 @@
+import { DocumentMetrics } from '@/components/document-metrics';
 import { ExpandedDashboard } from '@/components/expanded-dashboard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,10 +52,32 @@ interface Props {
         // Transaction metrics
         total_payments: number;
         recent_payments_count: number;
+
+        // Document Verification Metrics
+        total_documents: number;
+        pending_documents: number;
+        verified_documents: number;
+        rejected_documents: number;
+        students_all_docs_verified: number;
+        students_pending_docs: number;
+        students_rejected_docs: number;
     };
+    activeSchoolYear: SchoolYear | null;
+    schoolYears: SchoolYear[];
 }
 
-export default function SuperAdminDashboardPage({ stats }: Props) {
+interface SchoolYear {
+    id: number;
+    name: string;
+    start_year: number;
+    end_year: number;
+    start_date: string;
+    end_date: string;
+    status: string;
+    is_active: boolean;
+}
+
+export default function SuperAdminDashboardPage({ stats, activeSchoolYear }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [{ title: 'Super Admin Dashboard', href: '/super-admin/dashboard' }];
 
     // Convert snake_case to camelCase for the shared component
@@ -89,13 +112,27 @@ export default function SuperAdminDashboardPage({ stats }: Props) {
         totalRevenue: stats.total_revenue,
     };
 
+    const documentMetrics = {
+        totalDocuments: stats.total_documents,
+        pendingDocuments: stats.pending_documents,
+        verifiedDocuments: stats.verified_documents,
+        rejectedDocuments: stats.rejected_documents,
+        studentsAllDocsVerified: stats.students_all_docs_verified,
+        studentsPendingDocs: stats.students_pending_docs,
+        studentsRejectedDocs: stats.students_rejected_docs,
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Super Admin Dashboard" />
             <div className="px-4 py-6">
-                <h1 className="mb-4 text-2xl font-bold">Super Admin Dashboard</h1>
+                <h1 className="mb-4 text-2xl font-bold">Super Admin Dashboard{activeSchoolYear ? ` - ${activeSchoolYear.name}` : ''}</h1>
 
                 <ExpandedDashboard stats={dashboardStats} />
+
+                <div className="mt-6">
+                    <DocumentMetrics metrics={documentMetrics} />
+                </div>
 
                 <div className="mt-6 grid gap-6 md:grid-cols-2">
                     {/* Quick Actions */}

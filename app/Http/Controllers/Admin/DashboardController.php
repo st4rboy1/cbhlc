@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\EnrollmentStatus;
+use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Document;
 use App\Models\Enrollment;
 use App\Models\Guardian;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\DashboardService;
@@ -54,6 +57,31 @@ class DashboardController extends Controller
             ->sum('net_amount_cents') / 100;
         $potentialRevenue = Enrollment::where('school_year', $currentYear)
             ->sum('balance_cents') / 100;
+
+        // Document Verification Metrics
+        $totalDocuments = Document::count();
+        $pendingDocuments = Document::where('verification_status', VerificationStatus::PENDING)->count();
+        $verifiedDocuments = Document::where('verification_status', VerificationStatus::VERIFIED)->count();
+        $rejectedDocuments = Document::where('verification_status', VerificationStatus::REJECTED)->count();
+
+        // Students with document statuses
+        $studentsWithAllDocsVerified = Student::whereHas('documents')
+            ->whereDoesntHave('documents', function ($query) {
+                $query->where('verification_status', '!=', VerificationStatus::VERIFIED);
+            })
+            ->count();
+
+        $studentsWithPendingDocs = Student::whereHas('documents', function ($query) {
+            $query->where('verification_status', VerificationStatus::PENDING);
+        })->count();
+
+        $studentsWithRejectedDocs = Student::whereHas('documents', function ($query) {
+            $query->where('verification_status', VerificationStatus::REJECTED);
+        })->count();
+
+        // School Years
+        $activeSchoolYear = SchoolYear::active();
+        $allSchoolYears = SchoolYear::orderBy('start_year', 'desc')->get();
 
         $stats = [
             // Core metrics
@@ -104,6 +132,15 @@ class DashboardController extends Controller
             'recentPaymentsCount' => Payment::where('created_at', '>=', now()->subDays(7))->count(),
             'totalRevenue' => Enrollment::where('school_year', $currentYear)
                 ->sum('amount_paid_cents') / 100,
+
+            // Document Verification Metrics
+            'totalDocuments' => $totalDocuments,
+            'pendingDocuments' => $pendingDocuments,
+            'verifiedDocuments' => $verifiedDocuments,
+            'rejectedDocuments' => $rejectedDocuments,
+            'studentsAllDocsVerified' => $studentsWithAllDocsVerified,
+            'studentsPendingDocs' => $studentsWithPendingDocs,
+            'studentsRejectedDocs' => $studentsWithRejectedDocs,
         ];
 
         $recentActivities = Enrollment::with('student')
@@ -126,6 +163,8 @@ class DashboardController extends Controller
         return Inertia::render('admin/dashboard', [
             'stats' => $stats,
             'recentActivities' => $recentActivities,
+            'activeSchoolYear' => $activeSchoolYear,
+            'schoolYears' => $allSchoolYears,
         ]);
     }
 }
