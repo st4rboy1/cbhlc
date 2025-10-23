@@ -53,7 +53,7 @@ test('new users are automatically assigned guardian role', function () {
         ->and($user->hasRole('guardian'))->toBeTrue();
 
     $this->assertAuthenticated();
-    $response->assertRedirect('/guardian/dashboard');
+    $response->assertRedirect('/verify-email');
 });
 
 test('role parameter is ignored if provided', function () {
@@ -77,7 +77,7 @@ test('role parameter is ignored if provided', function () {
         ->and($user->hasRole('student'))->toBeFalse();
 
     $this->assertAuthenticated();
-    $response->assertRedirect('/guardian/dashboard');
+    $response->assertRedirect('/verify-email');
 });
 
 test('invalid role parameter is ignored', function () {
@@ -135,7 +135,7 @@ test('registration requires password confirmation', function () {
     $this->assertGuest();
 });
 
-test('all users are redirected to guardian dashboard after registration', function () {
+test('all users are redirected to email verification after registration', function () {
     // Test first registration
     $response = $this->post('/register', [
         'first_name' => 'First',
@@ -148,7 +148,7 @@ test('all users are redirected to guardian dashboard after registration', functi
         'occupation' => 'Engineer',
     ]);
 
-    $response->assertRedirect('/guardian/dashboard');
+    $response->assertRedirect('/verify-email');
 
     // Logout and test second registration
     $this->post('/logout');
@@ -164,7 +164,7 @@ test('all users are redirected to guardian dashboard after registration', functi
         'occupation' => 'Teacher',
     ]);
 
-    $response->assertRedirect('/guardian/dashboard');
+    $response->assertRedirect('/verify-email');
 });
 
 test('registration validates all required fields', function () {
