@@ -58,8 +58,10 @@ test('super admin can view enrollment periods index', function () {
 // ========================================
 
 test('super admin can create enrollment period', function () {
+    $schoolYear = \App\Models\SchoolYear::factory()->create(['name' => '2025-2026']);
+
     $data = [
-        'school_year' => '2025-2026',
+        'school_year_id' => $schoolYear->id,
         'start_date' => now()->addDay()->format('Y-m-d'),
         'end_date' => now()->addMonths(10)->format('Y-m-d'),
         'early_registration_deadline' => now()->addWeek()->format('Y-m-d'),
