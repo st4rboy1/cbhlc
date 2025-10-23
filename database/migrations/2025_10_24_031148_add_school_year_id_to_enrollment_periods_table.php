@@ -22,14 +22,26 @@ return new class extends Migration
         });
 
         // Populate school_year_id from existing school_year strings
-        DB::statement('
-            UPDATE enrollment_periods ep
-            SET school_year_id = (
-                SELECT id FROM school_years sy
-                WHERE sy.name = ep.school_year
-                LIMIT 1
-            )
-        ');
+        // Use different syntax for SQLite vs MySQL
+        if (DB::getDriverName() === 'sqlite') {
+            DB::statement('
+                UPDATE enrollment_periods
+                SET school_year_id = (
+                    SELECT id FROM school_years
+                    WHERE school_years.name = enrollment_periods.school_year
+                    LIMIT 1
+                )
+            ');
+        } else {
+            DB::statement('
+                UPDATE enrollment_periods ep
+                SET school_year_id = (
+                    SELECT id FROM school_years sy
+                    WHERE sy.name = ep.school_year
+                    LIMIT 1
+                )
+            ');
+        }
 
         // Make school_year_id non-nullable after data migration
         Schema::table('enrollment_periods', function (Blueprint $table) {
