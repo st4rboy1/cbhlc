@@ -35,5 +35,8 @@ class DatabaseSeeder extends Seeder
 
         // Seed invoices for enrollments
         $this->call(InvoiceSeeder::class);
+
+        // Seed payments for enrollments
+        $this->call(PaymentSeeder::class);
     }
 }
