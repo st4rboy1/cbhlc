@@ -93,6 +93,7 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_2,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
@@ -251,6 +252,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year' => '2024-2025',
             'grade_level' => GradeLevel::GRADE_4,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PARTIAL,
@@ -451,6 +453,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year' => '2024-2025',
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 
