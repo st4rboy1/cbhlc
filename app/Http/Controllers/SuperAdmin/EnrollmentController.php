@@ -191,7 +191,7 @@ class EnrollmentController extends Controller
     {
         Gate::authorize('update', $enrollment);
 
-        $enrollment->load(['student', 'guardian', 'schoolYear']);
+        $enrollment->load(['student', 'guardian']);
         $students = Student::with('guardians')->get();
         $guardians = Guardian::with('user')->get();
 
