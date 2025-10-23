@@ -1,3 +1,4 @@
+import { SchoolYearSelect } from '@/components/school-year-select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -11,7 +12,7 @@ import { ArrowLeft, Save } from 'lucide-react';
 
 interface FormData {
     grade_level: string;
-    school_year: string;
+    school_year_id: string;
     tuition_fee: string;
     miscellaneous_fee: string;
     laboratory_fee: string;
@@ -21,14 +22,24 @@ interface FormData {
     is_active: boolean;
 }
 
-interface Props {
-    gradeLevels?: string[];
+interface SchoolYear {
+    id: number;
+    name: string;
+    status: string;
+    is_active: boolean;
 }
 
-export default function SuperAdminGradeLevelFeesCreate({ gradeLevels = [] }: Props) {
+interface Props {
+    gradeLevels?: string[];
+    schoolYears: SchoolYear[];
+}
+
+export default function SuperAdminGradeLevelFeesCreate({ gradeLevels = [], schoolYears }: Props) {
+    const activeSchoolYear = schoolYears.find((sy) => sy.is_active);
+
     const { data, setData, post, processing, errors } = useForm<FormData>({
         grade_level: '',
-        school_year: '',
+        school_year_id: activeSchoolYear?.id.toString() || '',
         tuition_fee: '',
         miscellaneous_fee: '',
         laboratory_fee: '',
@@ -88,17 +99,14 @@ export default function SuperAdminGradeLevelFeesCreate({ gradeLevels = [] }: Pro
                                     {errors.grade_level && <p className="text-sm text-red-600">{errors.grade_level}</p>}
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="school_year">School Year</Label>
-                                    <Input
-                                        id="school_year"
-                                        type="text"
-                                        placeholder="e.g., 2024-2025"
-                                        value={data.school_year}
-                                        onChange={(e) => setData('school_year', e.target.value)}
-                                    />
-                                    {errors.school_year && <p className="text-sm text-red-600">{errors.school_year}</p>}
-                                </div>
+                                {/* School Year */}
+                                <SchoolYearSelect
+                                    value={data.school_year_id}
+                                    onChange={(value) => setData('school_year_id', value)}
+                                    schoolYears={schoolYears}
+                                    error={errors.school_year_id}
+                                    required
+                                />
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-3">
