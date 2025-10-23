@@ -49,6 +49,7 @@ class GradeLevelFeeController extends Controller
         return Inertia::render('registrar/grade-level-fees/index', [
             'fees' => $fees,
             'filters' => $request->only(['search', 'school_year', 'active']),
+            'gradeLevels' => \App\Enums\GradeLevel::values(),
             'schoolYears' => $schoolYears,
         ]);
     }

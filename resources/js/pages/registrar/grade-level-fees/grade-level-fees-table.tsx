@@ -25,7 +25,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
@@ -168,10 +167,11 @@ interface GradeLevelFeesTableProps {
         school_year: string | null;
         active: string | null;
     };
+    gradeLevels: string[];
     schoolYears: SchoolYear[];
 }
 
-export function GradeLevelFeesTable({ fees, filters, schoolYears }: GradeLevelFeesTableProps) {
+export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }: GradeLevelFeesTableProps) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -218,14 +218,26 @@ export function GradeLevelFeesTable({ fees, filters, schoolYears }: GradeLevelFe
     return (
         <div className="w-full">
             <div className="flex items-center gap-4 py-4">
-                <Input
-                    placeholder="Search grade level..."
-                    value={gradeLevelFilter}
-                    onChange={(e) => setGradeLevelFilter(e.target.value)}
-                    onBlur={(e) => applyFilters(e.target.value, undefined, undefined)}
-                    onKeyDown={(e) => e.key === 'Enter' && applyFilters(gradeLevelFilter, undefined, undefined)}
-                    className="max-w-sm"
-                />
+                <Select
+                    value={gradeLevelFilter || 'all'}
+                    onValueChange={(value) => {
+                        const newValue = value === 'all' ? '' : value;
+                        setGradeLevelFilter(newValue);
+                        applyFilters(newValue, undefined, undefined);
+                    }}
+                >
+                    <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Filter by grade level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Grade Levels</SelectItem>
+                        {gradeLevels.map((level) => (
+                            <SelectItem key={level} value={level}>
+                                {level}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                 <Select
                     value={schoolYear || 'all'}
                     onValueChange={(value) => {

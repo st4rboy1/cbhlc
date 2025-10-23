@@ -45,10 +45,11 @@ interface Props {
         school_year?: string;
         active?: string;
     };
+    gradeLevels: string[];
     schoolYears: SchoolYear[];
 }
 
-export default function RegistrarGradeLevelFeesIndex({ fees, filters, schoolYears }: Props) {
+export default function RegistrarGradeLevelFeesIndex({ fees, filters, gradeLevels, schoolYears }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Registrar', href: '/registrar/dashboard' },
         { title: 'Grade Level Fees', href: '/registrar/grade-level-fees' },
@@ -86,6 +87,7 @@ export default function RegistrarGradeLevelFeesIndex({ fees, filters, schoolYear
                         school_year: filters.school_year || null,
                         active: filters.active || null,
                     }}
+                    gradeLevels={gradeLevels}
                     schoolYears={schoolYears}
                 />
             </div>
