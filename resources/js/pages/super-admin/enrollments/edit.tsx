@@ -41,7 +41,6 @@ interface Enrollment {
     payment_plan: string;
     student: Student;
     guardian: Guardian;
-    schoolYear?: SchoolYear;
 }
 
 interface GradeLevel {
