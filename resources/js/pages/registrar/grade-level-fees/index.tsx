@@ -143,7 +143,7 @@ export default function RegistrarGradeLevelFeesIndex({ fees, filters, schoolYear
                     </Button>
                 </div>
 
-                <div className="rounded-lg border bg-white shadow">
+                <div className="rounded-md border">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -160,7 +160,7 @@ export default function RegistrarGradeLevelFeesIndex({ fees, filters, schoolYear
                         <TableBody>
                             {fees.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center text-gray-500">
+                                    <TableCell colSpan={8} className="h-24 text-center">
                                         No grade level fees found.
                                     </TableCell>
                                 </TableRow>
