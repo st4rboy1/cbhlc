@@ -130,9 +130,15 @@ class GradeLevelFeeController extends Controller
             abort(403, 'Unauthorized to manage grade level fees');
         }
 
+        // Get available school years (active and upcoming)
+        $schoolYears = \App\Models\SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
+
         return Inertia::render('registrar/grade-level-fees/edit', [
             'fee' => $gradeLevelFee,
-            'gradelevels' => GradeLevel::cases(),
+            'gradeLevels' => GradeLevel::values(),
+            'schoolYears' => $schoolYears,
         ]);
     }
 
