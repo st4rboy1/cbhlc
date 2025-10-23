@@ -27,7 +27,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
@@ -176,6 +175,13 @@ export const columns: ColumnDef<GradeLevelFee>[] = [
     },
 ];
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    status: string;
+    is_active: boolean;
+}
+
 interface GradeLevelFeesTableProps {
     fees: GradeLevelFee[];
     filters: {
@@ -184,9 +190,10 @@ interface GradeLevelFeesTableProps {
         active: string | null;
     };
     gradeLevels: string[];
+    schoolYears: SchoolYear[];
 }
 
-export function GradeLevelFeesTable({ fees, filters, gradeLevels }: GradeLevelFeesTableProps) {
+export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }: GradeLevelFeesTableProps) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -253,14 +260,26 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels }: GradeLevelFe
                         ))}
                     </SelectContent>
                 </Select>
-                <Input
-                    placeholder="School year (e.g., 2024-2025)"
-                    value={schoolYear}
-                    onChange={(e) => setSchoolYear(e.target.value)}
-                    onBlur={(e) => applyFilters(undefined, e.target.value, undefined)}
-                    onKeyDown={(e) => e.key === 'Enter' && applyFilters(undefined, schoolYear, undefined)}
-                    className="max-w-sm"
-                />
+                <Select
+                    value={schoolYear || 'all'}
+                    onValueChange={(value) => {
+                        const newValue = value === 'all' ? '' : value;
+                        setSchoolYear(newValue);
+                        applyFilters(undefined, newValue, undefined);
+                    }}
+                >
+                    <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Filter by school year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All School Years</SelectItem>
+                        {schoolYears.map((sy) => (
+                            <SelectItem key={sy.id} value={sy.name}>
+                                {sy.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                 <Select
                     value={activeFilter}
                     onValueChange={(value) => {
