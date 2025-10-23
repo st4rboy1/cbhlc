@@ -27,6 +27,8 @@ class EnrollmentPeriodFactory extends Factory
             [
                 'start_year' => $year,
                 'end_year' => $year + 1,
+                'start_date' => "$year-06-01",
+                'end_date' => ($year + 1).'-05-31',
                 'status' => 'upcoming',
             ]
         );
@@ -61,6 +63,8 @@ class EnrollmentPeriodFactory extends Factory
                 [
                     'start_year' => (int) $startYear,
                     'end_year' => (int) $endYear,
+                    'start_date' => "$startYear-06-01",
+                    'end_date' => "$endYear-05-31",
                     'status' => 'upcoming',
                 ]
             );
