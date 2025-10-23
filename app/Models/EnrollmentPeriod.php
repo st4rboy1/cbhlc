@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class EnrollmentPeriod extends Model
@@ -11,6 +12,7 @@ class EnrollmentPeriod extends Model
     use HasFactory;
 
     protected $fillable = [
+        'school_year_id',
         'school_year',
         'start_date',
         'end_date',
@@ -88,6 +90,11 @@ class EnrollmentPeriod extends Model
         }
 
         return max(0, now()->diffInDays($this->regular_registration_deadline, false));
+    }
+
+    public function schoolYear(): BelongsTo
+    {
+        return $this->belongsTo(SchoolYear::class);
     }
 
     public function enrollments(): HasMany
