@@ -26,6 +26,35 @@ class DashboardController extends Controller
         $paymentStats = $this->dashboardService->getPaymentStatistics();
         $enrollmentStats = $this->dashboardService->getEnrollmentStatistics();
 
+        // Guardian Journey Metrics
+        $totalGuardians = Guardian::count();
+        $guardiansWithStudents = Guardian::has('children')->count();
+        $guardiansWithoutStudents = $totalGuardians - $guardiansWithStudents;
+
+        // Get guardians with students but no enrollments
+        $guardiansWithStudentsNoEnrollments = Guardian::has('children')
+            ->whereDoesntHave('children.enrollments')
+            ->count();
+
+        // User verification metrics
+        $unverifiedUsers = User::whereNull('email_verified_at')->count();
+        $verifiedUsers = User::whereNotNull('email_verified_at')->count();
+
+        // Student enrollment journey
+        $studentsWithEnrollments = Student::has('enrollments')->count();
+        $studentsWithoutEnrollments = Student::count() - $studentsWithEnrollments;
+
+        // Payment journey metrics
+        $enrollmentsNeedingPayment = Enrollment::where('status', EnrollmentStatus::ENROLLED)
+            ->where('payment_status', '!=', \App\Enums\PaymentStatus::PAID)
+            ->count();
+
+        // Financial projections
+        $totalExpected = Enrollment::where('school_year', $currentYear)
+            ->sum('net_amount_cents') / 100;
+        $potentialRevenue = Enrollment::where('school_year', $currentYear)
+            ->sum('balance_cents') / 100;
+
         $stats = [
             // Core metrics
             'totalStudents' => Student::count(),
@@ -36,14 +65,26 @@ class DashboardController extends Controller
             'pendingApplications' => Enrollment::where('status', EnrollmentStatus::PENDING)->count(),
             'totalStaff' => User::role(['super_admin', 'administrator', 'registrar'])->count(),
 
-            // User metrics
+            // User Journey Metrics
             'totalUsers' => User::count(),
-            'totalGuardians' => Guardian::count(),
+            'verifiedUsers' => $verifiedUsers,
+            'unverifiedUsers' => $unverifiedUsers,
+
+            // Guardian Journey Metrics
+            'totalGuardians' => $totalGuardians,
+            'guardiansWithStudents' => $guardiansWithStudents,
+            'guardiansWithoutStudents' => $guardiansWithoutStudents,
+            'guardiansWithStudentsNoEnrollments' => $guardiansWithStudentsNoEnrollments,
+
+            // Student Journey Metrics
+            'studentsWithEnrollments' => $studentsWithEnrollments,
+            'studentsWithoutEnrollments' => $studentsWithoutEnrollments,
 
             // Enrollment metrics
             'approvedEnrollments' => $enrollmentStats['approved'],
             'completedEnrollments' => $enrollmentStats['completed'],
             'rejectedEnrollments' => $enrollmentStats['rejected'],
+            'enrollmentsNeedingPayment' => $enrollmentsNeedingPayment,
 
             // Payment metrics
             'totalInvoices' => Invoice::count(),
@@ -53,6 +94,10 @@ class DashboardController extends Controller
             'totalCollected' => $paymentStats['total_collected'],
             'totalBalance' => $paymentStats['total_balance'],
             'collectionRate' => $paymentStats['collection_rate'],
+
+            // Financial Projections
+            'totalExpectedRevenue' => $totalExpected,
+            'potentialIncomingRevenue' => $potentialRevenue,
 
             // Transaction metrics
             'totalPayments' => Payment::count(),

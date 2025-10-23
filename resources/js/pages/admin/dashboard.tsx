@@ -1,4 +1,4 @@
-import { ComprehensiveDashboard } from '@/components/comprehensive-dashboard';
+import { ExpandedDashboard } from '@/components/expanded-dashboard';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,21 +8,32 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
 
 interface Stats {
-    // Core metrics
     totalStudents: number;
     activeEnrollments: number;
     newEnrollments: number;
     pendingApplications: number;
     totalStaff: number;
 
-    // User metrics
+    // User Journey Metrics
     totalUsers: number;
+    verifiedUsers: number;
+    unverifiedUsers: number;
+
+    // Guardian Journey Metrics
     totalGuardians: number;
+    guardiansWithStudents: number;
+    guardiansWithoutStudents: number;
+    guardiansWithStudentsNoEnrollments: number;
+
+    // Student Journey Metrics
+    studentsWithEnrollments: number;
+    studentsWithoutEnrollments: number;
 
     // Enrollment metrics
     approvedEnrollments: number;
     completedEnrollments: number;
     rejectedEnrollments: number;
+    enrollmentsNeedingPayment: number;
 
     // Payment metrics
     totalInvoices: number;
@@ -33,12 +44,15 @@ interface Stats {
     totalBalance: number;
     collectionRate: number;
 
+    // Financial Projections
+    totalExpectedRevenue: number;
+    potentialIncomingRevenue: number;
+
     // Transaction metrics
     totalPayments: number;
     recentPaymentsCount: number;
     totalRevenue: number;
 }
-
 interface Activity {
     id: number;
     message: string;
@@ -67,7 +81,7 @@ export default function AdminDashboard({ stats, recentActivities }: Props) {
             <div className="px-4 py-6">
                 <Heading title={`Welcome back, ${auth.user?.name}!`} description="Here's an overview of your school's current status" />
 
-                <ComprehensiveDashboard stats={stats} />
+                <ExpandedDashboard stats={stats} />
 
                 <div className="mt-6 grid gap-6 md:grid-cols-2">
                     {/* Quick Actions */}
