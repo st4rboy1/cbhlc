@@ -20,6 +20,7 @@ class Document extends Model
 
     protected $fillable = [
         'student_id',
+        'enrollment_id',
         'document_type',
         'original_filename',
         'stored_filename',
@@ -72,6 +73,14 @@ class Document extends Model
     public function verifiedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    /**
+     * Get the enrollment that owns the document.
+     */
+    public function enrollment(): BelongsTo
+    {
+        return $this->belongsTo(Enrollment::class);
     }
 
     /**
