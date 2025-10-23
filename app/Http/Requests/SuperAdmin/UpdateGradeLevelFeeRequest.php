@@ -11,7 +11,7 @@ class UpdateGradeLevelFeeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->hasRole('super_admin');
+        return $this->user()->can('grade_level_fees.manage');
     }
 
     /**
