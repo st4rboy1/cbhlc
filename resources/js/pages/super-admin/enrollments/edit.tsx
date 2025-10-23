@@ -1,3 +1,4 @@
+import { SchoolYearSelect } from '@/components/school-year-select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -33,12 +34,14 @@ interface Enrollment {
     grade_level: string;
     quarter: string;
     school_year: string;
+    school_year_id: number;
     status: string;
     type: string;
     previous_school: string | null;
     payment_plan: string;
     student: Student;
     guardian: Guardian;
+    schoolYear?: SchoolYear;
 }
 
 interface GradeLevel {
@@ -66,6 +69,13 @@ interface PaymentPlan {
     value: string;
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    status: string;
+    is_active: boolean;
+}
+
 interface Props {
     enrollment: Enrollment;
     students: Student[];
@@ -75,6 +85,7 @@ interface Props {
     statuses: Status[];
     types: Type[];
     paymentPlans: PaymentPlan[];
+    schoolYears: SchoolYear[];
 }
 
 interface FormData {
@@ -82,14 +93,24 @@ interface FormData {
     guardian_id: string;
     grade_level: string;
     quarter: string;
-    school_year: string;
+    school_year_id: string;
     status: string;
     type: string;
     previous_school: string;
     payment_plan: string;
 }
 
-export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardians, gradelevels, quarters, statuses, types, paymentPlans }: Props) {
+export default function SuperAdminEnrollmentsEdit({
+    enrollment,
+    students,
+    guardians,
+    gradelevels,
+    quarters,
+    statuses,
+    types,
+    paymentPlans,
+    schoolYears,
+}: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Enrollments', href: '/super-admin/enrollments' },
@@ -101,7 +122,7 @@ export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardi
         guardian_id: enrollment.guardian_id.toString(),
         grade_level: enrollment.grade_level,
         quarter: enrollment.quarter,
-        school_year: enrollment.school_year,
+        school_year_id: enrollment.school_year_id?.toString() || '',
         status: enrollment.status,
         type: enrollment.type,
         previous_school: enrollment.previous_school || '',
@@ -231,19 +252,14 @@ export default function SuperAdminEnrollmentsEdit({ enrollment, students, guardi
                                     </div>
 
                                     {/* School Year */}
-                                    <div className="space-y-2">
-                                        <Label htmlFor="school_year">
-                                            School Year <span className="text-destructive">*</span>
-                                        </Label>
-                                        <Input
-                                            id="school_year"
-                                            value={data.school_year}
-                                            onChange={(e) => setData('school_year', e.target.value)}
-                                            placeholder="YYYY-YYYY"
-                                        />
-                                        {errors.school_year && <p className="text-sm text-destructive">{errors.school_year}</p>}
-                                        <p className="text-sm text-muted-foreground">Format: YYYY-YYYY (e.g., 2024-2025)</p>
-                                    </div>
+                                    {/* School Year */}
+                                    <SchoolYearSelect
+                                        value={data.school_year_id}
+                                        onChange={(value) => setData('school_year_id', value)}
+                                        schoolYears={schoolYears}
+                                        error={errors.school_year_id}
+                                        required
+                                    />
 
                                     {/* Status */}
                                     <div className="space-y-2">

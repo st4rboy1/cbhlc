@@ -26,24 +26,12 @@ class UpdateEnrollmentRequest extends FormRequest
             'student_id' => ['required', 'exists:students,id'],
             'guardian_id' => ['required', 'exists:guardians,id'],
             'grade_level' => ['required', 'string'],
-            'school_year' => ['required', 'string', 'regex:/^\d{4}-\d{4}$/'],
+            'school_year_id' => ['required', 'exists:school_years,id'],
             'quarter' => ['required', 'string'],
             'type' => ['required', 'in:new,continuing,returnee,transferee'],
             'previous_school' => ['nullable', 'string', 'max:255'],
             'payment_plan' => ['required', 'in:annual,semestral,quarterly,monthly'],
             'status' => ['required', 'string', 'in:'.implode(',', array_column(EnrollmentStatus::cases(), 'value'))],
-        ];
-    }
-
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'school_year.regex' => 'School year must be in the format YYYY-YYYY (e.g., 2024-2025).',
         ];
     }
 }
