@@ -30,7 +30,7 @@ class EnrollmentControllerTest extends TestCase
         $this->seed(RolesAndPermissionsSeeder::class);
 
         // Create school year
-        $this->sy2024 = \App\Models\SchoolYear::create([
+        $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
             'name' => '2024-2025',
             'start_year' => 2024,
             'end_year' => 2025,
@@ -99,7 +99,7 @@ class EnrollmentControllerTest extends TestCase
     /** @test */
     public function registrar_can_filter_enrollments_by_school_year()
     {
-        $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
+        $sy2023 = \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
         Enrollment::factory()->create(['school_year_id' => $sy2023->id]);
         Enrollment::factory()->create(['school_year_id' => $this->sy2024->id]);
 

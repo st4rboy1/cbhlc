@@ -18,7 +18,7 @@ beforeEach(function () {
     $this->service = new EnrollmentService(new Enrollment);
 
     // Create school year
-    $this->sy2024 = \App\Models\SchoolYear::create([
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
         'name' => '2024-2025',
         'start_year' => 2024,
         'end_year' => 2025,
@@ -266,7 +266,7 @@ test('calculateFees returns fee breakdown for enrollment', function () {
 
 test('canEnroll returns true when student has no pending enrollment', function () {
     $student = Student::factory()->create();
-    $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
+    $sy2023 = \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
     Enrollment::factory()->create([
         'student_id' => $student->id,
         'status' => EnrollmentStatus::APPROVED,
@@ -332,7 +332,7 @@ test('getStatistics filters by current school year', function () {
     $currentYear = date('Y').'-'.(date('Y') + 1);
 
     // Create enrollments for previous year (should not be counted)
-    $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
+    $sy2023 = \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
     Enrollment::factory()->count(3)->create([
         'status' => EnrollmentStatus::ENROLLED,
         'school_year_id' => $sy2023->id,

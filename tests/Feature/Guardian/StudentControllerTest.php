@@ -20,7 +20,7 @@ beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create school year
-    $this->sy2024 = \App\Models\SchoolYear::create([
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
         'name' => '2024-2025',
         'start_year' => 2024,
         'end_year' => 2025,
@@ -115,7 +115,7 @@ describe('Guardian StudentController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year_id' => \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed'])->id,
+            'school_year_id' => \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed'])->id,
             'grade_level' => GradeLevel::GRADE_2,
             'status' => EnrollmentStatus::COMPLETED,
             'created_at' => now()->subYear(),

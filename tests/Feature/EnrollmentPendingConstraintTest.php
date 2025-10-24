@@ -17,7 +17,7 @@ beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create school year
-    $this->sy2024 = \App\Models\SchoolYear::create([
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
         'name' => '2024-2025',
         'start_year' => 2024,
         'end_year' => 2025,
@@ -83,7 +83,7 @@ describe('enrollment pending constraint', function () {
         // Try to create second pending enrollment for different school year
         $response = $this->actingAs($guardian)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
-            'school_year_id' => \App\Models\SchoolYear::create(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming'])->id,
+            'school_year_id' => \App\Models\SchoolYear::firstOrCreate(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming'])->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => 'Grade 2',
         ]);
@@ -126,7 +126,7 @@ describe('enrollment pending constraint', function () {
         Enrollment::create([
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
-            'school_year_id' => \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed'])->id,
+            'school_year_id' => \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed'])->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Kinder',
             'status' => EnrollmentStatus::COMPLETED,
@@ -194,7 +194,7 @@ describe('enrollment pending constraint', function () {
         // Try to create pending enrollment for next year - should fail due to ongoing enrollment
         $response = $this->actingAs($guardian)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
-            'school_year_id' => \App\Models\SchoolYear::create(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming'])->id,
+            'school_year_id' => \App\Models\SchoolYear::firstOrCreate(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming'])->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => 'Grade 2',
         ]);
