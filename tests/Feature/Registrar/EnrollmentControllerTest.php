@@ -99,11 +99,12 @@ class EnrollmentControllerTest extends TestCase
     /** @test */
     public function registrar_can_filter_enrollments_by_school_year()
     {
-        Enrollment::factory()->create(['school_year' => '2023-2024']);
-        Enrollment::factory()->create(['school_year' => '2024-2025']);
+        $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'closed']);
+        Enrollment::factory()->create(['school_year_id' => $sy2023->id]);
+        Enrollment::factory()->create(['school_year_id' => $this->sy2024->id]);
 
         $response = $this->actingAs($this->registrar)
-            ->get(route('registrar.enrollments.index', ['school_year' => '2024-2025']));
+            ->get(route('registrar.enrollments.index', ['school_year_id' => $this->sy2024->id]));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
