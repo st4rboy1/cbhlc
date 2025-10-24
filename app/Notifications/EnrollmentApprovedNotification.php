@@ -41,7 +41,7 @@ class EnrollmentApprovedNotification extends Notification
             ->line('We are pleased to inform you that the enrollment application for '.$student->full_name.' has been approved.')
             ->line('Enrollment Details:')
             ->line('Student: '.$student->full_name)
-            ->line('Grade Level: '.$this->enrollment->grade_level)
+            ->line('Grade Level: '.$this->enrollment->grade_level->label())
             ->line('School Year: '.$this->enrollment->schoolYear->name)
             ->line('Application ID: '.$this->enrollment->enrollment_id)
             ->line('Approval Date: '.$this->enrollment->approved_at->format('F d, Y'));
@@ -73,7 +73,7 @@ class EnrollmentApprovedNotification extends Notification
             'application_id' => $this->enrollment->enrollment_id,
             'student_id' => $this->enrollment->student_id,
             'student_name' => $this->enrollment->student->full_name,
-            'grade_level' => $this->enrollment->grade_level,
+            'grade_level' => $this->enrollment->grade_level->label(),
             'school_year' => $this->enrollment->schoolYear->name,
             'approved_at' => $this->enrollment->approved_at,
             'status' => 'approved',
