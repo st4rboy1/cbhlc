@@ -158,7 +158,7 @@ describe('invoice controller', function () {
             'enrollment_id' => 'ENR-0004',
             'student_id' => $child->id,
             'guardian_id' => $guardianModel->id,
-            'school_year' => '2023-2024',
+            'school_year_id' => \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'closed'])->id,
             'quarter' => Quarter::FOURTH,
             'grade_level' => GradeLevel::KINDER,
             'status' => EnrollmentStatus::APPROVED,
