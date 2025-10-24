@@ -20,7 +20,10 @@ class EnrollmentPeriodController extends Controller
             ->withCount('enrollments')
             ->paginate(10);
 
-        $activePeriod = EnrollmentPeriod::active()->first();
+        $activePeriod = EnrollmentPeriod::with('schoolYear')
+            ->withCount('enrollments')
+            ->active()
+            ->first();
 
         return Inertia::render('super-admin/enrollment-periods/index', [
             'periods' => $periods,
