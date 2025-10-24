@@ -18,11 +18,39 @@ beforeEach(function () {
     // Create roles for testing
     Role::create(['name' => 'super_admin']);
     Role::create(['name' => 'administrator']);
+
+    // Create school years
+    $this->sy2024 = \App\Models\SchoolYear::create([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
+
+    $this->sy2025 = \App\Models\SchoolYear::create([
+        'name' => '2025-2026',
+        'start_year' => 2025,
+        'end_year' => 2026,
+        'start_date' => '2025-06-01',
+        'end_date' => '2026-05-31',
+        'status' => 'upcoming',
+    ]);
+
+    $this->sy2026 = \App\Models\SchoolYear::create([
+        'name' => '2026-2027',
+        'start_year' => 2026,
+        'end_year' => 2027,
+        'start_date' => '2026-06-01',
+        'end_date' => '2027-05-31',
+        'status' => 'upcoming',
+    ]);
 });
 
 test('command activates upcoming periods when start date is reached', function () {
     $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+        'school_year_id' => $this->sy2025->id,
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonth(),
@@ -41,7 +69,7 @@ test('command activates upcoming periods when start date is reached', function (
 
 test('command closes active periods when end date is passed', function () {
     $period = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->subDay(),
@@ -60,7 +88,7 @@ test('command closes active periods when end date is passed', function () {
 
 test('command does not change periods that are not ready', function () {
     $upcomingPeriod = EnrollmentPeriod::create([
-        'school_year' => '2026-2027',
+        'school_year_id' => $this->sy2026->id,
         'status' => 'upcoming',
         'start_date' => now()->addWeek(),
         'end_date' => now()->addMonth(),
@@ -72,7 +100,7 @@ test('command does not change periods that are not ready', function () {
     ]);
 
     $activePeriod = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+        'school_year_id' => $this->sy2025->id,
         'status' => 'active',
         'start_date' => now()->subWeek(),
         'end_date' => now()->addWeek(),
@@ -94,7 +122,7 @@ test('command does not change periods that are not ready', function () {
 
 test('command closes previously active periods when activating new period', function () {
     $oldPeriod = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->addWeek(),
@@ -106,7 +134,7 @@ test('command closes previously active periods when activating new period', func
     ]);
 
     $newPeriod = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+        'school_year_id' => $this->sy2025->id,
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonth(),
@@ -128,7 +156,7 @@ test('command closes previously active periods when activating new period', func
 
 test('command runs successfully with dry-run option', function () {
     $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+        'school_year_id' => $this->sy2025->id,
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonth(),
@@ -153,7 +181,7 @@ test('command sends notifications when notify option is used', function () {
     $admin->assignRole('administrator');
 
     EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+        'school_year_id' => $this->sy2025->id,
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonth(),
@@ -177,7 +205,7 @@ test('command does not send notifications without notify option', function () {
     $admin->assignRole('super_admin');
 
     EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+        'school_year_id' => $this->sy2025->id,
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonth(),
@@ -195,7 +223,7 @@ test('command does not send notifications without notify option', function () {
 
 test('command logs activity for activated periods', function () {
     $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+        'school_year_id' => $this->sy2025->id,
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonth(),
@@ -217,7 +245,7 @@ test('command logs activity for activated periods', function () {
 
 test('command logs activity for closed periods', function () {
     $period = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->subDay(),
@@ -245,7 +273,7 @@ test('command returns success status code', function () {
 
 test('command handles multiple periods correctly', function () {
     EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+        'school_year_id' => $this->sy2025->id,
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonth(),
@@ -257,7 +285,7 @@ test('command handles multiple periods correctly', function () {
     ]);
 
     EnrollmentPeriod::create([
-        'school_year' => '2026-2027',
+        'school_year_id' => $this->sy2026->id,
         'status' => 'upcoming',
         'start_date' => now()->subHours(2),
         'end_date' => now()->addMonths(2),
@@ -269,7 +297,7 @@ test('command handles multiple periods correctly', function () {
     ]);
 
     $toClose = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->subDay(),
