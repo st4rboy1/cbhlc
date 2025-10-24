@@ -31,8 +31,8 @@ class GradeLevelFeeController extends Controller
         }
 
         // Filter by school year
-        if ($request->filled('school_year')) {
-            $query->where('school_year', $request->get('school_year'));
+        if ($request->filled('school_year_id')) {
+            $query->where('school_year_id', $request->get('school_year_id'));
         }
 
         // Filter by active status
@@ -47,7 +47,7 @@ class GradeLevelFeeController extends Controller
 
         return Inertia::render('registrar/grade-level-fees/index', [
             'fees' => $fees,
-            'filters' => $request->only(['search', 'school_year', 'active']),
+            'filters' => $request->only(['search', 'school_year_id', 'active']),
             'gradeLevels' => \App\Enums\GradeLevel::values(),
             'schoolYears' => $schoolYears,
         ]);
@@ -85,10 +85,6 @@ class GradeLevelFeeController extends Controller
         }
 
         $validated = $request->validated();
-
-        // Get the school year to populate the school_year string field
-        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
-        $validated['school_year'] = $schoolYear->name;
 
         // Set created_by to track who created the fee
         $validated['created_by'] = auth()->id();
@@ -148,10 +144,6 @@ class GradeLevelFeeController extends Controller
 
         $validated = $request->validated();
 
-        // Get the school year to populate the school_year string field
-        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
-        $validated['school_year'] = $schoolYear->name;
-
         // Set updated_by to track who updated the fee
         $validated['updated_by'] = auth()->id();
 
@@ -188,11 +180,11 @@ class GradeLevelFeeController extends Controller
         }
 
         $validated = $request->validate([
-            'school_year' => ['required', 'regex:/^\d{4}-\d{4}$/'],
+            'school_year_id' => ['required', 'exists:school_years,id'],
         ]);
 
         // Check if fee already exists for the target school year and grade level
-        $exists = GradeLevelFee::where('school_year', $validated['school_year'])
+        $exists = GradeLevelFee::where('school_year_id', $validated['school_year_id'])
             ->where('grade_level', $gradeLevelFee->grade_level)
             ->exists();
 
@@ -202,11 +194,13 @@ class GradeLevelFeeController extends Controller
 
         // Create a copy with new school year
         $newFee = $gradeLevelFee->replicate();
-        $newFee->school_year = $validated['school_year'];
+        $newFee->school_year_id = $validated['school_year_id'];
         $newFee->created_by = auth()->id();
         $newFee->save();
 
+        $schoolYear = \App\Models\SchoolYear::find($validated['school_year_id']);
+
         return redirect()->route('registrar.grade-level-fees.index')
-            ->with('success', 'Grade level fee duplicated successfully for school year '.$validated['school_year']);
+            ->with('success', 'Grade level fee duplicated successfully for school year '.$schoolYear->name);
     }
 }
