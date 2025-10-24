@@ -23,7 +23,6 @@ class GradeLevelFee extends Model
 
     protected $fillable = [
         'grade_level',
-        'school_year',
         'school_year_id',
         'tuition_fee',
         'tuition_fee_cents',
@@ -127,30 +126,34 @@ class GradeLevelFee extends Model
     }
 
     /**
-     * Scope to get fees for current school year
+     * Scope a query to only include fees for the current school year.
      */
     public function scopeCurrentSchoolYear($query)
     {
-        $currentYear = date('Y');
-        $nextYear = $currentYear + 1;
-        $schoolYear = "{$currentYear}-{$nextYear}";
+        $activeSchoolYear = SchoolYear::active();
 
-        return $query->where('school_year', $schoolYear);
+        if (! $activeSchoolYear) {
+            return $query->whereRaw('1 = 0'); // Return empty result
+        }
+
+        return $query->where('school_year_id', $activeSchoolYear->id);
     }
 
     /**
      * Get fees for a specific grade level and school year
      */
-    public static function getFeesForGrade(GradeLevel $gradeLevel, ?string $schoolYear = null): ?self
+    public static function getFeesForGrade(GradeLevel $gradeLevel, ?int $schoolYearId = null): ?self
     {
-        if (! $schoolYear) {
-            $currentYear = date('Y');
-            $nextYear = $currentYear + 1;
-            $schoolYear = "{$currentYear}-{$nextYear}";
+        if (! $schoolYearId) {
+            $activeSchoolYear = SchoolYear::active();
+            if (! $activeSchoolYear) {
+                return null;
+            }
+            $schoolYearId = $activeSchoolYear->id;
         }
 
         return self::where('grade_level', $gradeLevel)
-            ->where('school_year', $schoolYear)
+            ->where('school_year_id', $schoolYearId)
             ->where('is_active', true)
             ->first();
     }
