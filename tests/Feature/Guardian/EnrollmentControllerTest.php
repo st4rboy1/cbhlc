@@ -777,10 +777,18 @@ class EnrollmentControllerTest extends TestCase
     {
         // Create 15 enrollments for the student
         for ($i = 0; $i < 15; $i++) {
+            $sy = \App\Models\SchoolYear::create([
+                'name' => '202'.$i.'-202'.($i + 1),
+                'start_year' => 2020 + $i,
+                'end_year' => 2021 + $i,
+                'start_date' => (2020 + $i).'-06-01',
+                'end_date' => (2021 + $i).'-05-31',
+                'status' => 'closed',
+            ]);
             Enrollment::factory()->create([
                 'student_id' => $this->student->id,
                 'guardian_id' => $this->guardian->id,
-                'school_year' => '202'.$i.'-202'.($i + 1),
+                'school_year_id' => $sy->id,
             ]);
         }
 
@@ -803,7 +811,7 @@ class EnrollmentControllerTest extends TestCase
 
         $response->assertSessionHasErrors([
             'student_id',
-            'school_year',
+            'school_year_id',
             'quarter',
             'grade_level',
         ]);
