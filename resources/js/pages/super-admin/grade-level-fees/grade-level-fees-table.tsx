@@ -15,6 +15,7 @@ import {
 import { ArrowUpDown, ChevronDown, Copy, Edit, Eye, MoreHorizontal, Trash } from 'lucide-react';
 import * as React from 'react';
 
+import { SchoolYearFilter } from '@/components/school-year-filter';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -186,7 +187,7 @@ interface GradeLevelFeesTableProps {
     fees: GradeLevelFee[];
     filters: {
         search: string | null;
-        school_year: string | null;
+        school_year_id: string | null;
         active: string | null;
     };
     gradeLevels: string[];
@@ -219,15 +220,15 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
     });
 
     const [gradeLevelFilter, setGradeLevelFilter] = React.useState(filters.search || 'all');
-    const [schoolYear, setSchoolYear] = React.useState(filters.school_year || '');
+    const [schoolYearId, setSchoolYearId] = React.useState(filters.school_year_id || 'all');
     const [activeFilter, setActiveFilter] = React.useState(filters.active || 'all');
 
-    const applyFilters = (gradeLevel?: string, year?: string, active?: string) => {
+    const applyFilters = (gradeLevel?: string, yearId?: string, active?: string) => {
         router.get(
             '/super-admin/grade-level-fees',
             {
                 search: (gradeLevel ?? gradeLevelFilter) !== 'all' ? (gradeLevel ?? gradeLevelFilter) : undefined,
-                school_year: (year ?? schoolYear) || undefined,
+                school_year_id: (yearId ?? schoolYearId) !== 'all' ? (yearId ?? schoolYearId) : undefined,
                 active: (active ?? activeFilter) !== 'all' ? (active ?? activeFilter) : undefined,
             },
             {
@@ -260,26 +261,16 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
                         ))}
                     </SelectContent>
                 </Select>
-                <Select
-                    value={schoolYear || 'all'}
-                    onValueChange={(value) => {
-                        const newValue = value === 'all' ? '' : value;
-                        setSchoolYear(newValue);
-                        applyFilters(undefined, newValue, undefined);
-                    }}
-                >
-                    <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="Filter by school year" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All School Years</SelectItem>
-                        {schoolYears.map((sy) => (
-                            <SelectItem key={sy.id} value={sy.name}>
-                                {sy.name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                <div className="w-[200px]">
+                    <SchoolYearFilter
+                        value={schoolYearId}
+                        onChange={(value) => {
+                            setSchoolYearId(value);
+                            applyFilters(undefined, value, undefined);
+                        }}
+                        schoolYears={schoolYears}
+                    />
+                </div>
                 <Select
                     value={activeFilter}
                     onValueChange={(value) => {
