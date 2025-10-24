@@ -40,7 +40,7 @@ class DashboardController extends Controller
                                      $enrollment->student->last_name,
                     'grade_level' => $enrollment->grade_level,
                     'status' => $enrollment->status->value,
-                    'submission_date' => $enrollment->created_at->format('Y-m-d'),
+                    'submission_date' => $enrollment->created_at->format('M d, Y'),
                     'payment_status' => $enrollment->payment_status->value,
                 ];
             });
