@@ -8,6 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Registrar\RejectEnrollmentRequest;
 use App\Models\Enrollment;
 use App\Models\Student;
+use App\Notifications\EnrollmentApprovedNotification;
+use App\Notifications\EnrollmentRejectedNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -123,9 +125,18 @@ class DashboardController extends Controller
             'status' => EnrollmentStatus::ENROLLED,
             'approved_at' => now(),
             'approved_by' => auth()->id(),
+            'remarks' => $request->input('remarks'),
         ]);
 
-        return back()->with('success', 'Enrollment application approved successfully.');
+        // Send approval notification to guardian
+        $enrollment->load(['student', 'guardian.user', 'schoolYear']);
+        if ($enrollment->guardian && $enrollment->guardian->user) {
+            $enrollment->guardian->user->notify(
+                new EnrollmentApprovedNotification($enrollment, $request->input('remarks'))
+            );
+        }
+
+        return back()->with('success', 'Enrollment application approved and guardian has been notified.');
     }
 
     /**
@@ -148,6 +159,14 @@ class DashboardController extends Controller
             'remarks' => $validated['reason'],
         ]);
 
-        return back()->with('success', 'Enrollment application rejected.');
+        // Send rejection notification to guardian
+        $enrollment->load(['student', 'guardian.user', 'schoolYear']);
+        if ($enrollment->guardian && $enrollment->guardian->user) {
+            $enrollment->guardian->user->notify(
+                new EnrollmentRejectedNotification($enrollment, $validated['reason'])
+            );
+        }
+
+        return back()->with('success', 'Enrollment application rejected and guardian has been notified.');
     }
 }

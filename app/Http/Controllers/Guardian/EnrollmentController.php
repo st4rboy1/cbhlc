@@ -14,6 +14,9 @@ use App\Models\GuardianStudent;
 use App\Models\Payment;
 use App\Models\SchoolYear;
 use App\Models\Student;
+use App\Models\User;
+use App\Notifications\EnrollmentSubmittedNotification;
+use App\Notifications\NewEnrollmentForReviewNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -266,6 +269,22 @@ class EnrollmentController extends Controller
             'amount_paid_cents' => $amountPaidCents,
             'balance_cents' => $balanceCents,
         ]);
+
+        // Load relationships for notifications
+        $enrollment->load(['student', 'guardian.user', 'schoolYear']);
+
+        // Notify guardian of submission
+        if ($guardian->user) {
+            /** @var \App\Models\User $user */
+            $user = $guardian->user;
+            $user->notify(new EnrollmentSubmittedNotification($enrollment));
+        }
+
+        // Notify all registrars and administrators of new enrollment
+        $registrars = User::role(['registrar', 'administrator', 'super_admin'])->get();
+        foreach ($registrars as $registrar) {
+            $registrar->notify(new NewEnrollmentForReviewNotification($enrollment));
+        }
 
         return redirect()->route('guardian.enrollments.index')
             ->with('success', 'Enrollment application submitted successfully. Please wait for approval.');
