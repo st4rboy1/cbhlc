@@ -31,9 +31,21 @@ class EnrollmentSeeder extends Seeder
 
         $this->command->info('Seeding enrollments...');
 
+        // Get or create school year
+        $schoolYear = \App\Models\SchoolYear::firstOrCreate(
+            ['name' => '2024-2025'],
+            [
+                'start_year' => 2024,
+                'end_year' => 2025,
+                'start_date' => '2024-06-01',
+                'end_date' => '2025-05-31',
+                'status' => 'active',
+            ]
+        );
+
         // Get or create enrollment period
         $enrollmentPeriod = EnrollmentPeriod::firstOrCreate(
-            ['school_year' => '2024-2025'],
+            ['school_year_id' => $schoolYear->id],
             [
                 'start_date' => '2024-06-01',
                 'end_date' => '2025-03-31',
@@ -122,7 +134,7 @@ class EnrollmentSeeder extends Seeder
                 'enrollment_id' => 'ENR-'.now()->format('Ym').'-'.str_pad((string) ($enrollmentCount + 1), 4, '0', STR_PAD_LEFT),
                 'student_id' => $student->id,
                 'guardian_id' => $guardian->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $schoolYear->id,
                 'enrollment_period_id' => $enrollmentPeriod->id,
                 'quarter' => 'first',
                 'grade_level' => $gradeLevel,

@@ -299,6 +299,16 @@ class UserSeeder extends Seeder
     {
         $guardianModel = Guardian::where('user_id', $guardian->id)->first();
 
+        // Get or create school years
+        $sy2025 = \App\Models\SchoolYear::firstOrCreate(
+            ['name' => '2025-2026'],
+            ['start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'active']
+        );
+        $sy2024 = \App\Models\SchoolYear::firstOrCreate(
+            ['name' => '2024-2025'],
+            ['start_year' => 2024, 'end_year' => 2025, 'start_date' => '2024-06-01', 'end_date' => '2025-05-31', 'status' => 'closed']
+        );
+
         // Student 1 - Pending enrollment for Grade 5
         $student1 = Student::firstOrCreate(
             ['first_name' => 'Miguel', 'last_name' => 'Dela Cruz', 'birthdate' => '2013-05-20'],
@@ -323,7 +333,7 @@ class UserSeeder extends Seeder
         // Create pending enrollment for next school year
         Enrollment::firstOrCreate([
             'student_id' => $student1->id,
-            'school_year' => '2025-2026',
+            'school_year_id' => $sy2025->id,
         ], [
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
@@ -364,7 +374,7 @@ class UserSeeder extends Seeder
         // Pending enrollment for Grade 4
         Enrollment::firstOrCreate([
             'student_id' => $student2->id,
-            'school_year' => '2025-2026',
+            'school_year_id' => $sy2025->id,
         ], [
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
@@ -388,6 +398,16 @@ class UserSeeder extends Seeder
     private function createMixedStatusStudents(User $guardian): void
     {
         $guardianModel = Guardian::where('user_id', $guardian->id)->first();
+
+        // Get or create school years
+        $sy2025 = \App\Models\SchoolYear::firstOrCreate(
+            ['name' => '2025-2026'],
+            ['start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'active']
+        );
+        $sy2024 = \App\Models\SchoolYear::firstOrCreate(
+            ['name' => '2024-2025'],
+            ['start_year' => 2024, 'end_year' => 2025, 'start_date' => '2024-06-01', 'end_date' => '2025-05-31', 'status' => 'closed']
+        );
 
         // Student 1 - With rejected enrollment
         $student1 = Student::firstOrCreate(
@@ -413,7 +433,7 @@ class UserSeeder extends Seeder
         // Create rejected enrollment
         Enrollment::firstOrCreate([
             'student_id' => $student1->id,
-            'school_year' => '2025-2026',
+            'school_year_id' => $sy2025->id,
         ], [
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::SECOND,
@@ -456,7 +476,7 @@ class UserSeeder extends Seeder
         // Create enrollment with overdue payment
         Enrollment::firstOrCreate([
             'student_id' => $student2->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $sy2024->id,
         ], [
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
@@ -482,6 +502,12 @@ class UserSeeder extends Seeder
     {
         $guardianModel = Guardian::where('user_id', $guardian->id)->first();
 
+        // Get or create school years
+        $sy2025 = \App\Models\SchoolYear::firstOrCreate(
+            ['name' => '2025-2026'],
+            ['start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'active']
+        );
+
         // Student 1 - New to school
         $student1 = Student::firstOrCreate(
             ['first_name' => 'Gabriel', 'last_name' => 'Mendoza', 'birthdate' => '2016-04-12'],
@@ -506,7 +532,7 @@ class UserSeeder extends Seeder
         // Pending enrollment for Kindergarten
         Enrollment::firstOrCreate([
             'student_id' => $student1->id,
-            'school_year' => '2025-2026',
+            'school_year_id' => $sy2025->id,
         ], [
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
@@ -547,7 +573,7 @@ class UserSeeder extends Seeder
         // Create pending enrollment for Grade 1
         Enrollment::firstOrCreate([
             'student_id' => $student2->id,
-            'school_year' => '2025-2026',
+            'school_year_id' => $sy2025->id,
         ], [
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
@@ -572,11 +598,25 @@ class UserSeeder extends Seeder
     {
         $guardianModel = Guardian::where('user_id', $guardian->id)->first();
 
+        // Get or create school years
+        $sy2022 = \App\Models\SchoolYear::firstOrCreate(
+            ['name' => '2022-2023'],
+            ['start_year' => 2022, 'end_year' => 2023, 'start_date' => '2022-06-01', 'end_date' => '2023-05-31', 'status' => 'closed']
+        );
+        $sy2023 = \App\Models\SchoolYear::firstOrCreate(
+            ['name' => '2023-2024'],
+            ['start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'closed']
+        );
+        $sy2024 = \App\Models\SchoolYear::firstOrCreate(
+            ['name' => '2024-2025'],
+            ['start_year' => 2024, 'end_year' => 2025, 'start_date' => '2024-06-01', 'end_date' => '2025-05-31', 'status' => 'closed']
+        );
+
         // Create completed enrollments for previous years
         // Juan was in Grade 4 in 2022-2023 (completed)
         Enrollment::firstOrCreate([
             'student_id' => $student->id,
-            'school_year' => '2022-2023',
+            'school_year_id' => $sy2022->id,
         ], [
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
@@ -596,7 +636,7 @@ class UserSeeder extends Seeder
         // Juan was in Grade 5 in 2023-2024 (completed)
         Enrollment::firstOrCreate([
             'student_id' => $student->id,
-            'school_year' => '2023-2024',
+            'school_year_id' => $sy2023->id,
         ], [
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
@@ -616,7 +656,7 @@ class UserSeeder extends Seeder
         // Juan is currently enrolled in Grade 6 in 2024-2025
         Enrollment::firstOrCreate([
             'student_id' => $student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $sy2024->id,
         ], [
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
