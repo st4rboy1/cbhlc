@@ -17,6 +17,16 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
+
+    // Create school year
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
 });
 
 describe('tuition controller', function () {
@@ -32,7 +42,7 @@ describe('tuition controller', function () {
                 'enrollment_id' => 'ENR-'.str_pad($student->id, 4, '0', STR_PAD_LEFT),
                 'student_id' => $student->id,
                 'guardian_id' => Guardian::factory()->create()->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST,
                 'grade_level' => GradeLevel::GRADE_1,
                 'status' => EnrollmentStatus::APPROVED,
@@ -96,7 +106,7 @@ describe('tuition controller', function () {
                 'enrollment_id' => 'ENR-'.str_pad($child->id, 4, '0', STR_PAD_LEFT),
                 'student_id' => $child->id,
                 'guardian_id' => $guardianModel->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST,
                 'grade_level' => GradeLevel::GRADE_1,
                 'status' => EnrollmentStatus::APPROVED,
@@ -116,7 +126,7 @@ describe('tuition controller', function () {
             'enrollment_id' => 'ENR-9999',
             'student_id' => $otherStudent->id,
             'guardian_id' => Guardian::factory()->create()->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_2,
             'status' => EnrollmentStatus::APPROVED,
@@ -147,7 +157,7 @@ describe('tuition controller', function () {
                 'enrollment_id' => 'ENR-'.str_pad($student->id, 4, '0', STR_PAD_LEFT),
                 'student_id' => $student->id,
                 'guardian_id' => Guardian::factory()->create()->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST,
                 'grade_level' => GradeLevel::GRADE_1,
                 'status' => EnrollmentStatus::APPROVED,

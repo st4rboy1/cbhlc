@@ -186,7 +186,7 @@ class GuardianController extends Controller
                         'first_name' => $student->first_name,
                         'last_name' => $student->last_name,
                     ],
-                    'school_year' => $enrollment->school_year,
+                    'school_year' => $enrollment->schoolYear->name,
                     'grade_level' => $enrollment->grade_level,
                     'status' => $enrollment->status,
                     'enrollment_date' => $enrollment->created_at,

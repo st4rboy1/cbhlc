@@ -53,7 +53,7 @@ class EnrollmentApproved extends Mailable implements ShouldQueue
                 'studentName' => $this->enrollment->student->full_name,
                 'enrollmentId' => $this->enrollment->enrollment_id,
                 'gradeLevel' => $this->enrollment->grade_level_label,
-                'schoolYear' => $this->enrollment->school_year,
+                'schoolYear' => $this->enrollment->schoolYear->name,
                 'approvedAt' => $this->enrollment->approved_at?->format('F j, Y g:i A') ?? now()->format('F j, Y g:i A'),
                 'tuitionFee' => $tuitionFee,
                 'totalAmount' => $totalAmount,

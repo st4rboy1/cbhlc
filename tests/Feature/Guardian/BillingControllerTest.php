@@ -18,6 +18,16 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
+    // Create school year
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
+
     // Create currency service
     $this->currencyService = new CurrencyService;
 
@@ -64,6 +74,7 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_1,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
@@ -93,7 +104,7 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_2,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
@@ -111,7 +122,7 @@ describe('Guardian BillingController', function () {
             ->has('enrollments.0', fn ($enrollment) => $enrollment
                 ->where('student_name', 'John Michael Doe')
                 ->where('student_id', 'STU-001')
-                ->where('school_year', '2024-2025')
+                ->where('school_year_name', '2024-2025')
                 ->where('grade_level', GradeLevel::GRADE_2->value)
                 ->where('tuition_fee', '₱22,000.00')
                 ->where('miscellaneous_fee', '₱5,500.00')
@@ -126,12 +137,14 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::ENROLLED,
         ]);
 
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::REJECTED,
         ]);
 
@@ -224,6 +237,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_3,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
@@ -252,7 +266,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_4,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PARTIAL,
@@ -269,7 +283,7 @@ describe('Guardian BillingController', function () {
             ->component('guardian/billing/show')
             ->where('enrollment.student_name', 'John Michael Doe')
             ->where('enrollment.student_id', 'STU-001')
-            ->where('enrollment.school_year', '2024-2025')
+            ->where('enrollment.school_year_name', '2024-2025')
             ->where('enrollment.grade_level', GradeLevel::GRADE_4->value)
             ->where('enrollment.payment_status', PaymentStatus::PARTIAL->value)
             ->where('billing.tuition_fee', '₱26,000.00')
@@ -289,6 +303,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_5,
             'tuition_fee_cents' => 2800000,
             'miscellaneous_fee_cents' => 700000,
@@ -315,6 +330,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
             'tuition_fee_cents' => 2000000,
             'miscellaneous_fee_cents' => 500000,
@@ -341,6 +357,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $otherStudent->id,
             'guardian_id' => Guardian::factory()->create()->id,
+            'school_year_id' => $this->sy2024->id,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -354,6 +371,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_6,
             'tuition_fee_cents' => 0,
             'miscellaneous_fee_cents' => 0,
@@ -377,6 +395,7 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
             'tuition_fee_cents' => 2000000,
             'miscellaneous_fee_cents' => 500000,
@@ -406,6 +425,7 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $otherStudent->id,
             'guardian_id' => $otherGuardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 
@@ -436,6 +456,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $studentNoMiddle->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 
@@ -453,7 +474,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 

@@ -20,6 +20,16 @@ beforeEach(function () {
     // Seed roles and permissions for each test
     $this->seed(RolesAndPermissionsSeeder::class);
     $this->service = new DashboardService;
+
+    // Create school year
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
 });
 
 test('getQuickStats returns admin statistics', function () {
@@ -52,17 +62,17 @@ test('getRegistrarDashboardData returns registrar-specific data', function () {
 
     Enrollment::factory()->count(4)->create([
         'status' => EnrollmentStatus::PENDING,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->sy2024->id,
     ]);
     Enrollment::factory()->count(2)->create([
         'status' => EnrollmentStatus::APPROVED,
         'approved_at' => now(),
-        'school_year' => $currentYear,
+        'school_year_id' => $this->sy2024->id,
     ]);
     Enrollment::factory()->create([
         'status' => EnrollmentStatus::REJECTED,
         'rejected_at' => now(),
-        'school_year' => $currentYear,
+        'school_year_id' => $this->sy2024->id,
     ]);
 
     $result = $this->service->getRegistrarDashboardData();
@@ -124,7 +134,7 @@ test('getStudentDashboardData returns student-specific data', function () {
     $enrollment = Enrollment::factory()->create([
         'student_id' => $student->id,
         'status' => EnrollmentStatus::APPROVED,
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
     ]);
 
     $result = $this->service->getStudentDashboardData($student->id);
@@ -139,7 +149,7 @@ test('getStudentDashboardData returns student-specific data', function () {
     expect($result['profile']['id'])->toBe($student->id);
     expect($result['enrollment_status'])->toBe(EnrollmentStatus::APPROVED->label());
     expect($result['current_grade']->value)->toBe('Grade 5');
-    expect($result['school_year'])->toBe('2024-2025');
+    expect($result['school_year'])->toBe($this->sy2024->name);
 });
 
 test('getEnrollmentTrend returns monthly enrollment data', function () {

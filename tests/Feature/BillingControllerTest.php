@@ -16,6 +16,16 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
+
+    // Create school year
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
 });
 
 describe('invoice controller', function () {
@@ -28,7 +38,7 @@ describe('invoice controller', function () {
             'enrollment_id' => 'ENR-0001',
             'student_id' => $student->id,
             'guardian_id' => Guardian::factory()->create()->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_4,
             'status' => EnrollmentStatus::APPROVED,
@@ -78,7 +88,7 @@ describe('invoice controller', function () {
             'enrollment_id' => 'ENR-0002',
             'student_id' => $ownChild->id,
             'guardian_id' => $guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::SECOND,
             'grade_level' => GradeLevel::GRADE_5,
             'status' => EnrollmentStatus::APPROVED,
@@ -97,7 +107,7 @@ describe('invoice controller', function () {
             'enrollment_id' => 'ENR-0003',
             'student_id' => $otherStudent->id,
             'guardian_id' => Guardian::factory()->create()->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::THIRD,
             'grade_level' => GradeLevel::GRADE_6,
             'status' => EnrollmentStatus::APPROVED,
@@ -148,7 +158,7 @@ describe('invoice controller', function () {
             'enrollment_id' => 'ENR-0004',
             'student_id' => $child->id,
             'guardian_id' => $guardianModel->id,
-            'school_year' => '2023-2024',
+            'school_year_id' => \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed'])->id,
             'quarter' => Quarter::FOURTH,
             'grade_level' => GradeLevel::KINDER,
             'status' => EnrollmentStatus::APPROVED,
@@ -172,7 +182,7 @@ describe('invoice controller', function () {
             'enrollment_id' => 'ENR-0005',
             'student_id' => $child->id,
             'guardian_id' => $guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_1,
             'status' => EnrollmentStatus::APPROVED,
@@ -213,7 +223,7 @@ describe('updatePayment method', function () {
             'enrollment_id' => 'ENR-0006',
             'student_id' => Student::factory()->create()->id,
             'guardian_id' => Guardian::factory()->create()->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_2,
             'status' => EnrollmentStatus::APPROVED,
@@ -250,7 +260,7 @@ describe('updatePayment method', function () {
             'enrollment_id' => 'ENR-0007',
             'student_id' => Student::factory()->create()->id,
             'guardian_id' => Guardian::factory()->create()->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::SECOND,
             'grade_level' => GradeLevel::GRADE_3,
             'status' => EnrollmentStatus::APPROVED,
@@ -283,7 +293,7 @@ describe('updatePayment method', function () {
             'enrollment_id' => 'ENR-0008',
             'student_id' => Student::factory()->create()->id,
             'guardian_id' => Guardian::factory()->create()->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::THIRD,
             'grade_level' => GradeLevel::GRADE_4,
             'status' => EnrollmentStatus::APPROVED,
@@ -317,7 +327,7 @@ describe('updatePayment method', function () {
             'enrollment_id' => 'ENR-0009',
             'student_id' => Student::factory()->create()->id,
             'guardian_id' => Guardian::factory()->create()->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FOURTH,
             'grade_level' => GradeLevel::GRADE_5,
             'status' => EnrollmentStatus::APPROVED,
@@ -377,7 +387,7 @@ describe('updatePayment method', function () {
             'enrollment_id' => 'ENR-0010',
             'student_id' => Student::factory()->create()->id,
             'guardian_id' => Guardian::factory()->create()->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_6,
             'status' => EnrollmentStatus::APPROVED,

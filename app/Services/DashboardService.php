@@ -7,6 +7,7 @@ use App\Enums\EnrollmentStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Enrollment;
 use App\Models\GuardianStudent;
+use App\Models\SchoolYear;
 use App\Models\Student;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -87,6 +88,17 @@ class DashboardService implements DashboardServiceInterface
     }
 
     /**
+     * Get current school year ID from name
+     */
+    protected function getCurrentSchoolYearId(): ?int
+    {
+        $currentYearName = date('Y').'-'.(date('Y') + 1);
+        $schoolYear = SchoolYear::where('name', $currentYearName)->first();
+
+        return $schoolYear?->id;
+    }
+
+    /**
      * Get enrollment statistics
      */
     public function getEnrollmentStatistics(array $filters = []): array
@@ -94,7 +106,15 @@ class DashboardService implements DashboardServiceInterface
         $query = Enrollment::query();
 
         if (! empty($filters['school_year'])) {
-            $query->where('school_year', $filters['school_year']);
+            // Convert school year name to ID if needed
+            if (is_string($filters['school_year'])) {
+                $schoolYear = SchoolYear::where('name', $filters['school_year'])->first();
+                if ($schoolYear) {
+                    $query->where('school_year_id', $schoolYear->id);
+                }
+            } else {
+                $query->where('school_year_id', $filters['school_year']);
+            }
         }
 
         if (! empty($filters['date_from'])) {
@@ -257,16 +277,20 @@ class DashboardService implements DashboardServiceInterface
     {
         $this->logActivity('getQuickStats', []);
 
-        $currentYear = date('Y').'-'.(date('Y') + 1);
+        $currentSchoolYearId = $this->getCurrentSchoolYearId();
 
         return [
             'total_students' => Student::count(),
-            'active_enrollments' => Enrollment::where('school_year', $currentYear)
-                ->where('status', EnrollmentStatus::ENROLLED)
-                ->count(),
+            'active_enrollments' => $currentSchoolYearId
+                ? Enrollment::where('school_year_id', $currentSchoolYearId)
+                    ->where('status', EnrollmentStatus::ENROLLED)
+                    ->count()
+                : 0,
             'pending_enrollments' => Enrollment::where('status', EnrollmentStatus::PENDING)->count(),
-            'total_revenue' => Enrollment::where('school_year', $currentYear)
-                ->sum('amount_paid_cents') / 100,
+            'total_revenue' => $currentSchoolYearId
+                ? Enrollment::where('school_year_id', $currentSchoolYearId)
+                    ->sum('amount_paid_cents') / 100
+                : 0,
             'recent_enrollments' => $this->getRecentActivities(5)->where('type', 'enrollment'),
             'enrollment_trend' => $this->getEnrollmentTrend(6),
             'revenue_chart' => $this->getRevenueChart(6),
@@ -315,15 +339,29 @@ class DashboardService implements DashboardServiceInterface
      */
     public function getPaymentStatistics(): array
     {
-        $currentYear = date('Y').'-'.(date('Y') + 1);
+        $currentSchoolYearId = $this->getCurrentSchoolYearId();
 
-        $totalExpected = Enrollment::where('school_year', $currentYear)
+        if (! $currentSchoolYearId) {
+            return [
+                'total_expected' => 0,
+                'total_collected' => 0,
+                'total_balance' => 0,
+                'collection_rate' => 0,
+                'by_status' => [
+                    'paid' => 0,
+                    'partial' => 0,
+                    'pending' => 0,
+                ],
+            ];
+        }
+
+        $totalExpected = Enrollment::where('school_year_id', $currentSchoolYearId)
             ->sum('net_amount_cents');
 
-        $totalCollected = Enrollment::where('school_year', $currentYear)
+        $totalCollected = Enrollment::where('school_year_id', $currentSchoolYearId)
             ->sum('amount_paid_cents');
 
-        $totalBalance = Enrollment::where('school_year', $currentYear)
+        $totalBalance = Enrollment::where('school_year_id', $currentSchoolYearId)
             ->sum('balance_cents');
 
         return [
@@ -334,13 +372,13 @@ class DashboardService implements DashboardServiceInterface
                 ? round(($totalCollected / $totalExpected) * 100, 2)
                 : 0,
             'by_status' => [
-                'paid' => Enrollment::where('school_year', $currentYear)
+                'paid' => Enrollment::where('school_year_id', $currentSchoolYearId)
                     ->where('payment_status', PaymentStatus::PAID)
                     ->count(),
-                'partial' => Enrollment::where('school_year', $currentYear)
+                'partial' => Enrollment::where('school_year_id', $currentSchoolYearId)
                     ->where('payment_status', PaymentStatus::PARTIAL)
                     ->count(),
-                'pending' => Enrollment::where('school_year', $currentYear)
+                'pending' => Enrollment::where('school_year_id', $currentSchoolYearId)
                     ->where('payment_status', PaymentStatus::PENDING)
                     ->count(),
             ],
@@ -352,16 +390,18 @@ class DashboardService implements DashboardServiceInterface
      */
     public function getGradeLevelDistribution(): array
     {
-        $currentYear = date('Y').'-'.(date('Y') + 1);
+        $currentSchoolYearId = $this->getCurrentSchoolYearId();
 
-        $distribution = Enrollment::where('school_year', $currentYear)
-            ->where('status', EnrollmentStatus::ENROLLED)
-            ->select('grade_level', DB::raw('count(*) as count'))
-            ->groupBy('grade_level')
-            ->orderBy('grade_level')
-            ->get()
-            ->pluck('count', 'grade_level')
-            ->toArray();
+        $distribution = $currentSchoolYearId
+            ? Enrollment::where('school_year_id', $currentSchoolYearId)
+                ->where('status', EnrollmentStatus::ENROLLED)
+                ->select('grade_level', DB::raw('count(*) as count'))
+                ->groupBy('grade_level')
+                ->orderBy('grade_level')
+                ->get()
+                ->pluck('count', 'grade_level')
+                ->toArray()
+            : [];
 
         // Ensure all grade levels are represented
         $gradeLevels = [
@@ -446,12 +486,16 @@ class DashboardService implements DashboardServiceInterface
      */
     protected function calculateCollectionRate(): float
     {
-        $currentYear = date('Y').'-'.(date('Y') + 1);
+        $currentSchoolYearId = $this->getCurrentSchoolYearId();
 
-        $totalExpected = Enrollment::where('school_year', $currentYear)
+        if (! $currentSchoolYearId) {
+            return 0;
+        }
+
+        $totalExpected = Enrollment::where('school_year_id', $currentSchoolYearId)
             ->sum('net_amount_cents');
 
-        $totalCollected = Enrollment::where('school_year', $currentYear)
+        $totalCollected = Enrollment::where('school_year_id', $currentSchoolYearId)
             ->sum('amount_paid_cents');
 
         return $totalExpected > 0 ? round(($totalCollected / $totalExpected) * 100, 2) : 0;
@@ -464,16 +508,20 @@ class DashboardService implements DashboardServiceInterface
     {
         $this->logActivity('getAdminDashboardData', []);
 
-        $currentYear = date('Y').'-'.(date('Y') + 1);
+        $currentSchoolYearId = $this->getCurrentSchoolYearId();
 
         return [
             'total_students' => Student::count(),
-            'active_enrollments' => Enrollment::where('school_year', $currentYear)
-                ->where('status', EnrollmentStatus::ENROLLED)
-                ->count(),
+            'active_enrollments' => $currentSchoolYearId
+                ? Enrollment::where('school_year_id', $currentSchoolYearId)
+                    ->where('status', EnrollmentStatus::ENROLLED)
+                    ->count()
+                : 0,
             'pending_enrollments' => Enrollment::where('status', EnrollmentStatus::PENDING)->count(),
-            'total_revenue' => Enrollment::where('school_year', $currentYear)
-                ->sum('amount_paid_cents') / 100,
+            'total_revenue' => $currentSchoolYearId
+                ? Enrollment::where('school_year_id', $currentSchoolYearId)
+                    ->sum('amount_paid_cents') / 100
+                : 0,
             'recent_enrollments' => $this->getRecentActivities(5)->where('type', 'enrollment'),
             'enrollment_trend' => $this->getEnrollmentTrend(6),
             'revenue_chart' => $this->getRevenueChart(6),
@@ -515,7 +563,8 @@ class DashboardService implements DashboardServiceInterface
     public function getStudentDashboardData(int $studentId): array
     {
         $student = Student::findOrFail($studentId);
-        $enrollment = Enrollment::where('student_id', $studentId)
+        $enrollment = Enrollment::with('schoolYear')
+            ->where('student_id', $studentId)
             ->latest()
             ->first();
 
@@ -525,7 +574,7 @@ class DashboardService implements DashboardServiceInterface
             'profile' => $student,
             'enrollment_status' => $enrollment ? $enrollment->status->label() : 'Not Enrolled',
             'current_grade' => $student->grade_level,
-            'school_year' => $enrollment ? $enrollment->school_year : null,
+            'school_year' => $enrollment?->schoolYear?->name,
             'announcements' => $this->getAnnouncements(),
         ];
     }

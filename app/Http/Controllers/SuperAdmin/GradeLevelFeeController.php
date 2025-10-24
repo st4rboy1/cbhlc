@@ -77,10 +77,6 @@ class GradeLevelFeeController extends Controller
 
         $validated = $request->validated();
 
-        // Get school year and populate school_year string for backward compatibility
-        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
-        $validated['school_year'] = $schoolYear->name;
-
         GradeLevelFee::create($validated);
 
         return redirect()->route('super-admin.grade-level-fees.index')
@@ -127,10 +123,6 @@ class GradeLevelFeeController extends Controller
 
         $validated = $request->validated();
 
-        // Get school year and populate school_year string for backward compatibility
-        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
-        $validated['school_year'] = $schoolYear->name;
-
         $gradeLevelFee->update($validated);
 
         return redirect()->route('super-admin.grade-level-fees.index')
@@ -158,11 +150,11 @@ class GradeLevelFeeController extends Controller
         Gate::authorize('create', GradeLevelFee::class);
 
         $validated = $request->validate([
-            'school_year' => ['required', 'regex:/^\d{4}-\d{4}$/'],
+            'school_year_id' => ['required', 'exists:school_years,id'],
         ]);
 
         // Check if fee already exists for the target school year and grade level
-        $exists = GradeLevelFee::where('school_year', $validated['school_year'])
+        $exists = GradeLevelFee::where('school_year_id', $validated['school_year_id'])
             ->where('grade_level', $gradeLevelFee->grade_level)
             ->exists();
 
@@ -172,10 +164,12 @@ class GradeLevelFeeController extends Controller
 
         // Create a copy with new school year
         $newFee = $gradeLevelFee->replicate();
-        $newFee->school_year = $validated['school_year'];
+        $newFee->school_year_id = $validated['school_year_id'];
         $newFee->save();
 
+        $schoolYear = \App\Models\SchoolYear::find($validated['school_year_id']);
+
         return redirect()->route('super-admin.grade-level-fees.index')
-            ->with('success', 'Grade level fee duplicated successfully for school year '.$validated['school_year']);
+            ->with('success', 'Grade level fee duplicated successfully for school year '.$schoolYear->name);
     }
 }

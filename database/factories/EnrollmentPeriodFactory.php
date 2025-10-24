@@ -44,7 +44,6 @@ class EnrollmentPeriodFactory extends Factory
 
         return [
             'school_year_id' => $schoolYear->id,
-            'school_year' => $schoolYearName,
             'start_date' => $startDate,
             'end_date' => $endDate,
             'early_registration_deadline' => $earlyDeadline,
@@ -80,7 +79,6 @@ class EnrollmentPeriodFactory extends Factory
 
             return [
                 'school_year_id' => $schoolYear->id,
-                'school_year' => $schoolYearName,
             ];
         });
     }

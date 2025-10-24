@@ -24,12 +24,43 @@ class EnrollmentControllerTest extends TestCase
     protected User $guardian;
     protected Student $student;
     protected Guardian $guardianModel;
+    protected $sy2023;
+    protected $sy2024;
+    protected $sy2025;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->seed(RolesAndPermissionsSeeder::class);
+
+        // Create school years
+        $this->sy2023 = \App\Models\SchoolYear::firstOrCreate([
+            'name' => '2023-2024',
+            'start_year' => 2023,
+            'end_year' => 2024,
+            'start_date' => '2023-06-01',
+            'end_date' => '2024-05-31',
+            'status' => 'completed',
+        ]);
+
+        $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
+            'name' => '2024-2025',
+            'start_year' => 2024,
+            'end_year' => 2025,
+            'start_date' => '2024-06-01',
+            'end_date' => '2025-05-31',
+            'status' => 'active',
+        ]);
+
+        $this->sy2025 = \App\Models\SchoolYear::firstOrCreate([
+            'name' => '2025-2026',
+            'start_year' => 2025,
+            'end_year' => 2026,
+            'start_date' => '2025-06-01',
+            'end_date' => '2026-05-31',
+            'status' => 'upcoming',
+        ]);
 
         // Create guardian user
         $this->guardian = User::factory()->create();
@@ -97,7 +128,7 @@ class EnrollmentControllerTest extends TestCase
         // Setup grade level fee
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_1->value,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 20000,
             'miscellaneous_fee' => 5000,
         ]);
@@ -105,7 +136,7 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($this->guardian)
             ->post(route('guardian.enrollments.store'), [
                 'student_id' => $this->student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
             ]);
@@ -116,7 +147,7 @@ class EnrollmentControllerTest extends TestCase
         $this->assertDatabaseHas('enrollments', [
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardian->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
             'status' => EnrollmentStatus::PENDING->value,
@@ -130,7 +161,7 @@ class EnrollmentControllerTest extends TestCase
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardian->id,
-            'school_year' => '2023-2024',
+            'school_year_id' => $this->sy2023->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
             'status' => EnrollmentStatus::COMPLETED->value,
@@ -139,7 +170,7 @@ class EnrollmentControllerTest extends TestCase
         // Setup grade level fee
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_2->value,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 22000,
             'miscellaneous_fee' => 5500,
         ]);
@@ -148,7 +179,7 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($this->guardian)
             ->post(route('guardian.enrollments.store'), [
                 'student_id' => $this->student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::SECOND->value, // This should be overridden to FIRST
                 'grade_level' => GradeLevel::GRADE_2->value,
             ]);
@@ -158,7 +189,7 @@ class EnrollmentControllerTest extends TestCase
         // Check that quarter was forced to FIRST
         $this->assertDatabaseHas('enrollments', [
             'student_id' => $this->student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value, // Should be FIRST, not SECOND
             'grade_level' => GradeLevel::GRADE_2->value,
         ]);
@@ -171,7 +202,7 @@ class EnrollmentControllerTest extends TestCase
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardian->id,
-            'school_year' => '2023-2024',
+            'school_year_id' => $this->sy2023->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_3->value,
             'status' => EnrollmentStatus::COMPLETED->value,
@@ -180,7 +211,7 @@ class EnrollmentControllerTest extends TestCase
         // Setup grade level fee
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_2->value,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 22000,
             'miscellaneous_fee' => 5500,
         ]);
@@ -189,7 +220,7 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($this->guardian)
             ->post(route('guardian.enrollments.store'), [
                 'student_id' => $this->student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_2->value, // Lower than GRADE_3
             ]);
@@ -199,7 +230,7 @@ class EnrollmentControllerTest extends TestCase
         // Ensure enrollment was not created
         $this->assertDatabaseMissing('enrollments', [
             'student_id' => $this->student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
         ]);
     }
 
@@ -210,14 +241,14 @@ class EnrollmentControllerTest extends TestCase
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardian->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 
         $response = $this->actingAs($this->guardian)
             ->post(route('guardian.enrollments.store'), [
                 'student_id' => $this->student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
             ]);
@@ -232,14 +263,14 @@ class EnrollmentControllerTest extends TestCase
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardian->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::ENROLLED->value,
         ]);
 
         $response = $this->actingAs($this->guardian)
             ->post(route('guardian.enrollments.store'), [
                 'student_id' => $this->student->id,
-                'school_year' => '2025-2026',
+                'school_year_id' => $this->sy2025->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_2->value,
             ]);
@@ -386,7 +417,7 @@ class EnrollmentControllerTest extends TestCase
         // Setup grade level fee
         $gradeLevelFee = GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_1->value,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 20000.50,
             'miscellaneous_fee' => 5000.25,
         ]);
@@ -394,13 +425,13 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($this->guardian)
             ->post(route('guardian.enrollments.store'), [
                 'student_id' => $this->student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
             ]);
 
         $enrollment = Enrollment::where('student_id', $this->student->id)
-            ->where('school_year', '2024-2025')
+            ->where('school_year_id', $this->sy2024->id)
             ->first();
 
         $this->assertEquals(2000050, $enrollment->tuition_fee_cents);
@@ -421,7 +452,7 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($otherGuardian)
             ->post(route('guardian.enrollments.store'), [
                 'student_id' => $this->student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
             ]);
@@ -602,14 +633,14 @@ class EnrollmentControllerTest extends TestCase
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardian->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::COMPLETED->value,
         ]);
 
         // Setup grade level fee
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_2->value,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 22000,
             'miscellaneous_fee' => 5500,
         ]);
@@ -618,7 +649,7 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($this->guardian)
             ->post(route('guardian.enrollments.store'), [
                 'student_id' => $this->student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_2->value,
             ]);
@@ -627,7 +658,7 @@ class EnrollmentControllerTest extends TestCase
 
         // Count should still be 1
         $this->assertEquals(1, Enrollment::where('student_id', $this->student->id)
-            ->where('school_year', '2024-2025')
+            ->where('school_year_id', $this->sy2024->id)
             ->count());
     }
 
@@ -639,7 +670,7 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($this->guardian)
             ->post(route('guardian.enrollments.store'), [
                 'student_id' => $this->student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
             ]);
@@ -647,7 +678,7 @@ class EnrollmentControllerTest extends TestCase
         $response->assertRedirect(route('guardian.enrollments.index'));
 
         $enrollment = Enrollment::where('student_id', $this->student->id)
-            ->where('school_year', '2024-2025')
+            ->where('school_year_id', $this->sy2024->id)
             ->first();
 
         // Should have zero fees when grade level fee is not found
@@ -663,7 +694,7 @@ class EnrollmentControllerTest extends TestCase
         $previousEnrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardian->id,
-            'school_year' => '2023-2024',
+            'school_year_id' => $this->sy2023->id,
             'quarter' => Quarter::FIRST->value,
             'status' => EnrollmentStatus::COMPLETED->value,
         ]);
@@ -676,7 +707,7 @@ class EnrollmentControllerTest extends TestCase
         // Setup grade level fee
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_2->value,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 22000,
             'miscellaneous_fee' => 5500,
         ]);
@@ -685,7 +716,7 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($this->guardian)
             ->post(route('guardian.enrollments.store'), [
                 'student_id' => $this->student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_2->value,
             ]);
@@ -695,7 +726,7 @@ class EnrollmentControllerTest extends TestCase
 
         $this->assertDatabaseHas('enrollments', [
             'student_id' => $this->student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_2->value,
         ]);
     }
@@ -746,10 +777,18 @@ class EnrollmentControllerTest extends TestCase
     {
         // Create 15 enrollments for the student
         for ($i = 0; $i < 15; $i++) {
+            $sy = \App\Models\SchoolYear::firstOrCreate([
+                'name' => '202'.$i.'-202'.($i + 1),
+                'start_year' => 2020 + $i,
+                'end_year' => 2021 + $i,
+                'start_date' => (2020 + $i).'-06-01',
+                'end_date' => (2021 + $i).'-05-31',
+                'status' => 'completed',
+            ]);
             Enrollment::factory()->create([
                 'student_id' => $this->student->id,
                 'guardian_id' => $this->guardian->id,
-                'school_year' => '202'.$i.'-202'.($i + 1),
+                'school_year_id' => $sy->id,
             ]);
         }
 
@@ -772,7 +811,7 @@ class EnrollmentControllerTest extends TestCase
 
         $response->assertSessionHasErrors([
             'student_id',
-            'school_year',
+            'school_year_id',
             'quarter',
             'grade_level',
         ]);
@@ -784,7 +823,7 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($this->guardian)
             ->post(route('guardian.enrollments.store'), [
                 'student_id' => 99999, // Non-existent student
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
             ]);
@@ -805,5 +844,72 @@ class EnrollmentControllerTest extends TestCase
             ->put(route('guardian.enrollments.update', $enrollment), []);
 
         $response->assertSessionHasErrors(['quarter', 'grade_level']);
+    }
+
+    /** @test */
+    public function guardian_enrollment_automatically_uses_active_period_school_year()
+    {
+        // Setup grade level fee
+        GradeLevelFee::create([
+            'grade_level' => GradeLevel::GRADE_1->value,
+            'school_year_id' => $this->sy2024->id,
+            'tuition_fee' => 20000,
+            'miscellaneous_fee' => 5000,
+        ]);
+
+        // Guardian submits enrollment WITHOUT school_year_id
+        $response = $this->actingAs($this->guardian)
+            ->post(route('guardian.enrollments.store'), [
+                'student_id' => $this->student->id,
+                // Note: NO school_year_id provided
+                'quarter' => Quarter::FIRST->value,
+                'grade_level' => GradeLevel::GRADE_1->value,
+            ]);
+
+        $response->assertRedirect(route('guardian.enrollments.index'));
+
+        // Should automatically use the active enrollment period's school year
+        $this->assertDatabaseHas('enrollments', [
+            'student_id' => $this->student->id,
+            'school_year_id' => $this->sy2024->id, // Should be set automatically
+            'status' => EnrollmentStatus::PENDING->value,
+        ]);
+    }
+
+    /** @test */
+    public function guardian_provided_school_year_id_is_ignored_and_overridden()
+    {
+        // Setup grade level fee for 2024
+        GradeLevelFee::create([
+            'grade_level' => GradeLevel::GRADE_1->value,
+            'school_year_id' => $this->sy2024->id,
+            'tuition_fee' => 20000,
+            'miscellaneous_fee' => 5000,
+        ]);
+
+        // Guardian tries to submit enrollment for a different school year (2025)
+        // This should be ignored and the active period's school year (2024) should be used
+        $response = $this->actingAs($this->guardian)
+            ->post(route('guardian.enrollments.store'), [
+                'student_id' => $this->student->id,
+                'school_year_id' => $this->sy2025->id, // Guardian tries to set 2025
+                'quarter' => Quarter::FIRST->value,
+                'grade_level' => GradeLevel::GRADE_1->value,
+            ]);
+
+        $response->assertRedirect(route('guardian.enrollments.index'));
+
+        // Should use active period's school year (2024), not the provided one (2025)
+        $this->assertDatabaseHas('enrollments', [
+            'student_id' => $this->student->id,
+            'school_year_id' => $this->sy2024->id, // Should be 2024, not 2025
+            'status' => EnrollmentStatus::PENDING->value,
+        ]);
+
+        // Should NOT have enrollment with 2025
+        $this->assertDatabaseMissing('enrollments', [
+            'student_id' => $this->student->id,
+            'school_year_id' => $this->sy2025->id,
+        ]);
     }
 }

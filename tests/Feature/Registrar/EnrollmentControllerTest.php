@@ -29,6 +29,16 @@ class EnrollmentControllerTest extends TestCase
 
         $this->seed(RolesAndPermissionsSeeder::class);
 
+        // Create school year
+        $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
+            'name' => '2024-2025',
+            'start_year' => 2024,
+            'end_year' => 2025,
+            'start_date' => '2024-06-01',
+            'end_date' => '2025-05-31',
+            'status' => 'active',
+        ]);
+
         // Create registrar user
         $this->registrar = User::factory()->create();
         $this->registrar->assignRole('registrar');
@@ -89,15 +99,16 @@ class EnrollmentControllerTest extends TestCase
     /** @test */
     public function registrar_can_filter_enrollments_by_school_year()
     {
-        Enrollment::factory()->create(['school_year' => '2023-2024']);
-        Enrollment::factory()->create(['school_year' => '2024-2025']);
+        $sy2023 = \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
+        Enrollment::factory()->create(['school_year_id' => $sy2023->id]);
+        Enrollment::factory()->create(['school_year_id' => $this->sy2024->id]);
 
         $response = $this->actingAs($this->registrar)
-            ->get(route('registrar.enrollments.index', ['school_year' => '2024-2025']));
+            ->get(route('registrar.enrollments.index', ['school_year_id' => $this->sy2024->id]));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('filters.school_year', '2024-2025')
+            ->where('filters.school_year_id', $this->sy2024->id)
         );
     }
 
@@ -689,7 +700,7 @@ class EnrollmentControllerTest extends TestCase
         Enrollment::factory()->create([
             'student_id' => $student->id,
             'status' => EnrollmentStatus::PENDING,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_1,
             'payment_status' => PaymentStatus::PENDING,
         ]);
@@ -697,7 +708,7 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($this->registrar)
             ->get(route('registrar.enrollments.index', [
                 'status' => EnrollmentStatus::PENDING->value,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'grade_level' => GradeLevel::GRADE_1->value,
                 'payment_status' => PaymentStatus::PENDING->value,
                 'search' => 'John',
@@ -706,7 +717,7 @@ class EnrollmentControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->where('filters.status', EnrollmentStatus::PENDING->value)
-            ->where('filters.school_year', '2024-2025')
+            ->where('filters.school_year_id', $this->sy2024->id)
             ->where('filters.grade_level', GradeLevel::GRADE_1->value)
             ->where('filters.payment_status', PaymentStatus::PENDING->value)
             ->where('filters.search', 'John')

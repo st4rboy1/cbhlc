@@ -156,7 +156,7 @@ test('grade level fee model current school year scope works correctly', function
     $currentYearFees = GradeLevelFee::currentSchoolYear()->get();
 
     expect($currentYearFees)->toHaveCount(1);
-    expect($currentYearFees->first()->school_year)->toBe($currentSchoolYear);
+    expect($currentYearFees->first()->schoolYear->name)->toBe($currentSchoolYear);
 });
 
 test('grade level fee model getFeesForGrade method works correctly', function () {
@@ -212,9 +212,18 @@ test('grade level fee model getFeesForGrade returns null for non-existent grade'
 
 test('grade level fee model getFeesForGrade works with specific school year', function () {
     $specificSchoolYear = '2024-2025';
+    $schoolYear = \App\Models\SchoolYear::firstOrCreate([
+        'name' => $specificSchoolYear,
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
 
-    $fee = GradeLevelFee::factory()->schoolYear($specificSchoolYear)->create([
+    $fee = GradeLevelFee::factory()->create([
         'grade_level' => GradeLevel::KINDER,
+        'school_year_id' => $schoolYear->id,
         'tuition_fee_cents' => 100000,
         'miscellaneous_fee_cents' => 5000,
         'laboratory_fee_cents' => 0,
@@ -223,9 +232,9 @@ test('grade level fee model getFeesForGrade works with specific school year', fu
         'is_active' => true,
     ]);
 
-    $foundFee = GradeLevelFee::getFeesForGrade(GradeLevel::KINDER, $specificSchoolYear);
+    $foundFee = GradeLevelFee::getFeesForGrade(GradeLevel::KINDER, $schoolYear->id);
 
     expect($foundFee)->not->toBeNull();
     expect($foundFee->id)->toBe($fee->id);
-    expect($foundFee->school_year)->toBe($specificSchoolYear);
+    expect($foundFee->schoolYear->name)->toBe($specificSchoolYear);
 });
