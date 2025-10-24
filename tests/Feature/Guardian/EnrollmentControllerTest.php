@@ -35,7 +35,7 @@ class EnrollmentControllerTest extends TestCase
         $this->seed(RolesAndPermissionsSeeder::class);
 
         // Create school years
-        $this->sy2023 = \App\Models\SchoolYear::create([
+        $this->sy2023 = \App\Models\SchoolYear::firstOrCreate([
             'name' => '2023-2024',
             'start_year' => 2023,
             'end_year' => 2024,
@@ -44,7 +44,7 @@ class EnrollmentControllerTest extends TestCase
             'status' => 'completed',
         ]);
 
-        $this->sy2024 = \App\Models\SchoolYear::create([
+        $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
             'name' => '2024-2025',
             'start_year' => 2024,
             'end_year' => 2025,
@@ -53,7 +53,7 @@ class EnrollmentControllerTest extends TestCase
             'status' => 'active',
         ]);
 
-        $this->sy2025 = \App\Models\SchoolYear::create([
+        $this->sy2025 = \App\Models\SchoolYear::firstOrCreate([
             'name' => '2025-2026',
             'start_year' => 2025,
             'end_year' => 2026,
@@ -777,7 +777,7 @@ class EnrollmentControllerTest extends TestCase
     {
         // Create 15 enrollments for the student
         for ($i = 0; $i < 15; $i++) {
-            $sy = \App\Models\SchoolYear::create([
+            $sy = \App\Models\SchoolYear::firstOrCreate([
                 'name' => '202'.$i.'-202'.($i + 1),
                 'start_year' => 2020 + $i,
                 'end_year' => 2021 + $i,

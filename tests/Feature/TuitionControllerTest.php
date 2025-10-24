@@ -19,7 +19,7 @@ beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create school year
-    $this->sy2024 = \App\Models\SchoolYear::create([
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
         'name' => '2024-2025',
         'start_year' => 2024,
         'end_year' => 2025,

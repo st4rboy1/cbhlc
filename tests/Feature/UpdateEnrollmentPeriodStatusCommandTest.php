@@ -20,7 +20,7 @@ beforeEach(function () {
     Role::create(['name' => 'administrator']);
 
     // Create school years
-    $this->sy2024 = \App\Models\SchoolYear::create([
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
         'name' => '2024-2025',
         'start_year' => 2024,
         'end_year' => 2025,
@@ -29,7 +29,7 @@ beforeEach(function () {
         'status' => 'active',
     ]);
 
-    $this->sy2025 = \App\Models\SchoolYear::create([
+    $this->sy2025 = \App\Models\SchoolYear::firstOrCreate([
         'name' => '2025-2026',
         'start_year' => 2025,
         'end_year' => 2026,
@@ -38,7 +38,7 @@ beforeEach(function () {
         'status' => 'upcoming',
     ]);
 
-    $this->sy2026 = \App\Models\SchoolYear::create([
+    $this->sy2026 = \App\Models\SchoolYear::firstOrCreate([
         'name' => '2026-2027',
         'start_year' => 2026,
         'end_year' => 2027,

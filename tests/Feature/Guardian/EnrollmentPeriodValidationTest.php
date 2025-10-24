@@ -19,7 +19,7 @@ beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create school years
-    $this->sy2024 = \App\Models\SchoolYear::create([
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
         'name' => '2024-2025',
         'start_year' => 2024,
         'end_year' => 2025,
@@ -181,7 +181,7 @@ test('new student cannot enroll when period does not allow new students', functi
 
 test('returning student cannot enroll when period does not allow returning students', function () {
     // Create a previous enrollment to make this a returning student
-    $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
+    $sy2023 = \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
     Enrollment::factory()->create([
         'student_id' => $this->student->id,
         'guardian_id' => $this->guardianModel->id,
@@ -293,7 +293,7 @@ test('school year must match active enrollment period', function () {
     $response = $this->actingAs($this->guardian)
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
-            'school_year_id' => \App\Models\SchoolYear::create(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming'])->id, // Different school year
+            'school_year_id' => \App\Models\SchoolYear::firstOrCreate(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming'])->id, // Different school year
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
@@ -371,7 +371,7 @@ test('canEnrollForPeriod method validates new student eligibility', function () 
 
 test('canEnrollForPeriod method validates returning student eligibility', function () {
     // Make student a returning student
-    $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
+    $sy2023 = \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
     Enrollment::factory()->create([
         'student_id' => $this->student->id,
         'guardian_id' => $this->guardianModel->id,
