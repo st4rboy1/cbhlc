@@ -123,6 +123,7 @@ class EnrollmentPeriodController extends Controller
 
     /**
      * Remove the specified enrollment period.
+     */
     public function destroy(EnrollmentPeriod $enrollmentPeriod)
     {
         // Prevent deletion of active period
