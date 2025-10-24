@@ -1,3 +1,4 @@
+import { SchoolYearFilter } from '@/components/school-year-filter';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,6 +30,12 @@ interface FilterOption {
     label: string;
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    status: string;
+}
+
 interface Props {
     enrollments: {
         data: Enrollment[];
@@ -36,14 +43,14 @@ interface Props {
         meta: unknown;
     };
     filters: {
-        school_year?: string;
+        school_year_id?: string;
         student_id?: string;
         status?: string;
         search?: string;
     };
     filterOptions: {
         students: FilterOption[];
-        schoolYears: FilterOption[];
+        schoolYears: SchoolYear[];
         statuses: FilterOption[];
     };
 }
@@ -95,7 +102,7 @@ export default function GuardianEnrollmentsIndex({ enrollments, filters, filterO
         router.get('/guardian/enrollments', {}, { preserveState: true });
     };
 
-    const hasActiveFilters = filters.school_year || filters.student_id || filters.status || filters.search;
+    const hasActiveFilters = filters.school_year_id || filters.student_id || filters.status || filters.search;
 
     const columns: ColumnDef<Enrollment>[] = useMemo(
         () => [
@@ -202,22 +209,13 @@ export default function GuardianEnrollmentsIndex({ enrollments, filters, filterO
                             </form>
 
                             <div className="flex flex-wrap gap-2">
-                                <Select
-                                    value={filters.school_year || 'all'}
-                                    onValueChange={(value) => handleFilterChange('school_year', value === 'all' ? '' : value)}
-                                >
-                                    <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="School Year" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All School Years</SelectItem>
-                                        {filterOptions.schoolYears.map((option) => (
-                                            <SelectItem key={option.value} value={option.value}>
-                                                {option.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <div className="w-[180px]">
+                                    <SchoolYearFilter
+                                        value={filters.school_year_id || 'all'}
+                                        onChange={(value) => handleFilterChange('school_year_id', value === 'all' ? '' : value)}
+                                        schoolYears={filterOptions.schoolYears}
+                                    />
+                                </div>
 
                                 <Select
                                     value={filters.student_id || 'all'}
