@@ -29,6 +29,16 @@ class EnrollmentControllerTest extends TestCase
 
         $this->seed(RolesAndPermissionsSeeder::class);
 
+        // Create school year
+        $this->sy2024 = \App\Models\SchoolYear::create([
+            'name' => '2024-2025',
+            'start_year' => 2024,
+            'end_year' => 2025,
+            'start_date' => '2024-06-01',
+            'end_date' => '2025-05-31',
+            'status' => 'active',
+        ]);
+
         // Create registrar user
         $this->registrar = User::factory()->create();
         $this->registrar->assignRole('registrar');
@@ -689,7 +699,7 @@ class EnrollmentControllerTest extends TestCase
         Enrollment::factory()->create([
             'student_id' => $student->id,
             'status' => EnrollmentStatus::PENDING,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_1,
             'payment_status' => PaymentStatus::PENDING,
         ]);
@@ -697,7 +707,7 @@ class EnrollmentControllerTest extends TestCase
         $response = $this->actingAs($this->registrar)
             ->get(route('registrar.enrollments.index', [
                 'status' => EnrollmentStatus::PENDING->value,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'grade_level' => GradeLevel::GRADE_1->value,
                 'payment_status' => PaymentStatus::PENDING->value,
                 'search' => 'John',
