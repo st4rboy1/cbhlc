@@ -18,6 +18,16 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
+    // Create school year
+    $this->sy2024 = \App\Models\SchoolYear::create([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
+
     // Create currency service
     $this->currencyService = new CurrencyService;
 
@@ -93,7 +103,7 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_2,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
@@ -252,7 +262,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_4,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PARTIAL,
@@ -453,7 +463,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 
