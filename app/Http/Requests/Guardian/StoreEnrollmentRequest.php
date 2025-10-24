@@ -108,28 +108,8 @@ class StoreEnrollmentRequest extends FormRequest
                         ->where('status', EnrollmentStatus::ENROLLED)
                         ->exists()) {
                         $fail('This student has an active enrollment. Please wait for the current enrollment to be completed before applying for another year.');
-                    }
-                },
-            ],
-            'school_year_id' => [
-                'required',
-                'integer',
-                'exists:school_years,id',
-                function ($attribute, $value, $fail) {
-                    // Check that school year matches active enrollment period
-                    $activePeriod = EnrollmentPeriod::active()->first();
-                    if ($activePeriod && $activePeriod->school_year_id != $value) {
-                        $fail('The selected school year does not match the currently active enrollment period.');
 
                         return;
-                    }
-
-                    // Check for existing enrollment for this school year
-                    $studentId = $this->input('student_id');
-                    if ($studentId && Enrollment::where('student_id', $studentId)
-                        ->where('school_year_id', $value)
-                        ->exists()) {
-                        $fail('This student already has an enrollment for the selected school year.');
                     }
                 },
             ],
@@ -182,8 +162,6 @@ class StoreEnrollmentRequest extends FormRequest
         return [
             'student_id.required' => 'Please select a student.',
             'student_id.exists' => 'Selected student does not exist.',
-            'school_year_id.required' => 'School year is required.',
-            'school_year_id.exists' => 'The selected school year is invalid.',
             'quarter.required' => 'Quarter is required.',
             'quarter.in' => 'Invalid quarter selected.',
             'grade_level.required' => 'Grade level is required.',

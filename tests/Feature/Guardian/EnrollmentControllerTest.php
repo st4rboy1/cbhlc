@@ -845,4 +845,71 @@ class EnrollmentControllerTest extends TestCase
 
         $response->assertSessionHasErrors(['quarter', 'grade_level']);
     }
+
+    /** @test */
+    public function guardian_enrollment_automatically_uses_active_period_school_year()
+    {
+        // Setup grade level fee
+        GradeLevelFee::create([
+            'grade_level' => GradeLevel::GRADE_1->value,
+            'school_year_id' => $this->sy2024->id,
+            'tuition_fee' => 20000,
+            'miscellaneous_fee' => 5000,
+        ]);
+
+        // Guardian submits enrollment WITHOUT school_year_id
+        $response = $this->actingAs($this->guardian)
+            ->post(route('guardian.enrollments.store'), [
+                'student_id' => $this->student->id,
+                // Note: NO school_year_id provided
+                'quarter' => Quarter::FIRST->value,
+                'grade_level' => GradeLevel::GRADE_1->value,
+            ]);
+
+        $response->assertRedirect(route('guardian.enrollments.index'));
+
+        // Should automatically use the active enrollment period's school year
+        $this->assertDatabaseHas('enrollments', [
+            'student_id' => $this->student->id,
+            'school_year_id' => $this->sy2024->id, // Should be set automatically
+            'status' => EnrollmentStatus::PENDING->value,
+        ]);
+    }
+
+    /** @test */
+    public function guardian_provided_school_year_id_is_ignored_and_overridden()
+    {
+        // Setup grade level fee for 2024
+        GradeLevelFee::create([
+            'grade_level' => GradeLevel::GRADE_1->value,
+            'school_year_id' => $this->sy2024->id,
+            'tuition_fee' => 20000,
+            'miscellaneous_fee' => 5000,
+        ]);
+
+        // Guardian tries to submit enrollment for a different school year (2025)
+        // This should be ignored and the active period's school year (2024) should be used
+        $response = $this->actingAs($this->guardian)
+            ->post(route('guardian.enrollments.store'), [
+                'student_id' => $this->student->id,
+                'school_year_id' => $this->sy2025->id, // Guardian tries to set 2025
+                'quarter' => Quarter::FIRST->value,
+                'grade_level' => GradeLevel::GRADE_1->value,
+            ]);
+
+        $response->assertRedirect(route('guardian.enrollments.index'));
+
+        // Should use active period's school year (2024), not the provided one (2025)
+        $this->assertDatabaseHas('enrollments', [
+            'student_id' => $this->student->id,
+            'school_year_id' => $this->sy2024->id, // Should be 2024, not 2025
+            'status' => EnrollmentStatus::PENDING->value,
+        ]);
+
+        // Should NOT have enrollment with 2025
+        $this->assertDatabaseMissing('enrollments', [
+            'student_id' => $this->student->id,
+            'school_year_id' => $this->sy2025->id,
+        ]);
+    }
 }

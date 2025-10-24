@@ -202,6 +202,17 @@ class EnrollmentController extends Controller
             ])->withInput();
         }
 
+        // Check for existing enrollment in the same school year
+        $existingEnrollment = Enrollment::where('student_id', $student->id)
+            ->where('school_year_id', $activePeriod->school_year_id)
+            ->exists();
+
+        if ($existingEnrollment) {
+            return back()->withErrors([
+                'student_id' => 'This student already has an enrollment for the current school year.',
+            ])->withInput();
+        }
+
         // Check if student is an existing student (has previous enrollments)
         $previousEnrollments = Enrollment::where('student_id', $validated['student_id'])
             ->orderBy('created_at', 'desc')
