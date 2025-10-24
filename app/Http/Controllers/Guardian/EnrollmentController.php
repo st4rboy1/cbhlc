@@ -275,7 +275,9 @@ class EnrollmentController extends Controller
 
         // Notify guardian of submission
         if ($guardian->user) {
-            $guardian->user->notify(new EnrollmentSubmittedNotification($enrollment));
+            /** @var \App\Models\User $user */
+            $user = $guardian->user;
+            $user->notify(new EnrollmentSubmittedNotification($enrollment));
         }
 
         // Notify all registrars and administrators of new enrollment
