@@ -18,6 +18,16 @@ beforeEach(function () {
     Role::create(['name' => 'administrator']);
     Role::create(['name' => 'guardian']);
 
+    // Create school year
+    $this->sy2024 = \App\Models\SchoolYear::create([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
+
     // Create super admin user
     $this->superAdmin = User::factory()->create();
     $this->superAdmin->assignRole('super_admin');
@@ -79,7 +89,7 @@ test('super admin can create enrollment period', function () {
     $response->assertSessionHas('success');
 
     assertDatabaseHas('enrollment_periods', [
-        'school_year' => '2025-2026',
+        'school_year_id' => \App\Models\SchoolYear::where('name', '2025-2026')->first()->id,
         'description' => 'Test enrollment period',
     ]);
 });
@@ -324,8 +334,9 @@ test('cannot delete period with existing enrollments', function () {
     ]);
 
     // Create an enrollment for this period
+    $sy2025 = \App\Models\SchoolYear::create(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming']);
     Enrollment::factory()->create([
-        'school_year' => '2025-2026',
+        'school_year_id' => $sy2025->id,
     ]);
 
     $response = actingAs($this->superAdmin)
