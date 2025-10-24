@@ -43,7 +43,7 @@ interface Props {
     };
     filters: {
         search?: string;
-        school_year?: string;
+        school_year_id?: string;
         active?: string;
     };
     gradeLevels: string[];
@@ -99,7 +99,7 @@ export default function SuperAdminGradeLevelFeesIndex({ fees, filters, gradeLeve
                     fees={formattedFees}
                     filters={{
                         search: filters.search || null,
-                        school_year: filters.school_year || null,
+                        school_year_id: filters.school_year_id || null,
                         active: filters.active || null,
                     }}
                     gradeLevels={gradeLevels}

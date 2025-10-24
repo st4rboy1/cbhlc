@@ -52,8 +52,8 @@ class EnrollmentController extends Controller
         }
 
         // Filter by school year
-        if ($request->filled('school_year')) {
-            $query->where('school_year', $request->get('school_year'));
+        if ($request->filled('school_year_id')) {
+            $query->where('school_year_id', $request->get('school_year_id'));
         }
 
         $enrollments = $query->latest()->paginate(15)->withQueryString();
@@ -64,12 +64,12 @@ class EnrollmentController extends Controller
 
         return Inertia::render('super-admin/enrollments/index', [
             'enrollments' => $enrollments,
-            'filters' => $request->only(['search', 'status', 'grade', 'school_year']),
+            'filters' => $request->only(['search', 'status', 'grade', 'school_year_id']),
             'statuses' => array_map(fn ($status) => [
                 'label' => $status->label(),
                 'value' => $status->value,
             ], EnrollmentStatus::cases()),
-            'schoolYears' => Enrollment::distinct()->pluck('school_year'),
+            'schoolYears' => SchoolYear::orderBy('start_year', 'desc')->get(),
         ]);
     }
 
