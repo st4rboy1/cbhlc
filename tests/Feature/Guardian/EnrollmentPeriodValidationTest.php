@@ -275,7 +275,7 @@ test('enrollment period id is set correctly on enrollment', function () {
     expect($enrollment->enrollment_period_id)->toBe($period->id);
 });
 
-test('school year must match active enrollment period', function () {
+test('school year is automatically set from active enrollment period and guardian input is ignored', function () {
     // Create enrollment period for 2024-2025
     EnrollmentPeriod::create([
         'school_year_id' => $this->sy2024->id,
@@ -292,16 +292,27 @@ test('school year must match active enrollment period', function () {
     // Create a different school year using factory (let factory generate unique name)
     $differentSchoolYear = \App\Models\SchoolYear::factory()->create();
 
-    // Try to enroll for a different school year
+    // Guardian tries to enroll for a different school year - this should be ignored
     $response = $this->actingAs($this->guardian)
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
-            'school_year_id' => $differentSchoolYear->id, // Different school year
+            'school_year_id' => $differentSchoolYear->id, // Guardian tries different school year (will be ignored)
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
 
-    $response->assertSessionHasErrors(['school_year_id']);
+    // Should succeed and use the active period's school year, not the one guardian provided
+    $response->assertRedirect();
+
+    // Verify enrollment was created with the active period's school year (2024), NOT the different one
+    expect(Enrollment::where('student_id', $this->student->id)
+        ->where('school_year_id', $this->sy2024->id)
+        ->exists())->toBeTrue();
+
+    // Verify enrollment was NOT created with the different school year
+    expect(Enrollment::where('student_id', $this->student->id)
+        ->where('school_year_id', $differentSchoolYear->id)
+        ->exists())->toBeFalse();
 });
 
 test('enrollment relationship with enrollment period works', function () {

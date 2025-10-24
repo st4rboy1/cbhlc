@@ -244,11 +244,12 @@ describe('enrollment pending constraint', function () {
         // Try to create another enrollment for same school year
         $response = $this->actingAs($guardian)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
-            'school_year_id' => $this->sy2024->id,
+            // Note: school_year_id is auto-set from active enrollment period
             'quarter' => Quarter::SECOND->value,
             'grade_level' => 'Grade 1',
         ]);
 
-        $response->assertSessionHasErrors(['school_year_id']);
+        // Error should be on student_id since it validates duplicate enrollments for the school year
+        $response->assertSessionHasErrors(['student_id']);
     });
 });
