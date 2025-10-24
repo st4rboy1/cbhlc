@@ -11,6 +11,16 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
+
+    // Create school year
+    $this->sy2025 = \App\Models\SchoolYear::create([
+        'name' => '2025-2026',
+        'start_year' => 2025,
+        'end_year' => 2026,
+        'start_date' => '2025-06-01',
+        'end_date' => '2026-05-31',
+        'status' => 'active',
+    ]);
 });
 
 test('enrollment model stores money values in cents and returns float', function () {
@@ -109,7 +119,7 @@ test('enrollment model guardian relationship works', function () {
         'enrollment_id' => 'ENR-2025-001',
         'student_id' => $student->id,
         'guardian_id' => $guardian->id,
-        'school_year' => '2025-2026',
+        'school_year_id' => $this->sy2025->id,
         'quarter' => 'First',
         'grade_level' => 'Grade 1',
         'status' => EnrollmentStatus::PENDING,
