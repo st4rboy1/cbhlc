@@ -15,7 +15,8 @@ class EnrollmentPeriodController extends Controller
      */
     public function index()
     {
-        $periods = EnrollmentPeriod::latest('school_year')
+        $periods = EnrollmentPeriod::with('schoolYear')
+            ->latest('start_date')
             ->withCount('enrollments')
             ->paginate(10);
 
