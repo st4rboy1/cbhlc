@@ -16,6 +16,16 @@ beforeEach(function () {
     // Seed roles and permissions for each test
     $this->seed(RolesAndPermissionsSeeder::class);
     $this->service = new EnrollmentService(new Enrollment);
+
+    // Create school year
+    $this->sy2024 = \App\Models\SchoolYear::create([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
 });
 
 test('getPaginatedEnrollments returns paginated results with relationships', function () {
@@ -91,7 +101,7 @@ test('createEnrollment creates new enrollment with pending status', function () 
         'student_id' => $student->id,
         'guardian_id' => $guardian->id,
         'grade_level' => 'Grade 1',
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'enrollment_date' => now()->toDateString(),
     ];
 
@@ -122,7 +132,7 @@ test('createEnrollment generates reference number', function () {
         'student_id' => $student->id,
         'guardian_id' => $guardian->id,
         'grade_level' => 'Grade 1',
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'enrollment_date' => now()->toDateString(),
     ];
 
@@ -272,7 +282,7 @@ test('canEnroll returns false when student has pending enrollment', function () 
     Enrollment::factory()->create([
         'student_id' => $student->id,
         'status' => EnrollmentStatus::PENDING,
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
     ]);
 
     $result = $this->service->canEnroll($student, '2024-2025');
@@ -285,7 +295,7 @@ test('canEnroll returns false when student has approved enrollment for same year
     Enrollment::factory()->create([
         'student_id' => $student->id,
         'status' => EnrollmentStatus::APPROVED,
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
     ]);
 
     $result = $this->service->canEnroll($student, '2024-2025');
