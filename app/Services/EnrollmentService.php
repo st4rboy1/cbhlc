@@ -295,8 +295,11 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
      */
     public function calculateFees(string $gradeLevel, array $options = []): array
     {
+        $currentSchoolYearName = date('Y').'-'.(date('Y') + 1);
+        $currentSchoolYear = \App\Models\SchoolYear::where('name', $currentSchoolYearName)->first();
+
         $gradeLevelFee = GradeLevelFee::where('grade_level', $gradeLevel)
-            ->where('school_year', date('Y').'-'.(date('Y') + 1))
+            ->where('school_year_id', $currentSchoolYear?->id)
             ->first();
 
         if (! $gradeLevelFee) {
@@ -341,10 +344,13 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
      */
     public function canEnroll(Student $student, string $schoolYear): bool
     {
+        // Get school year ID
+        $schoolYearModel = \App\Models\SchoolYear::where('name', $schoolYear)->first();
+
         // Check for existing enrollment in the same school year
         $existingEnrollment = $this->model
             ->where('student_id', $student->id)
-            ->where('school_year', $schoolYear)
+            ->where('school_year_id', $schoolYearModel?->id)
             ->first();
 
         if ($existingEnrollment) {
@@ -375,19 +381,21 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
      */
     public function getStatistics(): array
     {
-        $currentYear = date('Y').'-'.(date('Y') + 1);
+        $currentYearName = date('Y').'-'.(date('Y') + 1);
+        $currentYear = \App\Models\SchoolYear::where('name', $currentYearName)->first();
+        $currentYearId = $currentYear?->id;
 
         return [
-            'total' => $this->model->where('school_year', $currentYear)->count(),
-            'pending' => $this->model->where('school_year', $currentYear)
+            'total' => $this->model->where('school_year_id', $currentYearId)->count(),
+            'pending' => $this->model->where('school_year_id', $currentYearId)
                 ->where('status', EnrollmentStatus::PENDING)->count(),
-            'approved' => $this->model->where('school_year', $currentYear)
+            'approved' => $this->model->where('school_year_id', $currentYearId)
                 ->where('status', EnrollmentStatus::ENROLLED)->count(),
-            'rejected' => $this->model->where('school_year', $currentYear)
+            'rejected' => $this->model->where('school_year_id', $currentYearId)
                 ->where('status', EnrollmentStatus::REJECTED)->count(),
-            'paid' => $this->model->where('school_year', $currentYear)
+            'paid' => $this->model->where('school_year_id', $currentYearId)
                 ->where('payment_status', PaymentStatus::PAID)->count(),
-            'partial' => $this->model->where('school_year', $currentYear)
+            'partial' => $this->model->where('school_year_id', $currentYearId)
                 ->where('payment_status', PaymentStatus::PARTIAL)->count(),
         ];
     }
