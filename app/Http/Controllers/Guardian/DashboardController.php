@@ -41,7 +41,7 @@ class DashboardController extends Controller
                                      ($enrollment->student->middle_name ? $enrollment->student->middle_name.' ' : '').
                                      $enrollment->student->last_name,
                     'grade_level' => $enrollment->grade_level,
-                    'school_year' => $enrollment->schoolYear->name,
+                    'school_year_name' => $enrollment->schoolYear->name,
                     'status' => $enrollment->status->value,
                     'payment_status' => $enrollment->payment_status->value,
                     'created_at' => $enrollment->created_at->format('Y-m-d'),
