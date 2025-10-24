@@ -21,7 +21,10 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $currentYear = date('Y').'-'.(date('Y') + 1);
+        $currentYearName = date('Y').'-'.(date('Y') + 1);
+        $currentSchoolYear = SchoolYear::where('name', $currentYearName)->first();
+        $currentSchoolYearId = $currentSchoolYear?->id;
+
         $quickStats = $this->dashboardService->getQuickStats();
         $paymentStats = $this->dashboardService->getPaymentStatistics();
         $enrollmentStats = $this->dashboardService->getEnrollmentStatistics();
@@ -50,10 +53,14 @@ class DashboardController extends Controller
             ->count();
 
         // Financial projections
-        $totalExpected = Enrollment::where('school_year', $currentYear)
-            ->sum('net_amount_cents') / 100;
-        $potentialRevenue = Enrollment::where('school_year', $currentYear)
-            ->sum('balance_cents') / 100;
+        $totalExpected = $currentSchoolYearId
+            ? Enrollment::where('school_year_id', $currentSchoolYearId)
+                ->sum('net_amount_cents') / 100
+            : 0;
+        $potentialRevenue = $currentSchoolYearId
+            ? Enrollment::where('school_year_id', $currentSchoolYearId)
+                ->sum('balance_cents') / 100
+            : 0;
 
         // Document Verification Metrics
         $totalDocuments = Document::count();

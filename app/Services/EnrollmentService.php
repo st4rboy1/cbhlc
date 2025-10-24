@@ -37,7 +37,15 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
 
         // Apply school year filter
         if (! empty($filters['school_year'])) {
-            $query->where('school_year', $filters['school_year']);
+            // Convert school year name to ID if needed
+            if (is_string($filters['school_year'])) {
+                $schoolYear = \App\Models\SchoolYear::where('name', $filters['school_year'])->first();
+                if ($schoolYear) {
+                    $query->where('school_year_id', $schoolYear->id);
+                }
+            } else {
+                $query->where('school_year_id', $filters['school_year']);
+            }
         }
 
         // Apply grade level filter

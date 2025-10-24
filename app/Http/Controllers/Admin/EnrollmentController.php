@@ -109,7 +109,7 @@ class EnrollmentController extends Controller
 
         // Get the fee for the selected grade level and school year
         $gradeLevelFee = \App\Models\GradeLevelFee::where('grade_level', $validated['grade_level'])
-            ->where('school_year', $validated['school_year'])
+            ->where('school_year_id', $validated['school_year_id'])
             ->first();
 
         $tuitionFeeCents = ($gradeLevelFee ? $gradeLevelFee->tuition_fee : 0) * 100;
