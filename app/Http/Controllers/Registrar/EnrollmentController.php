@@ -9,6 +9,7 @@ use App\Http\Requests\Registrar\BulkApproveEnrollmentsRequest;
 use App\Http\Requests\Registrar\RejectEnrollmentRequest;
 use App\Http\Requests\Registrar\UpdatePaymentStatusRequest;
 use App\Models\Enrollment;
+use App\Models\SchoolYear;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -27,8 +28,8 @@ class EnrollmentController extends Controller
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('school_year')) {
-            $query->where('school_year', $request->school_year);
+        if ($request->filled('school_year_id')) {
+            $query->where('school_year_id', $request->school_year_id);
         }
 
         if ($request->filled('grade_level')) {
@@ -52,9 +53,10 @@ class EnrollmentController extends Controller
 
         return Inertia::render('registrar/enrollments/index', [
             'enrollments' => $enrollments,
-            'filters' => $request->only(['status', 'school_year', 'grade_level', 'payment_status', 'search']),
+            'filters' => $request->only(['status', 'school_year_id', 'grade_level', 'payment_status', 'search']),
             'statuses' => EnrollmentStatus::values(),
             'paymentStatuses' => PaymentStatus::values(),
+            'schoolYears' => SchoolYear::orderBy('start_year', 'desc')->get(),
         ]);
     }
 
