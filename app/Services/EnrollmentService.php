@@ -113,7 +113,16 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
         return DB::transaction(function () use ($data) {
             // Check if student can enroll
             $student = Student::findOrFail($data['student_id']);
-            if (! $this->canEnroll($student, $data['school_year'])) {
+
+            // Get school year name from ID if provided
+            if (isset($data['school_year_id'])) {
+                $schoolYear = \App\Models\SchoolYear::find($data['school_year_id']);
+                $schoolYearName = $schoolYear?->name;
+            } else {
+                $schoolYearName = $data['school_year'] ?? null;
+            }
+
+            if ($schoolYearName && ! $this->canEnroll($student, $schoolYearName)) {
                 throw new \Exception('Student cannot enroll for this school year');
             }
 

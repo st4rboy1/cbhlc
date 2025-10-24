@@ -98,6 +98,14 @@ class EnrollmentPeriod extends Model
 
     public function enrollments(): HasMany
     {
-        return $this->hasMany(Enrollment::class, 'enrollment_period_id');
+        return $this->hasMany(Enrollment::class);
+    }
+
+    /**
+     * Get the school year name (accessor for backward compatibility)
+     */
+    public function getSchoolYearAttribute(): ?string
+    {
+        return $this->schoolYear?->name;
     }
 }
