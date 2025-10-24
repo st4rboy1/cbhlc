@@ -33,6 +33,7 @@ class DashboardController extends Controller
             ->latest('created_at')
             ->take(5)
             ->get()
+            /** @phpstan-ignore-next-line */
             ->map(function (Enrollment $enrollment): array {
                 return [
                     'id' => $enrollment->id,
