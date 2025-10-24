@@ -18,9 +18,37 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
+    // Create school years
+    $this->sy2024 = \App\Models\SchoolYear::create([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
+
+    $this->sy2023 = \App\Models\SchoolYear::create([
+        'name' => '2023-2024',
+        'start_year' => 2023,
+        'end_year' => 2024,
+        'start_date' => '2023-06-01',
+        'end_date' => '2024-05-31',
+        'status' => 'closed',
+    ]);
+
+    $this->sy2025 = \App\Models\SchoolYear::create([
+        'name' => '2025-2026',
+        'start_year' => 2025,
+        'end_year' => 2026,
+        'start_date' => '2025-06-01',
+        'end_date' => '2026-05-31',
+        'status' => 'upcoming',
+    ]);
+
     // Create an active enrollment period for all tests
     EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(3),
         'early_registration_deadline' => now()->addDays(10),
@@ -33,7 +61,7 @@ beforeEach(function () {
 
     // Create enrollment period for 2025-2026 for tests that need it
     EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+        'school_year_id' => $this->sy2025->id,
         'start_date' => now()->addMonths(6),
         'end_date' => now()->addMonths(9),
         'early_registration_deadline' => now()->addMonths(6)->addDays(10),
@@ -140,7 +168,7 @@ describe('enrollment controller', function () {
 
         $enrollmentData = [
             'student_id' => $student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => 'First',
             'grade_level' => 'Grade 1',
         ];
@@ -158,7 +186,7 @@ describe('enrollment controller', function () {
         $response->assertRedirect(route('guardian.enrollments.index'));
         $this->assertDatabaseHas('enrollments', [
             'student_id' => $student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => 'Grade 1',
         ]);
     });
@@ -212,7 +240,7 @@ describe('enrollment controller', function () {
         $firstEnrollment = Enrollment::create([
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Grade 1',
             'status' => EnrollmentStatus::PENDING,
@@ -229,7 +257,7 @@ describe('enrollment controller', function () {
         // Attempt to create duplicate enrollment for same student and school year
         $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
             'student_id' => $student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::SECOND->value,
             'grade_level' => 'Grade 2',
         ]);
@@ -239,7 +267,7 @@ describe('enrollment controller', function () {
 
         // Verify only one enrollment exists for this student and school year
         $enrollmentCount = Enrollment::where('student_id', $student->id)
-            ->where('school_year', '2024-2025')
+            ->where('school_year_id', $this->sy2024->id)
             ->count();
 
         expect($enrollmentCount)->toBe(1);
@@ -270,7 +298,7 @@ describe('enrollment controller', function () {
         Enrollment::create([
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Kinder',
             'status' => EnrollmentStatus::APPROVED, // Make sure they passed
@@ -285,11 +313,11 @@ describe('enrollment controller', function () {
         ]);
 
         // Close the 2024-2025 period and activate the 2025-2026 enrollment period
-        EnrollmentPeriod::where('school_year', '2024-2025')->update([
+        EnrollmentPeriod::where('school_year_id', $this->sy2024->id)->update([
             'status' => EnrollmentPeriodStatus::CLOSED->value,
         ]);
 
-        EnrollmentPeriod::where('school_year', '2025-2026')->update([
+        EnrollmentPeriod::where('school_year_id', $this->sy2025->id)->update([
             'status' => EnrollmentPeriodStatus::ACTIVE->value,
             'start_date' => now()->subDays(1),
             'late_registration_deadline' => now()->addMonths(2),
@@ -298,7 +326,7 @@ describe('enrollment controller', function () {
         // Create enrollment for different school year - should succeed (progression from Kinder to Grade 1)
         $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
             'student_id' => $student->id,
-            'school_year' => '2025-2026',
+            'school_year_id' => $this->sy2025->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => 'Grade 1',
         ]);
@@ -337,7 +365,7 @@ describe('enrollment controller', function () {
             // New student should be able to select any quarter
             $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::SECOND->value,
                 'grade_level' => 'Kinder',
             ]);
@@ -375,7 +403,7 @@ describe('enrollment controller', function () {
             Enrollment::create([
                 'student_id' => $student->id,
                 'guardian_id' => $guardianModel->id,
-                'school_year' => '2023-2024',
+                'school_year_id' => $this->sy2023->id,
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Kinder',
                 'status' => EnrollmentStatus::APPROVED,
@@ -392,7 +420,7 @@ describe('enrollment controller', function () {
             // Try to enroll in second quarter - should be overridden to first quarter
             $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::SECOND->value,
                 'grade_level' => 'Grade 1',
             ]);
@@ -400,7 +428,7 @@ describe('enrollment controller', function () {
             $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST, // Should be overridden to First
             ]);
         });
@@ -432,7 +460,7 @@ describe('enrollment controller', function () {
             // New student should be able to enroll in any grade
             $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => 'Grade 3',
             ]);
@@ -472,7 +500,7 @@ describe('enrollment controller', function () {
             Enrollment::create([
                 'student_id' => $student->id,
                 'guardian_id' => $guardianModel->id,
-                'school_year' => '2023-2024',
+                'school_year_id' => $this->sy2023->id,
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Grade 3',
                 'status' => EnrollmentStatus::APPROVED,
@@ -489,7 +517,7 @@ describe('enrollment controller', function () {
             // Try to enroll in lower grade - should fail
             $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => 'Grade 2', // Lower than current Grade 3
             ]);
@@ -526,7 +554,7 @@ describe('enrollment controller', function () {
             Enrollment::create([
                 'student_id' => $student->id,
                 'guardian_id' => $guardianModel->id,
-                'school_year' => '2023-2024',
+                'school_year_id' => $this->sy2023->id,
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Grade 2',
                 'status' => EnrollmentStatus::APPROVED,
@@ -543,7 +571,7 @@ describe('enrollment controller', function () {
             // Enroll in next grade level - should succeed
             $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => 'Grade 3',
             ]);
@@ -551,7 +579,7 @@ describe('enrollment controller', function () {
             $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'grade_level' => 'Grade 3',
             ]);
         });
@@ -584,7 +612,7 @@ describe('enrollment controller', function () {
             Enrollment::create([
                 'student_id' => $student->id,
                 'guardian_id' => $guardianModel->id,
-                'school_year' => '2023-2024',
+                'school_year_id' => $this->sy2023->id,
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Grade 1',
                 'status' => EnrollmentStatus::APPROVED,
@@ -601,7 +629,7 @@ describe('enrollment controller', function () {
             // Enroll in grade level beyond next (accelerated) - should succeed
             $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
                 'student_id' => $student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => 'Grade 4', // Skipping Grade 2 and 3
             ]);
@@ -609,7 +637,7 @@ describe('enrollment controller', function () {
             $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
-                'school_year' => '2024-2025',
+                'school_year_id' => $this->sy2024->id,
                 'grade_level' => 'Grade 4',
             ]);
         });
