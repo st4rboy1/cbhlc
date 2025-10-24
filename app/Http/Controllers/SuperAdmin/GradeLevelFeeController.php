@@ -28,8 +28,8 @@ class GradeLevelFeeController extends Controller
         }
 
         // Filter by school year
-        if ($request->filled('school_year')) {
-            $query->where('school_year', $request->get('school_year'));
+        if ($request->filled('school_year_id')) {
+            $query->where('school_year_id', $request->get('school_year_id'));
         }
 
         // Filter by active status
@@ -44,7 +44,7 @@ class GradeLevelFeeController extends Controller
 
         return Inertia::render('super-admin/grade-level-fees/index', [
             'fees' => $fees,
-            'filters' => $request->only(['search', 'school_year', 'active']),
+            'filters' => $request->only(['search', 'school_year_id', 'active']),
             'gradeLevels' => \App\Enums\GradeLevel::values(),
             'schoolYears' => $schoolYears,
         ]);

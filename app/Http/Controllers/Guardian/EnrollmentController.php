@@ -12,6 +12,7 @@ use App\Models\Enrollment;
 use App\Models\EnrollmentPeriod;
 use App\Models\GuardianStudent;
 use App\Models\Payment;
+use App\Models\SchoolYear;
 use App\Models\Student;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -37,8 +38,8 @@ class EnrollmentController extends Controller
             ->whereIn('student_id', $studentIds);
 
         // Filter by school year
-        if ($request->filled('school_year')) {
-            $query->where('school_year', $request->school_year);
+        if ($request->filled('school_year_id')) {
+            $query->where('school_year_id', $request->school_year_id);
         }
 
         // Filter by student
@@ -78,15 +79,7 @@ class EnrollmentController extends Controller
                 'label' => "{$student->first_name} {$student->last_name}",
             ]);
 
-        $schoolYears = Enrollment::whereIn('student_id', $studentIds)
-            ->select('school_year')
-            ->distinct()
-            ->orderBy('school_year', 'desc')
-            ->pluck('school_year')
-            ->map(fn ($year) => [
-                'value' => $year,
-                'label' => $year,
-            ]);
+        $schoolYears = SchoolYear::orderBy('start_year', 'desc')->get();
 
         $statuses = collect(EnrollmentStatus::cases())
             ->map(fn ($status) => [
@@ -97,7 +90,7 @@ class EnrollmentController extends Controller
         return Inertia::render('guardian/enrollments/index', [
             'enrollments' => $enrollments,
             'filters' => [
-                'school_year' => $request->school_year,
+                'school_year_id' => $request->school_year_id,
                 'student_id' => $request->student_id,
                 'status' => $request->status,
                 'search' => $request->search,
