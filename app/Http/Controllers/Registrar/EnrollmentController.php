@@ -10,6 +10,8 @@ use App\Http\Requests\Registrar\RejectEnrollmentRequest;
 use App\Http\Requests\Registrar\UpdatePaymentStatusRequest;
 use App\Models\Enrollment;
 use App\Models\SchoolYear;
+use App\Notifications\EnrollmentApprovedNotification;
+use App\Notifications\EnrollmentRejectedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -105,10 +107,11 @@ class EnrollmentController extends Controller
             ]);
 
             // Send notification to guardian about approval and payment requirements
-            $enrollment->load(['student', 'guardian.user']);
+            $enrollment->load(['student', 'guardian.user', 'schoolYear']);
             if ($enrollment->guardian && $enrollment->guardian->user) {
-                \Illuminate\Support\Facades\Mail::to($enrollment->guardian->user->email)
-                    ->send(new \App\Mail\EnrollmentApproved($enrollment));
+                $enrollment->guardian->user->notify(
+                    new EnrollmentApprovedNotification($enrollment, $request->input('remarks'))
+                );
             }
         });
 
@@ -133,7 +136,15 @@ class EnrollmentController extends Controller
             'remarks' => $validated['reason'],
         ]);
 
-        return back()->with('success', 'Enrollment rejected.');
+        // Send rejection notification to guardian
+        $enrollment->load(['student', 'guardian.user', 'schoolYear']);
+        if ($enrollment->guardian && $enrollment->guardian->user) {
+            $enrollment->guardian->user->notify(
+                new EnrollmentRejectedNotification($enrollment, $validated['reason'])
+            );
+        }
+
+        return back()->with('success', 'Enrollment rejected and guardian has been notified.');
     }
 
     /**
