@@ -5,15 +5,27 @@ import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
+interface NotificationData {
+    message: string;
+    student_name?: string;
+    grade_level?: string;
+    school_year?: string;
+    application_id?: string;
+    enrollment_id?: number;
+    status?: string;
+    reason?: string;
+    remarks?: string;
+}
+
 interface Notification {
     id: string;
     type: string;
-    data: Record<string, string | number | boolean | null>;
+    data: NotificationData;
     read_at: string | null;
     created_at: string;
 }
 
-interface PageProps {
+interface PageProps extends Record<string, unknown> {
     auth?: {
         user?: {
             id: number;
