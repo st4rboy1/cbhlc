@@ -42,7 +42,7 @@ class EnrollmentRejectedNotification extends Notification
             ->line('We have reviewed your enrollment application for '.$student->full_name.'.')
             ->line('Application Details:')
             ->line('Student: '.$student->full_name)
-            ->line('Grade Level: '.$this->enrollment->grade_level)
+            ->line('Grade Level: '.$this->enrollment->grade_level->label())
             ->line('School Year: '.$this->enrollment->schoolYear->name)
             ->line('Application ID: '.$this->enrollment->enrollment_id)
             ->line('Unfortunately, we are unable to approve your application at this time.')
@@ -69,7 +69,7 @@ class EnrollmentRejectedNotification extends Notification
             'application_id' => $this->enrollment->enrollment_id,
             'student_id' => $this->enrollment->student_id,
             'student_name' => $this->enrollment->student->full_name,
-            'grade_level' => $this->enrollment->grade_level,
+            'grade_level' => $this->enrollment->grade_level->label(),
             'school_year' => $this->enrollment->schoolYear->name,
             'status' => 'rejected',
             'reason' => $this->reason,

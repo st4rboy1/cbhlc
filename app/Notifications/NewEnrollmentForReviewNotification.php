@@ -41,7 +41,7 @@ class NewEnrollmentForReviewNotification extends Notification
             ->line('A new enrollment application has been submitted and requires your review.')
             ->line('Application Details:')
             ->line('Student: '.$student->full_name)
-            ->line('Grade Level: '.$this->enrollment->grade_level)
+            ->line('Grade Level: '.$this->enrollment->grade_level->label())
             ->line('School Year: '.$this->enrollment->schoolYear->name)
             ->line('Application ID: '.$this->enrollment->enrollment_id)
             ->line('Submitted by: '.$this->enrollment->guardian->name)
@@ -62,7 +62,7 @@ class NewEnrollmentForReviewNotification extends Notification
             'application_id' => $this->enrollment->enrollment_id,
             'student_id' => $this->enrollment->student_id,
             'student_name' => $this->enrollment->student->full_name,
-            'grade_level' => $this->enrollment->grade_level,
+            'grade_level' => $this->enrollment->grade_level->label(),
             'school_year' => $this->enrollment->schoolYear->name,
             'guardian_name' => $this->enrollment->guardian->name,
             'submitted_at' => $this->enrollment->created_at,
