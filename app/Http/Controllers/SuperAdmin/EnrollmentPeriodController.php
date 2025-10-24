@@ -32,7 +32,14 @@ class EnrollmentPeriodController extends Controller
      */
     public function create()
     {
-        return Inertia::render('super-admin/enrollment-periods/create');
+        // Get available school years (active and upcoming)
+        $schoolYears = \App\Models\SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
+
+        return Inertia::render('super-admin/enrollment-periods/create', [
+            'schoolYears' => $schoolYears,
+        ]);
     }
 
     /**
@@ -40,7 +47,13 @@ class EnrollmentPeriodController extends Controller
      */
     public function store(StoreEnrollmentPeriodRequest $request)
     {
-        $period = EnrollmentPeriod::create($request->validated());
+        $validated = $request->validated();
+
+        // Get the school year to populate the school_year string field
+        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
+        $validated['school_year'] = $schoolYear->name;
+
+        $period = EnrollmentPeriod::create($validated);
 
         activity()
             ->performedOn($period)
@@ -69,8 +82,14 @@ class EnrollmentPeriodController extends Controller
      */
     public function edit(EnrollmentPeriod $enrollmentPeriod)
     {
+        // Get available school years (active and upcoming)
+        $schoolYears = \App\Models\SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
+
         return Inertia::render('super-admin/enrollment-periods/edit', [
             'period' => $enrollmentPeriod,
+            'schoolYears' => $schoolYears,
         ]);
     }
 
@@ -81,7 +100,13 @@ class EnrollmentPeriodController extends Controller
     {
         $old = $enrollmentPeriod->toArray();
 
-        $enrollmentPeriod->update($request->validated());
+        $validated = $request->validated();
+
+        // Get the school year to populate the school_year string field
+        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
+        $validated['school_year'] = $schoolYear->name;
+
+        $enrollmentPeriod->update($validated);
 
         activity()
             ->performedOn($enrollmentPeriod)

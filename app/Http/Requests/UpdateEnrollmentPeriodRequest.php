@@ -23,10 +23,9 @@ class UpdateEnrollmentPeriodRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'school_year' => [
+            'school_year_id' => [
                 'required',
-                'string',
-                'regex:/^\d{4}-\d{4}$/',
+                'exists:school_years,id',
                 Rule::unique('enrollment_periods')->ignore($this->enrollment_period),
             ],
             'start_date' => 'required|date',
@@ -48,9 +47,9 @@ class UpdateEnrollmentPeriodRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'school_year.required' => 'The school year is required.',
-            'school_year.regex' => 'The school year must be in the format YYYY-YYYY (e.g., 2025-2026).',
-            'school_year.unique' => 'An enrollment period for this school year already exists.',
+            'school_year_id.required' => 'The school year is required.',
+            'school_year_id.exists' => 'The selected school year is invalid.',
+            'school_year_id.unique' => 'An enrollment period for this school year already exists.',
             'start_date.required' => 'The start date is required.',
             'end_date.required' => 'The end date is required.',
             'end_date.after' => 'The end date must be after the start date.',

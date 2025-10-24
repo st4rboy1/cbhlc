@@ -32,8 +32,7 @@ beforeEach(function () {
 // ========================================
 
 test('super admin can view enrollment periods index', function () {
-    EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now(),
         'end_date' => now()->addMonths(10),
@@ -59,8 +58,10 @@ test('super admin can view enrollment periods index', function () {
 // ========================================
 
 test('super admin can create enrollment period', function () {
+    $schoolYear = \App\Models\SchoolYear::factory()->create(['name' => '2025-2026']);
+
     $data = [
-        'school_year' => '2025-2026',
+        'school_year_id' => $schoolYear->id,
         'start_date' => now()->addDay()->format('Y-m-d'),
         'end_date' => now()->addMonths(10)->format('Y-m-d'),
         'early_registration_deadline' => now()->addWeek()->format('Y-m-d'),
@@ -84,8 +85,10 @@ test('super admin can create enrollment period', function () {
 });
 
 test('creating enrollment period logs activity', function () {
+    $schoolYear = \App\Models\SchoolYear::factory()->create(['name' => '2025-2026']);
+
     $data = [
-        'school_year' => '2025-2026',
+        'school_year_id' => $schoolYear->id,
         'start_date' => now()->addDay()->format('Y-m-d'),
         'end_date' => now()->addMonths(10)->format('Y-m-d'),
         'regular_registration_deadline' => now()->addMonths(2)->format('Y-m-d'),
@@ -102,9 +105,9 @@ test('creating enrollment period logs activity', function () {
     ]);
 });
 
-test('school year must be in correct format', function () {
+test('school year must be valid', function () {
     $data = [
-        'school_year' => '2025/2026', // Wrong format
+        'school_year_id' => 99999, // Non-existent ID
         'start_date' => now()->addDay()->format('Y-m-d'),
         'end_date' => now()->addMonths(10)->format('Y-m-d'),
         'regular_registration_deadline' => now()->addMonths(2)->format('Y-m-d'),
@@ -115,12 +118,11 @@ test('school year must be in correct format', function () {
     $response = actingAs($this->superAdmin)
         ->post(route('super-admin.enrollment-periods.store'), $data);
 
-    $response->assertSessionHasErrors('school_year');
+    $response->assertSessionHasErrors('school_year_id');
 });
 
 test('school year must be unique', function () {
-    EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now(),
         'end_date' => now()->addMonths(10),
@@ -130,7 +132,7 @@ test('school year must be unique', function () {
     ]);
 
     $data = [
-        'school_year' => '2025-2026', // Duplicate
+        'school_year_id' => $period->school_year_id, // Duplicate
         'start_date' => now()->addDay()->format('Y-m-d'),
         'end_date' => now()->addMonths(10)->format('Y-m-d'),
         'regular_registration_deadline' => now()->addMonths(2)->format('Y-m-d'),
@@ -141,12 +143,14 @@ test('school year must be unique', function () {
     $response = actingAs($this->superAdmin)
         ->post(route('super-admin.enrollment-periods.store'), $data);
 
-    $response->assertSessionHasErrors('school_year');
+    $response->assertSessionHasErrors('school_year_id');
 });
 
 test('end date must be after start date', function () {
+    $schoolYear = \App\Models\SchoolYear::factory()->create(['name' => '2025-2026']);
+
     $data = [
-        'school_year' => '2025-2026',
+        'school_year_id' => $schoolYear->id,
         'start_date' => now()->addMonths(10)->format('Y-m-d'),
         'end_date' => now()->addDay()->format('Y-m-d'), // Before start date
         'regular_registration_deadline' => now()->addMonths(2)->format('Y-m-d'),
@@ -161,8 +165,10 @@ test('end date must be after start date', function () {
 });
 
 test('registration deadlines must be within period dates', function () {
+    $schoolYear = \App\Models\SchoolYear::factory()->create(['name' => '2025-2026']);
+
     $data = [
-        'school_year' => '2025-2026',
+        'school_year_id' => $schoolYear->id,
         'start_date' => now()->addMonth()->format('Y-m-d'),
         'end_date' => now()->addMonths(10)->format('Y-m-d'),
         'regular_registration_deadline' => now()->format('Y-m-d'), // Before start date
@@ -177,12 +183,14 @@ test('registration deadlines must be within period dates', function () {
 });
 
 test('late registration deadline must be after regular deadline', function () {
+    $schoolYear = \App\Models\SchoolYear::factory()->create(['name' => '2025-2026']);
+
     $data = [
-        'school_year' => '2025-2026',
+        'school_year_id' => $schoolYear->id,
         'start_date' => now()->addDay()->format('Y-m-d'),
         'end_date' => now()->addMonths(10)->format('Y-m-d'),
         'regular_registration_deadline' => now()->addMonths(5)->format('Y-m-d'),
-        'late_registration_deadline' => now()->addMonth()->format('Y-m-d'), // Before regular
+        'late_registration_deadline' => now()->addMonths(3)->format('Y-m-d'), // Before regular
         'allow_new_students' => true,
         'allow_returning_students' => true,
     ];
@@ -198,8 +206,7 @@ test('late registration deadline must be after regular deadline', function () {
 // ========================================
 
 test('super admin can update enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -210,7 +217,7 @@ test('super admin can update enrollment period', function () {
     ]);
 
     $data = [
-        'school_year' => '2025-2026',
+        'school_year_id' => $period->school_year_id,
         'start_date' => now()->addMonth()->format('Y-m-d'),
         'end_date' => now()->addMonths(11)->format('Y-m-d'),
         'regular_registration_deadline' => now()->addMonths(3)->format('Y-m-d'),
@@ -233,8 +240,7 @@ test('super admin can update enrollment period', function () {
 });
 
 test('updating enrollment period logs activity', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -244,7 +250,7 @@ test('updating enrollment period logs activity', function () {
     ]);
 
     $data = [
-        'school_year' => '2025-2026',
+        'school_year_id' => $period->school_year_id,
         'start_date' => now()->addMonth()->format('Y-m-d'),
         'end_date' => now()->addMonths(11)->format('Y-m-d'),
         'regular_registration_deadline' => now()->addMonths(3)->format('Y-m-d'),
@@ -267,8 +273,7 @@ test('updating enrollment period logs activity', function () {
 // ========================================
 
 test('super admin can delete enrollment period without enrollments', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -289,8 +294,7 @@ test('super admin can delete enrollment period without enrollments', function ()
 });
 
 test('cannot delete active enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->addMonths(10),
@@ -310,8 +314,7 @@ test('cannot delete active enrollment period', function () {
 });
 
 test('cannot delete period with existing enrollments', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'closed',
         'start_date' => now()->subYear(),
         'end_date' => now()->subMonths(2),
@@ -340,8 +343,7 @@ test('cannot delete period with existing enrollments', function () {
 // ========================================
 
 test('super admin can activate enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonths(10),
@@ -361,8 +363,7 @@ test('super admin can activate enrollment period', function () {
 });
 
 test('activating period closes other active periods', function () {
-    $oldPeriod = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+    $oldPeriod = EnrollmentPeriod::factory()->schoolYear('2024-2025')->create([
         'status' => 'active',
         'start_date' => now()->subYear(),
         'end_date' => now()->addMonth(),
@@ -371,8 +372,7 @@ test('activating period closes other active periods', function () {
         'allow_returning_students' => true,
     ]);
 
-    $newPeriod = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $newPeriod = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonths(10),
@@ -392,8 +392,7 @@ test('activating period closes other active periods', function () {
 });
 
 test('activating period logs activity', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonths(10),
@@ -417,8 +416,7 @@ test('activating period logs activity', function () {
 // ========================================
 
 test('super admin can close active enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->addMonths(10),
@@ -438,8 +436,7 @@ test('super admin can close active enrollment period', function () {
 });
 
 test('cannot close non-active enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -458,8 +455,7 @@ test('cannot close non-active enrollment period', function () {
 });
 
 test('closing period logs activity', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->addMonths(10),
@@ -490,8 +486,10 @@ test('non super admin cannot access enrollment periods index', function () {
 });
 
 test('non super admin cannot create enrollment period', function () {
+    $schoolYear = \App\Models\SchoolYear::factory()->create(['name' => '2025-2026']);
+
     $data = [
-        'school_year' => '2025-2026',
+        'school_year_id' => $schoolYear->id,
         'start_date' => now()->addDay()->format('Y-m-d'),
         'end_date' => now()->addMonths(10)->format('Y-m-d'),
         'regular_registration_deadline' => now()->addMonths(2)->format('Y-m-d'),
@@ -506,8 +504,7 @@ test('non super admin cannot create enrollment period', function () {
 });
 
 test('non super admin cannot update enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -517,7 +514,7 @@ test('non super admin cannot update enrollment period', function () {
     ]);
 
     $data = [
-        'school_year' => '2025-2026',
+        'school_year_id' => $period->school_year_id,
         'start_date' => now()->addMonth()->format('Y-m-d'),
         'end_date' => now()->addMonths(11)->format('Y-m-d'),
         'regular_registration_deadline' => now()->addMonths(3)->format('Y-m-d'),
@@ -532,8 +529,7 @@ test('non super admin cannot update enrollment period', function () {
 });
 
 test('non super admin cannot delete enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->addMonth(),
         'end_date' => now()->addMonths(10),
@@ -549,8 +545,7 @@ test('non super admin cannot delete enrollment period', function () {
 });
 
 test('non super admin cannot activate enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'upcoming',
         'start_date' => now()->subDay(),
         'end_date' => now()->addMonths(10),
@@ -566,8 +561,7 @@ test('non super admin cannot activate enrollment period', function () {
 });
 
 test('non super admin cannot close enrollment period', function () {
-    $period = EnrollmentPeriod::create([
-        'school_year' => '2025-2026',
+    $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
         'status' => 'active',
         'start_date' => now()->subMonth(),
         'end_date' => now()->addMonths(10),
