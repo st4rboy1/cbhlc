@@ -163,6 +163,7 @@ class GradeLevelFee extends Model
      */
     public function getSchoolYearAttribute(): ?string
     {
-        return $this->schoolYear?->name;
+        // Use getRelationValue to avoid infinite recursion
+        return $this->getRelationValue('schoolYear')?->name;
     }
 }
