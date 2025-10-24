@@ -16,9 +16,19 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
+    // Create school year
+    $this->sy2024 = \App\Models\SchoolYear::create([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
+
     // Create an active enrollment period for all tests
     EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(3),
         'early_registration_deadline' => now()->addDays(10),
@@ -56,7 +66,7 @@ describe('enrollment pending constraint', function () {
         Enrollment::create([
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Grade 1',
             'status' => EnrollmentStatus::PENDING,
@@ -73,7 +83,7 @@ describe('enrollment pending constraint', function () {
         // Try to create second pending enrollment for different school year
         $response = $this->actingAs($guardian)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
-            'school_year' => '2025-2026',
+            'school_year_id' => \App\Models\SchoolYear::create(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming'])->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => 'Grade 2',
         ]);
@@ -116,7 +126,7 @@ describe('enrollment pending constraint', function () {
         Enrollment::create([
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
-            'school_year' => '2023-2024',
+            'school_year_id' => \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'closed'])->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Kinder',
             'status' => EnrollmentStatus::COMPLETED,
@@ -133,7 +143,7 @@ describe('enrollment pending constraint', function () {
         // Create new pending enrollment - should succeed
         $response = $this->actingAs($guardian)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => 'Grade 1',
         ]);
@@ -167,7 +177,7 @@ describe('enrollment pending constraint', function () {
         Enrollment::create([
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Grade 1',
             'status' => EnrollmentStatus::ENROLLED,
@@ -184,7 +194,7 @@ describe('enrollment pending constraint', function () {
         // Try to create pending enrollment for next year - should fail due to ongoing enrollment
         $response = $this->actingAs($guardian)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
-            'school_year' => '2025-2026',
+            'school_year_id' => \App\Models\SchoolYear::create(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming'])->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => 'Grade 2',
         ]);
@@ -217,7 +227,7 @@ describe('enrollment pending constraint', function () {
         Enrollment::create([
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Grade 1',
             'status' => EnrollmentStatus::REJECTED,
@@ -234,11 +244,11 @@ describe('enrollment pending constraint', function () {
         // Try to create another enrollment for same school year
         $response = $this->actingAs($guardian)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::SECOND->value,
             'grade_level' => 'Grade 1',
         ]);
 
-        $response->assertSessionHasErrors(['school_year']);
+        $response->assertSessionHasErrors(['student_id']);
     });
 });
