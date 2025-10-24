@@ -16,9 +16,15 @@ interface Notification {
     id: string;
     type: string;
     data: {
-        title: string;
         message: string;
-        action_url?: string;
+        student_name?: string;
+        grade_level?: string;
+        school_year?: string;
+        application_id?: string;
+        enrollment_id?: number;
+        status?: string;
+        reason?: string;
+        remarks?: string;
     };
     read_at: string | null;
     created_at: string;
@@ -57,13 +63,47 @@ export default function NotificationsDropdown({ notifications }: Props) {
         );
     };
 
+    const getNotificationUrl = (notification: Notification): string | null => {
+        // For enrollment notifications, navigate to enrollments page
+        if (notification.type.includes('Enrollment')) {
+            if (notification.data.enrollment_id) {
+                // Navigate to specific enrollment if we have the ID
+                return `/guardian/enrollments/${notification.data.enrollment_id}`;
+            }
+            // Otherwise navigate to enrollments list
+            return '/guardian/enrollments';
+        }
+        // For registrar notifications, navigate to registrar enrollments
+        if (notification.type.includes('NewEnrollmentForReview')) {
+            return '/registrar/enrollments';
+        }
+        return null;
+    };
+
     const handleNotificationClick = (notification: Notification) => {
         if (!notification.read_at) {
             handleMarkAsRead(notification.id);
         }
-        if (notification.data.action_url) {
-            router.visit(notification.data.action_url);
+        const url = getNotificationUrl(notification);
+        if (url) {
+            router.visit(url);
         }
+    };
+
+    const getNotificationTitle = (notification: Notification): string => {
+        if (notification.type.includes('EnrollmentSubmitted')) {
+            return 'Enrollment Submitted';
+        }
+        if (notification.type.includes('EnrollmentApproved')) {
+            return 'Enrollment Approved';
+        }
+        if (notification.type.includes('EnrollmentRejected')) {
+            return 'Enrollment Status Update';
+        }
+        if (notification.type.includes('NewEnrollmentForReview')) {
+            return 'New Enrollment to Review';
+        }
+        return 'Notification';
     };
 
     const formatDate = (dateString: string) => {
@@ -119,7 +159,7 @@ export default function NotificationsDropdown({ notifications }: Props) {
                             >
                                 <div className="flex w-full items-start justify-between gap-2">
                                     <div className="flex-1">
-                                        <p className="text-sm font-semibold">{notification.data.title}</p>
+                                        <p className="text-sm font-semibold">{getNotificationTitle(notification)}</p>
                                         <p className="text-xs text-muted-foreground">{notification.data.message}</p>
                                     </div>
                                     {!notification.read_at && <div className="h-2 w-2 rounded-full bg-blue-600" />}
