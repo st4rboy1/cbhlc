@@ -12,7 +12,14 @@ import { toast } from 'sonner';
 
 export type EnrollmentPeriod = {
     id: number;
-    school_year: string;
+    school_year_id: number;
+    school_year: {
+        id: number;
+        name: string;
+        start_year: number;
+        end_year: number;
+        status: string;
+    };
     status: string;
     start_date: string;
     end_date: string;
@@ -155,7 +162,7 @@ export default function EnrollmentPeriodsIndex({ periods, activePeriod }: Props)
                             <div className="grid gap-4 md:grid-cols-3">
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">School Year</p>
-                                    <p className="text-lg font-semibold">{activePeriod.school_year}</p>
+                                    <p className="text-lg font-semibold">{activePeriod.school_year.name}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Period</p>
@@ -213,7 +220,7 @@ export default function EnrollmentPeriodsIndex({ periods, activePeriod }: Props)
                                         const StatusIcon = statusIcons[period.status as keyof typeof statusIcons];
                                         return (
                                             <TableRow key={period.id}>
-                                                <TableCell className="font-medium">{period.school_year}</TableCell>
+                                                <TableCell className="font-medium">{period.school_year.name}</TableCell>
                                                 <TableCell>
                                                     <Badge
                                                         variant={statusColors[period.status as keyof typeof statusColors] || 'default'}
