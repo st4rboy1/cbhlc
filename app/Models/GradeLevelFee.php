@@ -157,13 +157,4 @@ class GradeLevelFee extends Model
             ->where('is_active', true)
             ->first();
     }
-
-    /**
-     * Get the school year name (accessor for backward compatibility)
-     */
-    public function getSchoolYearAttribute(): ?string
-    {
-        // Use getRelationValue to avoid infinite recursion
-        return $this->getRelationValue('schoolYear')?->name;
-    }
 }

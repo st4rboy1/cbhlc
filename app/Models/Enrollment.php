@@ -263,13 +263,4 @@ class Enrollment extends Model
 
         return $errors;
     }
-
-    /**
-     * Get the school year name (accessor for backward compatibility)
-     */
-    public function getSchoolYearAttribute(): ?string
-    {
-        // Use getRelationValue to avoid infinite recursion
-        return $this->getRelationValue('schoolYear')?->name;
-    }
 }
