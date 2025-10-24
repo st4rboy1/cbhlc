@@ -266,10 +266,11 @@ test('calculateFees returns fee breakdown for enrollment', function () {
 
 test('canEnroll returns true when student has no pending enrollment', function () {
     $student = Student::factory()->create();
+    $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'closed']);
     Enrollment::factory()->create([
         'student_id' => $student->id,
         'status' => EnrollmentStatus::APPROVED,
-        'school_year' => '2023-2024',
+        'school_year_id' => $sy2023->id,
     ]);
 
     $result = $this->service->canEnroll($student, '2024-2025');
@@ -308,15 +309,15 @@ test('getStatistics returns enrollment counts by status', function () {
 
     Enrollment::factory()->count(5)->create([
         'status' => EnrollmentStatus::PENDING,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->sy2024->id,
     ]);
     Enrollment::factory()->count(10)->create([
         'status' => EnrollmentStatus::ENROLLED,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->sy2024->id,
     ]);
     Enrollment::factory()->count(2)->create([
         'status' => EnrollmentStatus::REJECTED,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->sy2024->id,
     ]);
 
     $result = $this->service->getStatistics();
@@ -331,14 +332,15 @@ test('getStatistics filters by current school year', function () {
     $currentYear = date('Y').'-'.(date('Y') + 1);
 
     // Create enrollments for previous year (should not be counted)
+    $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'closed']);
     Enrollment::factory()->count(3)->create([
         'status' => EnrollmentStatus::ENROLLED,
-        'school_year' => '2023-2024',
+        'school_year_id' => $sy2023->id,
     ]);
     // Create enrollments for current year (should be counted)
     Enrollment::factory()->count(5)->create([
         'status' => EnrollmentStatus::ENROLLED,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->sy2024->id,
     ]);
 
     $result = $this->service->getStatistics();
@@ -352,15 +354,15 @@ test('getStatistics calculates payment statistics', function () {
 
     Enrollment::factory()->count(3)->create([
         'payment_status' => PaymentStatus::PAID,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->sy2024->id,
     ]);
     Enrollment::factory()->count(2)->create([
         'payment_status' => PaymentStatus::PARTIAL,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->sy2024->id,
     ]);
     Enrollment::factory()->count(5)->create([
         'payment_status' => PaymentStatus::PENDING,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->sy2024->id,
     ]);
 
     $result = $this->service->getStatistics();
