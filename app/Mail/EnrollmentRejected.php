@@ -51,7 +51,7 @@ class EnrollmentRejected extends Mailable implements ShouldQueue
                 'studentName' => $this->enrollment->student->full_name,
                 'enrollmentId' => $this->enrollment->enrollment_id,
                 'gradeLevel' => $this->enrollment->grade_level_label,
-                'schoolYear' => $this->enrollment->school_year,
+                'schoolYear' => $this->enrollment->schoolYear->name,
                 'rejectedAt' => $this->enrollment->rejected_at?->format('F j, Y g:i A') ?? now()->format('F j, Y g:i A'),
                 'reason' => $this->reason ?: $this->enrollment->remarks,
                 'nextSteps' => [
