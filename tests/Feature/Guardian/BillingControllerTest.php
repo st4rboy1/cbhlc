@@ -74,6 +74,7 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_1,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
@@ -136,12 +137,14 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::ENROLLED,
         ]);
 
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::REJECTED,
         ]);
 
@@ -234,6 +237,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_3,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
@@ -299,6 +303,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_5,
             'tuition_fee_cents' => 2800000,
             'miscellaneous_fee_cents' => 700000,
@@ -325,6 +330,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
             'tuition_fee_cents' => 2000000,
             'miscellaneous_fee_cents' => 500000,
@@ -351,6 +357,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $otherStudent->id,
             'guardian_id' => Guardian::factory()->create()->id,
+            'school_year_id' => $this->sy2024->id,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -364,6 +371,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_6,
             'tuition_fee_cents' => 0,
             'miscellaneous_fee_cents' => 0,
@@ -387,6 +395,7 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
             'tuition_fee_cents' => 2000000,
             'miscellaneous_fee_cents' => 500000,
@@ -416,6 +425,7 @@ describe('Guardian BillingController', function () {
         Enrollment::factory()->create([
             'student_id' => $otherStudent->id,
             'guardian_id' => $otherGuardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 
@@ -446,6 +456,7 @@ describe('Guardian BillingController', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $studentNoMiddle->id,
             'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
         ]);
 

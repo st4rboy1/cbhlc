@@ -289,11 +289,14 @@ test('school year must match active enrollment period', function () {
         'allow_returning_students' => true,
     ]);
 
+    // Create a different school year using factory (let factory generate unique name)
+    $differentSchoolYear = \App\Models\SchoolYear::factory()->create();
+
     // Try to enroll for a different school year
     $response = $this->actingAs($this->guardian)
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
-            'school_year_id' => \App\Models\SchoolYear::firstOrCreate(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming'])->id, // Different school year
+            'school_year_id' => $differentSchoolYear->id, // Different school year
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
