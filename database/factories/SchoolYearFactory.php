@@ -19,15 +19,18 @@ class SchoolYearFactory extends Factory
      */
     public function definition(): array
     {
-        // Use unique() to ensure no duplicate school year names
-        // This will generate unique timestamps-based school years
-        static $counter = 0;
-        $counter++;
-        $startYear = 2020 + $counter;
+        // Generate unique school year names for parallel test execution
+        // Use combination of microtime and random number to ensure uniqueness across processes
+        $uniqueId = (int) (microtime(true) * 10000) + mt_rand(0, 9999);
+        $startYear = 2020 + ($uniqueId % 100); // Keep years in reasonable range
         $endYear = $startYear + 1;
 
+        // Add random suffix to ensure uniqueness when years collide
+        $suffix = substr(md5(uniqid((string) mt_rand(), true)), 0, 6);
+        $name = "{$startYear}-{$endYear}-{$suffix}";
+
         return [
-            'name' => "{$startYear}-{$endYear}",
+            'name' => $name,
             'start_year' => $startYear,
             'end_year' => $endYear,
             'start_date' => "{$startYear}-06-01",
