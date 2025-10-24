@@ -24,6 +24,16 @@ class EmailNotificationTest extends TestCase
         parent::setUp();
         $this->service = app(EnrollmentService::class);
         Mail::fake();
+
+        // Create school year
+        $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
+            'name' => '2024-2025',
+            'start_year' => 2024,
+            'end_year' => 2025,
+            'start_date' => '2024-06-01',
+            'end_date' => '2025-05-31',
+            'status' => 'active',
+        ]);
     }
 
     public function test_sends_email_when_enrollment_is_submitted(): void
@@ -42,7 +52,7 @@ class EmailNotificationTest extends TestCase
         $enrollmentData = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => 'Grade 1',
             'section' => 'A',
         ];
@@ -181,7 +191,7 @@ class EmailNotificationTest extends TestCase
         $enrollmentData = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => 'Grade 1',
             'section' => 'A',
         ];
@@ -212,7 +222,7 @@ class EmailNotificationTest extends TestCase
         $enrollmentData = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => 'Grade 5',
             'section' => 'A',
         ];

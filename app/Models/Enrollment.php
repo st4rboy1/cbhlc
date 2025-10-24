@@ -35,7 +35,6 @@ class Enrollment extends Model
         'enrollment_id',
         'student_id',
         'guardian_id',
-        'school_year',
         'school_year_id',
         'enrollment_period_id',
         'quarter',

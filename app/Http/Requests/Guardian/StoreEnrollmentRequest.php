@@ -108,32 +108,8 @@ class StoreEnrollmentRequest extends FormRequest
                         ->where('status', EnrollmentStatus::ENROLLED)
                         ->exists()) {
                         $fail('This student has an active enrollment. Please wait for the current enrollment to be completed before applying for another year.');
-                    }
-                },
-            ],
-            'school_year' => [
-                'required',
-                'string',
-                'regex:/^\d{4}-\d{4}$/',
-                function ($attribute, $value, $fail) {
-                    // Validate school year format (e.g., 2024-2025)
-                    $years = explode('-', $value);
-                    if (count($years) !== 2 || ((int) $years[1] - (int) $years[0]) !== 1) {
-                        $fail('School year must be in format YYYY-YYYY (e.g., 2024-2025) with consecutive years.');
-                    }
 
-                    // Validate school year matches active enrollment period
-                    $activePeriod = EnrollmentPeriod::active()->first();
-                    if ($activePeriod && $value !== $activePeriod->school_year) {
-                        $fail("School year must be {$activePeriod->school_year} for the current enrollment period.");
-                    }
-
-                    // Check for existing enrollment for this school year
-                    $studentId = $this->input('student_id');
-                    if ($studentId && Enrollment::where('student_id', $studentId)
-                        ->where('school_year', $value)
-                        ->exists()) {
-                        $fail('This student already has an enrollment for the selected school year.');
+                        return;
                     }
                 },
             ],
@@ -186,8 +162,6 @@ class StoreEnrollmentRequest extends FormRequest
         return [
             'student_id.required' => 'Please select a student.',
             'student_id.exists' => 'Selected student does not exist.',
-            'school_year.required' => 'School year is required.',
-            'school_year.regex' => 'School year must be in format YYYY-YYYY (e.g., 2024-2025).',
             'quarter.required' => 'Quarter is required.',
             'quarter.in' => 'Invalid quarter selected.',
             'grade_level.required' => 'Grade level is required.',

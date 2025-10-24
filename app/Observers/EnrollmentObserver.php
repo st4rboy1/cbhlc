@@ -132,7 +132,7 @@ class EnrollmentObserver
     {
         $fees = GradeLevelFee::getFeesForGrade(
             $enrollment->grade_level,
-            $enrollment->school_year
+            $enrollment->school_year_id
         );
 
         if ($fees) {

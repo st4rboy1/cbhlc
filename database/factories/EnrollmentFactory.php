@@ -77,7 +77,7 @@ class EnrollmentFactory extends Factory
 
                 return $guardian->id;
             },
-            'school_year' => $this->faker->randomElement(['2023-2024', '2024-2025', '2025-2026']),
+            'school_year_id' => \App\Models\SchoolYear::factory(),
             'quarter' => $this->faker->randomElement(Quarter::values()),
             'grade_level' => $this->faker->randomElement(GradeLevel::values()),
             'status' => $status,

@@ -56,13 +56,15 @@ class EnrollmentController extends Controller
 
     public function create(Request $request)
     {
-        $currentSchoolYear = date('Y').'-'.(date('Y') + 1);
+        $currentSchoolYearName = date('Y').'-'.(date('Y') + 1);
+        $currentSchoolYear = \App\Models\SchoolYear::where('name', $currentSchoolYearName)->first();
+        $currentSchoolYearId = $currentSchoolYear?->id;
         $selectedStudentId = $request->query('student_id');
 
         // Get all students for admin (unlike guardian who only sees their students)
         $studentsQuery = Student::query()->get();
 
-        $students = $studentsQuery->map(function ($student) use ($currentSchoolYear) {
+        $students = $studentsQuery->map(function ($student) use ($currentSchoolYearId) {
             return [
                 'id' => $student->id,
                 'first_name' => $student->first_name,
@@ -73,7 +75,7 @@ class EnrollmentController extends Controller
                 'current_grade_level' => $student->getCurrentGradeLevel()?->value,
                 'available_grade_levels' => array_map(
                     fn ($grade) => $grade->value,
-                    $student->getAvailableGradeLevels($currentSchoolYear)
+                    $student->getAvailableGradeLevels($currentSchoolYearId)
                 ),
             ];
         });
@@ -107,7 +109,7 @@ class EnrollmentController extends Controller
 
         // Get the fee for the selected grade level and school year
         $gradeLevelFee = \App\Models\GradeLevelFee::where('grade_level', $validated['grade_level'])
-            ->where('school_year', $validated['school_year'])
+            ->where('school_year_id', $validated['school_year_id'])
             ->first();
 
         $tuitionFeeCents = ($gradeLevelFee ? $gradeLevelFee->tuition_fee : 0) * 100;

@@ -16,10 +16,33 @@ beforeEach(function () {
     // Seed roles and permissions for each test
     $this->seed(RolesAndPermissionsSeeder::class);
     $this->service = new EnrollmentService(new Enrollment);
+
+    // Create school year for regular tests
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
+
+    // Create current year school year for statistics tests
+    $currentYear = date('Y');
+    $this->syCurrentYear = \App\Models\SchoolYear::firstOrCreate([
+        'name' => $currentYear.'-'.($currentYear + 1),
+        'start_year' => $currentYear,
+        'end_year' => $currentYear + 1,
+        'start_date' => $currentYear.'-06-01',
+        'end_date' => ($currentYear + 1).'-05-31',
+        'status' => 'active',
+    ]);
 });
 
 test('getPaginatedEnrollments returns paginated results with relationships', function () {
-    Enrollment::factory()->count(15)->create();
+    Enrollment::factory()->count(15)->create([
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $result = $this->service->getPaginatedEnrollments([], 10);
 
@@ -29,9 +52,18 @@ test('getPaginatedEnrollments returns paginated results with relationships', fun
 });
 
 test('getPaginatedEnrollments applies status filter', function () {
-    Enrollment::factory()->create(['status' => EnrollmentStatus::PENDING]);
-    Enrollment::factory()->create(['status' => EnrollmentStatus::APPROVED]);
-    Enrollment::factory()->create(['status' => EnrollmentStatus::REJECTED]);
+    Enrollment::factory()->create([
+        'status' => EnrollmentStatus::PENDING,
+        'school_year_id' => $this->sy2024->id,
+    ]);
+    Enrollment::factory()->create([
+        'status' => EnrollmentStatus::APPROVED,
+        'school_year_id' => $this->sy2024->id,
+    ]);
+    Enrollment::factory()->create([
+        'status' => EnrollmentStatus::REJECTED,
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $result = $this->service->getPaginatedEnrollments(['status' => EnrollmentStatus::PENDING->value], 10);
 
@@ -43,8 +75,14 @@ test('getPaginatedEnrollments applies student filter', function () {
     $student1 = Student::factory()->create();
     $student2 = Student::factory()->create();
 
-    Enrollment::factory()->create(['student_id' => $student1->id]);
-    Enrollment::factory()->create(['student_id' => $student2->id]);
+    Enrollment::factory()->create([
+        'student_id' => $student1->id,
+        'school_year_id' => $this->sy2024->id,
+    ]);
+    Enrollment::factory()->create([
+        'student_id' => $student2->id,
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $result = $this->service->getPaginatedEnrollments(['student_id' => $student1->id], 10);
 
@@ -53,9 +91,18 @@ test('getPaginatedEnrollments applies student filter', function () {
 });
 
 test('getPaginatedEnrollments applies date range filter', function () {
-    Enrollment::factory()->create(['created_at' => now()->subDays(5)]);
-    Enrollment::factory()->create(['created_at' => now()->subDays(2)]);
-    Enrollment::factory()->create(['created_at' => now()]);
+    Enrollment::factory()->create([
+        'created_at' => now()->subDays(5),
+        'school_year_id' => $this->sy2024->id,
+    ]);
+    Enrollment::factory()->create([
+        'created_at' => now()->subDays(2),
+        'school_year_id' => $this->sy2024->id,
+    ]);
+    Enrollment::factory()->create([
+        'created_at' => now(),
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $result = $this->service->getPaginatedEnrollments([
         'date_from' => now()->subDays(3)->toDateString(),
@@ -66,7 +113,9 @@ test('getPaginatedEnrollments applies date range filter', function () {
 });
 
 test('findWithRelations returns enrollment with relationships', function () {
-    $enrollment = Enrollment::factory()->create();
+    $enrollment = Enrollment::factory()->create([
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $result = $this->service->findWithRelations($enrollment->id);
 
@@ -91,7 +140,7 @@ test('createEnrollment creates new enrollment with pending status', function () 
         'student_id' => $student->id,
         'guardian_id' => $guardian->id,
         'grade_level' => 'Grade 1',
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'enrollment_date' => now()->toDateString(),
     ];
 
@@ -122,7 +171,7 @@ test('createEnrollment generates reference number', function () {
         'student_id' => $student->id,
         'guardian_id' => $guardian->id,
         'grade_level' => 'Grade 1',
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'enrollment_date' => now()->toDateString(),
     ];
 
@@ -133,7 +182,10 @@ test('createEnrollment generates reference number', function () {
 });
 
 test('approveEnrollment updates status to approved', function () {
-    $enrollment = Enrollment::factory()->create(['status' => EnrollmentStatus::PENDING]);
+    $enrollment = Enrollment::factory()->create([
+        'status' => EnrollmentStatus::PENDING,
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $result = $this->service->approveEnrollment($enrollment);
 
@@ -146,7 +198,10 @@ test('approveEnrollment updates status to approved', function () {
 });
 
 test('approveEnrollment throws exception for non-pending enrollment', function () {
-    $enrollment = Enrollment::factory()->create(['status' => EnrollmentStatus::ENROLLED]);
+    $enrollment = Enrollment::factory()->create([
+        'status' => EnrollmentStatus::ENROLLED,
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage('Only pending enrollments can be approved');
@@ -155,7 +210,10 @@ test('approveEnrollment throws exception for non-pending enrollment', function (
 });
 
 test('rejectEnrollment updates status with reason', function () {
-    $enrollment = Enrollment::factory()->create(['status' => EnrollmentStatus::PENDING]);
+    $enrollment = Enrollment::factory()->create([
+        'status' => EnrollmentStatus::PENDING,
+        'school_year_id' => $this->sy2024->id,
+    ]);
     $reason = 'Incomplete documents';
 
     $result = $this->service->rejectEnrollment($enrollment, $reason);
@@ -166,7 +224,10 @@ test('rejectEnrollment updates status with reason', function () {
 });
 
 test('rejectEnrollment throws exception for non-pending enrollment', function () {
-    $enrollment = Enrollment::factory()->create(['status' => EnrollmentStatus::APPROVED]);
+    $enrollment = Enrollment::factory()->create([
+        'status' => EnrollmentStatus::APPROVED,
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage('Only pending enrollments can be rejected');
@@ -175,9 +236,18 @@ test('rejectEnrollment throws exception for non-pending enrollment', function ()
 });
 
 test('bulkApproveEnrollments approves multiple pending enrollments', function () {
-    $pending1 = Enrollment::factory()->create(['status' => EnrollmentStatus::PENDING]);
-    $pending2 = Enrollment::factory()->create(['status' => EnrollmentStatus::PENDING]);
-    $approved = Enrollment::factory()->create(['status' => EnrollmentStatus::APPROVED]);
+    $pending1 = Enrollment::factory()->create([
+        'status' => EnrollmentStatus::PENDING,
+        'school_year_id' => $this->sy2024->id,
+    ]);
+    $pending2 = Enrollment::factory()->create([
+        'status' => EnrollmentStatus::PENDING,
+        'school_year_id' => $this->sy2024->id,
+    ]);
+    $approved = Enrollment::factory()->create([
+        'status' => EnrollmentStatus::APPROVED,
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $count = $this->service->bulkApproveEnrollments([
         $pending1->id,
@@ -203,13 +273,19 @@ test('bulkApproveEnrollments uses database transaction', function () {
             return $callback();
         });
 
-    $pending = Enrollment::factory()->create(['status' => EnrollmentStatus::PENDING]);
+    $pending = Enrollment::factory()->create([
+        'status' => EnrollmentStatus::PENDING,
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $this->service->bulkApproveEnrollments([$pending->id]);
 });
 
 test('updatePaymentStatus updates enrollment payment status', function () {
-    $enrollment = Enrollment::factory()->create(['payment_status' => PaymentStatus::PENDING]);
+    $enrollment = Enrollment::factory()->create([
+        'payment_status' => PaymentStatus::PENDING,
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $result = $this->service->updatePaymentStatus($enrollment, PaymentStatus::PAID);
 
@@ -223,7 +299,10 @@ test('updatePaymentStatus updates enrollment payment status', function () {
 test('updatePaymentStatus logs activity', function () {
     Log::spy();
 
-    $enrollment = Enrollment::factory()->create(['payment_status' => PaymentStatus::PENDING]);
+    $enrollment = Enrollment::factory()->create([
+        'payment_status' => PaymentStatus::PENDING,
+        'school_year_id' => $this->sy2024->id,
+    ]);
 
     $this->service->updatePaymentStatus($enrollment, PaymentStatus::PAID);
 
@@ -256,10 +335,11 @@ test('calculateFees returns fee breakdown for enrollment', function () {
 
 test('canEnroll returns true when student has no pending enrollment', function () {
     $student = Student::factory()->create();
+    $sy2023 = \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
     Enrollment::factory()->create([
         'student_id' => $student->id,
         'status' => EnrollmentStatus::APPROVED,
-        'school_year' => '2023-2024',
+        'school_year_id' => $sy2023->id,
     ]);
 
     $result = $this->service->canEnroll($student, '2024-2025');
@@ -272,7 +352,7 @@ test('canEnroll returns false when student has pending enrollment', function () 
     Enrollment::factory()->create([
         'student_id' => $student->id,
         'status' => EnrollmentStatus::PENDING,
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
     ]);
 
     $result = $this->service->canEnroll($student, '2024-2025');
@@ -285,7 +365,7 @@ test('canEnroll returns false when student has approved enrollment for same year
     Enrollment::factory()->create([
         'student_id' => $student->id,
         'status' => EnrollmentStatus::APPROVED,
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
     ]);
 
     $result = $this->service->canEnroll($student, '2024-2025');
@@ -294,19 +374,17 @@ test('canEnroll returns false when student has approved enrollment for same year
 });
 
 test('getStatistics returns enrollment counts by status', function () {
-    $currentYear = date('Y').'-'.(date('Y') + 1);
-
     Enrollment::factory()->count(5)->create([
         'status' => EnrollmentStatus::PENDING,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->syCurrentYear->id,
     ]);
     Enrollment::factory()->count(10)->create([
         'status' => EnrollmentStatus::ENROLLED,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->syCurrentYear->id,
     ]);
     Enrollment::factory()->count(2)->create([
         'status' => EnrollmentStatus::REJECTED,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->syCurrentYear->id,
     ]);
 
     $result = $this->service->getStatistics();
@@ -318,17 +396,16 @@ test('getStatistics returns enrollment counts by status', function () {
 });
 
 test('getStatistics filters by current school year', function () {
-    $currentYear = date('Y').'-'.(date('Y') + 1);
-
     // Create enrollments for previous year (should not be counted)
+    $sy2023 = \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
     Enrollment::factory()->count(3)->create([
         'status' => EnrollmentStatus::ENROLLED,
-        'school_year' => '2023-2024',
+        'school_year_id' => $sy2023->id,
     ]);
     // Create enrollments for current year (should be counted)
     Enrollment::factory()->count(5)->create([
         'status' => EnrollmentStatus::ENROLLED,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->syCurrentYear->id,
     ]);
 
     $result = $this->service->getStatistics();
@@ -338,19 +415,17 @@ test('getStatistics filters by current school year', function () {
 });
 
 test('getStatistics calculates payment statistics', function () {
-    $currentYear = date('Y').'-'.(date('Y') + 1);
-
     Enrollment::factory()->count(3)->create([
         'payment_status' => PaymentStatus::PAID,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->syCurrentYear->id,
     ]);
     Enrollment::factory()->count(2)->create([
         'payment_status' => PaymentStatus::PARTIAL,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->syCurrentYear->id,
     ]);
     Enrollment::factory()->count(5)->create([
         'payment_status' => PaymentStatus::PENDING,
-        'school_year' => $currentYear,
+        'school_year_id' => $this->syCurrentYear->id,
     ]);
 
     $result = $this->service->getStatistics();
@@ -363,7 +438,10 @@ test('getStatistics calculates payment statistics', function () {
 test('logActivity is called for main operations', function () {
     Log::spy();
 
-    $enrollment = Enrollment::factory()->create(['status' => EnrollmentStatus::PENDING]);
+    $enrollment = Enrollment::factory()->create([
+        'status' => EnrollmentStatus::PENDING,
+        'school_year_id' => $this->sy2024->id,
+    ]);
     $student = Student::factory()->create();
 
     $this->service->getPaginatedEnrollments();

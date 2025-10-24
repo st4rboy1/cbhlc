@@ -39,7 +39,6 @@ class GradeLevelFeeFactory extends Factory
 
         return [
             'grade_level' => fake()->randomElement(GradeLevel::values()),
-            'school_year' => $schoolYear,
             'school_year_id' => $schoolYearModel->id,
             'tuition_fee_cents' => fake()->numberBetween(2000000, 5000000), // 20,000 to 50,000 pesos
             'registration_fee_cents' => fake()->numberBetween(100000, 300000), // 1,000 to 3,000 pesos
@@ -98,7 +97,6 @@ class GradeLevelFeeFactory extends Factory
             );
 
             return [
-                'school_year' => $schoolYear,
                 'school_year_id' => $schoolYearModel->id,
             ];
         });

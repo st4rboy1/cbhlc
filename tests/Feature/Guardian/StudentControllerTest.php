@@ -19,6 +19,16 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
+    // Create school year
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
+
     // Create guardian user
     $this->guardian = User::factory()->create();
     $this->guardian->assignRole('guardian');
@@ -76,7 +86,7 @@ describe('Guardian StudentController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_3,
             'status' => EnrollmentStatus::ENROLLED,
         ]);
@@ -105,7 +115,7 @@ describe('Guardian StudentController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2023-2024',
+            'school_year_id' => \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed'])->id,
             'grade_level' => GradeLevel::GRADE_2,
             'status' => EnrollmentStatus::COMPLETED,
             'created_at' => now()->subYear(),
@@ -114,7 +124,7 @@ describe('Guardian StudentController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_3,
             'status' => EnrollmentStatus::ENROLLED,
             'created_at' => now(),
@@ -127,7 +137,7 @@ describe('Guardian StudentController', function () {
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('guardian/students/index')
             ->has('students.0', fn ($student) => $student
-                ->where('latest_enrollment.school_year', '2024-2025')
+                ->where('latest_enrollment.school_year_name', '2024-2025')
                 ->where('latest_enrollment.grade_level', GradeLevel::GRADE_3->value)
                 ->where('latest_enrollment.status', EnrollmentStatus::ENROLLED->value)
                 ->etc()
@@ -140,7 +150,7 @@ describe('Guardian StudentController', function () {
         Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_3,
             'quarter' => Quarter::FIRST,
             'status' => EnrollmentStatus::ENROLLED,
@@ -484,7 +494,7 @@ describe('Guardian StudentController', function () {
             ->has('student.enrollments', 3)
             ->has('student.enrollments.0', fn ($enrollment) => $enrollment
                 ->has('id')
-                ->has('school_year')
+                ->has('school_year_id')
                 ->has('grade_level')
                 ->has('quarter')
                 ->has('status')

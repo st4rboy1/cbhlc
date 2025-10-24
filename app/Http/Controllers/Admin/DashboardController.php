@@ -25,7 +25,10 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $currentYear = date('Y').'-'.(date('Y') + 1);
+        $currentYearName = date('Y').'-'.(date('Y') + 1);
+        $currentSchoolYear = SchoolYear::where('name', $currentYearName)->first();
+        $currentSchoolYearId = $currentSchoolYear?->id;
+
         $paymentStats = $this->dashboardService->getPaymentStatistics();
         $enrollmentStats = $this->dashboardService->getEnrollmentStatistics();
 
@@ -53,10 +56,14 @@ class DashboardController extends Controller
             ->count();
 
         // Financial projections
-        $totalExpected = Enrollment::where('school_year', $currentYear)
-            ->sum('net_amount_cents') / 100;
-        $potentialRevenue = Enrollment::where('school_year', $currentYear)
-            ->sum('balance_cents') / 100;
+        $totalExpected = $currentSchoolYearId
+            ? Enrollment::where('school_year_id', $currentSchoolYearId)
+                ->sum('net_amount_cents') / 100
+            : 0;
+        $potentialRevenue = $currentSchoolYearId
+            ? Enrollment::where('school_year_id', $currentSchoolYearId)
+                ->sum('balance_cents') / 100
+            : 0;
 
         // Document Verification Metrics
         $totalDocuments = Document::count();
@@ -86,9 +93,11 @@ class DashboardController extends Controller
         $stats = [
             // Core metrics
             'totalStudents' => Student::count(),
-            'activeEnrollments' => Enrollment::where('school_year', $currentYear)
-                ->where('status', EnrollmentStatus::ENROLLED)
-                ->count(),
+            'activeEnrollments' => $currentSchoolYearId
+                ? Enrollment::where('school_year_id', $currentSchoolYearId)
+                    ->where('status', EnrollmentStatus::ENROLLED)
+                    ->count()
+                : 0,
             'newEnrollments' => Enrollment::where('created_at', '>=', now()->startOfMonth())->count(),
             'pendingApplications' => Enrollment::where('status', EnrollmentStatus::PENDING)->count(),
             'totalStaff' => User::role(['super_admin', 'administrator', 'registrar'])->count(),
@@ -130,8 +139,10 @@ class DashboardController extends Controller
             // Transaction metrics
             'totalPayments' => Payment::count(),
             'recentPaymentsCount' => Payment::where('created_at', '>=', now()->subDays(7))->count(),
-            'totalRevenue' => Enrollment::where('school_year', $currentYear)
-                ->sum('amount_paid_cents') / 100,
+            'totalRevenue' => $currentSchoolYearId
+                ? Enrollment::where('school_year_id', $currentSchoolYearId)
+                    ->sum('amount_paid_cents') / 100
+                : 0,
 
             // Document Verification Metrics
             'totalDocuments' => $totalDocuments,

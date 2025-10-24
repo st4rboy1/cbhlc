@@ -201,9 +201,13 @@ describe('StudentReportController', function () {
 
         $student = Student::factory()->create();
 
+        // Create school year for enrollments
+        $schoolYear = \App\Models\SchoolYear::factory()->create();
+
         // Create enrollments
         \App\Models\Enrollment::factory()->count(2)->create([
             'student_id' => $student->id,
+            'school_year_id' => $schoolYear->id,
         ]);
 
         $response = $this->actingAs($admin)

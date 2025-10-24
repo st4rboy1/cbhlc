@@ -18,6 +18,16 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
+    // Create school years
+    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
+        'name' => '2024-2025',
+        'start_year' => 2024,
+        'end_year' => 2025,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'status' => 'active',
+    ]);
+
     // Create guardian user
     $this->guardian = User::factory()->create();
     $this->guardian->assignRole('guardian');
@@ -45,6 +55,7 @@ beforeEach(function () {
     // Create grade level fee
     GradeLevelFee::factory()->create([
         'grade_level' => GradeLevel::GRADE_1->value,
+        'school_year_id' => $this->sy2024->id,
         'tuition_fee_cents' => 2000000,
         'miscellaneous_fee_cents' => 500000,
     ]);
@@ -64,7 +75,7 @@ test('guardian cannot view create form when no active enrollment period', functi
 test('guardian cannot view create form when enrollment period is closed', function () {
     // Create a closed enrollment period (deadline in the past)
     EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subMonths(2),
         'end_date' => now()->subMonth(),
         'early_registration_deadline' => now()->subMonths(2),
@@ -86,7 +97,7 @@ test('guardian cannot view create form when enrollment period is closed', functi
 test('guardian can view create form when active enrollment period exists', function () {
     // Create an active open enrollment period
     EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(2),
         'early_registration_deadline' => now()->addDays(10),
@@ -107,7 +118,7 @@ test('guardian cannot enroll when no active enrollment period', function () {
     $response = $this->actingAs($this->guardian)
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
@@ -119,7 +130,7 @@ test('guardian cannot enroll when no active enrollment period', function () {
 test('guardian cannot enroll when enrollment period deadline passed', function () {
     // Create a closed enrollment period
     EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subMonths(2),
         'end_date' => now()->subMonth(),
         'early_registration_deadline' => now()->subMonths(2),
@@ -133,7 +144,7 @@ test('guardian cannot enroll when enrollment period deadline passed', function (
     $response = $this->actingAs($this->guardian)
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
@@ -145,7 +156,7 @@ test('guardian cannot enroll when enrollment period deadline passed', function (
 test('new student cannot enroll when period does not allow new students', function () {
     // Create enrollment period that doesn't allow new students
     EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(2),
         'early_registration_deadline' => now()->addDays(10),
@@ -159,7 +170,7 @@ test('new student cannot enroll when period does not allow new students', functi
     $response = $this->actingAs($this->guardian)
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
@@ -170,16 +181,17 @@ test('new student cannot enroll when period does not allow new students', functi
 
 test('returning student cannot enroll when period does not allow returning students', function () {
     // Create a previous enrollment to make this a returning student
+    $sy2023 = \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
     Enrollment::factory()->create([
         'student_id' => $this->student->id,
         'guardian_id' => $this->guardianModel->id,
-        'school_year' => '2023-2024',
+        'school_year_id' => $sy2023->id,
         'status' => EnrollmentStatus::COMPLETED->value,
     ]);
 
     // Create enrollment period that doesn't allow returning students
     EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(2),
         'early_registration_deadline' => now()->addDays(10),
@@ -193,7 +205,7 @@ test('returning student cannot enroll when period does not allow returning stude
     $response = $this->actingAs($this->guardian)
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
@@ -205,7 +217,7 @@ test('returning student cannot enroll when period does not allow returning stude
 test('guardian can enroll when all period conditions are met', function () {
     // Create an active open enrollment period
     $period = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(2),
         'early_registration_deadline' => now()->addDays(10),
@@ -219,7 +231,7 @@ test('guardian can enroll when all period conditions are met', function () {
     $response = $this->actingAs($this->guardian)
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
@@ -229,14 +241,14 @@ test('guardian can enroll when all period conditions are met', function () {
 
     $this->assertDatabaseHas('enrollments', [
         'student_id' => $this->student->id,
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'enrollment_period_id' => $period->id,
     ]);
 });
 
 test('enrollment period id is set correctly on enrollment', function () {
     $period = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(2),
         'early_registration_deadline' => now()->addDays(10),
@@ -250,23 +262,23 @@ test('enrollment period id is set correctly on enrollment', function () {
     $this->actingAs($this->guardian)
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
 
     $enrollment = Enrollment::where('student_id', $this->student->id)
-        ->where('school_year', '2024-2025')
+        ->where('school_year_id', $this->sy2024->id)
         ->first();
 
     expect($enrollment)->not->toBeNull();
     expect($enrollment->enrollment_period_id)->toBe($period->id);
 });
 
-test('school year must match active enrollment period', function () {
+test('school year is automatically set from active enrollment period and guardian input is ignored', function () {
     // Create enrollment period for 2024-2025
     EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(2),
         'early_registration_deadline' => now()->addDays(10),
@@ -277,21 +289,35 @@ test('school year must match active enrollment period', function () {
         'allow_returning_students' => true,
     ]);
 
-    // Try to enroll for a different school year
+    // Create a different school year using factory (let factory generate unique name)
+    $differentSchoolYear = \App\Models\SchoolYear::factory()->create();
+
+    // Guardian tries to enroll for a different school year - this should be ignored
     $response = $this->actingAs($this->guardian)
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
-            'school_year' => '2025-2026', // Different school year
+            'school_year_id' => $differentSchoolYear->id, // Guardian tries different school year (will be ignored)
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
 
-    $response->assertSessionHasErrors(['school_year']);
+    // Should succeed and use the active period's school year, not the one guardian provided
+    $response->assertRedirect();
+
+    // Verify enrollment was created with the active period's school year (2024), NOT the different one
+    expect(Enrollment::where('student_id', $this->student->id)
+        ->where('school_year_id', $this->sy2024->id)
+        ->exists())->toBeTrue();
+
+    // Verify enrollment was NOT created with the different school year
+    expect(Enrollment::where('student_id', $this->student->id)
+        ->where('school_year_id', $differentSchoolYear->id)
+        ->exists())->toBeFalse();
 });
 
 test('enrollment relationship with enrollment period works', function () {
     $period = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(2),
         'early_registration_deadline' => now()->addDays(10),
@@ -305,23 +331,23 @@ test('enrollment relationship with enrollment period works', function () {
     $this->actingAs($this->guardian)
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
 
     $enrollment = Enrollment::where('student_id', $this->student->id)
-        ->where('school_year', '2024-2025')
+        ->where('school_year_id', $this->sy2024->id)
         ->first();
 
     expect($enrollment->enrollmentPeriod)->not->toBeNull();
     expect($enrollment->enrollmentPeriod->id)->toBe($period->id);
-    expect($enrollment->enrollmentPeriod->school_year)->toBe('2024-2025');
+    expect($enrollment->enrollmentPeriod->schoolYear->name)->toBe('2024-2025');
 });
 
 test('canEnrollForPeriod method validates period is open', function () {
     $closedPeriod = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subMonths(2),
         'end_date' => now()->subMonth(),
         'early_registration_deadline' => now()->subMonths(2),
@@ -340,7 +366,7 @@ test('canEnrollForPeriod method validates period is open', function () {
 
 test('canEnrollForPeriod method validates new student eligibility', function () {
     $period = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(2),
         'early_registration_deadline' => now()->addDays(10),
@@ -359,15 +385,16 @@ test('canEnrollForPeriod method validates new student eligibility', function () 
 
 test('canEnrollForPeriod method validates returning student eligibility', function () {
     // Make student a returning student
+    $sy2023 = \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
     Enrollment::factory()->create([
         'student_id' => $this->student->id,
         'guardian_id' => $this->guardianModel->id,
-        'school_year' => '2023-2024',
+        'school_year_id' => $sy2023->id,
         'status' => EnrollmentStatus::COMPLETED->value,
     ]);
 
     $period = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(2),
         'early_registration_deadline' => now()->addDays(10),
@@ -386,7 +413,7 @@ test('canEnrollForPeriod method validates returning student eligibility', functi
 
 test('canEnrollForPeriod method returns empty array when eligible', function () {
     $period = EnrollmentPeriod::create([
-        'school_year' => '2024-2025',
+        'school_year_id' => $this->sy2024->id,
         'start_date' => now()->subDays(5),
         'end_date' => now()->addMonths(2),
         'early_registration_deadline' => now()->addDays(10),

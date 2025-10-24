@@ -164,13 +164,21 @@ class Student extends Model
     /**
      * Check if student passed the previous school year
      */
-    public function passedPreviousYear(string $schoolYear): bool
+    public function passedPreviousYear(int $schoolYearId): bool
     {
-        $currentYearStart = (int) substr($schoolYear, 0, 4);
-        $previousYear = ($currentYearStart - 1).'-'.$currentYearStart;
+        $currentSchoolYear = SchoolYear::find($schoolYearId);
+        if (! $currentSchoolYear) {
+            return true;
+        }
+
+        // Find previous school year
+        $previousSchoolYear = SchoolYear::where('start_year', $currentSchoolYear->start_year - 1)->first();
+        if (! $previousSchoolYear) {
+            return true;
+        }
 
         $previousEnrollment = $this->enrollments()
-            ->where('school_year', $previousYear)
+            ->where('school_year_id', $previousSchoolYear->id)
             ->where('status', EnrollmentStatus::APPROVED)
             ->first();
 
@@ -188,7 +196,7 @@ class Student extends Model
     /**
      * Get available grade levels for enrollment
      */
-    public function getAvailableGradeLevels(string $schoolYear): array
+    public function getAvailableGradeLevels(int $schoolYearId): array
     {
         $currentGrade = $this->getCurrentGradeLevel();
 
@@ -196,7 +204,7 @@ class Student extends Model
             return GradeLevel::getAvailableGradesFor(null);
         }
 
-        if (! $this->passedPreviousYear($schoolYear)) {
+        if (! $this->passedPreviousYear($schoolYearId)) {
             return $currentGrade ? [$currentGrade] : [];
         }
 

@@ -15,11 +15,15 @@ class EnrollmentPeriodController extends Controller
      */
     public function index()
     {
-        $periods = EnrollmentPeriod::latest('school_year')
+        $periods = EnrollmentPeriod::with('schoolYear')
+            ->latest('start_date')
             ->withCount('enrollments')
             ->paginate(10);
 
-        $activePeriod = EnrollmentPeriod::active()->first();
+        $activePeriod = EnrollmentPeriod::with('schoolYear')
+            ->withCount('enrollments')
+            ->active()
+            ->first();
 
         return Inertia::render('super-admin/enrollment-periods/index', [
             'periods' => $periods,
@@ -48,10 +52,6 @@ class EnrollmentPeriodController extends Controller
     public function store(StoreEnrollmentPeriodRequest $request)
     {
         $validated = $request->validated();
-
-        // Get the school year to populate the school_year string field
-        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
-        $validated['school_year'] = $schoolYear->name;
 
         $period = EnrollmentPeriod::create($validated);
 
@@ -101,10 +101,6 @@ class EnrollmentPeriodController extends Controller
         $old = $enrollmentPeriod->toArray();
 
         $validated = $request->validated();
-
-        // Get the school year to populate the school_year string field
-        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
-        $validated['school_year'] = $schoolYear->name;
 
         $enrollmentPeriod->update($validated);
 

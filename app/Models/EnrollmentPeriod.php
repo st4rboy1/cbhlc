@@ -13,7 +13,6 @@ class EnrollmentPeriod extends Model
 
     protected $fillable = [
         'school_year_id',
-        'school_year',
         'start_date',
         'end_date',
         'early_registration_deadline',
@@ -99,6 +98,6 @@ class EnrollmentPeriod extends Model
 
     public function enrollments(): HasMany
     {
-        return $this->hasMany(Enrollment::class, 'school_year', 'school_year');
+        return $this->hasMany(Enrollment::class);
     }
 }
