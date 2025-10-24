@@ -125,7 +125,7 @@ class EnrollmentController extends Controller
 
         // Get Guardian model for authenticated user
         $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
-        $currentSchoolYear = $activePeriod->school_year;
+        $currentSchoolYearId = $activePeriod->school_year_id;
         $selectedStudentId = $request->query('student_id');
 
         // Get guardian's students with enrollment info
@@ -142,7 +142,7 @@ class EnrollmentController extends Controller
 
         $studentsQuery = Student::whereIn('id', $eligibleStudentIds)->get();
 
-        $students = $studentsQuery->map(function ($student) use ($currentSchoolYear) {
+        $students = $studentsQuery->map(function ($student) use ($currentSchoolYearId) {
             return [
                 'id' => $student->id,
                 'first_name' => $student->first_name,
@@ -153,7 +153,7 @@ class EnrollmentController extends Controller
                 'current_grade_level' => $student->getCurrentGradeLevel()?->value,
                 'available_grade_levels' => array_map(
                     fn ($grade) => $grade->value,
-                    $student->getAvailableGradeLevels($currentSchoolYear)
+                    $student->getAvailableGradeLevels($currentSchoolYearId)
                 ),
             ];
         });
@@ -162,7 +162,7 @@ class EnrollmentController extends Controller
             'students' => $students,
             'gradeLevels' => GradeLevel::values(),
             'quarters' => Quarter::values(),
-            'currentSchoolYear' => $currentSchoolYear,
+            'currentSchoolYear' => $activePeriod->schoolYear->name,
             'selectedStudentId' => $selectedStudentId,
             'activePeriod' => $activePeriod,
             'daysRemaining' => $activePeriod->getDaysRemaining(),
@@ -214,7 +214,7 @@ class EnrollmentController extends Controller
 
         // Get the fee for the selected grade level and school year
         $gradeLevelFee = \App\Models\GradeLevelFee::where('grade_level', $validated['grade_level'])
-            ->where('school_year', $activePeriod->school_year)
+            ->where('school_year_id', $activePeriod->school_year_id)
             ->first();
 
         $tuitionFeeCents = $gradeLevelFee ? $gradeLevelFee->tuition_fee_cents : 0;
@@ -237,7 +237,7 @@ class EnrollmentController extends Controller
         $enrollment = Enrollment::create([
             'student_id' => $validated['student_id'],
             'guardian_id' => $guardian->id,
-            'school_year' => $activePeriod->school_year,
+            'school_year_id' => $activePeriod->school_year_id,
             'enrollment_period_id' => $activePeriod->id,
             'quarter' => Quarter::from($validated['quarter']),
             'grade_level' => GradeLevel::from($validated['grade_level']),
