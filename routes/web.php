@@ -1,7 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
 use App\Http\Controllers\Admin\EnrollmentController as AdminEnrollmentController;
+use App\Http\Controllers\Admin\EnrollmentPeriodController as AdminEnrollmentPeriodController;
+use App\Http\Controllers\Admin\GradeLevelFeeController as AdminGradeLevelFeeController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\SchoolInformationController as AdminSchoolInformationController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Guardian\BillingController as GuardianBillingController;
@@ -187,6 +194,41 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Users Management (limited compared to super-admin)
         Route::resource('users', AdminUserController::class);
+
+        // Payments Management
+        Route::resource('payments', AdminPaymentController::class);
+
+        // Grade Level Fees Management
+        Route::resource('grade-level-fees', AdminGradeLevelFeeController::class);
+        Route::post('/grade-level-fees/{gradeLevelFee}/duplicate', [AdminGradeLevelFeeController::class, 'duplicate'])->name('grade-level-fees.duplicate');
+
+        // Enrollment Periods Management
+        Route::resource('enrollment-periods', AdminEnrollmentPeriodController::class);
+        Route::post('/enrollment-periods/{enrollmentPeriod}/activate', [AdminEnrollmentPeriodController::class, 'activate'])->name('enrollment-periods.activate');
+        Route::post('/enrollment-periods/{enrollmentPeriod}/close', [AdminEnrollmentPeriodController::class, 'close'])->name('enrollment-periods.close');
+
+        // Document Management
+        Route::get('/documents/pending', [AdminDocumentController::class, 'pending'])->name('documents.pending');
+        Route::get('/documents/{document}', [AdminDocumentController::class, 'show'])->name('documents.show');
+        Route::get('/documents/{document}/view', [AdminDocumentController::class, 'view'])->name('documents.view');
+        Route::post('/documents/{document}/verify', [AdminDocumentController::class, 'verify'])->name('documents.verify');
+        Route::post('/documents/{document}/reject', [AdminDocumentController::class, 'reject'])->name('documents.reject');
+
+        // Reports Management
+        Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+
+        // Audit Logs Management
+        Route::prefix('audit-logs')->name('audit-logs.')->group(function () {
+            Route::get('/', [AdminAuditLogController::class, 'index'])->name('index');
+            Route::get('/{activity}', [AdminAuditLogController::class, 'show'])->name('show');
+            Route::post('/export', [AdminAuditLogController::class, 'export'])->name('export');
+        });
+
+        // School Information Management
+        Route::prefix('school-information')->name('school-information.')->group(function () {
+            Route::get('/', [AdminSchoolInformationController::class, 'index'])->name('index');
+            Route::put('/', [AdminSchoolInformationController::class, 'update'])->name('update');
+        });
     });
 
     // Registrar Routes
