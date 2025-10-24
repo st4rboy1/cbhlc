@@ -24,6 +24,16 @@ class EnrollmentObserverTest extends TestCase
 
         // Seed roles
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+
+        // Create school year
+        $this->sy2024 = \App\Models\SchoolYear::create([
+            'name' => '2024-2025',
+            'start_year' => 2024,
+            'end_year' => 2025,
+            'start_date' => '2024-06-01',
+            'end_date' => '2025-05-31',
+            'status' => 'active',
+        ]);
     }
 
     public function test_enrollment_id_is_generated_automatically(): void
@@ -46,14 +56,14 @@ class EnrollmentObserverTest extends TestCase
     {
         $gradeLevelFee = GradeLevelFee::factory()->create([
             'grade_level' => 'Grade 1',
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 20000,
             'miscellaneous_fee' => 5000,
         ]);
 
         $enrollment = Enrollment::factory()->create([
             'grade_level' => 'Grade 1',
-            'school_year' => '2024-2025',
+            'school_year_id' => $this->sy2024->id,
             'tuition_fee' => null,
         ]);
 
