@@ -33,7 +33,7 @@ class DashboardController extends Controller
             ->latest('created_at')
             ->take(5)
             ->get()
-            ->map(function (Enrollment $enrollment) {
+            ->map(function (Enrollment $enrollment): array {
                 return [
                     'id' => $enrollment->id,
                     'student_name' => $enrollment->student->first_name.' '.
