@@ -100,13 +100,4 @@ class EnrollmentPeriod extends Model
     {
         return $this->hasMany(Enrollment::class);
     }
-
-    /**
-     * Get the school year name (accessor for backward compatibility)
-     */
-    public function getSchoolYearAttribute(): ?string
-    {
-        // Use getRelationValue to avoid infinite recursion
-        return $this->getRelationValue('schoolYear')?->name;
-    }
 }
