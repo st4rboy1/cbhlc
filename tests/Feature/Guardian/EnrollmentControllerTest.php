@@ -41,7 +41,7 @@ class EnrollmentControllerTest extends TestCase
             'end_year' => 2024,
             'start_date' => '2023-06-01',
             'end_date' => '2024-05-31',
-            'status' => 'closed',
+            'status' => 'completed',
         ]);
 
         $this->sy2024 = \App\Models\SchoolYear::create([
@@ -783,7 +783,7 @@ class EnrollmentControllerTest extends TestCase
                 'end_year' => 2021 + $i,
                 'start_date' => (2020 + $i).'-06-01',
                 'end_date' => (2021 + $i).'-05-31',
-                'status' => 'closed',
+                'status' => 'completed',
             ]);
             Enrollment::factory()->create([
                 'student_id' => $this->student->id,

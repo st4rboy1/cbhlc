@@ -23,11 +23,11 @@ class EnrollmentPeriodSeeder extends Seeder
         );
         $sy2024 = \App\Models\SchoolYear::firstOrCreate(
             ['name' => '2024-2025'],
-            ['start_year' => 2024, 'end_year' => 2025, 'start_date' => '2024-06-01', 'end_date' => '2025-05-31', 'status' => 'closed']
+            ['start_year' => 2024, 'end_year' => 2025, 'start_date' => '2024-06-01', 'end_date' => '2025-05-31', 'status' => 'completed']
         );
         $sy2023 = \App\Models\SchoolYear::firstOrCreate(
             ['name' => '2023-2024'],
-            ['start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'closed']
+            ['start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']
         );
 
         // Current/Active Period: 2025-2026
@@ -66,7 +66,7 @@ class EnrollmentPeriodSeeder extends Seeder
             'early_registration_deadline' => '2024-05-31',
             'regular_registration_deadline' => '2024-07-31',
             'late_registration_deadline' => '2024-08-31',
-            'status' => 'closed',
+            'status' => 'completed',
             'description' => 'School Year 2024-2025 Enrollment Period',
             'allow_new_students' => true,
             'allow_returning_students' => true,
@@ -80,7 +80,7 @@ class EnrollmentPeriodSeeder extends Seeder
             'early_registration_deadline' => '2023-05-31',
             'regular_registration_deadline' => '2023-07-31',
             'late_registration_deadline' => '2023-08-31',
-            'status' => 'closed',
+            'status' => 'completed',
             'description' => 'School Year 2023-2024 Enrollment Period',
             'allow_new_students' => true,
             'allow_returning_students' => true,

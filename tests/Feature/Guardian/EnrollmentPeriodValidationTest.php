@@ -181,7 +181,7 @@ test('new student cannot enroll when period does not allow new students', functi
 
 test('returning student cannot enroll when period does not allow returning students', function () {
     // Create a previous enrollment to make this a returning student
-    $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'closed']);
+    $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
     Enrollment::factory()->create([
         'student_id' => $this->student->id,
         'guardian_id' => $this->guardianModel->id,
@@ -371,7 +371,7 @@ test('canEnrollForPeriod method validates new student eligibility', function () 
 
 test('canEnrollForPeriod method validates returning student eligibility', function () {
     // Make student a returning student
-    $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'closed']);
+    $sy2023 = \App\Models\SchoolYear::create(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']);
     Enrollment::factory()->create([
         'student_id' => $this->student->id,
         'guardian_id' => $this->guardianModel->id,
