@@ -28,7 +28,7 @@ class DashboardController extends Controller
         $students = Student::whereIn('id', $studentIds)->get();
 
         // Get enrollments for guardian's children
-        $enrollments = Enrollment::with(['student'])
+        $enrollments = Enrollment::with(['student', 'schoolYear'])
             ->whereIn('student_id', $studentIds)
             ->latest('created_at')
             ->take(5)
@@ -40,7 +40,7 @@ class DashboardController extends Controller
                                      ($enrollment->student->middle_name ? $enrollment->student->middle_name.' ' : '').
                                      $enrollment->student->last_name,
                     'grade_level' => $enrollment->grade_level,
-                    'school_year' => $enrollment->school_year,
+                    'school_year' => $enrollment->schoolYear->name,
                     'status' => $enrollment->status->value,
                     'payment_status' => $enrollment->payment_status->value,
                     'created_at' => $enrollment->created_at->format('Y-m-d'),

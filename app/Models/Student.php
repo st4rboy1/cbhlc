@@ -196,7 +196,7 @@ class Student extends Model
     /**
      * Get available grade levels for enrollment
      */
-    public function getAvailableGradeLevels(string $schoolYear): array
+    public function getAvailableGradeLevels(int $schoolYearId): array
     {
         $currentGrade = $this->getCurrentGradeLevel();
 
@@ -204,7 +204,7 @@ class Student extends Model
             return GradeLevel::getAvailableGradesFor(null);
         }
 
-        if (! $this->passedPreviousYear($schoolYear)) {
+        if (! $this->passedPreviousYear($schoolYearId)) {
             return $currentGrade ? [$currentGrade] : [];
         }
 
