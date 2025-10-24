@@ -18,9 +18,8 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
-    // Create school years
-    $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
-        'name' => '2024-2025',
+    // Create school years using factory for parallel test support
+    $this->sy2024 = \App\Models\SchoolYear::factory()->create([
         'start_year' => 2024,
         'end_year' => 2025,
         'start_date' => '2024-06-01',
@@ -28,8 +27,7 @@ beforeEach(function () {
         'status' => 'active',
     ]);
 
-    $this->sy2023 = \App\Models\SchoolYear::firstOrCreate([
-        'name' => '2023-2024',
+    $this->sy2023 = \App\Models\SchoolYear::factory()->create([
         'start_year' => 2023,
         'end_year' => 2024,
         'start_date' => '2023-06-01',
@@ -37,8 +35,7 @@ beforeEach(function () {
         'status' => 'completed',
     ]);
 
-    $this->sy2025 = \App\Models\SchoolYear::firstOrCreate([
-        'name' => '2025-2026',
+    $this->sy2025 = \App\Models\SchoolYear::factory()->create([
         'start_year' => 2025,
         'end_year' => 2026,
         'start_date' => '2025-06-01',
