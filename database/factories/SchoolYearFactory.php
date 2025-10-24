@@ -19,7 +19,11 @@ class SchoolYearFactory extends Factory
      */
     public function definition(): array
     {
-        $startYear = $this->faker->numberBetween(2020, 2030);
+        // Use unique() to ensure no duplicate school year names
+        // This will generate unique timestamps-based school years
+        static $counter = 0;
+        $counter++;
+        $startYear = 2020 + $counter;
         $endYear = $startYear + 1;
 
         return [

@@ -334,9 +334,9 @@ test('cannot delete period with existing enrollments', function () {
     ]);
 
     // Create an enrollment for this period
-    $sy2025 = \App\Models\SchoolYear::firstOrCreate(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming']);
     Enrollment::factory()->create([
-        'school_year_id' => $sy2025->id,
+        'school_year_id' => $period->school_year_id,
+        'enrollment_period_id' => $period->id,
     ]);
 
     $response = actingAs($this->superAdmin)

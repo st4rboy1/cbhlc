@@ -32,7 +32,7 @@ class StudentController extends Controller
 
         /** @var \Illuminate\Support\Collection<int, array<string, mixed>> $students */
         $students = Student::with(['enrollments' => function ($query) {
-            $query->latest('created_at')->limit(1);
+            $query->with('schoolYear')->latest('created_at')->limit(1);
         }])
             ->whereIn('id', $studentIds)
             ->get()
@@ -53,7 +53,7 @@ class StudentController extends Controller
                     'gender' => $student->gender,
                     'grade_level' => $student->grade_level,
                     'latest_enrollment' => $latestEnrollment ? [
-                        'school_year' => $latestEnrollment->school_year,
+                        'school_year_name' => $latestEnrollment->schoolYear->name,
                         'status' => $latestEnrollment->status->value,
                         'grade_level' => $latestEnrollment->grade_level,
                     ] : null,
@@ -82,7 +82,7 @@ class StudentController extends Controller
             abort(403, 'You do not have access to view this student.');
         }
 
-        $student->load('enrollments', 'documents');
+        $student->load('enrollments.schoolYear', 'documents');
 
         return Inertia::render('guardian/students/show', [
             'student' => [
@@ -105,7 +105,7 @@ class StudentController extends Controller
                 'enrollments' => $student->enrollments->map(function (\App\Models\Enrollment $enrollment) {
                     return [
                         'id' => $enrollment->id,
-                        'school_year' => $enrollment->schoolYear->name,
+                        'school_year_id' => $enrollment->school_year_id,
                         'grade_level' => $enrollment->grade_level,
                         'quarter' => $enrollment->quarter,
                         'status' => $enrollment->status->value,

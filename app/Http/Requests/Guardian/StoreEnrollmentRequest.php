@@ -116,6 +116,14 @@ class StoreEnrollmentRequest extends FormRequest
                 'integer',
                 'exists:school_years,id',
                 function ($attribute, $value, $fail) {
+                    // Check that school year matches active enrollment period
+                    $activePeriod = EnrollmentPeriod::active()->first();
+                    if ($activePeriod && $activePeriod->school_year_id != $value) {
+                        $fail('The selected school year does not match the currently active enrollment period.');
+
+                        return;
+                    }
+
                     // Check for existing enrollment for this school year
                     $studentId = $this->input('student_id');
                     if ($studentId && Enrollment::where('student_id', $studentId)

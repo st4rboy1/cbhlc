@@ -35,7 +35,7 @@ class BillingController extends Controller
 
         // Get enrollments with billing information
         /** @var \Illuminate\Support\Collection<int, array<string, mixed>> $enrollments */
-        $enrollments = Enrollment::with(['student'])
+        $enrollments = Enrollment::with(['student', 'schoolYear'])
             ->whereIn('student_id', $studentIds)
             ->where('status', '!=', EnrollmentStatus::REJECTED)
             ->get()
@@ -63,7 +63,7 @@ class BillingController extends Controller
                                      ($enrollment->student->middle_name ? $enrollment->student->middle_name.' ' : '').
                                      $enrollment->student->last_name,
                     'student_id' => $enrollment->student->student_id,
-                    'school_year' => $enrollment->schoolYear->name,
+                    'school_year_name' => $enrollment->schoolYear->name,
                     'grade_level' => $enrollment->grade_level,
                     'status' => $enrollment->status->value,
                     'payment_status' => $enrollment->payment_status->value,
@@ -131,7 +131,7 @@ class BillingController extends Controller
             abort(403, 'You do not have access to view this billing information.');
         }
 
-        $enrollment->load(['student']);
+        $enrollment->load(['student', 'schoolYear']);
 
         // Use enrollment's stored fee amounts if available, otherwise lookup from grade level fees
         if ($enrollment->total_amount_cents > 0) {
@@ -188,7 +188,7 @@ class BillingController extends Controller
                                  ($enrollment->student->middle_name ? $enrollment->student->middle_name.' ' : '').
                                  $enrollment->student->last_name,
                 'student_id' => $enrollment->student->student_id,
-                'school_year' => $enrollment->schoolYear->name,
+                'school_year_name' => $enrollment->schoolYear->name,
                 'grade_level' => $enrollment->grade_level,
                 'status' => $enrollment->status->value,
                 'payment_status' => $enrollment->payment_status->value,
