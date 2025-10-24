@@ -34,7 +34,7 @@ beforeEach(function () {
         'end_year' => 2024,
         'start_date' => '2023-06-01',
         'end_date' => '2024-05-31',
-        'status' => 'closed',
+        'status' => 'completed',
     ]);
 
     $this->sy2025 = \App\Models\SchoolYear::create([

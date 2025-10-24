@@ -325,7 +325,7 @@ test('cannot delete active enrollment period', function () {
 
 test('cannot delete period with existing enrollments', function () {
     $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
-        'status' => 'closed',
+        'status' => 'completed',
         'start_date' => now()->subYear(),
         'end_date' => now()->subMonths(2),
         'regular_registration_deadline' => now()->subMonths(10),

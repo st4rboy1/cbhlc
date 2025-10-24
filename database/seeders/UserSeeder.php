@@ -306,7 +306,7 @@ class UserSeeder extends Seeder
         );
         $sy2024 = \App\Models\SchoolYear::firstOrCreate(
             ['name' => '2024-2025'],
-            ['start_year' => 2024, 'end_year' => 2025, 'start_date' => '2024-06-01', 'end_date' => '2025-05-31', 'status' => 'closed']
+            ['start_year' => 2024, 'end_year' => 2025, 'start_date' => '2024-06-01', 'end_date' => '2025-05-31', 'status' => 'completed']
         );
 
         // Student 1 - Pending enrollment for Grade 5
@@ -406,7 +406,7 @@ class UserSeeder extends Seeder
         );
         $sy2024 = \App\Models\SchoolYear::firstOrCreate(
             ['name' => '2024-2025'],
-            ['start_year' => 2024, 'end_year' => 2025, 'start_date' => '2024-06-01', 'end_date' => '2025-05-31', 'status' => 'closed']
+            ['start_year' => 2024, 'end_year' => 2025, 'start_date' => '2024-06-01', 'end_date' => '2025-05-31', 'status' => 'completed']
         );
 
         // Student 1 - With rejected enrollment
@@ -601,15 +601,15 @@ class UserSeeder extends Seeder
         // Get or create school years
         $sy2022 = \App\Models\SchoolYear::firstOrCreate(
             ['name' => '2022-2023'],
-            ['start_year' => 2022, 'end_year' => 2023, 'start_date' => '2022-06-01', 'end_date' => '2023-05-31', 'status' => 'closed']
+            ['start_year' => 2022, 'end_year' => 2023, 'start_date' => '2022-06-01', 'end_date' => '2023-05-31', 'status' => 'completed']
         );
         $sy2023 = \App\Models\SchoolYear::firstOrCreate(
             ['name' => '2023-2024'],
-            ['start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'closed']
+            ['start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed']
         );
         $sy2024 = \App\Models\SchoolYear::firstOrCreate(
             ['name' => '2024-2025'],
-            ['start_year' => 2024, 'end_year' => 2025, 'start_date' => '2024-06-01', 'end_date' => '2025-05-31', 'status' => 'closed']
+            ['start_year' => 2024, 'end_year' => 2025, 'start_date' => '2024-06-01', 'end_date' => '2025-05-31', 'status' => 'completed']
         );
 
         // Create completed enrollments for previous years
