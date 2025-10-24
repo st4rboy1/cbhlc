@@ -328,7 +328,7 @@ test('enrollment relationship with enrollment period works', function () {
 
     expect($enrollment->enrollmentPeriod)->not->toBeNull();
     expect($enrollment->enrollmentPeriod->id)->toBe($period->id);
-    expect($enrollment->enrollmentPeriod->school_year)->toBe('2024-2025');
+    expect($enrollment->enrollmentPeriod->schoolYear->name)->toBe('2024-2025');
 });
 
 test('canEnrollForPeriod method validates period is open', function () {

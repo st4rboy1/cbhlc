@@ -121,7 +121,7 @@ describe('Guardian BillingController', function () {
             ->has('enrollments.0', fn ($enrollment) => $enrollment
                 ->where('student_name', 'John Michael Doe')
                 ->where('student_id', 'STU-001')
-                ->where('school_year', '2024-2025')
+                ->where('school_year_name', '2024-2025')
                 ->where('grade_level', GradeLevel::GRADE_2->value)
                 ->where('tuition_fee', '₱22,000.00')
                 ->where('miscellaneous_fee', '₱5,500.00')
@@ -279,7 +279,7 @@ describe('Guardian BillingController', function () {
             ->component('guardian/billing/show')
             ->where('enrollment.student_name', 'John Michael Doe')
             ->where('enrollment.student_id', 'STU-001')
-            ->where('enrollment.school_year', '2024-2025')
+            ->where('enrollment.school_year_name', '2024-2025')
             ->where('enrollment.grade_level', GradeLevel::GRADE_4->value)
             ->where('enrollment.payment_status', PaymentStatus::PARTIAL->value)
             ->where('billing.tuition_fee', '₱26,000.00')

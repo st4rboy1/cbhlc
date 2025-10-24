@@ -49,10 +49,6 @@ class EnrollmentPeriodController extends Controller
     {
         $validated = $request->validated();
 
-        // Get the school year to populate the school_year string field
-        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
-        $validated['school_year'] = $schoolYear->name;
-
         $period = EnrollmentPeriod::create($validated);
 
         activity()
@@ -101,10 +97,6 @@ class EnrollmentPeriodController extends Controller
         $old = $enrollmentPeriod->toArray();
 
         $validated = $request->validated();
-
-        // Get the school year to populate the school_year string field
-        $schoolYear = \App\Models\SchoolYear::findOrFail($validated['school_year_id']);
-        $validated['school_year'] = $schoolYear->name;
 
         $enrollmentPeriod->update($validated);
 

@@ -108,7 +108,7 @@ class EnrollmentControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('filters.school_year', '2024-2025')
+            ->where('filters.school_year_id', $this->sy2024->id)
         );
     }
 
@@ -717,7 +717,7 @@ class EnrollmentControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->where('filters.status', EnrollmentStatus::PENDING->value)
-            ->where('filters.school_year', '2024-2025')
+            ->where('filters.school_year_id', $this->sy2024->id)
             ->where('filters.grade_level', GradeLevel::GRADE_1->value)
             ->where('filters.payment_status', PaymentStatus::PENDING->value)
             ->where('filters.search', 'John')

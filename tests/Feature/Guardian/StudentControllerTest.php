@@ -137,7 +137,7 @@ describe('Guardian StudentController', function () {
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('guardian/students/index')
             ->has('students.0', fn ($student) => $student
-                ->where('latest_enrollment.school_year', '2024-2025')
+                ->where('latest_enrollment.school_year_name', '2024-2025')
                 ->where('latest_enrollment.grade_level', GradeLevel::GRADE_3->value)
                 ->where('latest_enrollment.status', EnrollmentStatus::ENROLLED->value)
                 ->etc()
