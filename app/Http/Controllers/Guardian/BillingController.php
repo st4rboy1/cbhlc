@@ -49,7 +49,7 @@ class BillingController extends Controller
                 } else {
                     // Fallback: Find the fee for the enrollment's grade level
                     $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)
-                        ->where('school_year', $enrollment->school_year)
+                        ->where('school_year_id', $enrollment->school_year_id)
                         ->first();
 
                     $tuitionFee = $fee ? $fee->tuition_fee : 0;
@@ -63,7 +63,7 @@ class BillingController extends Controller
                                      ($enrollment->student->middle_name ? $enrollment->student->middle_name.' ' : '').
                                      $enrollment->student->last_name,
                     'student_id' => $enrollment->student->student_id,
-                    'school_year' => $enrollment->school_year,
+                    'school_year' => $enrollment->schoolYear->name,
                     'grade_level' => $enrollment->grade_level,
                     'status' => $enrollment->status->value,
                     'payment_status' => $enrollment->payment_status->value,
@@ -140,7 +140,7 @@ class BillingController extends Controller
             $totalFee = $enrollment->total_amount_cents / 100;
         } else {
             $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)
-                ->where('school_year', $enrollment->school_year)
+                ->where('school_year_id', $enrollment->school_year_id)
                 ->first();
 
             $tuitionFee = $fee ? $fee->tuition_fee : 0;
@@ -150,28 +150,32 @@ class BillingController extends Controller
 
         // Calculate payment schedule based on quarterly plan (default)
         $quarterlyAmount = $totalFee / 4;
+        $schoolYearName = $enrollment->schoolYear->name;
+        $startYear = substr($schoolYearName, 0, 4);
+        $endYear = substr($schoolYearName, 5, 4);
+
         $paymentSchedule = [
             [
                 'period' => 'First Quarter',
-                'due_date' => 'August 15, '.substr($enrollment->school_year, 0, 4),
+                'due_date' => 'August 15, '.$startYear,
                 'amount' => $this->currencyService->format($quarterlyAmount),
                 'status' => 'pending',
             ],
             [
                 'period' => 'Second Quarter',
-                'due_date' => 'October 15, '.substr($enrollment->school_year, 0, 4),
+                'due_date' => 'October 15, '.$startYear,
                 'amount' => $this->currencyService->format($quarterlyAmount),
                 'status' => 'pending',
             ],
             [
                 'period' => 'Third Quarter',
-                'due_date' => 'January 15, '.substr($enrollment->school_year, 5, 4),
+                'due_date' => 'January 15, '.$endYear,
                 'amount' => $this->currencyService->format($quarterlyAmount),
                 'status' => 'pending',
             ],
             [
                 'period' => 'Fourth Quarter',
-                'due_date' => 'March 15, '.substr($enrollment->school_year, 5, 4),
+                'due_date' => 'March 15, '.$endYear,
                 'amount' => $this->currencyService->format($quarterlyAmount),
                 'status' => 'pending',
             ],
@@ -184,7 +188,7 @@ class BillingController extends Controller
                                  ($enrollment->student->middle_name ? $enrollment->student->middle_name.' ' : '').
                                  $enrollment->student->last_name,
                 'student_id' => $enrollment->student->student_id,
-                'school_year' => $enrollment->school_year,
+                'school_year' => $enrollment->schoolYear->name,
                 'grade_level' => $enrollment->grade_level,
                 'status' => $enrollment->status->value,
                 'payment_status' => $enrollment->payment_status->value,

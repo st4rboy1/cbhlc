@@ -50,7 +50,7 @@ class EnrollmentSubmitted extends Mailable implements ShouldQueue
                 'studentName' => $this->enrollment->student->full_name,
                 'enrollmentId' => $this->enrollment->enrollment_id,
                 'gradeLevel' => $this->enrollment->grade_level_label,
-                'schoolYear' => $this->enrollment->school_year,
+                'schoolYear' => $this->enrollment->schoolYear->name,
                 'submittedAt' => $this->enrollment->created_at->format('F j, Y g:i A'),
                 'nextSteps' => [
                     'Your application will be reviewed by our admissions team',

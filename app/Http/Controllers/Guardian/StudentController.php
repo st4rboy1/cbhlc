@@ -105,7 +105,7 @@ class StudentController extends Controller
                 'enrollments' => $student->enrollments->map(function (\App\Models\Enrollment $enrollment) {
                     return [
                         'id' => $enrollment->id,
-                        'school_year' => $enrollment->school_year,
+                        'school_year' => $enrollment->schoolYear->name,
                         'grade_level' => $enrollment->grade_level,
                         'quarter' => $enrollment->quarter,
                         'status' => $enrollment->status->value,

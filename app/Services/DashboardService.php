@@ -515,7 +515,8 @@ class DashboardService implements DashboardServiceInterface
     public function getStudentDashboardData(int $studentId): array
     {
         $student = Student::findOrFail($studentId);
-        $enrollment = Enrollment::where('student_id', $studentId)
+        $enrollment = Enrollment::with('schoolYear')
+            ->where('student_id', $studentId)
             ->latest()
             ->first();
 
@@ -525,7 +526,7 @@ class DashboardService implements DashboardServiceInterface
             'profile' => $student,
             'enrollment_status' => $enrollment ? $enrollment->status->label() : 'Not Enrolled',
             'current_grade' => $student->grade_level,
-            'school_year' => $enrollment ? $enrollment->school_year : null,
+            'school_year' => $enrollment?->schoolYear?->name,
             'announcements' => $this->getAnnouncements(),
         ];
     }
