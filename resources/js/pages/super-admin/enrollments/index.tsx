@@ -1,3 +1,4 @@
+import { SchoolYearFilter } from '@/components/school-year-filter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
@@ -16,6 +17,12 @@ interface PaginationLink {
     active: boolean;
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    status: string;
+}
+
 interface Props {
     enrollments: {
         data: Enrollment[];
@@ -28,17 +35,17 @@ interface Props {
         search?: string;
         status?: string;
         grade?: string;
-        school_year?: string;
+        school_year_id?: string;
     };
     statuses: Array<{ label: string; value: string }>;
-    schoolYears: string[];
+    schoolYears: SchoolYear[];
 }
 
-export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statuses, schoolYears: schoolYearsData }: Props) {
+export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statuses, schoolYears }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || 'all');
     const [grade, setGrade] = useState(filters.grade || 'all');
-    const [schoolYear, setSchoolYear] = useState(filters.school_year || 'all');
+    const [schoolYearId, setSchoolYearId] = useState(filters.school_year_id || 'all');
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
@@ -52,7 +59,7 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
                 search: search || undefined,
                 status: status && status !== 'all' ? status : undefined,
                 grade: grade && grade !== 'all' ? grade : undefined,
-                school_year: schoolYear && schoolYear !== 'all' ? schoolYear : undefined,
+                school_year_id: schoolYearId && schoolYearId !== 'all' ? schoolYearId : undefined,
             },
             {
                 preserveState: true,
@@ -65,7 +72,7 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
         setSearch('');
         setStatus('all');
         setGrade('all');
-        setSchoolYear('all');
+        setSchoolYearId('all');
         router.get('/super-admin/enrollments', {}, { preserveState: true, preserveScroll: true });
     };
 
@@ -151,19 +158,7 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium">School Year</label>
-                            <Select value={schoolYear} onValueChange={setSchoolYear}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="All School Years" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All School Years</SelectItem>
-                                    {schoolYearsData.map((sy) => (
-                                        <SelectItem key={sy} value={sy}>
-                                            S.Y. {sy}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                            <SchoolYearFilter value={schoolYearId} onChange={setSchoolYearId} schoolYears={schoolYears} />
                         </div>
                     </div>
                     <div className="mt-6 flex gap-2">
@@ -171,7 +166,7 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
                             <Search className="mr-2 h-4 w-4" />
                             Search
                         </Button>
-                        {(search || (status && status !== 'all') || (grade && grade !== 'all') || (schoolYear && schoolYear !== 'all')) && (
+                        {(search || (status && status !== 'all') || (grade && grade !== 'all') || (schoolYearId && schoolYearId !== 'all')) && (
                             <Button onClick={handleClearFilters} variant="outline">
                                 Clear Filters
                             </Button>
