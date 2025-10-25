@@ -6,6 +6,7 @@ use App\Enums\PaymentMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -58,6 +59,14 @@ class Payment extends Model
     public function processedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'processed_by');
+    }
+
+    /**
+     * Get the receipt for this payment
+     */
+    public function receipt(): HasOne
+    {
+        return $this->hasOne(Receipt::class);
     }
 
     /**
