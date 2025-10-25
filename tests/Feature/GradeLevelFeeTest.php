@@ -210,7 +210,7 @@ test('grade level fee model getFeesForGrade returns null for non-existent grade'
     expect($fee)->toBeNull();
 });
 
-test('grade level fee model getFeesForGrade works with specific school year', function () {
+test('grade level fee model getFeesForGrade works with specific enrollment period', function () {
     $specificSchoolYear = '2024-2025';
     $schoolYear = \App\Models\SchoolYear::firstOrCreate([
         'name' => $specificSchoolYear,
@@ -221,9 +221,24 @@ test('grade level fee model getFeesForGrade works with specific school year', fu
         'status' => 'active',
     ]);
 
+    // Create enrollment period for this school year
+    $enrollmentPeriod = \App\Models\EnrollmentPeriod::firstOrCreate([
+        'school_year_id' => $schoolYear->id,
+    ], [
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'early_registration_deadline' => '2024-05-31',
+        'regular_registration_deadline' => '2024-07-31',
+        'late_registration_deadline' => '2024-08-31',
+        'status' => 'active',
+        'description' => "School Year {$specificSchoolYear} Enrollment Period",
+        'allow_new_students' => true,
+        'allow_returning_students' => true,
+    ]);
+
     $fee = GradeLevelFee::factory()->create([
         'grade_level' => GradeLevel::KINDER,
-        'school_year_id' => $schoolYear->id,
+        'enrollment_period_id' => $enrollmentPeriod->id,
         'tuition_fee_cents' => 100000,
         'miscellaneous_fee_cents' => 5000,
         'laboratory_fee_cents' => 0,
@@ -232,7 +247,7 @@ test('grade level fee model getFeesForGrade works with specific school year', fu
         'is_active' => true,
     ]);
 
-    $foundFee = GradeLevelFee::getFeesForGrade(GradeLevel::KINDER, $schoolYear->id);
+    $foundFee = GradeLevelFee::getFeesForGrade(GradeLevel::KINDER, $enrollmentPeriod->id);
 
     expect($foundFee)->not->toBeNull();
     expect($foundFee->id)->toBe($fee->id);
