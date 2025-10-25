@@ -42,6 +42,34 @@ class DashboardController extends Controller
         // User verification metrics
         $unverifiedUsers = User::whereNull('email_verified_at')->count();
         $verifiedUsers = User::whereNotNull('email_verified_at')->count();
+        $totalUsers = User::count();
+        $verificationRate = $totalUsers > 0 ? round(($verifiedUsers / $totalUsers) * 100, 1) : 0;
+
+        // Recent verification activity (last 24 hours)
+        $recentVerifications = \App\Models\EmailVerificationEvent::where('verified_at', '>=', now()->subDay())->count();
+
+        // Average time to verify (in hours)
+        $avgTimeToVerify = \App\Models\EmailVerificationEvent::avg('time_to_verify_minutes');
+        $avgTimeToVerifyHours = $avgTimeToVerify ? round($avgTimeToVerify / 60, 1) : null;
+
+        // Verification stats for this week
+        $weeklyRegistrations = User::where('created_at', '>=', now()->startOfWeek())->count();
+        $weeklyVerifications = \App\Models\EmailVerificationEvent::where('verified_at', '>=', now()->startOfWeek())->count();
+        $weeklyVerificationRate = $weeklyRegistrations > 0 ? round(($weeklyVerifications / $weeklyRegistrations) * 100, 1) : 0;
+
+        // Recent verification events with user details
+        $recentVerificationEvents = \App\Models\EmailVerificationEvent::with('user')
+            ->latest('verified_at')
+            ->limit(5)
+            ->get()
+            ->map(function ($event) {
+                return [
+                    'user_name' => $event->user->name,
+                    'user_email' => $event->user->email,
+                    'verified_at' => $event->verified_at->format('M d, Y g:i A'),
+                    'time_to_verify' => $event->time_to_verify_minutes ? round($event->time_to_verify_minutes / 60, 1).' hours' : 'N/A',
+                ];
+            });
 
         // Student enrollment journey
         $studentsWithEnrollments = Student::has('enrollments')->count();
@@ -98,6 +126,13 @@ class DashboardController extends Controller
             'total_users' => User::count(),
             'verified_users' => $verifiedUsers,
             'unverified_users' => $unverifiedUsers,
+            'verification_rate' => $verificationRate,
+            'recent_verifications_24h' => $recentVerifications,
+            'avg_time_to_verify_hours' => $avgTimeToVerifyHours,
+            'weekly_registrations' => $weeklyRegistrations,
+            'weekly_verifications' => $weeklyVerifications,
+            'weekly_verification_rate' => $weeklyVerificationRate,
+            'recent_verification_events' => $recentVerificationEvents,
 
             // Guardian Journey Metrics
             'total_guardians' => $totalGuardians,
