@@ -34,6 +34,21 @@ class EnrollmentObserverTest extends TestCase
             'end_date' => '2025-05-31',
             'status' => 'active',
         ]);
+
+        // Create enrollment period for school year
+        $this->enrollmentPeriod = \App\Models\EnrollmentPeriod::firstOrCreate([
+            'school_year_id' => $this->sy2024->id,
+        ], [
+            'start_date' => '2024-06-01',
+            'end_date' => '2025-05-31',
+            'early_registration_deadline' => '2024-05-31',
+            'regular_registration_deadline' => '2024-07-31',
+            'late_registration_deadline' => '2024-08-31',
+            'status' => 'active',
+            'description' => 'School Year 2024-2025 Enrollment Period',
+            'allow_new_students' => true,
+            'allow_returning_students' => true,
+        ]);
     }
 
     public function test_enrollment_id_is_generated_automatically(): void
@@ -56,7 +71,7 @@ class EnrollmentObserverTest extends TestCase
     {
         $gradeLevelFee = GradeLevelFee::factory()->create([
             'grade_level' => 'Grade 1',
-            'school_year_id' => $this->sy2024->id,
+            'enrollment_period_id' => $this->enrollmentPeriod->id,
             'tuition_fee' => 20000,
             'miscellaneous_fee' => 5000,
         ]);

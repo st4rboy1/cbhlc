@@ -312,11 +312,22 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
      */
     public function calculateFees(string $gradeLevel, array $options = []): array
     {
-        $currentSchoolYearName = date('Y').'-'.(date('Y') + 1);
-        $currentSchoolYear = \App\Models\SchoolYear::where('name', $currentSchoolYearName)->first();
+        // Find the current enrollment period
+        $activeEnrollmentPeriod = \App\Models\EnrollmentPeriod::where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->orderBy('start_date', 'desc')
+            ->first();
+
+        if (! $activeEnrollmentPeriod) {
+            $activeEnrollmentPeriod = \App\Models\EnrollmentPeriod::where('status', 'active')->first();
+        }
+
+        if (! $activeEnrollmentPeriod) {
+            $activeEnrollmentPeriod = \App\Models\EnrollmentPeriod::orderBy('start_date', 'desc')->first();
+        }
 
         $gradeLevelFee = GradeLevelFee::where('grade_level', $gradeLevel)
-            ->where('school_year_id', $currentSchoolYear?->id)
+            ->where('enrollment_period_id', $activeEnrollmentPeriod?->id)
             ->first();
 
         if (! $gradeLevelFee) {

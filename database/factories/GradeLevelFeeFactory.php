@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\GradeLevel;
+use App\Models\EnrollmentPeriod;
 use App\Models\GradeLevelFee;
 use App\Models\SchoolYear;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -37,9 +38,27 @@ class GradeLevelFeeFactory extends Factory
             ]
         );
 
+        // Create or get enrollment period for this school year
+        $enrollmentPeriod = EnrollmentPeriod::firstOrCreate(
+            [
+                'school_year_id' => $schoolYearModel->id,
+            ],
+            [
+                'start_date' => $currentYear.'-06-01',
+                'end_date' => ($currentYear + 1).'-03-31',
+                'early_registration_deadline' => $currentYear.'-05-31',
+                'regular_registration_deadline' => $currentYear.'-07-31',
+                'late_registration_deadline' => $currentYear.'-08-31',
+                'status' => 'active',
+                'description' => "School Year {$schoolYear} Enrollment Period",
+                'allow_new_students' => true,
+                'allow_returning_students' => true,
+            ]
+        );
+
         return [
             'grade_level' => fake()->randomElement(GradeLevel::values()),
-            'school_year_id' => $schoolYearModel->id,
+            'enrollment_period_id' => $enrollmentPeriod->id,
             'tuition_fee_cents' => fake()->numberBetween(2000000, 5000000), // 20,000 to 50,000 pesos
             'registration_fee_cents' => fake()->numberBetween(100000, 300000), // 1,000 to 3,000 pesos
             'miscellaneous_fee_cents' => fake()->numberBetween(50000, 150000), // 500 to 1,500 pesos
@@ -96,8 +115,26 @@ class GradeLevelFeeFactory extends Factory
                 ]
             );
 
+            // Create or get enrollment period for this school year
+            $enrollmentPeriod = EnrollmentPeriod::firstOrCreate(
+                [
+                    'school_year_id' => $schoolYearModel->id,
+                ],
+                [
+                    'start_date' => $startYear.'-06-01',
+                    'end_date' => $endYear.'-03-31',
+                    'early_registration_deadline' => $startYear.'-05-31',
+                    'regular_registration_deadline' => $startYear.'-07-31',
+                    'late_registration_deadline' => $startYear.'-08-31',
+                    'status' => 'active',
+                    'description' => "School Year {$schoolYear} Enrollment Period",
+                    'allow_new_students' => true,
+                    'allow_returning_students' => true,
+                ]
+            );
+
             return [
-                'school_year_id' => $schoolYearModel->id,
+                'enrollment_period_id' => $enrollmentPeriod->id,
             ];
         });
     }

@@ -23,7 +23,7 @@ class GradeLevelFee extends Model
 
     protected $fillable = [
         'grade_level',
-        'school_year_id',
+        'enrollment_period_id',
         'tuition_fee',
         'tuition_fee_cents',
         'registration_fee',
@@ -75,11 +75,26 @@ class GradeLevelFee extends Model
     ];
 
     /**
-     * Get the school year that this fee belongs to.
+     * Get the enrollment period that this fee belongs to.
+     */
+    public function enrollmentPeriod()
+    {
+        return $this->belongsTo(EnrollmentPeriod::class);
+    }
+
+    /**
+     * Get the school year through the enrollment period.
      */
     public function schoolYear()
     {
-        return $this->belongsTo(SchoolYear::class);
+        return $this->hasOneThrough(
+            SchoolYear::class,
+            EnrollmentPeriod::class,
+            'id',
+            'id',
+            'enrollment_period_id',
+            'school_year_id'
+        );
     }
 
     /**
@@ -126,34 +141,73 @@ class GradeLevelFee extends Model
     }
 
     /**
-     * Scope a query to only include fees for the current school year.
+     * Scope a query to only include fees for the active enrollment period.
      */
-    public function scopeCurrentSchoolYear($query)
+    public function scopeCurrentEnrollmentPeriod($query)
     {
-        $activeSchoolYear = SchoolYear::active();
+        // First priority: Find the period that contains today's date
+        $activeEnrollmentPeriod = EnrollmentPeriod::where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->orderBy('start_date', 'desc')
+            ->first();
 
-        if (! $activeSchoolYear) {
+        // Second priority: Get the enrollment period with status='active'
+        if (! $activeEnrollmentPeriod) {
+            $activeEnrollmentPeriod = EnrollmentPeriod::where('status', 'active')->first();
+        }
+
+        // Third priority: Get the most recent period by start date
+        if (! $activeEnrollmentPeriod) {
+            $activeEnrollmentPeriod = EnrollmentPeriod::orderBy('start_date', 'desc')->first();
+        }
+
+        if (! $activeEnrollmentPeriod) {
             return $query->whereRaw('1 = 0'); // Return empty result
         }
 
-        return $query->where('school_year_id', $activeSchoolYear->id);
+        return $query->where('enrollment_period_id', $activeEnrollmentPeriod->id);
     }
 
     /**
-     * Get fees for a specific grade level and school year
+     * Scope a query to only include fees for the current school year (kept for backward compatibility).
+     *
+     * @deprecated Use scopeCurrentEnrollmentPeriod instead
      */
-    public static function getFeesForGrade(GradeLevel $gradeLevel, ?int $schoolYearId = null): ?self
+    public function scopeCurrentSchoolYear($query)
     {
-        if (! $schoolYearId) {
-            $activeSchoolYear = SchoolYear::active();
-            if (! $activeSchoolYear) {
+        return $this->scopeCurrentEnrollmentPeriod($query);
+    }
+
+    /**
+     * Get fees for a specific grade level and enrollment period
+     */
+    public static function getFeesForGrade(GradeLevel $gradeLevel, ?int $enrollmentPeriodId = null): ?self
+    {
+        if (! $enrollmentPeriodId) {
+            // First priority: Find the period that contains today's date
+            $activeEnrollmentPeriod = EnrollmentPeriod::where('start_date', '<=', now())
+                ->where('end_date', '>=', now())
+                ->orderBy('start_date', 'desc')
+                ->first();
+
+            // Second priority: Get the enrollment period with status='active'
+            if (! $activeEnrollmentPeriod) {
+                $activeEnrollmentPeriod = EnrollmentPeriod::where('status', 'active')->first();
+            }
+
+            // Third priority: Get the most recent period by start date
+            if (! $activeEnrollmentPeriod) {
+                $activeEnrollmentPeriod = EnrollmentPeriod::orderBy('start_date', 'desc')->first();
+            }
+
+            if (! $activeEnrollmentPeriod) {
                 return null;
             }
-            $schoolYearId = $activeSchoolYear->id;
+            $enrollmentPeriodId = $activeEnrollmentPeriod->id;
         }
 
         return self::where('grade_level', $gradeLevel)
-            ->where('school_year_id', $schoolYearId)
+            ->where('enrollment_period_id', $enrollmentPeriodId)
             ->where('is_active', true)
             ->first();
     }
