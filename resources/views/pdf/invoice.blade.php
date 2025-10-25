@@ -138,14 +138,15 @@
     <div style="margin-top: 20px;">
         <strong>Payment Status:</strong>
         @php
+            $statusValue = $enrollment->payment_status->value ?? $enrollment->payment_status;
             $statusClass = 'status-unpaid';
-            if ($enrollment->payment_status === 'paid') {
+            if ($statusValue === 'paid') {
                 $statusClass = 'status-paid';
-            } elseif ($enrollment->payment_status === 'partially_paid') {
+            } elseif ($statusValue === 'partially_paid') {
                 $statusClass = 'status-partial';
             }
         @endphp
-        <span class="payment-status {{ $statusClass }}">{{ ucwords(str_replace('_', ' ', $enrollment->payment_status)) }}</span>
+        <span class="payment-status {{ $statusClass }}">{{ ucwords(str_replace('_', ' ', $statusValue)) }}</span>
     </div>
 
     {{-- Payment History --}}
@@ -165,7 +166,7 @@
             <tr>
                 <td>{{ $payment->payment_date->format('M d, Y') }}</td>
                 <td>₱{{ number_format($payment->amount, 2) }}</td>
-                <td>{{ ucfirst($payment->payment_method) }}</td>
+                <td>{{ ucfirst($payment->payment_method->value ?? $payment->payment_method) }}</td>
                 <td>{{ $payment->reference_number ?? 'N/A' }}</td>
             </tr>
             @endforeach
