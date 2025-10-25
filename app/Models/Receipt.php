@@ -92,7 +92,7 @@ class Receipt extends Model
             $sequenceNumber = $lastSequence + 1;
         }
 
-        return $prefix.str_pad($sequenceNumber, 4, '0', STR_PAD_LEFT);
+        return $prefix.str_pad((string) $sequenceNumber, 4, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -108,6 +108,6 @@ class Receipt extends Model
      */
     public function getFormattedAmountAttribute(): string
     {
-        return '₱'.number_format($this->amount, 2);
+        return '₱'.number_format((float) $this->amount, 2);
     }
 }
