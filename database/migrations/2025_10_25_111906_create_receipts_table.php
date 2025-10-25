@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('receipt_date');
             $table->decimal('amount', 10, 2)->comment('Amount received');
             $table->string('payment_method')->comment('Method of payment');
-            $table->foreignId('received_by')->constrained('users')->comment('User who received the payment');
+            $table->foreignId('received_by')->constrained('users');
             $table->text('notes')->nullable();
             $table->timestamps();
 
