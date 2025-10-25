@@ -145,7 +145,21 @@ class GradeLevelFee extends Model
      */
     public function scopeCurrentEnrollmentPeriod($query)
     {
-        $activeEnrollmentPeriod = EnrollmentPeriod::where('status', 'active')->first();
+        // First priority: Find the period that contains today's date
+        $activeEnrollmentPeriod = EnrollmentPeriod::where('start_date', '<=', now())
+            ->where('end_date', '>=', now())
+            ->orderBy('start_date', 'desc')
+            ->first();
+
+        // Second priority: Get the enrollment period with status='active'
+        if (! $activeEnrollmentPeriod) {
+            $activeEnrollmentPeriod = EnrollmentPeriod::where('status', 'active')->first();
+        }
+
+        // Third priority: Get the most recent period by start date
+        if (! $activeEnrollmentPeriod) {
+            $activeEnrollmentPeriod = EnrollmentPeriod::orderBy('start_date', 'desc')->first();
+        }
 
         if (! $activeEnrollmentPeriod) {
             return $query->whereRaw('1 = 0'); // Return empty result
@@ -170,7 +184,22 @@ class GradeLevelFee extends Model
     public static function getFeesForGrade(GradeLevel $gradeLevel, ?int $enrollmentPeriodId = null): ?self
     {
         if (! $enrollmentPeriodId) {
-            $activeEnrollmentPeriod = EnrollmentPeriod::where('status', 'active')->first();
+            // First priority: Find the period that contains today's date
+            $activeEnrollmentPeriod = EnrollmentPeriod::where('start_date', '<=', now())
+                ->where('end_date', '>=', now())
+                ->orderBy('start_date', 'desc')
+                ->first();
+
+            // Second priority: Get the enrollment period with status='active'
+            if (! $activeEnrollmentPeriod) {
+                $activeEnrollmentPeriod = EnrollmentPeriod::where('status', 'active')->first();
+            }
+
+            // Third priority: Get the most recent period by start date
+            if (! $activeEnrollmentPeriod) {
+                $activeEnrollmentPeriod = EnrollmentPeriod::orderBy('start_date', 'desc')->first();
+            }
+
             if (! $activeEnrollmentPeriod) {
                 return null;
             }
