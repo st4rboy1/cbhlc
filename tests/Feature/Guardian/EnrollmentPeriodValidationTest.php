@@ -52,22 +52,54 @@ beforeEach(function () {
         'is_primary_contact' => true,
     ]);
 
-    // Create grade level fee
-    GradeLevelFee::factory()->create([
-        'grade_level' => GradeLevel::GRADE_1->value,
+    // Create enrollment period for school year with 'upcoming' status
+    $this->enrollmentPeriod = EnrollmentPeriod::create([
         'school_year_id' => $this->sy2024->id,
+        'start_date' => '2024-06-01',
+        'end_date' => '2025-05-31',
+        'early_registration_deadline' => '2024-05-31',
+        'regular_registration_deadline' => '2024-07-31',
+        'late_registration_deadline' => '2024-08-31',
+        'status' => 'upcoming',
+        'description' => 'School Year 2024-2025 Enrollment Period',
+        'allow_new_students' => true,
+        'allow_returning_students' => true,
+    ]);
+
+    // Create grade level fee directly without factory to avoid creating extra enrollment period
+    GradeLevelFee::create([
+        'grade_level' => GradeLevel::GRADE_1->value,
+        'enrollment_period_id' => $this->enrollmentPeriod->id,
         'tuition_fee_cents' => 2000000,
+        'registration_fee_cents' => 100000,
         'miscellaneous_fee_cents' => 500000,
+        'laboratory_fee_cents' => 0,
+        'library_fee_cents' => 0,
+        'sports_fee_cents' => 0,
+        'other_fees_cents' => 0,
+        'down_payment_cents' => 0,
+        'payment_terms' => 'ANNUAL',
+        'is_active' => true,
     ]);
 });
 
 test('guardian cannot view create form when no active enrollment period', function () {
-    // No active enrollment period created
+    // No active enrollment period created (beforeEach creates one with status='upcoming')
+
+    // Debug: Check what periods exist
+    $periods = EnrollmentPeriod::all();
+    expect($periods)->toHaveCount(1);
+    expect($periods->first()->status)->toBe('upcoming');
+
+    // Verify no active periods exist
+    $activePeriod = EnrollmentPeriod::where('status', 'active')->first();
+    expect($activePeriod)->toBeNull();
 
     $response = $this->actingAs($this->guardian)
+        ->from(route('guardian.dashboard'))
         ->get(route('guardian.enrollments.create'));
 
-    $response->assertRedirect();
+    $response->assertRedirect(route('guardian.dashboard'));
     $response->assertSessionHasErrors(['enrollment']);
     expect(session('errors')->get('enrollment')[0])->toContain('Enrollment is currently closed');
 });
@@ -116,6 +148,7 @@ test('guardian can view create form when active enrollment period exists', funct
 
 test('guardian cannot enroll when no active enrollment period', function () {
     $response = $this->actingAs($this->guardian)
+        ->from(route('guardian.enrollments.create'))
         ->post(route('guardian.enrollments.store'), [
             'student_id' => $this->student->id,
             'school_year_id' => $this->sy2024->id,
@@ -123,7 +156,7 @@ test('guardian cannot enroll when no active enrollment period', function () {
             'grade_level' => GradeLevel::GRADE_1->value,
         ]);
 
-    $response->assertRedirect();
+    $response->assertRedirect(route('guardian.enrollments.create'));
     $response->assertSessionHasErrors(['enrollment']);
 });
 
