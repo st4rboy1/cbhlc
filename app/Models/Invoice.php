@@ -73,6 +73,11 @@ class Invoice extends Model
         return $this->hasMany(InvoiceItem::class);
     }
 
+    public function receipts(): HasMany
+    {
+        return $this->hasMany(Receipt::class);
+    }
+
     public function getRemainingBalanceAttribute(): float
     {
         return $this->total_amount - $this->paid_amount;
