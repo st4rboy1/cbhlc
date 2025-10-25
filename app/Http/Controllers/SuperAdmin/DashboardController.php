@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
+use App\Models\EmailVerificationEvent;
 use App\Models\Enrollment;
 use App\Models\Guardian;
 use App\Models\Invoice;
@@ -46,23 +47,24 @@ class DashboardController extends Controller
         $verificationRate = $totalUsers > 0 ? round(($verifiedUsers / $totalUsers) * 100, 1) : 0;
 
         // Recent verification activity (last 24 hours)
-        $recentVerifications = \App\Models\EmailVerificationEvent::where('verified_at', '>=', now()->subDay())->count();
+        $recentVerifications = EmailVerificationEvent::where('verified_at', '>=', now()->subDay())->count();
 
         // Average time to verify (in hours)
-        $avgTimeToVerify = \App\Models\EmailVerificationEvent::avg('time_to_verify_minutes');
+        $avgTimeToVerify = EmailVerificationEvent::avg('time_to_verify_minutes');
         $avgTimeToVerifyHours = $avgTimeToVerify ? round($avgTimeToVerify / 60, 1) : null;
 
         // Verification stats for this week
         $weeklyRegistrations = User::where('created_at', '>=', now()->startOfWeek())->count();
-        $weeklyVerifications = \App\Models\EmailVerificationEvent::where('verified_at', '>=', now()->startOfWeek())->count();
+        $weeklyVerifications = EmailVerificationEvent::where('verified_at', '>=', now()->startOfWeek())->count();
         $weeklyVerificationRate = $weeklyRegistrations > 0 ? round(($weeklyVerifications / $weeklyRegistrations) * 100, 1) : 0;
 
         // Recent verification events with user details
-        $recentVerificationEvents = \App\Models\EmailVerificationEvent::with('user')
+        $recentVerificationEvents = EmailVerificationEvent::with('user')
             ->latest('verified_at')
             ->limit(5)
             ->get()
-            ->map(function ($event) {
+            /** @phpstan-ignore-next-line */
+            ->map(function (EmailVerificationEvent $event): array {
                 return [
                     'user_name' => $event->user->name,
                     'user_email' => $event->user->email,
