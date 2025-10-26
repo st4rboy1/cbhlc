@@ -40,6 +40,7 @@ use App\Http\Controllers\SuperAdmin\InvoiceController as SuperAdminInvoiceContro
 use App\Http\Controllers\SuperAdmin\PaymentController as SuperAdminPaymentController;
 use App\Http\Controllers\SuperAdmin\SchoolInformationController as SuperAdminSchoolInformationController;
 use App\Http\Controllers\SuperAdmin\SchoolYearController as SuperAdminSchoolYearController;
+use App\Http\Controllers\SuperAdmin\SettingController as SuperAdminSettingController;
 use App\Http\Controllers\SuperAdmin\StudentController as SuperAdminStudentController;
 use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use App\Http\Controllers\TuitionController;
@@ -192,6 +193,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/', [SuperAdminSchoolInformationController::class, 'index'])->name('index');
             Route::put('/', [SuperAdminSchoolInformationController::class, 'update'])->name('update');
         });
+
+        // Settings Management
+        Route::resource('settings', SuperAdminSettingController::class);
     });
 
     // Admin Routes (for administrator roles)

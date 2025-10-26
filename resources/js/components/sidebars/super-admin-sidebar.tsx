@@ -14,6 +14,7 @@ import {
     LayoutGrid,
     Receipt,
     Settings,
+    Settings2,
     ShieldCheck,
     UserCog,
     Users,
@@ -85,6 +86,11 @@ const mainNavItems: NavItem[] = [
         title: 'Audit Logs',
         href: '/super-admin/audit-logs',
         icon: ClipboardList,
+    },
+    {
+        title: 'System Settings',
+        href: '/super-admin/settings',
+        icon: Settings2,
     },
     {
         title: 'Profile Settings',
