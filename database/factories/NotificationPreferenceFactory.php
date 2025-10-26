@@ -22,9 +22,9 @@ class NotificationPreferenceFactory extends Factory
 
         return [
             'user_id' => User::factory(),
-            'notification_type' => fake()->randomElement($types),
-            'email_enabled' => fake()->boolean(80), // 80% chance of being enabled
-            'database_enabled' => fake()->boolean(80),
+            'notification_type' => $this->faker->randomElement($types),
+            'email_enabled' => $this->faker->boolean(80), // 80% chance of being enabled
+            'database_enabled' => $this->faker->boolean(80),
         ];
     }
 }
