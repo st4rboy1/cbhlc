@@ -3,13 +3,13 @@
 use App\Models\Receipt;
 use App\Models\User;
 use App\Policies\ReceiptPolicy;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Database\Seeders\RolesAndPermissionsSeeder;
 
-uses(RefreshDatabase::class);
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
 beforeEach(function () {
     $this->policy = new ReceiptPolicy;
-    $this->artisan('db:seed', ['--class' => 'RolesAndPermissionsSeeder']);
+    $this->seed(RolesAndPermissionsSeeder::class);
 });
 
 it('allows super_admin to view any receipts', function () {
@@ -107,4 +107,36 @@ it('denies administrator from deleting a receipt', function () {
     $receipt = Receipt::factory()->create();
 
     expect($this->policy->delete($user, $receipt))->toBeFalse();
+});
+
+it('allows only super_admin to restore a receipt', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super_admin');
+    $receipt = Receipt::factory()->create();
+
+    expect($this->policy->restore($user, $receipt))->toBeTrue();
+});
+
+it('denies administrator from restoring a receipt', function () {
+    $user = User::factory()->create();
+    $user->assignRole('administrator');
+    $receipt = Receipt::factory()->create();
+
+    expect($this->policy->restore($user, $receipt))->toBeFalse();
+});
+
+it('allows only super_admin to force delete a receipt', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super_admin');
+    $receipt = Receipt::factory()->create();
+
+    expect($this->policy->forceDelete($user, $receipt))->toBeTrue();
+});
+
+it('denies administrator from force deleting a receipt', function () {
+    $user = User::factory()->create();
+    $user->assignRole('administrator');
+    $receipt = Receipt::factory()->create();
+
+    expect($this->policy->forceDelete($user, $receipt))->toBeFalse();
 });
