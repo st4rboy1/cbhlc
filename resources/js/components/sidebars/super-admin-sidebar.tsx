@@ -6,6 +6,7 @@ import {
     BadgeDollarSign,
     Building2,
     Calendar,
+    CalendarDays,
     ClipboardList,
     FileCheck,
     GraduationCap,
@@ -33,6 +34,11 @@ const mainNavItems: NavItem[] = [
         title: 'Enrollment Periods',
         href: '/super-admin/enrollment-periods',
         icon: Calendar,
+    },
+    {
+        title: 'School Years',
+        href: '/super-admin/school-years',
+        icon: CalendarDays,
     },
     {
         title: 'Students',
