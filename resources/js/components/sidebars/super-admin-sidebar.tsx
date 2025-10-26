@@ -13,6 +13,7 @@ import {
     GraduationCap,
     LayoutGrid,
     Receipt,
+    ReceiptText,
     Settings,
     Settings2,
     ShieldCheck,
@@ -76,6 +77,11 @@ const mainNavItems: NavItem[] = [
         title: 'Payments',
         href: '/super-admin/payments',
         icon: Receipt,
+    },
+    {
+        title: 'Receipts',
+        href: '/super-admin/receipts',
+        icon: ReceiptText,
     },
     {
         title: 'School Information',
