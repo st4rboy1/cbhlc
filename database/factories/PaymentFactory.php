@@ -21,11 +21,11 @@ class PaymentFactory extends Factory
     {
         return [
             'invoice_id' => Invoice::factory(),
-            'amount' => fake()->randomFloat(2, 100, 10000),
-            'payment_method' => fake()->randomElement(PaymentMethod::cases()),
-            'payment_date' => fake()->dateTimeThisMonth(),
-            'reference_number' => fake()->optional()->bothify('PAY-######'),
-            'notes' => fake()->optional()->sentence(),
+            'amount' => $this->faker->randomFloat(2, 100, 10000),
+            'payment_method' => $this->faker->randomElement(PaymentMethod::cases()),
+            'payment_date' => $this->faker->dateTimeThisMonth(),
+            'reference_number' => $this->faker->optional()->bothify('PAY-######'),
+            'notes' => $this->faker->optional()->sentence(),
             'processed_by' => User::factory(),
         ];
     }
@@ -41,7 +41,7 @@ class PaymentFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'payment_method' => PaymentMethod::BANK_TRANSFER,
-            'reference_number' => 'BT-'.fake()->numberBetween(100000, 999999),
+            'reference_number' => 'BT-'.$this->faker->numberBetween(100000, 999999),
         ]);
     }
 
@@ -49,7 +49,7 @@ class PaymentFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'payment_method' => PaymentMethod::CHECK,
-            'reference_number' => 'CHK-'.fake()->numberBetween(1000, 9999),
+            'reference_number' => 'CHK-'.$this->faker->numberBetween(1000, 9999),
         ]);
     }
 }

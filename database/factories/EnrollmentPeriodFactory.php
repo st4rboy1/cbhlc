@@ -16,9 +16,9 @@ class EnrollmentPeriodFactory extends Factory
      */
     public function definition(): array
     {
-        $year = fake()->numberBetween(2024, 2030);
-        $startDate = fake()->dateTimeBetween("$year-06-01", "$year-07-01");
-        $endDate = fake()->dateTimeBetween("$year-08-01", ($year + 1).'-05-31');
+        $year = $this->faker->numberBetween(2024, 2030);
+        $startDate = $this->faker->dateTimeBetween("$year-06-01", "$year-07-01");
+        $endDate = $this->faker->dateTimeBetween("$year-08-01", ($year + 1).'-05-31');
         $schoolYearName = "$year-".($year + 1);
 
         // Find or create the school year
@@ -49,8 +49,8 @@ class EnrollmentPeriodFactory extends Factory
             'early_registration_deadline' => $earlyDeadline,
             'regular_registration_deadline' => $regularDeadline,
             'late_registration_deadline' => $lateDeadline,
-            'status' => fake()->randomElement(['upcoming', 'active', 'closed']),
-            'description' => fake()->sentence(),
+            'status' => $this->faker->randomElement(['upcoming', 'active', 'closed']),
+            'description' => $this->faker->sentence(),
             'allow_new_students' => true,
             'allow_returning_students' => true,
         ];
