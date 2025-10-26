@@ -29,7 +29,7 @@ class ReceiptFactory extends Factory
             'amount' => $payment->amount,
             'payment_method' => $payment->payment_method->value,
             'received_by' => User::factory(),
-            'notes' => fake()->optional()->sentence(),
+            'notes' => $this->faker->optional()->sentence(),
         ];
     }
 
