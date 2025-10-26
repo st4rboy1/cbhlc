@@ -31,6 +31,7 @@ use App\Http\Controllers\Student\DashboardController as StudentDashboardControll
 use App\Http\Controllers\StudentReportController;
 use App\Http\Controllers\SuperAdmin\AuditLogController as SuperAdminAuditLogController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
+use App\Http\Controllers\SuperAdmin\DocumentController as SuperAdminDocumentController;
 use App\Http\Controllers\SuperAdmin\EnrollmentController as SuperAdminEnrollmentController;
 use App\Http\Controllers\SuperAdmin\EnrollmentPeriodController as SuperAdminEnrollmentPeriodController;
 use App\Http\Controllers\SuperAdmin\GradeLevelFeeController as SuperAdminGradeLevelFeeController;
@@ -39,6 +40,7 @@ use App\Http\Controllers\SuperAdmin\InvoiceController as SuperAdminInvoiceContro
 use App\Http\Controllers\SuperAdmin\PaymentController as SuperAdminPaymentController;
 use App\Http\Controllers\SuperAdmin\ReceiptController as SuperAdminReceiptController;
 use App\Http\Controllers\SuperAdmin\SchoolInformationController as SuperAdminSchoolInformationController;
+use App\Http\Controllers\SuperAdmin\SchoolYearController as SuperAdminSchoolYearController;
 use App\Http\Controllers\SuperAdmin\StudentController as SuperAdminStudentController;
 use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use App\Http\Controllers\TuitionController;
@@ -163,6 +165,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Receipts Management
         Route::resource('receipts', SuperAdminReceiptController::class);
 
+        // Documents Management
+        Route::resource('documents', SuperAdminDocumentController::class)->only(['index', 'show', 'destroy']);
+        Route::get('/documents/{document}/view', [SuperAdminDocumentController::class, 'view'])->name('documents.view');
+        Route::post('/documents/{document}/verify', [SuperAdminDocumentController::class, 'verify'])->name('documents.verify');
+        Route::post('/documents/{document}/reject', [SuperAdminDocumentController::class, 'reject'])->name('documents.reject');
+
         // Grade Level Fees Management
         Route::resource('grade-level-fees', SuperAdminGradeLevelFeeController::class);
         Route::post('/grade-level-fees/{gradeLevelFee}/duplicate', [SuperAdminGradeLevelFeeController::class, 'duplicate'])->name('grade-level-fees.duplicate');
@@ -171,6 +179,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('enrollment-periods', SuperAdminEnrollmentPeriodController::class);
         Route::post('/enrollment-periods/{enrollmentPeriod}/activate', [SuperAdminEnrollmentPeriodController::class, 'activate'])->name('enrollment-periods.activate');
         Route::post('/enrollment-periods/{enrollmentPeriod}/close', [SuperAdminEnrollmentPeriodController::class, 'close'])->name('enrollment-periods.close');
+
+        // School Years Management
+        Route::resource('school-years', SuperAdminSchoolYearController::class);
+        Route::post('/school-years/{schoolYear}/set-active', [SuperAdminSchoolYearController::class, 'setActive'])->name('school-years.set-active');
 
         // Audit Log Management
         Route::prefix('audit-logs')->name('audit-logs.')->group(function () {

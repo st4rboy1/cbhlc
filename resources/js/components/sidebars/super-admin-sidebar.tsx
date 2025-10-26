@@ -6,8 +6,10 @@ import {
     BadgeDollarSign,
     Building2,
     Calendar,
+    CalendarDays,
     ClipboardList,
     FileCheck,
+    FileText,
     GraduationCap,
     LayoutGrid,
     Receipt,
@@ -36,6 +38,11 @@ const mainNavItems: NavItem[] = [
         icon: Calendar,
     },
     {
+        title: 'School Years',
+        href: '/super-admin/school-years',
+        icon: CalendarDays,
+    },
+    {
         title: 'Students',
         href: '/super-admin/students',
         icon: Users,
@@ -54,6 +61,11 @@ const mainNavItems: NavItem[] = [
         title: 'Users',
         href: '/super-admin/users',
         icon: UserCog,
+    },
+    {
+        title: 'Documents',
+        href: '/super-admin/documents',
+        icon: FileText,
     },
     {
         title: 'Invoices',
