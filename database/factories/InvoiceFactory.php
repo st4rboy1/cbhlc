@@ -18,21 +18,21 @@ class InvoiceFactory extends Factory
      */
     public function definition(): array
     {
-        $totalAmount = fake()->randomFloat(2, 1000, 50000);
-        $paidAmount = fake()->randomFloat(2, 0, $totalAmount);
+        $totalAmount = $this->faker->randomFloat(2, 1000, 50000);
+        $paidAmount = $this->faker->randomFloat(2, 0, $totalAmount);
         $status = $paidAmount >= $totalAmount ? InvoiceStatus::PAID :
                  ($paidAmount > 0 ? InvoiceStatus::PARTIALLY_PAID : InvoiceStatus::SENT);
 
         return [
-            'invoice_number' => 'INV-'.fake()->unique()->numberBetween(100000, 999999),
+            'invoice_number' => 'INV-'.$this->faker->unique()->numberBetween(100000, 999999),
             'enrollment_id' => Enrollment::factory(),
-            'invoice_date' => fake()->dateTimeBetween('-30 days', 'now'),
+            'invoice_date' => $this->faker->dateTimeBetween('-30 days', 'now'),
             'total_amount' => $totalAmount,
             'paid_amount' => $paidAmount,
             'status' => $status,
-            'due_date' => fake()->dateTimeBetween('now', '+30 days'),
-            'paid_at' => $status === InvoiceStatus::PAID ? fake()->dateTimeThisMonth() : null,
-            'notes' => fake()->optional()->sentence(),
+            'due_date' => $this->faker->dateTimeBetween('now', '+30 days'),
+            'paid_at' => $status === InvoiceStatus::PAID ? $this->faker->dateTimeThisMonth() : null,
+            'notes' => $this->faker->optional()->sentence(),
         ];
     }
 
@@ -58,8 +58,8 @@ class InvoiceFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => InvoiceStatus::PAID,
-            'paid_amount' => $attributes['total_amount'] ?? fake()->randomFloat(2, 1000, 50000),
-            'paid_at' => fake()->dateTimeThisMonth(),
+            'paid_amount' => $attributes['total_amount'] ?? $this->faker->randomFloat(2, 1000, 50000),
+            'paid_at' => $this->faker->dateTimeThisMonth(),
         ]);
     }
 
@@ -67,7 +67,7 @@ class InvoiceFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => InvoiceStatus::OVERDUE,
-            'due_date' => fake()->dateTimeBetween('-30 days', '-1 day'),
+            'due_date' => $this->faker->dateTimeBetween('-30 days', '-1 day'),
             'paid_amount' => 0,
             'paid_at' => null,
         ]);

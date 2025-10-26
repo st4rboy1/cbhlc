@@ -20,17 +20,17 @@ class DocumentFactory extends Factory
      */
     public function definition(): array
     {
-        $originalFilename = fake()->word().'.'.fake()->randomElement(['pdf', 'jpg', 'png']);
+        $originalFilename = $this->faker->word().'.'.$this->faker->randomElement(['pdf', 'jpg', 'png']);
 
         return [
             'student_id' => Student::factory(),
-            'document_type' => fake()->randomElement(DocumentType::cases()),
+            'document_type' => $this->faker->randomElement(DocumentType::cases()),
             'original_filename' => $originalFilename,
-            'stored_filename' => fake()->uuid().'_'.$originalFilename,
-            'file_path' => 'documents/'.fake()->uuid().'/'.fake()->uuid().'_'.$originalFilename,
-            'file_size' => fake()->numberBetween(1024, 50 * 1024 * 1024), // 1KB to 50MB
-            'mime_type' => fake()->randomElement(['application/pdf', 'image/jpeg', 'image/png']),
-            'upload_date' => fake()->dateTimeBetween('-1 month', 'now'),
+            'stored_filename' => $this->faker->uuid().'_'.$originalFilename,
+            'file_path' => 'documents/'.$this->faker->uuid().'/'.$this->faker->uuid().'_'.$originalFilename,
+            'file_size' => $this->faker->numberBetween(1024, 50 * 1024 * 1024), // 1KB to 50MB
+            'mime_type' => $this->faker->randomElement(['application/pdf', 'image/jpeg', 'image/png']),
+            'upload_date' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'verification_status' => VerificationStatus::PENDING,
             'verified_by' => null,
             'verified_at' => null,
@@ -46,7 +46,7 @@ class DocumentFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'verification_status' => VerificationStatus::VERIFIED,
             'verified_by' => User::factory(),
-            'verified_at' => fake()->dateTimeBetween('-1 week', 'now'),
+            'verified_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
             'rejection_reason' => null,
         ]);
     }
@@ -59,7 +59,7 @@ class DocumentFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'verification_status' => VerificationStatus::REJECTED,
             'verified_by' => User::factory(),
-            'verified_at' => fake()->dateTimeBetween('-1 week', 'now'),
+            'verified_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
             'rejection_reason' => $reason,
         ]);
     }
