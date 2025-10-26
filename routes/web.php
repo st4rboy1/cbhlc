@@ -37,6 +37,7 @@ use App\Http\Controllers\SuperAdmin\GradeLevelFeeController as SuperAdminGradeLe
 use App\Http\Controllers\SuperAdmin\GuardianController as SuperAdminGuardianController;
 use App\Http\Controllers\SuperAdmin\InvoiceController as SuperAdminInvoiceController;
 use App\Http\Controllers\SuperAdmin\PaymentController as SuperAdminPaymentController;
+use App\Http\Controllers\SuperAdmin\ReceiptController as SuperAdminReceiptController;
 use App\Http\Controllers\SuperAdmin\SchoolInformationController as SuperAdminSchoolInformationController;
 use App\Http\Controllers\SuperAdmin\StudentController as SuperAdminStudentController;
 use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
@@ -158,6 +159,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Payments Management
         Route::resource('payments', SuperAdminPaymentController::class);
         Route::post('/payments/{payment}/refund', [SuperAdminPaymentController::class, 'refund'])->name('payments.refund');
+
+        // Receipts Management
+        Route::resource('receipts', SuperAdminReceiptController::class);
 
         // Grade Level Fees Management
         Route::resource('grade-level-fees', SuperAdminGradeLevelFeeController::class);
