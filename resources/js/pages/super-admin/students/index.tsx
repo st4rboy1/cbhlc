@@ -1,7 +1,9 @@
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { StudentTable } from '@/pages/super-admin/students/students-table';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { Plus } from 'lucide-react';
 
 export type Student = {
     id: number;
@@ -68,8 +70,14 @@ export default function StudentsIndex({ students, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Students" />
             <div className="px-4 py-6">
-                <div className="flex items-center justify-between">
-                    <h1 className="mb-4 text-2xl font-bold">Students Index</h1>
+                <div className="mb-4 flex items-center justify-between">
+                    <h1 className="text-2xl font-bold">Students Index</h1>
+                    <Link href="/super-admin/students/create">
+                        <Button>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Create Student
+                        </Button>
+                    </Link>
                 </div>
                 <StudentTable students={formattedStudents} filters={filters} />
             </div>
