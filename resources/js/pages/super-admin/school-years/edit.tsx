@@ -58,7 +58,7 @@ export default function SchoolYearEdit({ schoolYear }: Props) {
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-                                put(route('super-admin.school-years.update', schoolYear.id));
+                                put(route('super-admin.school-years.update', { school_year: schoolYear.id }));
                             }}
                             className="space-y-4"
                         >
