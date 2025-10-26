@@ -8,6 +8,7 @@ import {
     Calendar,
     ClipboardList,
     FileCheck,
+    FileText,
     GraduationCap,
     LayoutGrid,
     Receipt,
@@ -53,6 +54,11 @@ const mainNavItems: NavItem[] = [
         title: 'Users',
         href: '/super-admin/users',
         icon: UserCog,
+    },
+    {
+        title: 'Documents',
+        href: '/super-admin/documents',
+        icon: FileText,
     },
     {
         title: 'Invoices',

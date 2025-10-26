@@ -31,6 +31,7 @@ use App\Http\Controllers\Student\DashboardController as StudentDashboardControll
 use App\Http\Controllers\StudentReportController;
 use App\Http\Controllers\SuperAdmin\AuditLogController as SuperAdminAuditLogController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
+use App\Http\Controllers\SuperAdmin\DocumentController as SuperAdminDocumentController;
 use App\Http\Controllers\SuperAdmin\EnrollmentController as SuperAdminEnrollmentController;
 use App\Http\Controllers\SuperAdmin\EnrollmentPeriodController as SuperAdminEnrollmentPeriodController;
 use App\Http\Controllers\SuperAdmin\GradeLevelFeeController as SuperAdminGradeLevelFeeController;
@@ -158,6 +159,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Payments Management
         Route::resource('payments', SuperAdminPaymentController::class);
         Route::post('/payments/{payment}/refund', [SuperAdminPaymentController::class, 'refund'])->name('payments.refund');
+
+        // Documents Management
+        Route::resource('documents', SuperAdminDocumentController::class)->only(['index', 'show', 'destroy']);
+        Route::get('/documents/{document}/view', [SuperAdminDocumentController::class, 'view'])->name('documents.view');
+        Route::post('/documents/{document}/verify', [SuperAdminDocumentController::class, 'verify'])->name('documents.verify');
+        Route::post('/documents/{document}/reject', [SuperAdminDocumentController::class, 'reject'])->name('documents.reject');
 
         // Grade Level Fees Management
         Route::resource('grade-level-fees', SuperAdminGradeLevelFeeController::class);
