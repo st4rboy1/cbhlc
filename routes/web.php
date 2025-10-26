@@ -38,6 +38,7 @@ use App\Http\Controllers\SuperAdmin\GuardianController as SuperAdminGuardianCont
 use App\Http\Controllers\SuperAdmin\InvoiceController as SuperAdminInvoiceController;
 use App\Http\Controllers\SuperAdmin\PaymentController as SuperAdminPaymentController;
 use App\Http\Controllers\SuperAdmin\SchoolInformationController as SuperAdminSchoolInformationController;
+use App\Http\Controllers\SuperAdmin\SchoolYearController as SuperAdminSchoolYearController;
 use App\Http\Controllers\SuperAdmin\StudentController as SuperAdminStudentController;
 use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use App\Http\Controllers\TuitionController;
@@ -167,6 +168,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('enrollment-periods', SuperAdminEnrollmentPeriodController::class);
         Route::post('/enrollment-periods/{enrollmentPeriod}/activate', [SuperAdminEnrollmentPeriodController::class, 'activate'])->name('enrollment-periods.activate');
         Route::post('/enrollment-periods/{enrollmentPeriod}/close', [SuperAdminEnrollmentPeriodController::class, 'close'])->name('enrollment-periods.close');
+
+        // School Years Management
+        Route::resource('school-years', SuperAdminSchoolYearController::class);
+        Route::post('/school-years/{schoolYear}/set-active', [SuperAdminSchoolYearController::class, 'setActive'])->name('school-years.set-active');
 
         // Audit Log Management
         Route::prefix('audit-logs')->name('audit-logs.')->group(function () {
