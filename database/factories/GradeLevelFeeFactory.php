@@ -59,7 +59,7 @@ class GradeLevelFeeFactory extends Factory
         $useFaker = class_exists(\Faker\Factory::class) && $this->faker;
 
         return [
-            'grade_level' => $useFaker ? $this->faker->randomElement(GradeLevel::values()) : GradeLevel::Kinder->value,
+            'grade_level' => $useFaker ? $this->faker->randomElement(GradeLevel::values()) : GradeLevel::KINDER->value,
             'enrollment_period_id' => $enrollmentPeriod->id,
             'tuition_fee_cents' => $useFaker ? $this->faker->numberBetween(2000000, 5000000) : 2000000,
             'registration_fee_cents' => $useFaker ? $this->faker->numberBetween(100000, 300000) : 100000,
