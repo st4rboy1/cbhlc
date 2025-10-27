@@ -788,6 +788,9 @@ class UserSeeder extends Seeder
 
         // Issue #321 and #322: Create documents with different verification statuses
         $this->createDocumentTestData();
+
+        // Issue #318-320: Create payments for dashboard statistics
+        $this->createPaymentTestData();
     }
 
     /**
@@ -889,5 +892,124 @@ class UserSeeder extends Seeder
                 );
             }
         }
+    }
+
+    /**
+     * Create payment test data for dashboard statistics
+     * Issues #318-320
+     */
+    private function createPaymentTestData(): void
+    {
+        // Get or create registrar/cashier user for payment processing
+        $registrarUser = User::role(['registrar', 'administrator', 'super_admin'])->first();
+
+        if (! $registrarUser) {
+            $registrarUser = User::firstOrCreate(
+                ['email' => 'registrar@cbhlc.edu'],
+                [
+                    'name' => 'Test Registrar',
+                    'email_verified_at' => now(),
+                    'password' => bcrypt('password'),
+                ]
+            );
+            $registrarUser->assignRole('registrar');
+        }
+
+        // Get enrollments with balance for payment creation
+        $enrollmentsWithBalance = Enrollment::where('balance_cents', '>', 0)->get();
+
+        // Issue #319: Create fully paid enrollments (2-3 enrollments)
+        $enrollmentsForFullPayment = $enrollmentsWithBalance->take(2);
+
+        foreach ($enrollmentsForFullPayment as $enrollment) {
+            $totalAmountPeso = $enrollment->net_amount_cents / 100;
+
+            // Create invoice for this enrollment
+            $invoice = \App\Models\Invoice::firstOrCreate(
+                ['enrollment_id' => $enrollment->id],
+                [
+                    'invoice_number' => 'INV-'.str_pad((string) $enrollment->id, 6, '0', STR_PAD_LEFT),
+                    'invoice_date' => now()->subDays(rand(30, 60)),
+                    'due_date' => now()->addDays(30),
+                    'total_amount' => $totalAmountPeso,
+                    'paid_amount' => $totalAmountPeso,
+                    'status' => \App\Enums\InvoiceStatus::PAID,
+                    'paid_at' => now()->subDays(rand(5, 30)),
+                ]
+            );
+
+            // Create full payment
+            \App\Models\Payment::firstOrCreate(
+                [
+                    'invoice_id' => $invoice->id,
+                    'payment_method' => \App\Enums\PaymentMethod::CASH,
+                ],
+                [
+                    'amount' => $totalAmountPeso,
+                    'payment_date' => now()->subDays(rand(5, 30)),
+                    'reference_number' => 'PAY-'.strtoupper(uniqid()),
+                    'notes' => 'Full payment for tuition and miscellaneous fees',
+                    'processed_by' => $registrarUser->id,
+                ]
+            );
+
+            // Update enrollment to reflect full payment
+            $enrollment->update([
+                'amount_paid_cents' => $enrollment->net_amount_cents,
+                'balance_cents' => 0,
+                'payment_status' => PaymentStatus::PAID,
+            ]);
+        }
+
+        // Issue #320: Create partial payments (2-3 enrollments)
+        $enrollmentsForPartialPayment = $enrollmentsWithBalance->skip(2)->take(3);
+
+        foreach ($enrollmentsForPartialPayment as $enrollment) {
+            $totalAmountPeso = $enrollment->net_amount_cents / 100;
+
+            // Calculate partial payment (50-70% of total)
+            $partialPercentage = rand(50, 70) / 100;
+            $partialAmountPeso = round($totalAmountPeso * $partialPercentage, 2);
+            $partialAmountCents = (int) ($partialAmountPeso * 100);
+
+            // Create invoice for this enrollment
+            $invoice = \App\Models\Invoice::firstOrCreate(
+                ['enrollment_id' => $enrollment->id],
+                [
+                    'invoice_number' => 'INV-'.str_pad((string) $enrollment->id, 6, '0', STR_PAD_LEFT),
+                    'invoice_date' => now()->subDays(rand(30, 60)),
+                    'due_date' => now()->addDays(30),
+                    'total_amount' => $totalAmountPeso,
+                    'paid_amount' => $partialAmountPeso,
+                    'status' => \App\Enums\InvoiceStatus::PARTIALLY_PAID,
+                ]
+            );
+
+            // Create partial payment
+            \App\Models\Payment::firstOrCreate(
+                [
+                    'invoice_id' => $invoice->id,
+                    'payment_method' => \App\Enums\PaymentMethod::CASH,
+                ],
+                [
+                    'amount' => $partialAmountPeso,
+                    'payment_date' => now()->subDays(rand(10, 45)),
+                    'reference_number' => 'PAY-'.strtoupper(uniqid()),
+                    'notes' => 'Partial payment - '.($partialPercentage * 100).'% of total',
+                    'processed_by' => $registrarUser->id,
+                ]
+            );
+
+            // Update enrollment to reflect partial payment
+            $enrollment->update([
+                'amount_paid_cents' => $partialAmountCents,
+                'balance_cents' => $enrollment->net_amount_cents - $partialAmountCents,
+                'payment_status' => PaymentStatus::PARTIAL,
+            ]);
+        }
+
+        // Issue #318: Active enrollments already exist (ENROLLED status)
+        // The seeder already creates enrollments with EnrollmentStatus::ENROLLED
+        // at lines 487 and 667, so this requirement is already met
     }
 }
