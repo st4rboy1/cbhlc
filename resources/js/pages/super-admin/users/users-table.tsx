@@ -18,6 +18,7 @@ import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -30,6 +31,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Link, router } from '@inertiajs/react';
+import { toast } from 'sonner';
 import { useDebounce } from 'use-debounce';
 import { type User } from './index';
 
@@ -58,6 +60,59 @@ function formatRoleName(role: string) {
         .split('_')
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
+}
+
+function ActionsCell({ user }: { user: User }) {
+    const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+
+    const handleDelete = () => {
+        router.delete(`/super-admin/users/${user.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('User deleted successfully');
+                setDeleteDialogOpen(false);
+            },
+            onError: () => {
+                toast.error('Failed to delete user. Please try again.');
+            },
+        });
+    };
+
+    return (
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id.toString())}>Copy User ID</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                        <Link href={`/super-admin/users/${user.id}`}>View User</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href={`/super-admin/users/${user.id}/edit`}>Edit User</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>Delete User</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <ConfirmationDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={handleDelete}
+                title="Delete User?"
+                description="Are you sure you want to delete this user? This action cannot be undone."
+                confirmText="Delete"
+                variant="destructive"
+            />
+        </>
+    );
 }
 
 export const columns: ColumnDef<User>[] = [
@@ -141,41 +196,7 @@ export const columns: ColumnDef<User>[] = [
     },
     {
         id: 'actions',
-        cell: ({ row }) => {
-            const user = row.original;
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id.toString())}>Copy User ID</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={`/super-admin/users/${user.id}`}>View User</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href={`/super-admin/users/${user.id}/edit`}>Edit User</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            onClick={() => {
-                                if (window.confirm('Are you sure you want to delete this user?')) {
-                                    router.delete(`/super-admin/users/${user.id}`);
-                                }
-                            }}
-                        >
-                            Delete User
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        },
+        cell: ({ row }) => <ActionsCell user={row.original} />,
     },
 ];
 
