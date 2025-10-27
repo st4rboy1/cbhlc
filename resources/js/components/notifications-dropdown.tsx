@@ -18,10 +18,13 @@ interface Notification {
     data: {
         message: string;
         student_name?: string;
+        student_id?: number;
         grade_level?: string;
         school_year?: string;
         application_id?: string;
         enrollment_id?: number;
+        document_id?: number;
+        document_type?: string;
         status?: string;
         reason?: string;
         remarks?: string;
@@ -77,6 +80,13 @@ export default function NotificationsDropdown({ notifications }: Props) {
         if (notification.type.includes('NewEnrollmentForReview')) {
             return '/registrar/enrollments';
         }
+        // For document notifications, navigate to student documents page
+        if (notification.type.includes('Document')) {
+            const studentId = notification.data.student_id;
+            if (studentId) {
+                return `/guardian/students/${studentId}/documents`;
+            }
+        }
         return null;
     };
 
@@ -102,6 +112,16 @@ export default function NotificationsDropdown({ notifications }: Props) {
         }
         if (notification.type.includes('NewEnrollmentForReview')) {
             return 'New Enrollment to Review';
+        }
+        if (notification.type.includes('DocumentVerified')) {
+            return 'Document Verified';
+        }
+        if (notification.type.includes('DocumentRejected')) {
+            return 'Document Rejected';
+        }
+        // Use the message from notification data if available
+        if (notification.data.message) {
+            return notification.data.message;
         }
         return 'Notification';
     };
