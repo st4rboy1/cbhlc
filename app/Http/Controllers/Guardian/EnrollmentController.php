@@ -309,8 +309,21 @@ class EnrollmentController extends Controller
 
         $enrollment->load(['student', 'guardian']);
 
+        // Load payments for this enrollment
+        $payments = Payment::where('invoice_id', $enrollment->id)
+            ->orderBy('payment_date', 'desc')
+            ->get()
+            ->map(fn ($payment) => [
+                'id' => $payment->id,
+                'payment_date' => $payment->payment_date->toISOString(),
+                'amount' => $payment->amount_cents / 100,
+                'payment_method' => $payment->payment_method->value,
+                'reference_number' => $payment->reference_number,
+            ]);
+
         return Inertia::render('guardian/enrollments/show', [
             'enrollment' => $enrollment,
+            'payments' => $payments,
         ]);
     }
 
