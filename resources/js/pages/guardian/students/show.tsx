@@ -199,12 +199,20 @@ export default function GuardianStudentsShow({ student }: Props) {
                         <h1 className="text-2xl font-bold">{fullName}</h1>
                         <p className="text-muted-foreground">Student ID: {student.student_id}</p>
                     </div>
-                    <Link href={`/guardian/students/${student.id}/edit`}>
-                        <Button>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit Information
-                        </Button>
-                    </Link>
+                    <div className="flex gap-2">
+                        <Link href={`/guardian/enrollments/create?student_id=${student.id}`}>
+                            <Button variant="default">
+                                <GraduationCap className="mr-2 h-4 w-4" />
+                                Enroll Student
+                            </Button>
+                        </Link>
+                        <Link href={`/guardian/students/${student.id}/edit`}>
+                            <Button variant="outline">
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit Information
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2">
