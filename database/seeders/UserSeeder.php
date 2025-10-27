@@ -207,6 +207,9 @@ class UserSeeder extends Seeder
 
         // Create new students (no enrollment history)
         $this->createNewStudents($guardian4);
+
+        // Add dashboard statistics test data (issues #315-322)
+        $this->createDashboardStatisticsData();
     }
 
     /**
@@ -671,6 +674,116 @@ class UserSeeder extends Seeder
             'balance_cents' => 1750000,
             'payment_status' => PaymentStatus::PARTIAL,
             'approved_at' => now()->subMonths(3),
+        ]);
+    }
+
+    /**
+     * Create additional data for dashboard statistics (issues #315-322)
+     */
+    private function createDashboardStatisticsData(): void
+    {
+        // Issue #315: Unverified users
+        $unverifiedUser1 = User::firstOrCreate(
+            ['email' => 'unverified.guardian1@example.com'],
+            [
+                'name' => 'Unverified Guardian One',
+                'email_verified_at' => null, // Not verified
+                'password' => bcrypt('password'),
+            ]
+        );
+        if (! $unverifiedUser1->hasRole('guardian')) {
+            $unverifiedUser1->assignRole('guardian');
+        }
+
+        $unverifiedUser2 = User::firstOrCreate(
+            ['email' => 'unverified.guardian2@example.com'],
+            [
+                'name' => 'Unverified Guardian Two',
+                'email_verified_at' => null, // Not verified
+                'password' => bcrypt('password'),
+            ]
+        );
+        if (! $unverifiedUser2->hasRole('guardian')) {
+            $unverifiedUser2->assignRole('guardian');
+        }
+
+        // Issue #316: Guardian without students
+        $guardianNoStudents = User::firstOrCreate(
+            ['email' => 'no.students@example.com'],
+            [
+                'name' => 'Guardian Without Students',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+            ]
+        );
+        if (! $guardianNoStudents->hasRole('guardian')) {
+            $guardianNoStudents->assignRole('guardian');
+        }
+
+        Guardian::firstOrCreate(
+            ['user_id' => $guardianNoStudents->id],
+            [
+                'first_name' => 'NoStudents',
+                'middle_name' => 'Test',
+                'last_name' => 'Guardian',
+                'contact_number' => '+63999999999',
+                'address' => '999 Test Street, Manila',
+                'occupation' => 'Professional',
+                'employer' => 'Company Inc.',
+                'emergency_contact_name' => 'Emergency Contact',
+                'emergency_contact_phone' => '+63988888888',
+                'emergency_contact_relationship' => 'Sibling',
+            ]
+        );
+
+        // Issue #317: Guardian with students but no enrollments
+        $guardianNoEnrollments = User::firstOrCreate(
+            ['email' => 'no.enrollments@example.com'],
+            [
+                'name' => 'Guardian No Enrollments',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+            ]
+        );
+        if (! $guardianNoEnrollments->hasRole('guardian')) {
+            $guardianNoEnrollments->assignRole('guardian');
+        }
+
+        $guardianNoEnrollmentsModel = Guardian::firstOrCreate(
+            ['user_id' => $guardianNoEnrollments->id],
+            [
+                'first_name' => 'NoEnrollment',
+                'middle_name' => 'Test',
+                'last_name' => 'Guardian',
+                'contact_number' => '+63977777777',
+                'address' => '777 Test Avenue, Quezon City',
+                'occupation' => 'Teacher',
+                'employer' => 'School District',
+                'emergency_contact_name' => 'Test Emergency',
+                'emergency_contact_phone' => '+63966666666',
+                'emergency_contact_relationship' => 'Parent',
+            ]
+        );
+
+        // Create student for this guardian but no enrollments
+        $studentNoEnrollment = Student::firstOrCreate(
+            ['first_name' => 'NoEnrollment', 'last_name' => 'Student', 'birthdate' => '2015-06-15'],
+            [
+                'student_id' => Student::generateStudentId(),
+                'middle_name' => 'Test',
+                'gender' => 'Male',
+                'grade_level' => null,
+                'address' => '777 Test Avenue, Quezon City',
+                'contact_number' => '+63977777777',
+            ]
+        );
+
+        GuardianStudent::firstOrCreate([
+            'guardian_id' => $guardianNoEnrollmentsModel->id,
+            'student_id' => $studentNoEnrollment->id,
+        ], [
+            'relationship_type' => RelationshipType::MOTHER->value,
+            'is_primary_contact' => true,
         ]);
     }
 }
