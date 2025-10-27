@@ -8,6 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Guardian {
     id: number;
@@ -62,7 +63,14 @@ export default function SuperAdminGuardiansEdit({ guardian }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/super-admin/guardians/${guardian.id}`);
+        put(`/super-admin/guardians/${guardian.id}`, {
+            onSuccess: () => {
+                toast.success('Guardian updated successfully');
+            },
+            onError: () => {
+                toast.error('Failed to update guardian. Please check the form.');
+            },
+        });
     };
 
     return (
