@@ -1,8 +1,11 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { Link, router } from '@inertiajs/react';
 import { type ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Edit, Eye, Trash } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export interface Student {
     id: number;
@@ -52,15 +55,54 @@ const getStatusBadge = (status: string) => {
     );
 };
 
-const handleDelete = (id: number, enrollmentId: string) => {
-    if (
-        confirm(
-            `Are you sure you want to delete enrollment ${enrollmentId}? This action cannot be undone and only pending enrollments can be deleted.`,
-        )
-    ) {
-        router.delete(`/super-admin/enrollments/${id}`);
-    }
-};
+function ActionsCell({ enrollment }: { enrollment: Enrollment }) {
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+    const handleDelete = () => {
+        router.delete(`/super-admin/enrollments/${enrollment.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Enrollment deleted successfully');
+                setDeleteDialogOpen(false);
+            },
+            onError: () => {
+                toast.error('Failed to delete enrollment. Please try again.');
+            },
+        });
+    };
+
+    return (
+        <>
+            <div className="flex justify-end gap-2">
+                <Link href={`/super-admin/enrollments/${enrollment.id}`}>
+                    <Button size="sm" variant="outline">
+                        <Eye className="h-4 w-4" />
+                    </Button>
+                </Link>
+                <Link href={`/super-admin/enrollments/${enrollment.id}/edit`}>
+                    <Button size="sm" variant="outline">
+                        <Edit className="h-4 w-4" />
+                    </Button>
+                </Link>
+                {enrollment.status === 'pending' && (
+                    <Button size="sm" variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                        <Trash className="h-4 w-4" />
+                    </Button>
+                )}
+            </div>
+
+            <ConfirmationDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={handleDelete}
+                title="Delete Enrollment?"
+                description={`Are you sure you want to delete enrollment ${enrollment.enrollment_id}? This action cannot be undone and only pending enrollments can be deleted.`}
+                confirmText="Delete"
+                variant="destructive"
+            />
+        </>
+    );
+}
 
 export const columns: ColumnDef<Enrollment>[] = [
     {
@@ -164,28 +206,6 @@ export const columns: ColumnDef<Enrollment>[] = [
     {
         id: 'actions',
         header: () => <div className="text-right">Actions</div>,
-        cell: ({ row }) => {
-            const enrollment = row.original;
-
-            return (
-                <div className="flex justify-end gap-2">
-                    <Link href={`/super-admin/enrollments/${enrollment.id}`}>
-                        <Button size="sm" variant="outline">
-                            <Eye className="h-4 w-4" />
-                        </Button>
-                    </Link>
-                    <Link href={`/super-admin/enrollments/${enrollment.id}/edit`}>
-                        <Button size="sm" variant="outline">
-                            <Edit className="h-4 w-4" />
-                        </Button>
-                    </Link>
-                    {enrollment.status === 'pending' && (
-                        <Button size="sm" variant="destructive" onClick={() => handleDelete(enrollment.id, enrollment.enrollment_id)}>
-                            <Trash className="h-4 w-4" />
-                        </Button>
-                    )}
-                </div>
-            );
-        },
+        cell: ({ row }) => <ActionsCell enrollment={row.original} />,
     },
 ];
