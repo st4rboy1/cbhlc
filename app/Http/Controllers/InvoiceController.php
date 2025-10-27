@@ -134,7 +134,10 @@ class InvoiceController extends Controller
             'payments' => $payments,
             'settings' => $settings,
             'invoiceDate' => now()->format('F d, Y'),
-        ])->setPaper('a4', 'portrait');
+        ])
+            ->setPaper('a4', 'portrait')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true);
 
         return $pdf->download("invoice-{$invoice->enrollment_id}.pdf");
     }
