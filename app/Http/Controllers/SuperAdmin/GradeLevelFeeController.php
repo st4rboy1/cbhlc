@@ -19,7 +19,7 @@ class GradeLevelFeeController extends Controller
     {
         Gate::authorize('viewAny', GradeLevelFee::class);
 
-        $query = GradeLevelFee::query();
+        $query = GradeLevelFee::with(['enrollmentPeriod.schoolYear']);
 
         // Search functionality
         if ($request->filled('search')) {
@@ -27,9 +27,12 @@ class GradeLevelFeeController extends Controller
             $query->where('grade_level', 'like', "%{$search}%");
         }
 
-        // Filter by school year
+        // Filter by school year (via enrollment period)
         if ($request->filled('school_year_id')) {
-            $query->where('school_year_id', $request->get('school_year_id'));
+            $schoolYearId = $request->get('school_year_id');
+            $query->whereHas('enrollmentPeriod', function ($q) use ($schoolYearId) {
+                $q->where('school_year_id', $schoolYearId);
+            });
         }
 
         // Filter by active status
@@ -39,8 +42,10 @@ class GradeLevelFeeController extends Controller
 
         $fees = $query->latest()->paginate(15)->withQueryString();
 
-        // Get all unique school years from grade level fees
-        $schoolYears = \App\Models\SchoolYear::orderBy('start_year', 'desc')->get();
+        // Get school years filtered by active and upcoming status only (no past years)
+        $schoolYears = \App\Models\SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
 
         return Inertia::render('super-admin/grade-level-fees/index', [
             'fees' => $fees,
@@ -153,8 +158,18 @@ class GradeLevelFeeController extends Controller
             'school_year_id' => ['required', 'exists:school_years,id'],
         ]);
 
-        // Check if fee already exists for the target school year and grade level
-        $exists = GradeLevelFee::where('school_year_id', $validated['school_year_id'])
+        // Get or create enrollment period for the target school year
+        $enrollmentPeriod = \App\Models\EnrollmentPeriod::firstOrCreate(
+            ['school_year_id' => $validated['school_year_id']],
+            [
+                'start_date' => now()->startOfYear(),
+                'end_date' => now()->endOfYear(),
+                'status' => 'upcoming',
+            ]
+        );
+
+        // Check if fee already exists for the target enrollment period and grade level
+        $exists = GradeLevelFee::where('enrollment_period_id', $enrollmentPeriod->id)
             ->where('grade_level', $gradeLevelFee->grade_level)
             ->exists();
 
@@ -162,9 +177,9 @@ class GradeLevelFeeController extends Controller
             return back()->with('error', 'Fee already exists for this grade level in the specified school year.');
         }
 
-        // Create a copy with new school year
+        // Create a copy with new enrollment period
         $newFee = $gradeLevelFee->replicate();
-        $newFee->school_year_id = $validated['school_year_id'];
+        $newFee->enrollment_period_id = $enrollmentPeriod->id;
         $newFee->save();
 
         $schoolYear = \App\Models\SchoolYear::find($validated['school_year_id']);

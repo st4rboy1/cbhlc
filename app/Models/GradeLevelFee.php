@@ -7,6 +7,8 @@ use App\Casts\MoneyCast;
 use App\Enums\GradeLevel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -15,6 +17,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * @property float $miscellaneous_fee
  * @property float $other_fees
  * @property float $total_amount
+ * @property-read \App\Models\EnrollmentPeriod|null $enrollmentPeriod
+ * @property-read \App\Models\SchoolYear|null $schoolYear
  */
 class GradeLevelFee extends Model
 {
@@ -49,6 +53,7 @@ class GradeLevelFee extends Model
         'other_fees',
         'down_payment',
         'total_amount',
+        'school_year_name',
     ];
 
     protected $casts = [
@@ -77,7 +82,7 @@ class GradeLevelFee extends Model
     /**
      * Get the enrollment period that this fee belongs to.
      */
-    public function enrollmentPeriod()
+    public function enrollmentPeriod(): BelongsTo
     {
         return $this->belongsTo(EnrollmentPeriod::class);
     }
@@ -85,7 +90,7 @@ class GradeLevelFee extends Model
     /**
      * Get the school year through the enrollment period.
      */
-    public function schoolYear()
+    public function schoolYear(): HasOneThrough
     {
         return $this->hasOneThrough(
             SchoolYear::class,
@@ -130,6 +135,14 @@ class GradeLevelFee extends Model
     public function getTotalAmountAttribute(): float
     {
         return $this->total_fee;
+    }
+
+    /**
+     * Accessor for school_year_name (gets school year name through relationship)
+     */
+    public function getSchoolYearNameAttribute(): ?string
+    {
+        return $this->enrollmentPeriod?->schoolYear?->name;
     }
 
     /**
