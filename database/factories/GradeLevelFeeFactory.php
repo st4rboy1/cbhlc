@@ -55,22 +55,20 @@ class GradeLevelFeeFactory extends Factory
             ]);
         }
 
-        // Ensure faker is initialized
-        if (! $this->faker) {
-            $this->faker = \Faker\Factory::create();
-        }
+        // Check if Faker is available (it's a dev dependency)
+        $useFaker = class_exists(\Faker\Factory::class) && $this->faker;
 
         return [
-            'grade_level' => $this->faker->randomElement(GradeLevel::values()),
+            'grade_level' => $useFaker ? $this->faker->randomElement(GradeLevel::values()) : GradeLevel::Kinder->value,
             'enrollment_period_id' => $enrollmentPeriod->id,
-            'tuition_fee_cents' => $this->faker->numberBetween(2000000, 5000000), // 20,000 to 50,000 pesos
-            'registration_fee_cents' => $this->faker->numberBetween(100000, 300000), // 1,000 to 3,000 pesos
-            'miscellaneous_fee_cents' => $this->faker->numberBetween(50000, 150000), // 500 to 1,500 pesos
-            'laboratory_fee_cents' => $this->faker->numberBetween(0, 100000), // 0 to 1,000 pesos
-            'library_fee_cents' => $this->faker->numberBetween(20000, 50000), // 200 to 500 pesos
-            'sports_fee_cents' => $this->faker->numberBetween(10000, 30000), // 100 to 300 pesos
-            'other_fees_cents' => $this->faker->numberBetween(0, 50000), // 0 to 500 pesos
-            'payment_terms' => $this->faker->randomElement(['ANNUAL', 'SEMESTRAL', 'QUARTERLY', 'MONTHLY']),
+            'tuition_fee_cents' => $useFaker ? $this->faker->numberBetween(2000000, 5000000) : 2000000,
+            'registration_fee_cents' => $useFaker ? $this->faker->numberBetween(100000, 300000) : 100000,
+            'miscellaneous_fee_cents' => $useFaker ? $this->faker->numberBetween(50000, 150000) : 50000,
+            'laboratory_fee_cents' => $useFaker ? $this->faker->numberBetween(0, 100000) : 0,
+            'library_fee_cents' => $useFaker ? $this->faker->numberBetween(20000, 50000) : 20000,
+            'sports_fee_cents' => $useFaker ? $this->faker->numberBetween(10000, 30000) : 10000,
+            'other_fees_cents' => $useFaker ? $this->faker->numberBetween(0, 50000) : 0,
+            'payment_terms' => $useFaker ? $this->faker->randomElement(['ANNUAL', 'SEMESTRAL', 'QUARTERLY', 'MONTHLY']) : 'ANNUAL',
             'is_active' => true,
         ];
     }
