@@ -55,6 +55,11 @@ class GradeLevelFeeFactory extends Factory
             ]);
         }
 
+        // Ensure faker is initialized
+        if (! $this->faker) {
+            $this->faker = \Faker\Factory::create();
+        }
+
         return [
             'grade_level' => $this->faker->randomElement(GradeLevel::values()),
             'enrollment_period_id' => $enrollmentPeriod->id,
