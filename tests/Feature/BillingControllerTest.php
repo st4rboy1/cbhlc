@@ -51,7 +51,7 @@ describe('invoice controller', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($admin)->get(route('invoices.show', $enrollment));
+        $response = $this->actingAs($admin)->get(route('admin.invoices.show', $enrollment));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
@@ -121,7 +121,7 @@ describe('invoice controller', function () {
         ]);
 
         // Guardian can view own child's invoice
-        $response = $this->actingAs($guardian)->get(route('invoices.show', $ownEnrollment));
+        $response = $this->actingAs($guardian)->get(route('guardian.invoices.show', $ownEnrollment));
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('shared/invoice')
@@ -129,11 +129,11 @@ describe('invoice controller', function () {
         );
 
         // Guardian cannot view other child's invoice
-        $response = $this->actingAs($guardian)->get(route('invoices.show', $otherEnrollment));
+        $response = $this->actingAs($guardian)->get(route('guardian.invoices.show', $otherEnrollment));
         $response->assertStatus(404);
     });
 
-    test('guardian gets latest enrollment when no id specified', function () {
+    test('guardian can view invoices index with list of enrollments', function () {
         $guardian = User::factory()->create();
         $guardian->assignRole('guardian');
 
@@ -195,13 +195,14 @@ describe('invoice controller', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
-        $response = $this->actingAs($guardian)->get(route('invoices.index'));
+        $response = $this->actingAs($guardian)->get(route('guardian.invoices.index'));
 
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('shared/invoice')
-            ->has('enrollment')
-            ->where('invoiceNumber', 'ENR-0005')
+            ->component('guardian/invoices/index')
+            ->has('enrollments.data', 2) // Should have both enrollments
+            ->where('enrollments.data.0.enrollment_id', 'ENR-0005') // Latest first
+            ->where('enrollments.data.1.enrollment_id', 'ENR-0004')
         );
     });
 
@@ -209,7 +210,7 @@ describe('invoice controller', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
 
-        $response = $this->actingAs($admin)->get(route('invoices.show', 99999));
+        $response = $this->actingAs($admin)->get(route('admin.invoices.show', 99999));
         $response->assertStatus(404);
     });
 });
