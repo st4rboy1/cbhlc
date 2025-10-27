@@ -19,11 +19,18 @@ interface Student {
     section?: string;
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    start_year: number;
+    end_year: number;
+}
+
 interface Enrollment {
     id: number;
     enrollment_id: string;
     student: Student;
-    school_year: string;
+    school_year?: SchoolYear;
     semester?: string;
     tuition_fee: number;
     miscellaneous_fee: number;
@@ -279,7 +286,9 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                                     {enrollment.student.section && (
                                         <p className="text-sm text-muted-foreground">Section: {enrollment.student.section}</p>
                                     )}
-                                    <p className="text-sm text-muted-foreground">School Year: {enrollment.school_year}</p>
+                                    {enrollment.school_year && (
+                                        <p className="text-sm text-muted-foreground">School Year: {enrollment.school_year.name}</p>
+                                    )}
                                     {enrollment.semester && <p className="text-sm text-muted-foreground">Semester: {enrollment.semester}</p>}
                                 </div>
                             </div>
