@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { paymentStatusColors, statusColors } from '@/pages/guardian/enrollments/index';
 import { type BreadcrumbItem } from '@/types';
@@ -39,8 +40,17 @@ interface Enrollment {
     created_at: string;
 }
 
+interface Payment {
+    id: number;
+    payment_date: string;
+    amount: number;
+    payment_method: string;
+    reference_number: string | null;
+}
+
 interface Props {
     enrollment: Enrollment;
+    payments: Payment[];
 }
 
 const formatCurrency = (cents: number) => {
@@ -62,7 +72,7 @@ const formatDate = (dateString: string) => {
     }).format(date);
 };
 
-export default function GuardianEnrollmentsShow({ enrollment }: Props) {
+export default function GuardianEnrollmentsShow({ enrollment, payments }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Enrollments', href: '/guardian/enrollments' },
@@ -240,6 +250,45 @@ export default function GuardianEnrollmentsShow({ enrollment }: Props) {
                         </CardContent>
                     </Card>
                 </div>
+
+                {payments.length > 0 && (
+                    <Card className="mt-4">
+                        <CardHeader>
+                            <CardTitle>Payment History</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Payment Date</TableHead>
+                                        <TableHead>Amount</TableHead>
+                                        <TableHead>Payment Method</TableHead>
+                                        <TableHead>Reference Number</TableHead>
+                                        <TableHead className="text-right">Actions</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {payments.map((payment) => (
+                                        <TableRow key={payment.id}>
+                                            <TableCell>{formatDate(payment.payment_date)}</TableCell>
+                                            <TableCell>{formatCurrency(payment.amount * 100)}</TableCell>
+                                            <TableCell className="capitalize">{payment.payment_method.replace('_', ' ')}</TableCell>
+                                            <TableCell>{payment.reference_number || 'N/A'}</TableCell>
+                                            <TableCell className="text-right">
+                                                <Button size="sm" variant="ghost" asChild>
+                                                    <a href={`/payments/${payment.id}/receipt`} download>
+                                                        <Download className="mr-1 h-3 w-3" />
+                                                        Receipt
+                                                    </a>
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                )}
             </div>
         </AppLayout>
     );
