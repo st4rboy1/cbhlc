@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,6 +13,8 @@ import {
 import { Link, router } from '@inertiajs/react';
 import { type ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export type Student = {
     id: number;
@@ -46,6 +49,60 @@ function getStatusVariant(status: string): 'default' | 'secondary' | 'destructiv
         default:
             return 'outline';
     }
+}
+
+function ActionsCell({ student }: { student: Student }) {
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+    const handleDelete = () => {
+        router.delete(`/super-admin/students/${student.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Student deleted successfully');
+                setDeleteDialogOpen(false);
+            },
+            onError: () => {
+                toast.error('Failed to delete student. Student may have enrollments.');
+            },
+        });
+    };
+
+    return (
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(student.studentId)}>Copy Student ID</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                        <Link href={`/super-admin/students/${student.id}`}>View Student</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href={`/super-admin/students/${student.id}/edit`}>Edit Student</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>View Enrollments</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>Delete Student</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <ConfirmationDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={handleDelete}
+                title="Delete Student?"
+                description="Are you sure you want to delete this student? This action cannot be undone."
+                confirmText="Delete"
+                variant="destructive"
+            />
+        </>
+    );
 }
 
 export const columns: ColumnDef<Student>[] = [
@@ -122,46 +179,6 @@ export const columns: ColumnDef<Student>[] = [
     },
     {
         id: 'actions',
-        cell: ({ row }) => {
-            const student = row.original;
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(student.studentId)}>Copy Student ID</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={`/super-admin/students/${student.id}`}>View Student</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href={`/super-admin/students/${student.id}/edit`}>Edit Student</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>View Enrollments</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            onClick={() => {
-                                if (window.confirm('Are you sure you want to delete this student?')) {
-                                    router.delete(`/super-admin/students/${student.id}`, {
-                                        preserveScroll: true,
-                                        onSuccess: () => {
-                                            router.reload({ only: ['students'] });
-                                        },
-                                    });
-                                }
-                            }}
-                        >
-                            Delete Student
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        },
+        cell: ({ row }) => <ActionsCell student={row.original} />,
     },
 ];
