@@ -37,14 +37,6 @@ class SchoolYear extends Model
     }
 
     /**
-     * Get the invoices for this school year.
-     */
-    public function invoices(): HasMany
-    {
-        return $this->hasMany(Invoice::class);
-    }
-
-    /**
      * Get the active school year.
      */
     public static function active(): ?self

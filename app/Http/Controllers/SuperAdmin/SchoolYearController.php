@@ -19,7 +19,7 @@ class SchoolYearController extends Controller
     {
         Gate::authorize('viewAny', SchoolYear::class);
 
-        $query = SchoolYear::query()->withCount(['enrollments', 'invoices']);
+        $query = SchoolYear::query()->withCount(['enrollments']);
 
         // Search functionality
         if ($request->filled('search')) {
@@ -84,7 +84,7 @@ class SchoolYearController extends Controller
     {
         Gate::authorize('view', $schoolYear);
 
-        $schoolYear->loadCount(['enrollments', 'invoices']);
+        $schoolYear->loadCount(['enrollments']);
         $schoolYear->load(['enrollments' => function ($query) {
             $query->latest()->limit(10);
         }]);

@@ -17,7 +17,6 @@ interface SchoolYear {
     status: string;
     is_active: boolean;
     enrollments_count: number;
-    invoices_count: number;
 }
 
 interface PaginatedSchoolYears {
