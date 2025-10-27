@@ -16,19 +16,19 @@ interface Student {
 
 interface Enrollment {
     id: number;
-    student: Student;
+    student?: Student | null;
 }
 
 interface Invoice {
     id: number;
     invoice_number: string;
-    enrollment: Enrollment;
+    enrollment?: Enrollment | null;
 }
 
 interface Payment {
     id: number;
-    invoice: Invoice;
-    amount: number;
+    invoice?: Invoice | null;
+    amount: number | string;
 }
 
 interface Props {
@@ -87,10 +87,11 @@ export default function ReceiptCreate({ payments, invoices, nextReceiptNumber }:
                                         <SelectItem value="">None</SelectItem>
                                         {payments.map((payment) => {
                                             const student = payment.invoice?.enrollment?.student;
+                                            const amount = typeof payment.amount === 'number' ? payment.amount : parseFloat(payment.amount || '0');
                                             return (
                                                 <SelectItem key={payment.id} value={payment.id.toString()}>
                                                     {student ? `${student.first_name} ${student.last_name}` : 'Unknown Student'} - ₱
-                                                    {payment.amount.toLocaleString()}
+                                                    {amount.toLocaleString()}
                                                 </SelectItem>
                                             );
                                         })}
