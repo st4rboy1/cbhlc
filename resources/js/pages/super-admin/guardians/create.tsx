@@ -7,6 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Save } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface FormData {
     first_name: string;
@@ -45,7 +46,14 @@ export default function SuperAdminGuardiansCreate() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/super-admin/guardians');
+        post('/super-admin/guardians', {
+            onSuccess: () => {
+                toast.success('Guardian created successfully');
+            },
+            onError: () => {
+                toast.error('Failed to create guardian. Please check the form.');
+            },
+        });
     };
 
     return (

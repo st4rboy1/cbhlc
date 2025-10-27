@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
@@ -8,6 +9,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { Edit, Eye, PlusCircle, Search, Trash } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface Guardian {
     id: number;
@@ -50,6 +52,8 @@ interface Props {
 
 export default function SuperAdminGuardiansIndex({ guardians, filters, stats }: Props) {
     const [search, setSearch] = useState(filters.search || '');
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [guardianToDelete, setGuardianToDelete] = useState<number | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
@@ -69,10 +73,25 @@ export default function SuperAdminGuardiansIndex({ guardians, filters, stats }: 
         );
     };
 
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this guardian? This action cannot be undone.')) {
-            router.delete(`/super-admin/guardians/${id}`);
-        }
+    const openDeleteDialog = (id: number) => {
+        setGuardianToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDelete = () => {
+        if (guardianToDelete === null) return;
+
+        router.delete(`/super-admin/guardians/${guardianToDelete}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Guardian deleted successfully');
+                setDeleteDialogOpen(false);
+                setGuardianToDelete(null);
+            },
+            onError: () => {
+                toast.error('Failed to delete guardian. Guardian may have students.');
+            },
+        });
     };
 
     const getFullName = (guardian: Guardian) => {
@@ -191,7 +210,7 @@ export default function SuperAdminGuardiansIndex({ guardians, filters, stats }: 
                                                         <Edit className="h-4 w-4" />
                                                     </Button>
                                                 </Link>
-                                                <Button size="sm" variant="destructive" onClick={() => handleDelete(guardian.id)}>
+                                                <Button size="sm" variant="destructive" onClick={() => openDeleteDialog(guardian.id)}>
                                                     <Trash className="h-4 w-4" />
                                                 </Button>
                                             </div>
@@ -224,6 +243,16 @@ export default function SuperAdminGuardiansIndex({ guardians, filters, stats }: 
                         ))}
                     </div>
                 )}
+
+                <ConfirmationDialog
+                    open={deleteDialogOpen}
+                    onOpenChange={setDeleteDialogOpen}
+                    onConfirm={handleDelete}
+                    title="Delete Guardian?"
+                    description="Are you sure you want to delete this guardian? This action cannot be undone."
+                    confirmText="Delete"
+                    variant="destructive"
+                />
             </div>
         </AppLayout>
     );
