@@ -15,7 +15,6 @@ use App\Http\Controllers\Guardian\BillingController as GuardianBillingController
 use App\Http\Controllers\Guardian\DashboardController as GuardianDashboardController;
 use App\Http\Controllers\Guardian\EnrollmentController as GuardianEnrollmentController;
 use App\Http\Controllers\Guardian\StudentController as GuardianStudentController;
-use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\ApplicationController;
@@ -104,9 +103,6 @@ Route::middleware(['auth'])->group(function () {
     | Shared Routes (Temporarily - will be refactored per role)
     |--------------------------------------------------------------------------
     */
-    // Invoice Routes - Using resource controller (only index and show actions)
-    Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
-    Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
 
     // Payment Routes
     Route::get('/payments/{payment}/receipt', [\App\Http\Controllers\PaymentController::class, 'downloadReceipt'])->name('payments.receipt');
@@ -249,6 +245,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/', [AdminSchoolInformationController::class, 'index'])->name('index');
             Route::put('/', [AdminSchoolInformationController::class, 'update'])->name('update');
         });
+
+        // Invoice Management
+        Route::resource('invoices', \App\Http\Controllers\Admin\InvoiceController::class)->only(['index', 'show']);
+        Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Admin\InvoiceController::class, 'download'])->name('invoices.download');
     });
 
     // Registrar Routes
@@ -285,6 +285,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/documents/{document}/view', [RegistrarDocumentController::class, 'view'])->name('documents.view');
         Route::post('/documents/{document}/verify', [RegistrarDocumentController::class, 'verify'])->name('documents.verify');
         Route::post('/documents/{document}/reject', [RegistrarDocumentController::class, 'reject'])->name('documents.reject');
+
+        // Invoice Management
+        Route::resource('invoices', \App\Http\Controllers\Registrar\InvoiceController::class)->only(['index', 'show']);
+        Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Registrar\InvoiceController::class, 'download'])->name('invoices.download');
     });
 
     // Guardian Routes
@@ -304,6 +308,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Billing Information
         Route::get('/billing', [GuardianBillingController::class, 'index'])->name('billing.index');
         Route::get('/billing/{enrollment}', [GuardianBillingController::class, 'show'])->name('billing.show');
+
+        // Invoice Management
+        Route::resource('invoices', \App\Http\Controllers\Guardian\InvoiceController::class)->only(['index', 'show']);
+        Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Guardian\InvoiceController::class, 'download'])->name('invoices.download');
 
         // Document Management
         Route::get('/students/{student}/documents', [\App\Http\Controllers\Guardian\DocumentController::class, 'index'])->name('students.documents.index');
