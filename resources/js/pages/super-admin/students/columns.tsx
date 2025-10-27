@@ -148,7 +148,12 @@ export const columns: ColumnDef<Student>[] = [
                         <DropdownMenuItem
                             onClick={() => {
                                 if (window.confirm('Are you sure you want to delete this student?')) {
-                                    router.delete(`/super-admin/students/${student.id}`);
+                                    router.delete(`/super-admin/students/${student.id}`, {
+                                        preserveScroll: true,
+                                        onSuccess: () => {
+                                            router.reload({ only: ['students'] });
+                                        },
+                                    });
                                 }
                             }}
                         >
