@@ -8,7 +8,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { PlusCircle, Search } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { columns, type Enrollment } from './columns';
 
 interface PaginationLink {
@@ -51,6 +51,24 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Enrollments', href: '/super-admin/enrollments' },
     ];
+
+    // Auto-filter when status, grade, or school year changes
+    useEffect(() => {
+        router.get(
+            '/super-admin/enrollments',
+            {
+                search: search || undefined,
+                status: status && status !== 'all' ? status : undefined,
+                grade: grade && grade !== 'all' ? grade : undefined,
+                school_year_id: schoolYearId && schoolYearId !== 'all' ? schoolYearId : undefined,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                only: ['enrollments'],
+            },
+        );
+    }, [status, grade, schoolYearId]);
 
     const handleSearch = () => {
         router.get(
