@@ -232,7 +232,13 @@ describe('Guardian StudentController', function () {
             'address' => '789 New Address',
             'contact_number' => '09876543210',
             'email' => 'new.student@example.com',
+            'birth_place' => 'Manila',
+            'nationality' => 'Filipino',
+            'religion' => 'Catholic',
             'birth_certificate' => UploadedFile::fake()->image('birth_certificate.jpg'),
+            'report_card' => UploadedFile::fake()->image('report_card.jpg'),
+            'form_138' => UploadedFile::fake()->image('form_138.jpg'),
+            'good_moral' => UploadedFile::fake()->image('good_moral.jpg'),
         ];
 
         $response = $this->actingAs($this->guardian)
@@ -285,10 +291,10 @@ describe('Guardian StudentController', function () {
                 'gender' => 'Female',
                 'grade_level' => 'Grade 3',
                 'address' => '789 New Address',
-                // Missing birth_certificate
+                // Missing birth_certificate, birth_place, nationality, religion, and other Grade 3 documents
             ]);
 
-        $response->assertSessionHasErrors(['first_name', 'birth_certificate']);
+        $response->assertSessionHasErrors(['first_name', 'birth_certificate', 'birth_place', 'nationality', 'religion', 'report_card', 'form_138', 'good_moral']);
     });
 
     test('creating student validates birthdate is in past', function () {
@@ -300,9 +306,15 @@ describe('Guardian StudentController', function () {
                 'last_name' => 'Student',
                 'birthdate' => now()->addDay()->format('Y-m-d'),  // Future date
                 'birth_certificate' => UploadedFile::fake()->image('birth_certificate.jpg'),
+                'report_card' => UploadedFile::fake()->image('report_card.jpg'),
+                'form_138' => UploadedFile::fake()->image('form_138.jpg'),
+                'good_moral' => UploadedFile::fake()->image('good_moral.jpg'),
                 'gender' => 'Male',
                 'grade_level' => 'Grade 3',
                 'address' => '123 Future St',
+                'birth_place' => 'Cebu',
+                'nationality' => 'Filipino',
+                'religion' => 'Christian',
             ]);
 
         $response->assertSessionHasErrors(['birthdate']);
@@ -317,6 +329,9 @@ describe('Guardian StudentController', function () {
                 'gender' => 'Other',  // Invalid value
                 'grade_level' => 'Grade 3',
                 'address' => '123 Test St',
+                'birth_place' => 'Davao',
+                'nationality' => 'Filipino',
+                'religion' => 'Muslim',
             ]);
 
         $response->assertSessionHasErrors(['gender']);
@@ -331,10 +346,66 @@ describe('Guardian StudentController', function () {
                 'gender' => 'Male',
                 'grade_level' => 'Grade 3',
                 'address' => '123 Test St',
+                'birth_place' => 'Baguio',
+                'nationality' => 'Filipino',
+                'religion' => 'Protestant',
                 'email' => 'invalid-email',  // Invalid email
             ]);
 
         $response->assertSessionHasErrors(['email']);
+    });
+
+    test('kinder student only requires birth certificate', function () {
+        Storage::fake('private');
+
+        $studentData = [
+            'first_name' => 'Kinder',
+            'middle_name' => 'Test',
+            'last_name' => 'Student',
+            'birthdate' => '2019-05-20',
+            'gender' => 'Male',
+            'grade_level' => 'Kinder',
+            'address' => '123 Kinder St',
+            'birth_place' => 'Manila',
+            'nationality' => 'Filipino',
+            'religion' => 'Catholic',
+            'birth_certificate' => UploadedFile::fake()->image('birth_certificate.jpg'),
+            // No report_card, form_138, or good_moral - should still pass
+        ];
+
+        $response = $this->actingAs($this->guardian)
+            ->post(route('guardian.students.store'), $studentData);
+
+        $student = Student::where('first_name', 'Kinder')
+            ->where('last_name', 'Student')
+            ->first();
+
+        $response->assertRedirect(route('guardian.students.show', $student->id));
+        $response->assertSessionHas('success', 'Student and documents added successfully.');
+    });
+
+    test('grade 1+ student requires all documents', function () {
+        Storage::fake('private');
+
+        $studentData = [
+            'first_name' => 'Grade1',
+            'middle_name' => 'Test',
+            'last_name' => 'Student',
+            'birthdate' => '2018-05-20',
+            'gender' => 'Female',
+            'grade_level' => 'Grade 1',
+            'address' => '123 Grade1 St',
+            'birth_place' => 'Cebu',
+            'nationality' => 'Filipino',
+            'religion' => 'Christian',
+            'birth_certificate' => UploadedFile::fake()->image('birth_certificate.jpg'),
+            // Missing report_card, form_138, and good_moral - should fail
+        ];
+
+        $response = $this->actingAs($this->guardian)
+            ->post(route('guardian.students.store'), $studentData);
+
+        $response->assertSessionHasErrors(['report_card', 'form_138', 'good_moral']);
     });
 
     test('guardian can access edit student form', function () {
