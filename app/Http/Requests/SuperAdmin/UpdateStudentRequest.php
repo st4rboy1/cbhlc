@@ -35,7 +35,7 @@ class UpdateStudentRequest extends FormRequest
             'address' => ['required', 'string', 'max:500'],
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'unique:students,email,'.$student->id],
-            'grade' => ['required', 'string'],
+            'grade_level' => ['required', 'string'],
             'guardian_ids' => ['required', 'array', 'min:1'],
             'guardian_ids.*' => ['exists:guardians,id'],
         ];

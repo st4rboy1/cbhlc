@@ -61,7 +61,7 @@ class UpdateStudentRequestTest extends TestCase
         $this->assertArrayHasKey('birth_date', $rules);
         $this->assertArrayHasKey('gender', $rules);
         $this->assertArrayHasKey('address', $rules);
-        $this->assertArrayHasKey('grade', $rules);
+        $this->assertArrayHasKey('grade_level', $rules);
         $this->assertArrayHasKey('guardian_ids', $rules);
 
         // Check that email rule excludes current student
@@ -86,7 +86,7 @@ class UpdateStudentRequestTest extends TestCase
             'address' => '123 Updated Street',
             'phone' => '09123456789',
             'email' => 'updated@example.com',
-            'grade' => 'grade_2',
+            'grade_level' => 'Grade 2',
             'guardian_ids' => [$guardian->id],
         ];
 
@@ -126,7 +126,7 @@ class UpdateStudentRequestTest extends TestCase
             'gender' => 'Male',
             'address' => '123 Updated Street',
             'email' => 'test@example.com', // Same email
-            'grade' => 'grade_2',
+            'grade_level' => 'Grade 2',
             'guardian_ids' => [$guardian->id],
         ];
 

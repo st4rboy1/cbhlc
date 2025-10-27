@@ -40,7 +40,7 @@ class StoreStudentRequestTest extends TestCase
         $this->assertArrayHasKey('birth_date', $rules);
         $this->assertArrayHasKey('gender', $rules);
         $this->assertArrayHasKey('address', $rules);
-        $this->assertArrayHasKey('grade', $rules);
+        $this->assertArrayHasKey('grade_level', $rules);
         $this->assertArrayHasKey('guardian_ids', $rules);
     }
 
@@ -54,13 +54,13 @@ class StoreStudentRequestTest extends TestCase
             'last_name' => 'Doe',
             'birth_date' => '2010-01-01',
             'birth_place' => 'Manila',
-            'gender' => 'male',
+            'gender' => 'Male',
             'nationality' => 'Filipino',
             'religion' => 'Christian',
             'address' => '123 Test Street',
             'phone' => '09123456789',
             'email' => 'john.doe@example.com',
-            'grade' => 'grade_1',
+            'grade_level' => 'Grade 1',
             'guardian_ids' => [$guardian->id],
         ];
 
@@ -76,9 +76,9 @@ class StoreStudentRequestTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'birth_date' => '2010-01-01',
-            'gender' => 'male',
+            'gender' => 'Male',
             'address' => '123 Test Street',
-            'grade' => 'grade_1',
+            'grade_level' => 'Grade 1',
             'guardian_ids' => [], // Empty array
         ];
 
@@ -99,7 +99,7 @@ class StoreStudentRequestTest extends TestCase
             'birth_date' => '2010-01-01',
             'gender' => 'invalid',
             'address' => '123 Test Street',
-            'grade' => 'grade_1',
+            'grade_level' => 'Grade 1',
             'guardian_ids' => [$guardian->id],
         ];
 
@@ -118,9 +118,9 @@ class StoreStudentRequestTest extends TestCase
             'first_name' => 'John',
             'last_name' => 'Doe',
             'birth_date' => now()->addDay()->format('Y-m-d'),
-            'gender' => 'male',
+            'gender' => 'Male',
             'address' => '123 Test Street',
-            'grade' => 'grade_1',
+            'grade_level' => 'Grade 1',
             'guardian_ids' => [$guardian->id],
         ];
 
