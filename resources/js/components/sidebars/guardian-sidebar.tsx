@@ -27,11 +27,6 @@ const mainNavItems: NavItem[] = [
         icon: FileCheck,
     },
     {
-        title: 'Invoices',
-        href: '/invoices',
-        icon: FileCheck,
-    },
-    {
         title: 'Tuition Fees',
         href: '/tuition',
         icon: CreditCard,
