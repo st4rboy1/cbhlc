@@ -3,8 +3,9 @@
 **Type:** Bug/Enhancement
 **Priority:** High
 **Estimated Effort:** 0.5 day
-**Status:** 🔴 To Do
+**Status:** ✅ Completed
 **Epic:** Frontend Completion
+**PR:** #287 (Closed - already resolved)
 
 ## Description
 
