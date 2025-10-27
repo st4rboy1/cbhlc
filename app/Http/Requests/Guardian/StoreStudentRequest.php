@@ -33,15 +33,32 @@ class StoreStudentRequest extends FormRequest
             'contact_number' => ['nullable', 'string', 'max:20', 'regex:/^[0-9+\-\(\)\s]+$/'],
             'email' => ['nullable', 'email', 'max:255'],
             'grade_level' => ['required', 'string', 'in:Kinder,Grade 1,Grade 2,Grade 3,Grade 4,Grade 5,Grade 6'],
-            'birth_place' => ['nullable', 'string', 'max:255'],
-            'nationality' => ['nullable', 'string', 'max:100'],
-            'religion' => ['nullable', 'string', 'max:100'],
+            'birth_place' => ['required', 'string', 'max:255'],
+            'nationality' => ['required', 'string', 'max:100'],
+            'religion' => ['required', 'string', 'max:100'],
 
-            // Document uploads
+            // Document uploads - Birth certificate always required
             'birth_certificate' => ['required', 'file', 'mimes:jpeg,jpg,png', 'max:51200'], // 50MB in kilobytes
-            'report_card' => ['nullable', 'file', 'mimes:jpeg,jpg,png', 'max:51200'],
-            'form_138' => ['nullable', 'file', 'mimes:jpeg,jpg,png', 'max:51200'],
-            'good_moral' => ['nullable', 'file', 'mimes:jpeg,jpg,png', 'max:51200'],
+
+            // Conditional documents: required for Grade 1 and above, optional for Kinder
+            'report_card' => [
+                $this->grade_level === 'Kinder' ? 'nullable' : 'required',
+                'file',
+                'mimes:jpeg,jpg,png',
+                'max:51200',
+            ],
+            'form_138' => [
+                $this->grade_level === 'Kinder' ? 'nullable' : 'required',
+                'file',
+                'mimes:jpeg,jpg,png',
+                'max:51200',
+            ],
+            'good_moral' => [
+                $this->grade_level === 'Kinder' ? 'nullable' : 'required',
+                'file',
+                'mimes:jpeg,jpg,png',
+                'max:51200',
+            ],
         ];
     }
 
@@ -64,9 +81,15 @@ class StoreStudentRequest extends FormRequest
             'address.required' => 'Address is required.',
             'contact_number.regex' => 'Contact number format is invalid.',
             'email.email' => 'Please provide a valid email address.',
+            'birth_place.required' => 'Birth place is required.',
+            'nationality.required' => 'Nationality is required.',
+            'religion.required' => 'Religion is required.',
 
             // Document validation messages
             'birth_certificate.required' => 'Birth certificate is required.',
+            'report_card.required' => 'Report card is required for Grade 1 and above.',
+            'form_138.required' => 'Form 138 is required for Grade 1 and above.',
+            'good_moral.required' => 'Good moral certificate is required for Grade 1 and above.',
             'birth_certificate.mimes' => 'Birth certificate must be a JPEG or PNG image.',
             'birth_certificate.max' => 'Birth certificate file size must not exceed 50MB.',
             'report_card.mimes' => 'Report card must be a JPEG or PNG image.',
