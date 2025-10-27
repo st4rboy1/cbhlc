@@ -245,6 +245,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/', [AdminSchoolInformationController::class, 'index'])->name('index');
             Route::put('/', [AdminSchoolInformationController::class, 'update'])->name('update');
         });
+
+        // Invoice Management
+        Route::resource('invoices', \App\Http\Controllers\Admin\InvoiceController::class)->only(['index', 'show']);
+        Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Admin\InvoiceController::class, 'download'])->name('invoices.download');
     });
 
     // Registrar Routes
@@ -281,6 +285,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/documents/{document}/view', [RegistrarDocumentController::class, 'view'])->name('documents.view');
         Route::post('/documents/{document}/verify', [RegistrarDocumentController::class, 'verify'])->name('documents.verify');
         Route::post('/documents/{document}/reject', [RegistrarDocumentController::class, 'reject'])->name('documents.reject');
+
+        // Invoice Management
+        Route::resource('invoices', \App\Http\Controllers\Registrar\InvoiceController::class)->only(['index', 'show']);
+        Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Registrar\InvoiceController::class, 'download'])->name('invoices.download');
     });
 
     // Guardian Routes
