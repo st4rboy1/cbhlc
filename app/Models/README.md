@@ -132,7 +132,7 @@
 - `belongsTo` EnrollmentPeriod
 - `belongsTo` User (reviewer)
 - `hasMany` Invoices
-- `hasMany` Payments
+- `hasManyThrough` Payments (through Invoices)
 
 **Key Features:**
 
@@ -161,6 +161,7 @@
 
 - `belongsTo` SchoolYear
 - `hasMany` Enrollments
+- `hasMany` GradeLevelFees
 
 **Key Features:**
 
@@ -202,7 +203,7 @@
 
 **Key Attributes:**
 
-- `school_year_id`
+- `enrollment_period_id`
 - `grade_level` - Enum
 - `tuition_fee`, `miscellaneous_fee`, `other_fees`
 - `total` - Calculated sum
@@ -211,7 +212,8 @@
 
 **Relationships:**
 
-- `belongsTo` SchoolYear
+- `belongsTo` EnrollmentPeriod
+- `hasOneThrough` SchoolYear (through EnrollmentPeriod)
 
 **Key Features:**
 
@@ -296,7 +298,7 @@
 - `belongsTo` Enrollment
 - `belongsTo` Invoice
 - `belongsTo` User (receivedBy)
-- `hasMany` Receipts
+- `hasOne` Receipt
 
 **Key Features:**
 
