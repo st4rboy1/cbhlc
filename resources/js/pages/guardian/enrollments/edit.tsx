@@ -1,11 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import { AlertCircle } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 interface Enrollment {
@@ -30,6 +32,8 @@ interface Props {
 }
 
 export default function GuardianEnrollmentsEdit({ enrollment, gradeLevels, quarters }: Props) {
+    const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Enrollments', href: '/guardian/enrollments' },
@@ -55,16 +59,16 @@ export default function GuardianEnrollmentsEdit({ enrollment, gradeLevels, quart
     };
 
     const handleCancel = () => {
-        if (confirm('Are you sure you want to cancel this enrollment? This action cannot be undone.')) {
-            router.delete(`/guardian/enrollments/${enrollment.id}`, {
-                onSuccess: () => {
-                    toast.success('Enrollment canceled successfully');
-                },
-                onError: () => {
-                    toast.error('Failed to cancel enrollment');
-                },
-            });
-        }
+        router.delete(`/guardian/enrollments/${enrollment.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Enrollment canceled successfully');
+                setCancelDialogOpen(false);
+            },
+            onError: () => {
+                toast.error('Failed to cancel enrollment');
+            },
+        });
     };
 
     return (
@@ -173,13 +177,29 @@ export default function GuardianEnrollmentsEdit({ enrollment, gradeLevels, quart
                                 <Button type="button" variant="outline" onClick={() => window.history.back()} disabled={processing}>
                                     Cancel
                                 </Button>
-                                <Button type="button" variant="destructive" onClick={handleCancel} disabled={processing} className="ml-auto">
+                                <Button
+                                    type="button"
+                                    variant="destructive"
+                                    onClick={() => setCancelDialogOpen(true)}
+                                    disabled={processing}
+                                    className="ml-auto"
+                                >
                                     Cancel Enrollment
                                 </Button>
                             </div>
                         </form>
                     </CardContent>
                 </Card>
+
+                <ConfirmationDialog
+                    open={cancelDialogOpen}
+                    onOpenChange={setCancelDialogOpen}
+                    onConfirm={handleCancel}
+                    title="Cancel Enrollment?"
+                    description="Are you sure you want to cancel this enrollment? This action cannot be undone."
+                    confirmText="Cancel Enrollment"
+                    variant="destructive"
+                />
             </div>
         </AppLayout>
     );
