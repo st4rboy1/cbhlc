@@ -22,13 +22,42 @@ class GradeLevelFeeFactory extends Factory
      */
     public function definition(): array
     {
-        // Get the first available enrollment period, or null if none exists
-        // The schoolYear() state method will create one if needed
+        // Get or create an enrollment period
         $enrollmentPeriod = EnrollmentPeriod::first();
+
+        if (! $enrollmentPeriod) {
+            // Create a default school year if needed
+            $currentYear = now()->year;
+            $schoolYear = SchoolYear::firstOrCreate(
+                ['name' => $currentYear.'-'.($currentYear + 1)],
+                [
+                    'start_year' => $currentYear,
+                    'end_year' => $currentYear + 1,
+                    'start_date' => $currentYear.'-06-01',
+                    'end_date' => ($currentYear + 1).'-03-31',
+                    'status' => 'active',
+                    'is_active' => true,
+                ]
+            );
+
+            // Create enrollment period for this school year
+            $enrollmentPeriod = EnrollmentPeriod::create([
+                'school_year_id' => $schoolYear->id,
+                'start_date' => $currentYear.'-06-01',
+                'end_date' => ($currentYear + 1).'-03-31',
+                'early_registration_deadline' => $currentYear.'-05-31',
+                'regular_registration_deadline' => $currentYear.'-07-31',
+                'late_registration_deadline' => $currentYear.'-08-31',
+                'status' => 'active',
+                'description' => "School Year {$currentYear}-".($currentYear + 1).' Enrollment Period',
+                'allow_new_students' => true,
+                'allow_returning_students' => true,
+            ]);
+        }
 
         return [
             'grade_level' => fake()->randomElement(GradeLevel::values()),
-            'enrollment_period_id' => $enrollmentPeriod?->id ?? 1, // Default to 1, will be overridden by schoolYear()
+            'enrollment_period_id' => $enrollmentPeriod->id,
             'tuition_fee_cents' => fake()->numberBetween(2000000, 5000000), // 20,000 to 50,000 pesos
             'registration_fee_cents' => fake()->numberBetween(100000, 300000), // 1,000 to 3,000 pesos
             'miscellaneous_fee_cents' => fake()->numberBetween(50000, 150000), // 500 to 1,500 pesos
