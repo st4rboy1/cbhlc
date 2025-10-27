@@ -19,8 +19,14 @@ class EnrollmentController extends Controller
     {
         $enrollmentsQuery = Enrollment::query();
 
+        // Exclude completed and enrolled enrollments from count (they should appear in Students page only)
+        $activeEnrollmentsQuery = Enrollment::whereNotIn('status', [
+            EnrollmentStatus::COMPLETED,
+            EnrollmentStatus::ENROLLED,
+        ]);
+
         $statusCounts = [
-            'all' => (clone $enrollmentsQuery)->count(),
+            'all' => (clone $activeEnrollmentsQuery)->count(),
             'pending' => (clone $enrollmentsQuery)->where('status', 'pending')->count(),
             'approved' => (clone $enrollmentsQuery)->where('status', 'approved')->count(),
             'rejected' => (clone $enrollmentsQuery)->where('status', 'rejected')->count(),
@@ -28,7 +34,13 @@ class EnrollmentController extends Controller
             'completed' => (clone $enrollmentsQuery)->where('status', 'completed')->count(),
         ];
 
-        $enrollments = $enrollmentsQuery->with(['student'])
+        // Exclude completed and enrolled enrollments from index (they should appear in Students page only)
+        $enrollments = $enrollmentsQuery
+            ->whereNotIn('status', [
+                EnrollmentStatus::COMPLETED,
+                EnrollmentStatus::ENROLLED,
+            ])
+            ->with(['student'])
             ->when($request->input('search'), function ($query, $search) {
                 $query->whereHas('student', function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")

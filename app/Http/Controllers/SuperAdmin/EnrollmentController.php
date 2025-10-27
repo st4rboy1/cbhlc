@@ -31,6 +31,12 @@ class EnrollmentController extends Controller
 
         $query = Enrollment::with(['student', 'guardian.user']);
 
+        // Exclude completed and enrolled enrollments (they should appear in Students page only)
+        $query->whereNotIn('status', [
+            EnrollmentStatus::COMPLETED,
+            EnrollmentStatus::ENROLLED,
+        ]);
+
         // Search functionality
         if ($request->filled('search')) {
             $search = $request->get('search');
