@@ -75,9 +75,10 @@ describe('enrollment controller', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
 
-        // Create some enrollments
+        // Create some enrollments with statuses that won't be filtered out
+        // (COMPLETED and ENROLLED statuses are excluded from the enrollments index)
         Student::factory()->count(3)->create()->each(function ($student) {
-            Enrollment::factory()->create(['student_id' => $student->id]);
+            Enrollment::factory()->pending()->create(['student_id' => $student->id]);
         });
 
         $response = $this->actingAs($admin)->get(route('registrar.enrollments.index'));
