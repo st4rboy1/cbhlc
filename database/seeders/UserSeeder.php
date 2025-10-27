@@ -824,7 +824,7 @@ class UserSeeder extends Seeder
             $invoice = \App\Models\Invoice::firstOrCreate(
                 ['enrollment_id' => $enrollment->id],
                 [
-                    'invoice_number' => 'INV-'.str_pad($enrollment->id, 6, '0', STR_PAD_LEFT),
+                    'invoice_number' => 'INV-'.str_pad((string) $enrollment->id, 6, '0', STR_PAD_LEFT),
                     'invoice_date' => now()->subDays(rand(30, 60)),
                     'due_date' => now()->addDays(30),
                     'total_amount' => $totalAmountPeso,
@@ -872,7 +872,7 @@ class UserSeeder extends Seeder
             $invoice = \App\Models\Invoice::firstOrCreate(
                 ['enrollment_id' => $enrollment->id],
                 [
-                    'invoice_number' => 'INV-'.str_pad($enrollment->id, 6, '0', STR_PAD_LEFT),
+                    'invoice_number' => 'INV-'.str_pad((string) $enrollment->id, 6, '0', STR_PAD_LEFT),
                     'invoice_date' => now()->subDays(rand(30, 60)),
                     'due_date' => now()->addDays(30),
                     'total_amount' => $totalAmountPeso,
