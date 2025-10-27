@@ -22,27 +22,13 @@ class InvoiceController extends Controller
         $guardian = Guardian::where('user_id', $user->id)->firstOrFail();
         $studentIds = $guardian->children()->pluck('students.id');
 
-        $enrollment = Enrollment::with(['student', 'guardian', 'schoolYear'])
+        $enrollments = Enrollment::with(['student', 'guardian', 'schoolYear'])
             ->whereIn('student_id', $studentIds)
             ->latest()
-            ->first();
+            ->paginate(10);
 
-        $settings = Setting::pluck('value', 'key');
-
-        if (! $enrollment) {
-            return Inertia::render('shared/invoice', [
-                'enrollment' => null,
-                'invoiceNumber' => 'No Invoice Available',
-                'currentDate' => now()->format('F d, Y'),
-                'settings' => $settings,
-            ]);
-        }
-
-        return Inertia::render('shared/invoice', [
-            'enrollment' => $enrollment,
-            'invoiceNumber' => $enrollment->enrollment_id ?? 'No Invoice Available',
-            'currentDate' => now()->format('F d, Y'),
-            'settings' => $settings,
+        return Inertia::render('guardian/invoices/index', [
+            'enrollments' => $enrollments,
         ]);
     }
 
