@@ -1,9 +1,16 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Link } from '@inertiajs/react';
 import { type ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Eye, MoreHorizontal, Pencil } from 'lucide-react';
+import { ArrowUpDown, Eye, GraduationCap, MoreHorizontal, Pencil } from 'lucide-react';
 
 export interface Student {
     id: number;
@@ -135,6 +142,13 @@ export const columns: ColumnDef<Student>[] = [
                                 <Link href={`/guardian/students/${student.id}/edit`} className="flex cursor-pointer items-center">
                                     <Pencil className="mr-2 h-4 w-4" />
                                     Edit
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                                <Link href={`/guardian/enrollments/create?student_id=${student.id}`} className="flex cursor-pointer items-center">
+                                    <GraduationCap className="mr-2 h-4 w-4" />
+                                    Enroll Student
                                 </Link>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
