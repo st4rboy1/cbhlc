@@ -21,14 +21,46 @@ class DocumentController extends Controller
      */
     public function pending(Request $request)
     {
-        $documents = Document::with(['student', 'verifiedBy'])
+        $sortField = $request->get('sort', 'upload_date');
+        $sortDirection = $request->get('direction', 'desc');
+
+        // Validate sort field and direction
+        $allowedSorts = ['upload_date', 'document_type', 'student_name'];
+        $allowedDirections = ['asc', 'desc'];
+
+        if (! in_array($sortField, $allowedSorts)) {
+            $sortField = 'upload_date';
+        }
+
+        if (! in_array($sortDirection, $allowedDirections)) {
+            $sortDirection = 'desc';
+        }
+
+        $query = Document::with(['student', 'verifiedBy'])
             ->where('verification_status', 'pending')
-            ->when($request->student_id, fn ($query) => $query->where('student_id', $request->student_id))
-            ->latest('upload_date')
-            ->paginate(20);
+            ->when($request->student_id, fn ($query) => $query->where('student_id', $request->student_id));
+
+        // Apply sorting based on field
+        if ($sortField === 'student_name') {
+            $query->join('students', 'documents.student_id', '=', 'students.id')
+                ->orderBy('students.last_name', $sortDirection)
+                ->orderBy('students.first_name', $sortDirection)
+                ->select('documents.*');
+        } elseif ($sortField === 'document_type') {
+            $query->orderBy('document_type', $sortDirection);
+        } else {
+            // Default: sort by upload_date
+            $query->orderBy('upload_date', $sortDirection);
+        }
+
+        $documents = $query->paginate(20)->withQueryString();
 
         return Inertia::render('registrar/documents/pending', [
             'documents' => $documents,
+            'filters' => [
+                'sort' => $sortField,
+                'direction' => $sortDirection,
+            ],
         ]);
     }
 

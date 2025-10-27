@@ -1,6 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 
 interface Document {
     id: number;
@@ -29,14 +30,57 @@ interface PaginatedDocuments {
 
 interface Props {
     documents: PaginatedDocuments;
+    filters?: {
+        sort?: string;
+        direction?: string;
+    };
 }
 
-export default function PendingDocuments({ documents }: Props) {
+export default function PendingDocuments({ documents, filters }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Registrar', href: '/registrar/dashboard' },
         { title: 'Documents', href: '/registrar/documents/pending' },
         { title: 'Pending', href: '/registrar/documents/pending' },
     ];
+
+    const sortBy = (field: string) => {
+        const currentSort = filters?.sort || 'upload_date';
+        const currentDirection = filters?.direction || 'desc';
+
+        let newDirection = 'desc';
+
+        if (currentSort === field) {
+            // Toggle direction if same field
+            newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+        }
+
+        router.get(
+            '/registrar/documents/pending',
+            {
+                sort: field,
+                direction: newDirection,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
+    const getSortIcon = (field: string) => {
+        const currentSort = filters?.sort || 'upload_date';
+        const currentDirection = filters?.direction || 'desc';
+
+        if (currentSort !== field) {
+            return <ArrowUpDown className="ml-1 inline h-4 w-4 text-gray-400" />;
+        }
+
+        return currentDirection === 'asc' ? (
+            <ArrowUp className="ml-1 inline h-4 w-4 text-gray-700" />
+        ) : (
+            <ArrowDown className="ml-1 inline h-4 w-4 text-gray-700" />
+        );
+    };
 
     const verifyDocument = (documentId: number) => {
         if (confirm('Are you sure you want to verify this document?')) {
@@ -62,14 +106,35 @@ export default function PendingDocuments({ documents }: Props) {
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                    Student
+                                <th
+                                    scope="col"
+                                    className="cursor-pointer px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase hover:bg-gray-100"
+                                    onClick={() => sortBy('student_name')}
+                                >
+                                    <span className="flex items-center">
+                                        Student
+                                        {getSortIcon('student_name')}
+                                    </span>
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                    Document Type
+                                <th
+                                    scope="col"
+                                    className="cursor-pointer px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase hover:bg-gray-100"
+                                    onClick={() => sortBy('document_type')}
+                                >
+                                    <span className="flex items-center">
+                                        Document Type
+                                        {getSortIcon('document_type')}
+                                    </span>
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                    Upload Date
+                                <th
+                                    scope="col"
+                                    className="cursor-pointer px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase hover:bg-gray-100"
+                                    onClick={() => sortBy('upload_date')}
+                                >
+                                    <span className="flex items-center">
+                                        Upload Date
+                                        {getSortIcon('upload_date')}
+                                    </span>
                                 </th>
                                 <th scope="col" className="relative px-6 py-3">
                                     <span className="sr-only">Actions</span>
