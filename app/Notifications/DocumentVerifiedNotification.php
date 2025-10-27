@@ -51,6 +51,7 @@ class DocumentVerifiedNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
+            'message' => 'Document Verified: '.$this->document->document_type->label().' for '.$this->document->student->full_name,
             'document_id' => $this->document->id,
             'document_type' => $this->document->document_type,
             'student_id' => $this->document->student_id,
