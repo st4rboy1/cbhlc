@@ -786,21 +786,31 @@ class UserSeeder extends Seeder
             'is_primary_contact' => true,
         ]);
 
+        // Issue #321 and #322: Create documents with different verification statuses
+        $this->createDocumentTestData();
+
         // Issue #318-320: Create payments for dashboard statistics
         $this->createPaymentTestData();
     }
 
     /**
-     * Create payment records for dashboard statistics
-     * Issues #318, #319, #320
+     * Create documents with different verification statuses for dashboard statistics
+     * Issues #321 and #322
      */
-    private function createPaymentTestData(): void
+    private function createDocumentTestData(): void
     {
-        // Get or create registrar/cashier user for payment processing
-        $cashier = User::role(['registrar', 'administrator', 'super_admin'])->first();
+        // Get some students to attach documents to
+        $students = Student::limit(5)->get();
 
-        if (! $cashier) {
-            $cashier = User::firstOrCreate(
+        if ($students->isEmpty()) {
+            return;
+        }
+
+        // Get or create a registrar user for document verification
+        $registrarUser = User::role(['registrar', 'administrator', 'super_admin'])->first();
+
+        if (! $registrarUser) {
+            $registrarUser = User::firstOrCreate(
                 ['email' => 'registrar@cbhlc.edu'],
                 [
                     'name' => 'Test Registrar',
@@ -808,7 +818,101 @@ class UserSeeder extends Seeder
                     'password' => bcrypt('password'),
                 ]
             );
-            $cashier->assignRole('registrar');
+            $registrarUser->assignRole('registrar');
+        }
+
+        // Issue #321: Documents pending verification (at least 3)
+        foreach ($students->take(3) as $index => $student) {
+            \App\Models\Document::firstOrCreate(
+                [
+                    'student_id' => $student->id,
+                    'document_type' => \App\Enums\DocumentType::BIRTH_CERTIFICATE,
+                ],
+                [
+                    'original_filename' => "birth_cert_{$student->student_id}.pdf",
+                    'stored_filename' => "documents/{$student->student_id}/birth_cert_".time().'.pdf',
+                    'file_path' => "documents/{$student->student_id}/birth_cert_".time().'.pdf',
+                    'file_size' => rand(100000, 500000),
+                    'mime_type' => 'application/pdf',
+                    'upload_date' => now()->subDays(rand(1, 7)),
+                    'verification_status' => \App\Enums\VerificationStatus::PENDING,
+                ]
+            );
+        }
+
+        // Issue #322: Documents with different verification statuses
+        $documentTypes = [
+            \App\Enums\DocumentType::FORM_138,
+            \App\Enums\DocumentType::GOOD_MORAL,
+            \App\Enums\DocumentType::REPORT_CARD,
+        ];
+
+        foreach ($students->take(4) as $index => $student) {
+            $docType = $documentTypes[$index % count($documentTypes)];
+
+            // Create verified document
+            \App\Models\Document::firstOrCreate(
+                [
+                    'student_id' => $student->id,
+                    'document_type' => $docType,
+                    'verification_status' => \App\Enums\VerificationStatus::VERIFIED,
+                ],
+                [
+                    'original_filename' => strtolower($docType->value)."_{$student->student_id}.pdf",
+                    'stored_filename' => "documents/{$student->student_id}/".strtolower($docType->value).'_'.time().'.pdf',
+                    'file_path' => "documents/{$student->student_id}/".strtolower($docType->value).'_'.time().'.pdf',
+                    'file_size' => rand(100000, 500000),
+                    'mime_type' => 'application/pdf',
+                    'upload_date' => now()->subDays(rand(10, 30)),
+                    'verified_by' => $registrarUser->id,
+                    'verified_at' => now()->subDays(rand(5, 20)),
+                ]
+            );
+
+            // Create rejected document
+            if ($index < 2) {
+                \App\Models\Document::firstOrCreate(
+                    [
+                        'student_id' => $student->id,
+                        'document_type' => \App\Enums\DocumentType::OTHER,
+                        'verification_status' => \App\Enums\VerificationStatus::REJECTED,
+                    ],
+                    [
+                        'original_filename' => "other_doc_{$student->student_id}.pdf",
+                        'stored_filename' => "documents/{$student->student_id}/other_".time().'.pdf',
+                        'file_path' => "documents/{$student->student_id}/other_".time().'.pdf',
+                        'file_size' => rand(100000, 500000),
+                        'mime_type' => 'application/pdf',
+                        'upload_date' => now()->subDays(rand(15, 45)),
+                        'verification_status' => \App\Enums\VerificationStatus::REJECTED,
+                        'verified_by' => $registrarUser->id,
+                        'verified_at' => now()->subDays(rand(10, 40)),
+                        'rejection_reason' => 'Document is unclear or incomplete. Please re-upload a clearer copy.',
+                    ]
+                );
+            }
+        }
+    }
+
+    /**
+     * Create payment test data for dashboard statistics
+     * Issues #318-320
+     */
+    private function createPaymentTestData(): void
+    {
+        // Get or create registrar/cashier user for payment processing
+        $registrarUser = User::role(['registrar', 'administrator', 'super_admin'])->first();
+
+        if (! $registrarUser) {
+            $registrarUser = User::firstOrCreate(
+                ['email' => 'registrar@cbhlc.edu'],
+                [
+                    'name' => 'Test Registrar',
+                    'email_verified_at' => now(),
+                    'password' => bcrypt('password'),
+                ]
+            );
+            $registrarUser->assignRole('registrar');
         }
 
         // Get enrollments with balance for payment creation
@@ -845,7 +949,7 @@ class UserSeeder extends Seeder
                     'payment_date' => now()->subDays(rand(5, 30)),
                     'reference_number' => 'PAY-'.strtoupper(uniqid()),
                     'notes' => 'Full payment for tuition and miscellaneous fees',
-                    'processed_by' => $cashier->id,
+                    'processed_by' => $registrarUser->id,
                 ]
             );
 
@@ -892,7 +996,7 @@ class UserSeeder extends Seeder
                     'payment_date' => now()->subDays(rand(10, 45)),
                     'reference_number' => 'PAY-'.strtoupper(uniqid()),
                     'notes' => 'Partial payment - '.($partialPercentage * 100).'% of total',
-                    'processed_by' => $cashier->id,
+                    'processed_by' => $registrarUser->id,
                 ]
             );
 
