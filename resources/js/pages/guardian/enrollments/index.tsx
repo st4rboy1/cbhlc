@@ -18,7 +18,12 @@ interface Enrollment {
         first_name: string;
         last_name: string;
     };
-    school_year: string;
+    school_year?: {
+        id: number;
+        name: string;
+        start_year: number;
+        end_year: number;
+    };
     grade_level: string;
     status: 'pending' | 'approved' | 'enrolled' | 'rejected' | 'completed';
     payment_status: 'pending' | 'partial' | 'paid' | 'overdue';
@@ -117,6 +122,9 @@ export default function GuardianEnrollmentsIndex({ enrollments, filters, filterO
             {
                 accessorKey: 'school_year',
                 header: 'School Year',
+                cell: ({ row }) => {
+                    return row.original.school_year?.name || '-';
+                },
             },
             {
                 accessorKey: 'grade_level',

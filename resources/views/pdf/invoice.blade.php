@@ -95,41 +95,41 @@
         <tbody>
             <tr>
                 <td>Tuition Fee</td>
-                <td class="text-right">₱{{ number_format($enrollment->tuition_fee, 2) }}</td>
+                <td class="text-right">PHP {{ number_format($enrollment->tuition_fee, 2) }}</td>
             </tr>
             <tr>
                 <td>Miscellaneous Fee</td>
-                <td class="text-right">₱{{ number_format($enrollment->miscellaneous_fee, 2) }}</td>
+                <td class="text-right">PHP {{ number_format($enrollment->miscellaneous_fee, 2) }}</td>
             </tr>
             @if($enrollment->laboratory_fee > 0)
             <tr>
                 <td>Laboratory Fee</td>
-                <td class="text-right">₱{{ number_format($enrollment->laboratory_fee, 2) }}</td>
+                <td class="text-right">PHP {{ number_format($enrollment->laboratory_fee, 2) }}</td>
             </tr>
             @endif
             @if($enrollment->library_fee > 0)
             <tr>
                 <td>Library Fee</td>
-                <td class="text-right">₱{{ number_format($enrollment->library_fee, 2) }}</td>
+                <td class="text-right">PHP {{ number_format($enrollment->library_fee, 2) }}</td>
             </tr>
             @endif
             @if($enrollment->sports_fee > 0)
             <tr>
                 <td>Sports Fee</td>
-                <td class="text-right">₱{{ number_format($enrollment->sports_fee, 2) }}</td>
+                <td class="text-right">PHP {{ number_format($enrollment->sports_fee, 2) }}</td>
             </tr>
             @endif
             <tr class="total-row">
                 <td>TOTAL AMOUNT DUE</td>
-                <td class="text-right">₱{{ number_format($enrollment->total_amount, 2) }}</td>
+                <td class="text-right">PHP {{ number_format($enrollment->total_amount, 2) }}</td>
             </tr>
             <tr>
                 <td>Amount Paid</td>
-                <td class="text-right">₱{{ number_format($enrollment->amount_paid, 2) }}</td>
+                <td class="text-right">PHP {{ number_format($enrollment->amount_paid, 2) }}</td>
             </tr>
             <tr class="balance-row">
                 <td>OUTSTANDING BALANCE</td>
-                <td class="text-right">₱{{ number_format($enrollment->balance, 2) }}</td>
+                <td class="text-right">PHP {{ number_format($enrollment->balance, 2) }}</td>
             </tr>
         </tbody>
     </table>
@@ -165,7 +165,7 @@
             @foreach($payments as $payment)
             <tr>
                 <td>{{ $payment->payment_date->format('M d, Y') }}</td>
-                <td>₱{{ number_format($payment->amount, 2) }}</td>
+                <td>PHP {{ number_format($payment->amount, 2) }}</td>
                 <td>{{ ucfirst($payment->payment_method->value ?? $payment->payment_method) }}</td>
                 <td>{{ $payment->reference_number ?? 'N/A' }}</td>
             </tr>

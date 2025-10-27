@@ -37,7 +37,7 @@ class EnrollmentController extends Controller
             ->pluck('student_id');
 
         // Build query with filters
-        $query = Enrollment::with(['student', 'guardian'])
+        $query = Enrollment::with(['student', 'guardian', 'schoolYear'])
             ->whereIn('student_id', $studentIds);
 
         // Filter by school year
@@ -453,7 +453,9 @@ class EnrollmentController extends Controller
             'enrollment' => $enrollment,
             'payments' => $payments,
         ])
-            ->setPaper('a4', 'portrait');
+            ->setPaper('a4', 'portrait')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true);
 
         return $pdf->download("payment-history-{$enrollment->enrollment_id}.pdf");
     }
@@ -485,7 +487,9 @@ class EnrollmentController extends Controller
         $pdf = Pdf::loadView('pdf.enrollment-certificate', [
             'enrollment' => $enrollment,
         ])
-            ->setPaper('a4', 'portrait');
+            ->setPaper('a4', 'portrait')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true);
 
         return $pdf->download("enrollment-certificate-{$enrollment->enrollment_id}.pdf");
     }
