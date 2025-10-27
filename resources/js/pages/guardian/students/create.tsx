@@ -155,18 +155,34 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                             {/* Birth Place, Nationality, Religion */}
                             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 <div className="space-y-2">
-                                    <Label htmlFor="birth_place">Birth Place</Label>
-                                    <Input id="birth_place" value={data.birth_place} onChange={(e) => setData('birth_place', e.target.value)} />
+                                    <Label htmlFor="birth_place">
+                                        Birth Place <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input
+                                        id="birth_place"
+                                        value={data.birth_place}
+                                        onChange={(e) => setData('birth_place', e.target.value)}
+                                        required
+                                    />
                                     {errors.birth_place && <p className="text-sm text-destructive">{errors.birth_place}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="nationality">Nationality</Label>
-                                    <Input id="nationality" value={data.nationality} onChange={(e) => setData('nationality', e.target.value)} />
+                                    <Label htmlFor="nationality">
+                                        Nationality <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input
+                                        id="nationality"
+                                        value={data.nationality}
+                                        onChange={(e) => setData('nationality', e.target.value)}
+                                        required
+                                    />
                                     {errors.nationality && <p className="text-sm text-destructive">{errors.nationality}</p>}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="religion">Religion</Label>
-                                    <Input id="religion" value={data.religion} onChange={(e) => setData('religion', e.target.value)} />
+                                    <Label htmlFor="religion">
+                                        Religion <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Input id="religion" value={data.religion} onChange={(e) => setData('religion', e.target.value)} required />
                                     {errors.religion && <p className="text-sm text-destructive">{errors.religion}</p>}
                                 </div>
                             </div>
@@ -206,6 +222,13 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
                                     <p className="text-sm text-muted-foreground">
                                         Upload scanned copies of the following documents (JPEG/PNG, max 50MB each)
                                     </p>
+                                    {data.grade_level && (
+                                        <p className="mt-2 text-sm font-medium text-blue-600">
+                                            {data.grade_level === 'Kinder'
+                                                ? '📌 Only Birth Certificate is required for Kindergarten enrollment'
+                                                : '📌 All documents are required for Grade 1 and above'}
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Birth Certificate */}
@@ -239,7 +262,10 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
 
                                 {/* Report Card */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="report_card">Report Card (Latest)</Label>
+                                    <Label htmlFor="report_card">
+                                        Report Card (Latest)
+                                        {data.grade_level && data.grade_level !== 'Kinder' && <span className="text-destructive"> *</span>}
+                                    </Label>
                                     <div className="flex items-center gap-2">
                                         <Input
                                             id="report_card"
@@ -266,7 +292,10 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
 
                                 {/* Form 138 */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="form_138">Form 138 (School Records)</Label>
+                                    <Label htmlFor="form_138">
+                                        Form 138 (School Records)
+                                        {data.grade_level && data.grade_level !== 'Kinder' && <span className="text-destructive"> *</span>}
+                                    </Label>
                                     <div className="flex items-center gap-2">
                                         <Input
                                             id="form_138"
@@ -293,7 +322,10 @@ export default function GuardianStudentsCreate({ gradeLevels }: Props) {
 
                                 {/* Good Moral Certificate */}
                                 <div className="space-y-2">
-                                    <Label htmlFor="good_moral">Good Moral Certificate</Label>
+                                    <Label htmlFor="good_moral">
+                                        Good Moral Certificate
+                                        {data.grade_level && data.grade_level !== 'Kinder' && <span className="text-destructive"> *</span>}
+                                    </Label>
                                     <div className="flex items-center gap-2">
                                         <Input
                                             id="good_moral"
