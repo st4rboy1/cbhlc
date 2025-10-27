@@ -84,7 +84,15 @@ class StudentController extends Controller
 
         $student->load('enrollments.schoolYear', 'documents');
 
+        // Check for active enrollment period
+        $activePeriod = EnrollmentPeriod::active()->first();
+        $canEnroll = $activePeriod && $activePeriod->isOpen();
+
         return Inertia::render('guardian/students/show', [
+            'canEnroll' => $canEnroll,
+            'enrollmentMessage' => ! $canEnroll
+                ? ($activePeriod ? 'Enrollment period is currently closed.' : 'No active enrollment period available.')
+                : null,
             'student' => [
                 'id' => $student->id,
                 'student_id' => $student->student_id,
