@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { AlertCircle, Building2, Calendar, Download, FileText, Mail, Phone, Printer } from 'lucide-react';
 import { useRef } from 'react';
 
@@ -57,6 +57,33 @@ interface Props {
 }
 
 export default function Invoice({ enrollment, invoiceNumber, currentDate, settings }: Props) {
+    const { auth } = usePage<{
+        auth: {
+            user: {
+                roles?: Array<{ name: string }>;
+            };
+        };
+    }>().props;
+
+    // Determine the correct route prefix based on user role
+    const getRolePrefix = () => {
+        if (!auth?.user?.roles) return '';
+        const role = auth.user.roles[0]?.name;
+        switch (role) {
+            case 'guardian':
+                return '/guardian';
+            case 'registrar':
+            case 'administrator':
+                return '/registrar';
+            case 'super_admin':
+                return '/super-admin';
+            default:
+                return '';
+        }
+    };
+
+    const rolePrefix = getRolePrefix();
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Invoice',
@@ -125,8 +152,8 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
 
     const handleDownloadPDF = () => {
         if (!enrollment) return;
-        // Navigate to server-side PDF download endpoint
-        window.location.href = `/invoices/${enrollment.id}/download`;
+        // Navigate to server-side PDF download endpoint using role-based route
+        window.location.href = `${rolePrefix}/invoices/${enrollment.id}/download`;
     };
 
     if (!enrollment) {

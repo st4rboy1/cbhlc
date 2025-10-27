@@ -156,7 +156,7 @@ export default function GuardianDashboard({ children, announcements, upcomingEve
                                     </Link>
                                 </Button>
                                 <Button variant="outline" className="w-full justify-start" asChild>
-                                    <Link href="/invoices">
+                                    <Link href="/guardian/invoices">
                                         <FileText className="mr-2 h-4 w-4" />
                                         View Invoices
                                     </Link>
