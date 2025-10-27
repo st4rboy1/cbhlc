@@ -71,6 +71,8 @@ interface Student {
 
 interface Props {
     student: Student;
+    canEnroll: boolean;
+    enrollmentMessage?: string | null;
 }
 
 const statusColors = {
@@ -87,7 +89,7 @@ const paymentStatusColors = {
     overdue: 'destructive',
 } as const;
 
-export default function GuardianStudentsShow({ student }: Props) {
+export default function GuardianStudentsShow({ student, canEnroll, enrollmentMessage }: Props) {
     const [downloadingId, setDownloadingId] = useState<number | null>(null);
     const [imageUrls, setImageUrls] = useState<Record<number, string>>({});
     const [viewingImageId, setViewingImageId] = useState<number | null>(null);
@@ -200,12 +202,19 @@ export default function GuardianStudentsShow({ student }: Props) {
                         <p className="text-muted-foreground">Student ID: {student.student_id}</p>
                     </div>
                     <div className="flex gap-2">
-                        <Link href={`/guardian/enrollments/create?student_id=${student.id}`}>
-                            <Button variant="default">
+                        {canEnroll ? (
+                            <Link href={`/guardian/enrollments/create?student_id=${student.id}`}>
+                                <Button variant="default">
+                                    <GraduationCap className="mr-2 h-4 w-4" />
+                                    Enroll Student
+                                </Button>
+                            </Link>
+                        ) : (
+                            <Button variant="default" disabled title={enrollmentMessage || 'Enrollment is closed'}>
                                 <GraduationCap className="mr-2 h-4 w-4" />
                                 Enroll Student
                             </Button>
-                        </Link>
+                        )}
                         <Link href={`/guardian/students/${student.id}/edit`}>
                             <Button variant="outline">
                                 <Edit className="mr-2 h-4 w-4" />
@@ -214,6 +223,24 @@ export default function GuardianStudentsShow({ student }: Props) {
                         </Link>
                     </div>
                 </div>
+
+                {/* Enrollment Closed Message */}
+                {!canEnroll && enrollmentMessage && (
+                    <div className="mb-6">
+                        <div className="rounded-md border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900 dark:bg-yellow-950">
+                            <div className="flex items-start gap-3">
+                                <Clock className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-500" />
+                                <div>
+                                    <h3 className="font-semibold text-yellow-900 dark:text-yellow-100">Enrollment Currently Unavailable</h3>
+                                    <p className="mt-1 text-sm text-yellow-800 dark:text-yellow-200">{enrollmentMessage}</p>
+                                    <p className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                                        Please contact the school office for more information about upcoming enrollment periods.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="grid gap-6 md:grid-cols-2">
                     {/* Personal Information Card */}
@@ -293,12 +320,19 @@ export default function GuardianStudentsShow({ student }: Props) {
                             </div>
 
                             <div className="mt-4 border-t pt-4">
-                                <Link href={`/guardian/enrollments/create?student_id=${student.id}`}>
-                                    <Button className="w-full">
+                                {canEnroll ? (
+                                    <Link href={`/guardian/enrollments/create?student_id=${student.id}`}>
+                                        <Button className="w-full">
+                                            <Calendar className="mr-2 h-4 w-4" />
+                                            Enroll for New School Year
+                                        </Button>
+                                    </Link>
+                                ) : (
+                                    <Button className="w-full" disabled title={enrollmentMessage || 'Enrollment is closed'}>
                                         <Calendar className="mr-2 h-4 w-4" />
                                         Enroll for New School Year
                                     </Button>
-                                </Link>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
@@ -413,12 +447,19 @@ export default function GuardianStudentsShow({ student }: Props) {
                                 <GraduationCap className="mb-4 h-12 w-12 text-muted-foreground" />
                                 <p className="mb-2 text-lg font-semibold">No Enrollment History</p>
                                 <p className="mb-4 text-sm text-muted-foreground">This student has not been enrolled yet</p>
-                                <Link href={`/guardian/enrollments/create?student_id=${student.id}`}>
-                                    <Button>
+                                {canEnroll ? (
+                                    <Link href={`/guardian/enrollments/create?student_id=${student.id}`}>
+                                        <Button>
+                                            <Calendar className="mr-2 h-4 w-4" />
+                                            Create First Enrollment
+                                        </Button>
+                                    </Link>
+                                ) : (
+                                    <Button disabled title={enrollmentMessage || 'Enrollment is closed'}>
                                         <Calendar className="mr-2 h-4 w-4" />
                                         Create First Enrollment
                                     </Button>
-                                </Link>
+                                )}
                             </div>
                         )}
                     </CardContent>

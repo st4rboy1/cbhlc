@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Guardian\StoreStudentRequest;
 use App\Http\Requests\Guardian\UpdateStudentRequest;
 use App\Models\Document;
+use App\Models\EnrollmentPeriod;
 use App\Models\Guardian;
 use App\Models\GuardianStudent;
 use App\Models\Student;
@@ -84,7 +85,15 @@ class StudentController extends Controller
 
         $student->load('enrollments.schoolYear', 'documents');
 
+        // Check for active enrollment period
+        $activePeriod = EnrollmentPeriod::active()->first();
+        $canEnroll = $activePeriod && $activePeriod->isOpen();
+
         return Inertia::render('guardian/students/show', [
+            'canEnroll' => $canEnroll,
+            'enrollmentMessage' => ! $canEnroll
+                ? ($activePeriod ? 'Enrollment period is currently closed.' : 'No active enrollment period available.')
+                : null,
             'student' => [
                 'id' => $student->id,
                 'student_id' => $student->student_id,

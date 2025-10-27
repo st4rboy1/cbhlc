@@ -21,9 +21,16 @@ interface Student {
     available_grade_levels: string[];
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    start_year: number;
+    end_year: number;
+}
+
 interface EnrollmentPeriod {
     id: number;
-    school_year: string;
+    school_year: SchoolYear;
     status: string;
     start_date: string;
     end_date: string;
@@ -112,7 +119,7 @@ export default function GuardianEnrollmentsCreate({
                             </div>
                             <Badge variant="default">Open</Badge>
                         </div>
-                        <CardDescription className="text-blue-600 dark:text-blue-500">School Year {activePeriod.school_year}</CardDescription>
+                        <CardDescription className="text-blue-600 dark:text-blue-500">School Year {activePeriod.school_year.name}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="grid gap-4 md:grid-cols-2">
