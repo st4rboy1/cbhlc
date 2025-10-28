@@ -440,12 +440,18 @@ class EnrollmentController extends Controller
             abort(404);
         }
 
-        $enrollment->load('student');
+        // Load enrollment with related data
+        $enrollment->load([
+            'student',
+            'invoices.payments',
+        ]);
 
-        // Get all payments for this enrollment via invoice
-        $payments = Payment::where('invoice_id', $enrollment->id)
-            ->orderBy('payment_date', 'asc')
-            ->get();
+        // Get all payments for this enrollment through invoices
+        $payments = collect();
+        foreach ($enrollment->invoices as $invoice) {
+            $payments = $payments->merge($invoice->payments);
+        }
+        $payments = $payments->sortBy('payment_date');
 
         $pdf = Pdf::loadView('pdf.payment-history', [
             'enrollment' => $enrollment,
