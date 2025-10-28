@@ -227,9 +227,9 @@ class EnrollmentController extends Controller
             $validated['quarter'] = Quarter::FIRST->value;
         }
 
-        // Get the fee for the selected grade level and school year
+        // Get the fee for the selected grade level and enrollment period
         $gradeLevelFee = \App\Models\GradeLevelFee::where('grade_level', $validated['grade_level'])
-            ->where('school_year_id', $activePeriod->school_year_id)
+            ->where('enrollment_period_id', $activePeriod->id)
             ->first();
 
         $tuitionFeeCents = $gradeLevelFee ? $gradeLevelFee->tuition_fee_cents : 0;
