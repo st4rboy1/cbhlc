@@ -21,6 +21,7 @@ class Payment extends Model
         'payment_method',
         'payment_date',
         'reference_number',
+        'receipt_number',
         'notes',
         'processed_by',
     ];
