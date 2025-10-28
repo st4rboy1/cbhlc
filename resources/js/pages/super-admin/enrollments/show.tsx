@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -60,43 +60,6 @@ interface Props {
     enrollment: Enrollment;
 }
 
-const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string; label: string }> = {
-        pending: { variant: 'outline', className: 'bg-yellow-100 text-yellow-800', label: 'Pending Review' },
-        approved: { variant: 'default', className: 'bg-blue-100 text-blue-800', label: 'Approved' },
-        rejected: { variant: 'destructive', label: 'Rejected' },
-        ready_for_payment: { variant: 'outline', className: 'bg-yellow-100 text-yellow-800', label: 'Ready for Payment' },
-        paid: { variant: 'default', className: 'bg-green-100 text-green-800', label: 'Paid' },
-        enrolled: { variant: 'default', className: 'bg-primary text-primary-foreground', label: 'Enrolled' },
-        completed: { variant: 'secondary', label: 'Completed' },
-    };
-
-    const config = variants[status] || { variant: 'outline' as const, label: status };
-
-    return (
-        <Badge variant={config.variant} className={config.className}>
-            {config.label}
-        </Badge>
-    );
-};
-
-const getPaymentStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string; label: string }> = {
-        pending: { variant: 'outline', className: 'bg-yellow-100 text-yellow-800', label: 'Pending' },
-        partial: { variant: 'secondary', className: 'bg-orange-100 text-orange-800', label: 'Partial' },
-        paid: { variant: 'default', className: 'bg-green-100 text-green-800', label: 'Paid' },
-        overdue: { variant: 'destructive', label: 'Overdue' },
-    };
-
-    const config = variants[status] || { variant: 'outline' as const, label: status };
-
-    return (
-        <Badge variant={config.variant} className={config.className}>
-            {config.label}
-        </Badge>
-    );
-};
-
 const formatCurrency = (cents: number) => {
     return new Intl.NumberFormat('en-PH', {
         style: 'currency',
@@ -151,7 +114,9 @@ export default function SuperAdminEnrollmentsShow({ enrollment }: Props) {
                                         <FileText className="h-4 w-4" />
                                         Status
                                     </div>
-                                    <div>{getStatusBadge(enrollment.status)}</div>
+                                    <div>
+                                        <EnrollmentStatusBadge status={enrollment.status} />
+                                    </div>
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -179,7 +144,9 @@ export default function SuperAdminEnrollmentsShow({ enrollment }: Props) {
                                         <CreditCard className="h-4 w-4" />
                                         Payment Status
                                     </div>
-                                    <div>{getPaymentStatusBadge(enrollment.payment_status)}</div>
+                                    <div>
+                                        <PaymentStatusBadge status={enrollment.payment_status} />
+                                    </div>
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">

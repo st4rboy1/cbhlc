@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { DocumentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
@@ -43,19 +43,6 @@ interface Props {
 }
 
 export default function DocumentShow({ document, fileUrl }: Props) {
-    const getStatusBadgeVariant = (status: string): 'default' | 'secondary' | 'destructive' => {
-        switch (status) {
-            case 'verified':
-                return 'default';
-            case 'pending':
-                return 'secondary';
-            case 'rejected':
-                return 'destructive';
-            default:
-                return 'secondary';
-        }
-    };
-
     const getDocumentTypeLabel = (type: string): string => {
         const labels: Record<string, string> = {
             birth_certificate: 'Birth Certificate',
@@ -122,9 +109,7 @@ export default function DocumentShow({ document, fileUrl }: Props) {
                         <div>
                             <h1 className="flex items-center gap-2 text-2xl font-bold">
                                 {document.original_filename}
-                                <Badge variant={getStatusBadgeVariant(document.verification_status)}>
-                                    {document.verification_status.charAt(0).toUpperCase() + document.verification_status.slice(1)}
-                                </Badge>
+                                <DocumentStatusBadge status={document.verification_status} />
                             </h1>
                             <p className="text-sm text-muted-foreground">{getDocumentTypeLabel(document.document_type)}</p>
                         </div>

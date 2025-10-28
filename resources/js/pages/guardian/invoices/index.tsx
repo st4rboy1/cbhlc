@@ -1,5 +1,5 @@
 import Heading from '@/components/heading';
-import { Badge } from '@/components/ui/badge';
+import { PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
@@ -64,17 +64,6 @@ export default function GuardianInvoicesIndex({ enrollments }: Props) {
         { title: 'Invoices', href: '/guardian/invoices' },
     ];
 
-    const getPaymentStatusBadge = (status: string) => {
-        const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-            paid: 'default',
-            partially_paid: 'secondary',
-            unpaid: 'destructive',
-            pending: 'outline',
-        };
-
-        return <Badge variant={variants[status] || 'outline'}>{status.replace('_', ' ').toUpperCase()}</Badge>;
-    };
-
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-PH', {
             style: 'currency',
@@ -137,7 +126,7 @@ export default function GuardianInvoicesIndex({ enrollments }: Props) {
             accessorKey: 'payment_status',
             header: 'Status',
             cell: ({ row }) => {
-                return getPaymentStatusBadge(row.original.payment_status);
+                return <PaymentStatusBadge status={row.original.payment_status} />;
             },
         },
         {

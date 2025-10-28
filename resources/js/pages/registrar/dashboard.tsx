@@ -1,5 +1,5 @@
 import Heading from '@/components/heading';
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -144,65 +144,6 @@ export default function RegistrarDashboard({
                 },
             },
         );
-    };
-
-    const getStatusBadge = (status: string) => {
-        switch (status.toLowerCase()) {
-            case 'pending':
-                return (
-                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-                        Pending
-                    </Badge>
-                );
-            case 'enrolled':
-            case 'approved':
-                return (
-                    <Badge variant="secondary" className="bg-green-100 text-green-800">
-                        Enrolled
-                    </Badge>
-                );
-            case 'rejected':
-                return <Badge variant="destructive">Rejected</Badge>;
-            case 'completed':
-                return (
-                    <Badge variant="default" className="bg-blue-100 text-blue-800">
-                        Completed
-                    </Badge>
-                );
-            default:
-                return <Badge variant="outline">{status}</Badge>;
-        }
-    };
-
-    const getPaymentStatusBadge = (status: string) => {
-        switch (status.toLowerCase()) {
-            case 'pending':
-                return (
-                    <Badge variant="outline" className="border-orange-500 text-orange-700">
-                        Pending
-                    </Badge>
-                );
-            case 'partial':
-                return (
-                    <Badge variant="outline" className="border-blue-500 text-blue-700">
-                        Partial
-                    </Badge>
-                );
-            case 'paid':
-                return (
-                    <Badge variant="outline" className="border-green-500 text-green-700">
-                        Paid
-                    </Badge>
-                );
-            case 'overdue':
-                return (
-                    <Badge variant="outline" className="border-red-500 text-red-700">
-                        Overdue
-                    </Badge>
-                );
-            default:
-                return <Badge variant="outline">{status}</Badge>;
-        }
     };
 
     const getDeadlineColor = (daysLeft: number) => {
@@ -392,8 +333,12 @@ export default function RegistrarDashboard({
                                             <TableRow key={application.id}>
                                                 <TableCell className="font-medium">{application.student_name}</TableCell>
                                                 <TableCell>{application.grade_level}</TableCell>
-                                                <TableCell>{getStatusBadge(application.status)}</TableCell>
-                                                <TableCell>{getPaymentStatusBadge(application.payment_status)}</TableCell>
+                                                <TableCell>
+                                                    <EnrollmentStatusBadge status={application.status} />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <PaymentStatusBadge status={application.payment_status} />
+                                                </TableCell>
                                                 <TableCell>{application.submission_date}</TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex justify-end gap-2">
