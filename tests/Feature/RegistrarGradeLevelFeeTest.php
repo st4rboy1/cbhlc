@@ -8,6 +8,9 @@ uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 beforeEach(function () {
     // Seed roles and permissions
     $this->seed(RolesAndPermissionsSeeder::class);
+
+    // Clear permission cache to ensure roles have fresh permissions
+    app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 });
 
 test('registrar can access grade level fees index', function () {
