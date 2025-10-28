@@ -71,9 +71,11 @@
 **Key Attributes:**
 
 - Personal info: first_name, middle_name, last_name
-- Contact: contact_number, email, address
+- Contact: contact_number, address
 - Professional: occupation, employer
-- Emergency contact designation
+- Emergency contact: emergency_contact_name, emergency_contact_phone, emergency_contact_relationship
+
+**Note:** Guardian email is stored in the linked User model, not in the guardians table.
 
 **Relationships:**
 
@@ -115,22 +117,40 @@
 **Key Attributes:**
 
 - `enrollment_id` - Unique identifier (e.g., ENR-202501-0001)
-- `student_id`, `school_year_id`, `enrollment_period_id`
+- `student_id`, `guardian_id` (FK to users), `school_year_id`, `school_year`, `enrollment_period_id`
 - `grade_level` - Grade enrolling in
+- `section`, `adviser` - Class assignment
 - `quarter` - Quarter of entry
-- `status` - Enum: pending, approved, rejected, enrolled
-- `payment_status` - Enum: pending, partial, paid, overdue
-- Financial: tuition_fee, miscellaneous_fee, other_fees, total_fee, amount_paid, balance
-- Dates: submission_date, approval_date, rejection_date
-- `rejection_reason` - If rejected
+- `type` - Enum: new, continuing, returnee, transferee (default: 'new')
+- `previous_school` - For transfers
+- `payment_plan` - Enum: annual, semestral, quarterly, monthly (default: 'monthly')
+- `status` - Enum: pending, approved, rejected, enrolled (default: 'pending')
+- Financial (all stored in cents):
+    - `tuition_fee_cents`, `miscellaneous_fee_cents`, `laboratory_fee_cents`, `library_fee_cents`, `sports_fee_cents`
+    - `total_amount_cents`, `discount_cents`, `net_amount_cents`
+    - `invoice_id`, `payment_reference`
+- Payment tracking (amounts in cents):
+    - `payment_status` - Enum: pending, partial, paid, overdue (default: 'pending')
+    - `amount_paid_cents`, `balance_cents`, `payment_due_date`
+- Workflow timestamps:
+    - `approved_at`, `rejected_at`, `ready_for_payment_at`, `paid_at`
+    - `approved_by` (FK to users)
+- Information request workflow:
+    - `info_requested`, `info_request_message`, `info_request_date`, `info_requested_by`
+    - `info_response_message`, `info_response_date`
+- `remarks` - Additional notes/rejection reason
+
+**Note:** All monetary amounts are stored in cents using the money gem pattern for precision.
 
 **Relationships:**
 
 - `belongsTo` Student
-- `belongsTo` Guardian
+- `belongsTo` Guardian (through users table)
 - `belongsTo` SchoolYear
 - `belongsTo` EnrollmentPeriod
-- `belongsTo` User (reviewer)
+- `belongsTo` User (approved_by)
+- `belongsTo` User (info_requested_by)
+- `belongsTo` Invoice
 - `hasMany` Invoices
 - `hasManyThrough` Payments (through Invoices)
 
@@ -138,8 +158,12 @@
 
 - Activity logging
 - Enum casts for status fields
+- Money gem pattern for all financial fields (\_cents suffix)
 - Fee calculations
-- Approval workflow tracking
+- Comprehensive approval workflow tracking
+- Information request/response workflow
+- Multiple enrollment types support
+- Flexible payment plans
 
 ---
 
@@ -149,24 +173,28 @@
 
 **Key Attributes:**
 
-- `school_year_id`
+- `school_year` - String format (e.g., "2025-2026")
 - `start_date`, `end_date`
 - `early_registration_deadline`
 - `regular_registration_deadline`
 - `late_registration_deadline`
-- `status` - Enum: upcoming, active, completed, cancelled
-- `is_active` - Boolean for current active period
+- `status` - Enum: upcoming, active, closed (default: 'upcoming')
+- `description` - Period description
+- `allow_new_students` - Boolean (default: true)
+- `allow_returning_students` - Boolean (default: true)
+
+**Note:** Uses `school_year` string instead of foreign key relationship. Status field replaces `is_active` boolean.
 
 **Relationships:**
 
-- `belongsTo` SchoolYear
 - `hasMany` Enrollments
 - `hasMany` GradeLevelFees
 
 **Key Features:**
 
-- Only one active period at a time
-- Date-based status determination
+- Status-based enrollment control
+- Date-based deadline management
+- Separate flags for new vs returning students
 - `isOpen()` method checks if accepting enrollments
 - `getDaysRemaining()` calculates time left
 
@@ -203,22 +231,29 @@
 
 **Key Attributes:**
 
-- `enrollment_period_id`
 - `grade_level` - Enum
-- `tuition_fee`, `miscellaneous_fee`, `other_fees`
-- `total` - Calculated sum
-- `payment_terms` - Enum: annual, semestral, quarterly, monthly
-- `is_active` - Boolean
+- `school_year` - String format (e.g., "2025-2026")
+- Financial (all stored in cents):
+    - `tuition_fee_cents`
+    - `registration_fee_cents`
+    - `miscellaneous_fee_cents`
+    - `laboratory_fee_cents`
+    - `library_fee_cents`
+    - `sports_fee_cents`
+- `is_active` - Boolean (default: true)
+
+**Note:** All monetary amounts use the money gem pattern (\_cents suffix). Total should be calculated via accessor method, not stored. Uses `school_year` string instead of `enrollment_period_id`.
 
 **Relationships:**
 
-- `belongsTo` EnrollmentPeriod
-- `hasOneThrough` SchoolYear (through EnrollmentPeriod)
+- Can be related to EnrollmentPeriod through school_year string matching
 
 **Key Features:**
 
-- Multiple fee structures can exist per grade/year for different payment plans
-- Total is automatically calculated
+- Money gem pattern for all financial fields
+- Comprehensive fee breakdown by type
+- Unique constraint per grade_level + school_year
+- Total should be calculated dynamically via accessor
 - Activity logging
 
 ---
@@ -230,12 +265,15 @@
 **Key Attributes:**
 
 - `invoice_number` - Unique identifier
-- `enrollment_id`
-- `invoice_date`, `due_date`
-- `subtotal`, `tax_amount`, `total_amount`
-- `amount_paid`, `balance`
-- `status` - Enum: draft, sent, paid, overdue, cancelled
-- `notes`
+- `enrollment_id` (FK)
+- `total_amount` - Decimal(10,2)
+- `paid_amount` - Decimal(10,2), default 0
+- `due_date` - Date (nullable)
+- `paid_at` - Timestamp (nullable)
+- `status` - Enum: draft, sent, partially_paid, paid, overdue, cancelled (default: 'draft')
+- `notes` - Text (nullable)
+
+**Note:** Invoice date uses `created_at` timestamp. Balance is calculated as `total_amount - paid_amount`. No `subtotal` or `tax_amount` fields - system uses simple total.
 
 **Relationships:**
 
@@ -247,9 +285,11 @@
 **Key Features:**
 
 - Auto-generates invoice numbers
-- Calculates totals from line items
-- Tracks payment status
+- Decimal precision for monetary values
+- Tracks payment status including partially_paid
+- `paid_at` timestamp tracking
 - PDF generation capability
+- Balance calculated dynamically
 
 ---
 
@@ -283,28 +323,32 @@
 
 **Key Attributes:**
 
-- `payment_reference` - Unique identifier
-- `enrollment_id`, `invoice_id`
-- `amount`
-- `payment_date`
-- `payment_method` - Enum: cash, bank_transfer, check, gcash, etc.
-- `payment_status` - Enum: pending, completed, failed, refunded
-- `transaction_reference` - External reference (bank ref, receipt #, etc.)
-- `notes`
-- `received_by` - User ID who recorded payment
+- `invoice_id` (FK)
+- `amount` - Decimal(10,2)
+- `payment_method` - Enum: cash, bank_transfer, check, credit_card, gcash, paymaya
+- `payment_date` - Date
+- `reference_number` - External reference (bank ref, etc.) - nullable
+- `receipt_number` - Generated receipt number - nullable, unique
+- `notes` - Text (nullable)
+- `processed_by` - User ID who recorded payment (FK, nullable)
+
+**Note:** No separate `payment_reference`, `enrollment_id`, or `payment_status` fields. Enrollment accessed through Invoice relationship. Payment status is implicit (all records are completed payments).
 
 **Relationships:**
 
-- `belongsTo` Enrollment
 - `belongsTo` Invoice
-- `belongsTo` User (receivedBy)
+- `hasOneThrough` Enrollment (through Invoice)
+- `belongsTo` User (processedBy)
 - `hasOne` Receipt
 
 **Key Features:**
 
 - Activity logging
 - Multiple payment methods supported
-- Tracks who received payment
+- Tracks who processed payment
+- Links to receipt number
+- Decimal precision for amount
+- All payments are completed (no pending status)
 
 ---
 
@@ -341,16 +385,19 @@
 
 **Key Attributes:**
 
-- `student_id`
-- `document_type` - Enum: birth_certificate, report_card, form_138, good_moral, etc.
+- `student_id` (FK)
+- `document_type` - Enum: birth_certificate, report_card, form_138, good_moral, other
 - `original_filename`, `stored_filename`
 - `file_path` - Storage path
-- `file_size`, `mime_type`
-- `upload_date`
-- `verification_status` - Enum: pending, verified, rejected
-- `verified_by` - User ID
-- `verified_at`
-- `rejection_reason` - If rejected
+- `file_size` - Unsigned big integer (bytes), `mime_type`
+- `upload_date` - Timestamp (default: current)
+- `verification_status` - Enum: pending, verified, rejected (default: 'pending')
+- `verified_by` - User ID (FK, nullable)
+- `verified_at` - Timestamp (nullable)
+- `rejection_reason` - Text (nullable)
+- `deleted_at` - Soft deletes timestamp
+
+**Note:** Uses Laravel soft deletes for document recovery. Upload date defaults to current timestamp.
 
 **Relationships:**
 
@@ -363,6 +410,8 @@
 - Verification workflow
 - Multiple document types per student
 - Activity logging
+- Soft deletes for recovery
+- Comprehensive indexes for performance
 
 ---
 
