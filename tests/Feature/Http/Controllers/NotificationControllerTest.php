@@ -136,7 +136,7 @@ class NotificationControllerTest extends TestCase
             ->assertJson(['count' => 3]);
     }
 
-    public function test_can_mark_notification_as_read(): void
+    public function test_can_mark_notification_as_read_via_api(): void
     {
         $this->user->notify(new TestNotification('Test notification'));
 
@@ -147,6 +147,26 @@ class NotificationControllerTest extends TestCase
 
         $response->assertOk()
             ->assertJson(['success' => true]);
+
+        $this->assertNotNull($notification->fresh()->read_at);
+    }
+
+    public function test_marking_notification_as_read_via_web_redirects_to_dashboard(): void
+    {
+        $this->user->notify(new TestNotification('Test notification'));
+
+        $notification = $this->user->unreadNotifications()->first();
+
+        $response = $this->actingAs($this->user)
+            ->withHeaders([
+                'X-Inertia' => 'true',
+                'X-Inertia-Version' => '1.0',
+            ])
+            ->post(route('notifications.mark-as-read', $notification->id));
+
+        // Should redirect (Inertia::location returns 409 status with X-Inertia-Location header)
+        $response->assertStatus(409)
+            ->assertHeader('X-Inertia-Location');
 
         $this->assertNotNull($notification->fresh()->read_at);
     }
@@ -265,5 +285,67 @@ class NotificationControllerTest extends TestCase
                 ->component('notifications/Index', false)
                 ->where('filter', 'unread')
             );
+    }
+
+    public function test_document_notification_redirects_to_student_documents(): void
+    {
+        // Create a mock notification with document data
+        $notificationData = [
+            'message' => 'Document rejected',
+            'student_id' => 123,
+            'document_id' => 456,
+        ];
+
+        $this->user->notify(new TestNotification('Document notification', $notificationData));
+        $notification = $this->user->unreadNotifications()->first();
+
+        // Manually set the type to simulate DocumentRejectedNotification
+        $notification->type = 'App\\Notifications\\DocumentRejectedNotification';
+        $notification->save();
+
+        $response = $this->actingAs($this->user)
+            ->withHeaders([
+                'X-Inertia' => 'true',
+                'X-Inertia-Version' => '1.0',
+            ])
+            ->post(route('notifications.mark-as-read', $notification->id));
+
+        $response->assertStatus(409)
+            ->assertHeader('X-Inertia-Location');
+
+        // Verify it redirects to the student documents page
+        $location = $response->headers->get('X-Inertia-Location');
+        $this->assertStringContainsString('/guardian/students/123/documents', $location);
+    }
+
+    public function test_enrollment_notification_redirects_to_enrollment_details(): void
+    {
+        // Create a mock notification with enrollment data
+        $notificationData = [
+            'message' => 'Enrollment approved',
+            'enrollment_id' => 789,
+            'student_id' => 123,
+        ];
+
+        $this->user->notify(new TestNotification('Enrollment notification', $notificationData));
+        $notification = $this->user->unreadNotifications()->first();
+
+        // Manually set the type to simulate EnrollmentApprovedNotification
+        $notification->type = 'App\\Notifications\\EnrollmentApprovedNotification';
+        $notification->save();
+
+        $response = $this->actingAs($this->user)
+            ->withHeaders([
+                'X-Inertia' => 'true',
+                'X-Inertia-Version' => '1.0',
+            ])
+            ->post(route('notifications.mark-as-read', $notification->id));
+
+        $response->assertStatus(409)
+            ->assertHeader('X-Inertia-Location');
+
+        // Verify it redirects to the enrollment details page
+        $location = $response->headers->get('X-Inertia-Location');
+        $this->assertStringContainsString('/guardian/enrollments/789', $location);
     }
 }

@@ -41,13 +41,69 @@ class NotificationController extends Controller
 
     /**
      * Mark a specific notification as read.
+     * Returns JSON for API calls, Inertia redirect for web calls.
      */
-    public function markAsRead(string $id)
+    public function markAsRead(string $id, Request $request)
     {
         $notification = auth()->user()->notifications()->findOrFail($id);
         $notification->markAsRead();
 
-        return response()->json(['success' => true]);
+        // If this is an API call (starts with /api/), return JSON
+        if ($request->is('api/*')) {
+            return response()->json(['success' => true]);
+        }
+
+        // For Inertia calls, determine destination and redirect
+        $route = $this->getNotificationRoute($notification);
+
+        return Inertia::location($route);
+    }
+
+    /**
+     * Get the route to navigate to based on notification type.
+     */
+    private function getNotificationRoute($notification): string
+    {
+        $type = $notification->type;
+        $data = $notification->data;
+
+        // Document notifications - navigate to student documents page
+        if (str_contains($type, 'DocumentRejected') || str_contains($type, 'DocumentVerified')) {
+            if (isset($data['student_id'])) {
+                return route('guardian.students.documents.index', ['student' => $data['student_id']]);
+            }
+        }
+
+        // Enrollment notifications - navigate to enrollment details or list
+        if (str_contains($type, 'EnrollmentApproved') || str_contains($type, 'EnrollmentRejected') || str_contains($type, 'EnrollmentSubmitted')) {
+            if (isset($data['enrollment_id'])) {
+                return route('guardian.enrollments.show', ['enrollment' => $data['enrollment_id']]);
+            }
+
+            return route('guardian.enrollments.index');
+        }
+
+        // New enrollment for review (Registrar)
+        if (str_contains($type, 'NewEnrollmentForReview')) {
+            return route('registrar.enrollments.index');
+        }
+
+        // Enrollment period status changed
+        if (str_contains($type, 'EnrollmentPeriodStatus')) {
+            return route('guardian.dashboard');
+        }
+
+        // Default fallback - return to dashboard based on user role
+        $user = auth()->user();
+        if ($user->hasRole('guardian')) {
+            return route('guardian.dashboard');
+        } elseif ($user->hasRole('registrar')) {
+            return route('registrar.dashboard');
+        } elseif ($user->hasRole('admin') || $user->hasRole('super_admin')) {
+            return route('admin.dashboard');
+        }
+
+        return route('dashboard');
     }
 
     /**
