@@ -7,6 +7,7 @@ use App\Enums\GradeLevel;
 use App\Enums\PaymentStatus;
 use App\Enums\Quarter;
 use App\Models\Enrollment;
+use App\Models\EnrollmentPeriod;
 use App\Models\Guardian;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -78,6 +79,7 @@ class EnrollmentFactory extends Factory
                 return $guardian->id;
             },
             'school_year_id' => \App\Models\SchoolYear::factory(),
+            'enrollment_period_id' => EnrollmentPeriod::factory(),
             'quarter' => $this->faker->randomElement(Quarter::values()),
             'grade_level' => $this->faker->randomElement(GradeLevel::values()),
             'status' => $status,
