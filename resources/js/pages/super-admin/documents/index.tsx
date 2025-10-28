@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { DocumentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
@@ -49,19 +49,6 @@ export default function DocumentsIndex({ documents }: Props) {
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Documents', href: '/super-admin/documents' },
     ];
-
-    const getStatusBadgeVariant = (status: string): 'default' | 'secondary' | 'destructive' => {
-        switch (status) {
-            case 'verified':
-                return 'default';
-            case 'pending':
-                return 'secondary';
-            case 'rejected':
-                return 'destructive';
-            default:
-                return 'secondary';
-        }
-    };
 
     const getDocumentTypeLabel = (type: string): string => {
         const labels: Record<string, string> = {
@@ -139,11 +126,7 @@ export default function DocumentsIndex({ documents }: Props) {
         {
             accessorKey: 'verification_status',
             header: 'Status',
-            cell: ({ row }) => (
-                <Badge variant={getStatusBadgeVariant(row.original.verification_status)}>
-                    {row.original.verification_status.charAt(0).toUpperCase() + row.original.verification_status.slice(1)}
-                </Badge>
-            ),
+            cell: ({ row }) => <DocumentStatusBadge status={row.original.verification_status} />,
         },
         {
             id: 'actions',

@@ -1,5 +1,5 @@
 import Heading from '@/components/heading';
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -63,25 +63,6 @@ const EnrollmentShow: FC<Props> = ({ enrollment }) => {
         },
     ];
 
-    const getStatusBadge = (status: string) => {
-        const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-            approved: 'default',
-            pending: 'secondary',
-            rejected: 'destructive',
-            cancelled: 'outline',
-        };
-        return <Badge variant={variants[status.toLowerCase()] || 'secondary'}>{status}</Badge>;
-    };
-
-    const getPaymentBadge = (status: string) => {
-        const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
-            paid: 'default',
-            partial: 'secondary',
-            pending: 'destructive',
-        };
-        return <Badge variant={variants[status.toLowerCase()] || 'secondary'}>{status}</Badge>;
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Enrollment ${enrollment.enrollment_id}`} />
@@ -120,8 +101,8 @@ const EnrollmentShow: FC<Props> = ({ enrollment }) => {
                                     <CardDescription>School Year {enrollment.school_year}</CardDescription>
                                 </div>
                                 <div className="flex gap-2">
-                                    {getStatusBadge(enrollment.status)}
-                                    {getPaymentBadge(enrollment.payment_status)}
+                                    <EnrollmentStatusBadge status={enrollment.status} />
+                                    <PaymentStatusBadge status={enrollment.payment_status} />
                                 </div>
                             </div>
                         </CardHeader>
