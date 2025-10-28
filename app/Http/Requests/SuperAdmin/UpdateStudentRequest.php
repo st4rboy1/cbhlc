@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\SuperAdmin;
 
+use App\Enums\Gender;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateStudentRequest extends FormRequest
 {
@@ -29,7 +31,7 @@ class UpdateStudentRequest extends FormRequest
             'last_name' => ['required', 'string', 'max:100'],
             'birth_date' => ['required', 'date', 'before:today'],
             'birth_place' => ['nullable', 'string', 'max:255'],
-            'gender' => ['required', 'in:Male,Female,Other'],
+            'gender' => ['required', Rule::in(Gender::values())],
             'nationality' => ['nullable', 'string', 'max:100'],
             'religion' => ['nullable', 'string', 'max:100'],
             'address' => ['required', 'string', 'max:500'],
