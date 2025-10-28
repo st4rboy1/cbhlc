@@ -8,6 +8,7 @@ use App\Enums\PaymentStatus;
 use App\Enums\Quarter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guardian\StoreEnrollmentRequest;
+use App\Http\Requests\Guardian\UpdateEnrollmentRequest;
 use App\Models\Enrollment;
 use App\Models\EnrollmentPeriod;
 use App\Models\GuardianStudent;
@@ -362,7 +363,7 @@ class EnrollmentController extends Controller
     /**
      * Update the specified enrollment in storage.
      */
-    public function update(Request $request, Enrollment $enrollment)
+    public function update(UpdateEnrollmentRequest $request, Enrollment $enrollment)
     {
         // Get Guardian model for authenticated user
         $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
@@ -382,10 +383,7 @@ class EnrollmentController extends Controller
                 ->with('error', 'Only pending enrollments can be updated.');
         }
 
-        $validated = $request->validate([
-            'quarter' => 'required|string',
-            'grade_level' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $enrollment->update([
             'quarter' => Quarter::from($validated['quarter']),
