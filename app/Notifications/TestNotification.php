@@ -13,7 +13,8 @@ class TestNotification extends Notification
      * Create a new notification instance.
      */
     public function __construct(
-        public string $message
+        public string $message,
+        public array $data = []
     ) {}
 
     /**
@@ -33,8 +34,8 @@ class TestNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        return [
+        return array_merge([
             'message' => $this->message,
-        ];
+        ], $this->data);
     }
 }
