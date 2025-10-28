@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\SuperAdmin;
 
+use App\Enums\InvoiceStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateInvoiceRequest extends FormRequest
 {
@@ -25,7 +27,7 @@ class UpdateInvoiceRequest extends FormRequest
             'enrollment_id' => ['required', 'exists:enrollments,id'],
             'invoice_date' => ['required', 'date'],
             'due_date' => ['required', 'date', 'after:invoice_date'],
-            'status' => ['required', 'in:draft,sent,paid,overdue,cancelled'],
+            'status' => ['required', Rule::in(InvoiceStatus::values())],
             'items' => ['required', 'array', 'min:1'],
             'items.*.id' => ['nullable', 'exists:invoice_items,id'],
             'items.*.description' => ['required', 'string', 'max:255'],
