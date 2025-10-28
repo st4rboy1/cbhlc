@@ -40,14 +40,15 @@ interface Props {
 export default function NotificationsDropdown({ notifications }: Props) {
     const [unreadCount, setUnreadCount] = useState(notifications.filter((n) => !n.read_at).length);
 
-    const handleMarkAsRead = (notificationId: string) => {
+    const handleMarkAsRead = (notificationId: string, callback?: () => void) => {
         router.post(
             `/notifications/${notificationId}/mark-as-read`,
             {},
             {
-                preserveScroll: true,
+                preserveScroll: false, // Allow navigation
                 onSuccess: () => {
                     setUnreadCount((prev) => Math.max(0, prev - 1));
+                    callback?.();
                 },
             },
         );
@@ -66,38 +67,9 @@ export default function NotificationsDropdown({ notifications }: Props) {
         );
     };
 
-    const getNotificationUrl = (notification: Notification): string | null => {
-        // For enrollment notifications, navigate to enrollments page
-        if (notification.type.includes('Enrollment')) {
-            if (notification.data.enrollment_id) {
-                // Navigate to specific enrollment if we have the ID
-                return `/guardian/enrollments/${notification.data.enrollment_id}`;
-            }
-            // Otherwise navigate to enrollments list
-            return '/guardian/enrollments';
-        }
-        // For registrar notifications, navigate to registrar enrollments
-        if (notification.type.includes('NewEnrollmentForReview')) {
-            return '/registrar/enrollments';
-        }
-        // For document notifications, navigate to student documents page
-        if (notification.type.includes('Document')) {
-            const studentId = notification.data.student_id;
-            if (studentId) {
-                return `/guardian/students/${studentId}/documents`;
-            }
-        }
-        return null;
-    };
-
     const handleNotificationClick = (notification: Notification) => {
-        if (!notification.read_at) {
-            handleMarkAsRead(notification.id);
-        }
-        const url = getNotificationUrl(notification);
-        if (url) {
-            router.visit(url);
-        }
+        // Backend handles navigation via Inertia::location() after marking as read
+        handleMarkAsRead(notification.id);
     };
 
     const getNotificationTitle = (notification: Notification): string => {
