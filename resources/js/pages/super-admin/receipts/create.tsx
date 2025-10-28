@@ -84,7 +84,6 @@ export default function ReceiptCreate({ payments, invoices, nextReceiptNumber }:
                                         <SelectValue placeholder="Select a payment" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">None</SelectItem>
                                         {payments.map((payment) => {
                                             const student = payment.invoice?.enrollment?.student;
                                             const amount = typeof payment.amount === 'number' ? payment.amount : parseFloat(payment.amount || '0');
@@ -107,7 +106,6 @@ export default function ReceiptCreate({ payments, invoices, nextReceiptNumber }:
                                         <SelectValue placeholder="Select an invoice" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">None</SelectItem>
                                         {invoices.map((invoice) => {
                                             const student = invoice.enrollment?.student;
                                             return (
