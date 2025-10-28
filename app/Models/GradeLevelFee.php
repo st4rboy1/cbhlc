@@ -45,6 +45,8 @@ class GradeLevelFee extends Model
         'down_payment_cents',
         'payment_terms',
         'is_active',
+        'created_by',
+        'updated_by',
     ];
 
     protected $appends = [

@@ -17,9 +17,9 @@ class GradeLevelFeeController extends Controller
      */
     public function index(Request $request)
     {
-        // Check if user has permission to manage fees
-        if (! auth()->user()->can('grade_level_fees.manage')) {
-            abort(403, 'Unauthorized to manage grade level fees');
+        // Check if user has permission to view fees
+        if (! auth()->user()->can('grade_level_fees.view')) {
+            abort(403, 'Unauthorized to view grade level fees');
         }
 
         $query = GradeLevelFee::with(['enrollmentPeriod.schoolYear']);
@@ -63,9 +63,9 @@ class GradeLevelFeeController extends Controller
      */
     public function create()
     {
-        // Check if user has permission to manage fees
-        if (! auth()->user()->can('grade_level_fees.manage')) {
-            abort(403, 'Unauthorized to manage grade level fees');
+        // Check if user has permission to create fees
+        if (! auth()->user()->can('grade_level_fees.create')) {
+            abort(403, 'Unauthorized to create grade level fees');
         }
 
         // Get available school years (active and upcoming)
@@ -84,9 +84,9 @@ class GradeLevelFeeController extends Controller
      */
     public function store(StoreGradeLevelFeeRequest $request)
     {
-        // Check if user has permission to manage fees
-        if (! auth()->user()->can('grade_level_fees.manage')) {
-            abort(403, 'Unauthorized to manage grade level fees');
+        // Check if user has permission to create fees
+        if (! auth()->user()->can('grade_level_fees.create')) {
+            abort(403, 'Unauthorized to create grade level fees');
         }
 
         $validated = $request->validated();
@@ -105,9 +105,9 @@ class GradeLevelFeeController extends Controller
      */
     public function show(GradeLevelFee $gradeLevelFee)
     {
-        // Check if user has permission to manage fees
-        if (! auth()->user()->can('grade_level_fees.manage')) {
-            abort(403, 'Unauthorized to manage grade level fees');
+        // Check if user has permission to view fees
+        if (! auth()->user()->can('grade_level_fees.view')) {
+            abort(403, 'Unauthorized to view grade level fees');
         }
 
         return Inertia::render('registrar/grade-level-fees/show', [
@@ -120,9 +120,9 @@ class GradeLevelFeeController extends Controller
      */
     public function edit(GradeLevelFee $gradeLevelFee)
     {
-        // Check if user has permission to manage fees
-        if (! auth()->user()->can('grade_level_fees.manage')) {
-            abort(403, 'Unauthorized to manage grade level fees');
+        // Check if user has permission to update fees
+        if (! auth()->user()->can('grade_level_fees.update')) {
+            abort(403, 'Unauthorized to update grade level fees');
         }
 
         // Get available school years (active and upcoming)
@@ -142,9 +142,9 @@ class GradeLevelFeeController extends Controller
      */
     public function update(UpdateGradeLevelFeeRequest $request, GradeLevelFee $gradeLevelFee)
     {
-        // Check if user has permission to manage fees
-        if (! auth()->user()->can('grade_level_fees.manage')) {
-            abort(403, 'Unauthorized to manage grade level fees');
+        // Check if user has permission to update fees
+        if (! auth()->user()->can('grade_level_fees.update')) {
+            abort(403, 'Unauthorized to update grade level fees');
         }
 
         $validated = $request->validated();
@@ -163,9 +163,9 @@ class GradeLevelFeeController extends Controller
      */
     public function destroy(GradeLevelFee $gradeLevelFee)
     {
-        // Check if user has permission to manage fees
-        if (! auth()->user()->can('grade_level_fees.manage')) {
-            abort(403, 'Unauthorized to manage grade level fees');
+        // Check if user has permission to delete fees
+        if (! auth()->user()->can('grade_level_fees.delete')) {
+            abort(403, 'Unauthorized to delete grade level fees');
         }
 
         $gradeLevelFee->delete();
@@ -179,9 +179,9 @@ class GradeLevelFeeController extends Controller
      */
     public function duplicate(Request $request, GradeLevelFee $gradeLevelFee)
     {
-        // Check if user has permission to manage fees
-        if (! auth()->user()->can('grade_level_fees.manage')) {
-            abort(403, 'Unauthorized to manage grade level fees');
+        // Check if user has permission to create fees (duplication creates new fees)
+        if (! auth()->user()->can('grade_level_fees.create')) {
+            abort(403, 'Unauthorized to create grade level fees');
         }
 
         $validated = $request->validate([
