@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { InvoiceStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Link, router } from '@inertiajs/react';
 import { type ColumnDef } from '@tanstack/react-table';
@@ -40,25 +40,6 @@ const formatDate = (dateString: string) => {
         month: 'short',
         day: 'numeric',
     });
-};
-
-const getStatusBadge = (status: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {
-        draft: { variant: 'outline', label: 'Draft' },
-        sent: { variant: 'default', label: 'Sent' },
-        partially_paid: { variant: 'secondary', label: 'Partially Paid' },
-        paid: { variant: 'default', label: 'Paid' },
-        cancelled: { variant: 'destructive', label: 'Cancelled' },
-        overdue: { variant: 'destructive', label: 'Overdue' },
-    };
-
-    const config = variants[status] || { variant: 'outline' as const, label: status };
-
-    return (
-        <Badge variant={config.variant} className={status === 'paid' ? 'bg-green-100 text-green-800' : ''}>
-            {config.label}
-        </Badge>
-    );
 };
 
 const handleDelete = (id: number, invoiceNumber: string) => {
@@ -154,7 +135,7 @@ export const columns: ColumnDef<Invoice>[] = [
                 </Button>
             );
         },
-        cell: ({ row }) => getStatusBadge(row.getValue('status')),
+        cell: ({ row }) => <InvoiceStatusBadge status={row.getValue('status')} />,
     },
     {
         accessorKey: 'due_date',

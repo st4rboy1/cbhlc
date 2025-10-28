@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { InvoiceStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -113,21 +113,6 @@ export default function SuperAdminInvoicesShow({ invoice }: Props) {
         return `${invoice.enrollment.student.first_name}${middle} ${invoice.enrollment.student.last_name}`;
     };
 
-    const getStatusBadge = (status: string) => {
-        const variants: Record<string, { className: string; label: string }> = {
-            draft: { className: 'bg-gray-100 text-gray-800', label: 'Draft' },
-            sent: { className: 'bg-blue-100 text-blue-800', label: 'Sent' },
-            partially_paid: { className: 'bg-yellow-100 text-yellow-800', label: 'Partially Paid' },
-            paid: { className: 'bg-green-100 text-green-800', label: 'Paid' },
-            cancelled: { className: 'bg-red-100 text-red-800', label: 'Cancelled' },
-            overdue: { className: 'bg-orange-100 text-orange-800', label: 'Overdue' },
-        };
-
-        const config = variants[status] || { className: 'bg-gray-100 text-gray-800', label: status };
-
-        return <Badge className={config.className}>{config.label}</Badge>;
-    };
-
     const remainingBalance = invoice.total_amount - invoice.paid_amount;
 
     return (
@@ -164,7 +149,7 @@ export default function SuperAdminInvoicesShow({ invoice }: Props) {
                                     <CardTitle className="text-xl">{invoice.invoice_number}</CardTitle>
                                     <p className="text-sm text-muted-foreground">Created on {formatDateTime(invoice.created_at)}</p>
                                 </div>
-                                {getStatusBadge(invoice.status)}
+                                <InvoiceStatusBadge status={invoice.status} />
                             </div>
                         </CardHeader>
                         <CardContent>

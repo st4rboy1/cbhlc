@@ -1,4 +1,5 @@
 import Heading from '@/components/heading';
+import { PaymentStatusBadge } from '@/components/status-badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -212,17 +213,6 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
         return `${enrollment.student.first_name}${middle} ${enrollment.student.last_name}`;
     };
 
-    const getPaymentStatusBadge = (status: string) => {
-        switch (status) {
-            case 'paid':
-                return <Badge className="bg-green-100 text-green-800">PAID</Badge>;
-            case 'partial':
-                return <Badge className="bg-yellow-100 text-yellow-800">PARTIAL</Badge>;
-            default:
-                return <Badge className="bg-red-100 text-red-800">PENDING</Badge>;
-        }
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Invoice" />
@@ -269,7 +259,9 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                                         {invoiceNumber}
                                     </Badge>
                                 </div>
-                                <div className="mt-2">{getPaymentStatusBadge(enrollment.payment_status)}</div>
+                                <div className="mt-2">
+                                    <PaymentStatusBadge status={enrollment.payment_status} />
+                                </div>
                             </div>
                         </div>
 
