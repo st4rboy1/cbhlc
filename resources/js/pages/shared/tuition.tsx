@@ -1,5 +1,5 @@
 import Heading from '@/components/heading';
-import { Badge } from '@/components/ui/badge';
+import { PaymentStatusBadge } from '@/components/status-badges';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
@@ -90,17 +90,6 @@ export default function Tuition({ enrollments, gradeLevelFees, settings }: Props
         });
     };
 
-    const getPaymentStatusBadge = (status: string) => {
-        switch (status) {
-            case 'paid':
-                return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">PAID</Badge>;
-            case 'partial':
-                return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">PARTIAL PAYMENT</Badge>;
-            default:
-                return <Badge className="bg-red-100 text-red-800 hover:bg-red-200">PENDING</Badge>;
-        }
-    };
-
     const hasEnrollments = enrollments.data && enrollments.data.length > 0;
 
     return (
@@ -144,7 +133,7 @@ export default function Tuition({ enrollments, gradeLevelFees, settings }: Props
                                                 <DollarSign className="h-5 w-5" />
                                                 Payment Status - {enrollment.enrollment_id}
                                             </span>
-                                            {getPaymentStatusBadge(enrollment.payment_status)}
+                                            <PaymentStatusBadge status={enrollment.payment_status} />
                                         </CardTitle>
                                     </CardHeader>
                                     <CardContent>

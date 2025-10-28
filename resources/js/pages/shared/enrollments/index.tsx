@@ -1,5 +1,5 @@
 import Heading from '@/components/heading';
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -54,25 +54,6 @@ const EnrollmentIndex: FC<Props> = ({ enrollments }) => {
         },
     ];
 
-    const getStatusBadge = (status: string) => {
-        const variants: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-            approved: 'default',
-            pending: 'secondary',
-            rejected: 'destructive',
-            cancelled: 'outline',
-        };
-        return <Badge variant={variants[status.toLowerCase()] || 'secondary'}>{status}</Badge>;
-    };
-
-    const getPaymentBadge = (status: string) => {
-        const variants: Record<string, 'default' | 'secondary' | 'destructive'> = {
-            paid: 'default',
-            partial: 'secondary',
-            pending: 'destructive',
-        };
-        return <Badge variant={variants[status.toLowerCase()] || 'secondary'}>{status}</Badge>;
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Enrollments" />
@@ -126,9 +107,13 @@ const EnrollmentIndex: FC<Props> = ({ enrollments }) => {
                                                 <TableCell>{enrollment.school_year}</TableCell>
                                                 <TableCell>{enrollment.grade_level}</TableCell>
                                                 <TableCell>{enrollment.quarter}</TableCell>
-                                                <TableCell>{getStatusBadge(enrollment.status)}</TableCell>
+                                                <TableCell>
+                                                    <EnrollmentStatusBadge status={enrollment.status} />
+                                                </TableCell>
                                                 <TableCell>{formatCurrency(enrollment.balance_cents / 100)}</TableCell>
-                                                <TableCell>{getPaymentBadge(enrollment.payment_status)}</TableCell>
+                                                <TableCell>
+                                                    <PaymentStatusBadge status={enrollment.payment_status} />
+                                                </TableCell>
                                                 <TableCell>
                                                     <Button variant="ghost" size="sm" asChild>
                                                         <Link href={`/enrollments/${enrollment.id}`}>
