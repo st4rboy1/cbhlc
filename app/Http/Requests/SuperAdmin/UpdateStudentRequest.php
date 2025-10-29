@@ -3,6 +3,7 @@
 namespace App\Http\Requests\SuperAdmin;
 
 use App\Enums\Gender;
+use App\Enums\GradeLevel;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -37,7 +38,7 @@ class UpdateStudentRequest extends FormRequest
             'address' => ['required', 'string', 'max:500'],
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'unique:students,email,'.$student->id],
-            'grade_level' => ['required', 'string'],
+            'grade_level' => ['required', Rule::in(GradeLevel::values())],
             'guardian_ids' => ['required', 'array', 'min:1'],
             'guardian_ids.*' => ['exists:guardians,id'],
         ];
