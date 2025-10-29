@@ -155,9 +155,21 @@ class StudentController extends Controller
     {
         $validated = $request->validated();
 
-        // Remove document fields from student data
-        $documentFields = ['birth_certificate', 'report_card', 'form_138', 'good_moral'];
-        $studentData = collect($validated)->except($documentFields)->toArray();
+        // Extract only student fields (exclude document uploads)
+        $studentData = $request->only([
+            'first_name',
+            'middle_name',
+            'last_name',
+            'birthdate',
+            'gender',
+            'address',
+            'contact_number',
+            'email',
+            'grade_level',
+            'birth_place',
+            'nationality',
+            'religion',
+        ]);
 
         // Generate student ID
         $studentData['student_id'] = 'CBHLC'.date('Y').str_pad((string) (Student::count() + 1), 4, '0', STR_PAD_LEFT);
