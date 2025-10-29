@@ -91,6 +91,14 @@ class ReceiptController extends Controller
             ->withProperties($receipt->toArray())
             ->log('Receipt created');
 
+        // Notify guardian about the receipt
+        if ($receipt->payment && $receipt->payment->invoice && $receipt->payment->invoice->enrollment) {
+            $guardian = $receipt->payment->invoice->enrollment->guardian;
+            if ($guardian && $guardian->user) {
+                $guardian->user->notify(new \App\Notifications\ReceiptGeneratedNotification($receipt));
+            }
+        }
+
         return redirect()->route('super-admin.receipts.index')
             ->with('success', 'Receipt created successfully.');
     }
