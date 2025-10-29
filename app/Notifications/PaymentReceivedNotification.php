@@ -46,7 +46,6 @@ class PaymentReceivedNotification extends Notification
             ->line('Payment Method: '.ucfirst($this->payment->payment_method->value))
             ->line('Payment Date: '.$this->payment->payment_date->format('F d, Y'))
             ->line('Invoice: '.($invoice ? $invoice->invoice_number : 'N/A'))
-            ->action('View Payment', route('guardian.payments.show', $this->payment))
             ->line('A receipt will be generated shortly.');
     }
 

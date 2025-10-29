@@ -45,7 +45,6 @@ class ReceiptGeneratedNotification extends Notification
             ->line('Amount: ₱'.number_format($amount, 2))
             ->line('Issue Date: '.$this->receipt->created_at->format('F d, Y'))
             ->line('Payment Reference: '.($payment ? $payment->reference_number : 'N/A'))
-            ->action('View Receipt', route('guardian.receipts.show', $this->receipt))
             ->line('Thank you for your payment!');
     }
 
