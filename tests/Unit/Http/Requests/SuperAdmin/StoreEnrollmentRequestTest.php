@@ -53,7 +53,7 @@ class StoreEnrollmentRequestTest extends TestCase
 
         $data = [
             'student_id' => $student->id,
-            'grade_level' => 'grade_1',
+            'grade_level' => 'Grade 1',
             'school_year_id' => $schoolYear->id,
             'quarter' => 'first_quarter',
             'type' => 'new',

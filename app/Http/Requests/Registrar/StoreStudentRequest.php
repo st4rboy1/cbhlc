@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Registrar;
 
+use App\Enums\GradeLevel;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class StoreStudentRequest extends FormRequest
 {
@@ -34,7 +36,7 @@ class StoreStudentRequest extends FormRequest
             'birth_place' => ['nullable', 'string', 'max:255'],
             'nationality' => ['nullable', 'string', 'max:100'],
             'religion' => ['nullable', 'string', 'max:100'],
-            'grade_level' => ['nullable', 'string', 'max:20'],
+            'grade_level' => ['nullable', Rule::in(GradeLevel::values())],
             'section' => ['nullable', 'string', 'max:50'],
         ];
     }
