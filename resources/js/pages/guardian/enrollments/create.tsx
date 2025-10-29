@@ -69,6 +69,7 @@ export default function GuardianEnrollmentsCreate({
         school_year: currentSchoolYear,
         quarter: '',
         grade_level: '',
+        payment_plan: 'monthly',
         enrollment_period: 'active',
     });
 
@@ -262,6 +263,26 @@ export default function GuardianEnrollmentsCreate({
                                             <p className="text-xs text-muted-foreground">Returning students must enroll in 1st Quarter</p>
                                         )}
                                     </div>
+                                </div>
+
+                                {/* Payment Plan */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="payment_plan">
+                                        Payment Plan <span className="text-destructive">*</span>
+                                    </Label>
+                                    <Select value={data.payment_plan} onValueChange={(value) => setData('payment_plan', value)} disabled={processing}>
+                                        <SelectTrigger id="payment_plan" className={errors.payment_plan ? 'border-destructive' : ''}>
+                                            <SelectValue placeholder="Select payment plan" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="annual">Annual (Full Year)</SelectItem>
+                                            <SelectItem value="semestral">Semestral (Per Semester)</SelectItem>
+                                            <SelectItem value="quarterly">Quarterly (Per Quarter)</SelectItem>
+                                            <SelectItem value="monthly">Monthly</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <p className="text-sm text-muted-foreground">Choose how you want to split tuition fees over the school year</p>
+                                    {errors.payment_plan && <p className="text-sm text-destructive">{errors.payment_plan}</p>}
                                 </div>
 
                                 {/* Important Notes */}
