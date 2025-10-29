@@ -40,7 +40,7 @@ class NewStudentCreatedNotification extends Notification
             ->line('Student Details:')
             ->line('Student ID: '.$this->student->student_id)
             ->line('Name: '.$this->student->full_name)
-            ->line('Grade Level: '.$this->student->grade_level)
+            ->line('Grade Level: '.($this->student->grade_level instanceof \BackedEnum ? $this->student->grade_level->value : $this->student->grade_level))
             ->line('Email: '.$this->student->email)
             ->line('Added on: '.$this->student->created_at->format('F d, Y h:i A'))
             ->action('View Student', route('registrar.students.show', $this->student))
@@ -58,7 +58,7 @@ class NewStudentCreatedNotification extends Notification
             'student_id' => $this->student->id,
             'student_number' => $this->student->student_id,
             'student_name' => $this->student->full_name,
-            'grade_level' => $this->student->grade_level,
+            'grade_level' => $this->student->grade_level instanceof \BackedEnum ? $this->student->grade_level->value : $this->student->grade_level,
             'email' => $this->student->email,
             'created_at' => $this->student->created_at,
             'message' => 'New student '.$this->student->full_name.' has been added',
