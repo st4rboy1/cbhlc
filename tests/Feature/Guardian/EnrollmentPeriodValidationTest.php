@@ -154,6 +154,7 @@ test('guardian cannot enroll when no active enrollment period', function () {
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
         ]);
 
     $response->assertRedirect(route('guardian.enrollments.create'));
@@ -180,6 +181,7 @@ test('guardian cannot enroll when enrollment period deadline passed', function (
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
         ]);
 
     $response->assertRedirect();
@@ -206,6 +208,7 @@ test('new student cannot enroll when period does not allow new students', functi
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
         ]);
 
     $response->assertRedirect();
@@ -241,6 +244,7 @@ test('returning student cannot enroll when period does not allow returning stude
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
         ]);
 
     $response->assertRedirect();
@@ -267,6 +271,7 @@ test('guardian can enroll when all period conditions are met', function () {
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
         ]);
 
     $response->assertRedirect(route('guardian.enrollments.index'));
@@ -298,6 +303,7 @@ test('enrollment period id is set correctly on enrollment', function () {
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
         ]);
 
     $enrollment = Enrollment::where('student_id', $this->student->id)
@@ -332,6 +338,7 @@ test('school year is automatically set from active enrollment period and guardia
             'school_year_id' => $differentSchoolYear->id, // Guardian tries different school year (will be ignored)
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
         ]);
 
     // Should succeed and use the active period's school year, not the one guardian provided
@@ -367,6 +374,7 @@ test('enrollment relationship with enrollment period works', function () {
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
         ]);
 
     $enrollment = Enrollment::where('student_id', $this->student->id)

@@ -128,6 +128,7 @@ class EnrollmentControllerTest extends TestCase
         // Setup grade level fee
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
             'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 20000,
             'miscellaneous_fee' => 5000,
@@ -139,6 +140,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertRedirect(route('guardian.enrollments.index'));
@@ -150,6 +152,7 @@ class EnrollmentControllerTest extends TestCase
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
             'status' => EnrollmentStatus::PENDING->value,
         ]);
     }
@@ -164,12 +167,14 @@ class EnrollmentControllerTest extends TestCase
             'school_year_id' => $this->sy2023->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
             'status' => EnrollmentStatus::COMPLETED->value,
         ]);
 
         // Setup grade level fee
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_2->value,
+            'payment_plan' => 'annual',
             'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 22000,
             'miscellaneous_fee' => 5500,
@@ -182,6 +187,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::SECOND->value, // This should be overridden to FIRST
                 'grade_level' => GradeLevel::GRADE_2->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertRedirect(route('guardian.enrollments.index'));
@@ -192,6 +198,7 @@ class EnrollmentControllerTest extends TestCase
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value, // Should be FIRST, not SECOND
             'grade_level' => GradeLevel::GRADE_2->value,
+            'payment_plan' => 'annual',
         ]);
     }
 
@@ -205,12 +212,14 @@ class EnrollmentControllerTest extends TestCase
             'school_year_id' => $this->sy2023->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_3->value,
+            'payment_plan' => 'annual',
             'status' => EnrollmentStatus::COMPLETED->value,
         ]);
 
         // Setup grade level fee
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_2->value,
+            'payment_plan' => 'annual',
             'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 22000,
             'miscellaneous_fee' => 5500,
@@ -223,6 +232,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_2->value, // Lower than GRADE_3
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertSessionHasErrors(['grade_level']);
@@ -251,6 +261,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertSessionHasErrors(['student_id']);
@@ -273,6 +284,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2025->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_2->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertSessionHasErrors(['student_id']);
@@ -355,12 +367,14 @@ class EnrollmentControllerTest extends TestCase
             'status' => EnrollmentStatus::PENDING->value,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
         ]);
 
         $response = $this->actingAs($this->guardian)
             ->put(route('guardian.enrollments.update', $enrollment), [
                 'quarter' => Quarter::SECOND->value,
                 'grade_level' => GradeLevel::GRADE_2->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertRedirect(route('guardian.enrollments.show', $enrollment));
@@ -417,6 +431,7 @@ class EnrollmentControllerTest extends TestCase
         // Setup grade level fee
         $gradeLevelFee = GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
             'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 20000.50,
             'miscellaneous_fee' => 5000.25,
@@ -428,6 +443,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
+                'payment_plan' => 'annual',
             ]);
 
         $enrollment = Enrollment::where('student_id', $this->student->id)
@@ -455,6 +471,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertStatus(403);
@@ -559,6 +576,7 @@ class EnrollmentControllerTest extends TestCase
             ->put(route('guardian.enrollments.update', $enrollment), [
                 'quarter' => Quarter::SECOND->value,
                 'grade_level' => GradeLevel::GRADE_2->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertStatus(403);
@@ -609,12 +627,14 @@ class EnrollmentControllerTest extends TestCase
             'status' => EnrollmentStatus::ENROLLED->value,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
         ]);
 
         $response = $this->actingAs($this->guardian)
             ->put(route('guardian.enrollments.update', $enrollment), [
                 'quarter' => Quarter::SECOND->value,
                 'grade_level' => GradeLevel::GRADE_2->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertRedirect(route('guardian.enrollments.show', $enrollment));
@@ -640,6 +660,7 @@ class EnrollmentControllerTest extends TestCase
         // Setup grade level fee
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_2->value,
+            'payment_plan' => 'annual',
             'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 22000,
             'miscellaneous_fee' => 5500,
@@ -652,6 +673,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_2->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertSessionHasErrors(['student_id']);
@@ -673,6 +695,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertRedirect(route('guardian.enrollments.index'));
@@ -707,6 +730,7 @@ class EnrollmentControllerTest extends TestCase
         // Setup grade level fee
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_2->value,
+            'payment_plan' => 'annual',
             'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 22000,
             'miscellaneous_fee' => 5500,
@@ -719,6 +743,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_2->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertRedirect(route('guardian.enrollments.index'));
@@ -728,6 +753,7 @@ class EnrollmentControllerTest extends TestCase
             'student_id' => $this->student->id,
             'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_2->value,
+            'payment_plan' => 'annual',
         ]);
     }
 
@@ -826,6 +852,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertSessionHasErrors(['student_id']);
@@ -852,6 +879,7 @@ class EnrollmentControllerTest extends TestCase
         // Setup grade level fee
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
             'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 20000,
             'miscellaneous_fee' => 5000,
@@ -864,6 +892,7 @@ class EnrollmentControllerTest extends TestCase
                 // Note: NO school_year_id provided
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertRedirect(route('guardian.enrollments.index'));
@@ -882,6 +911,7 @@ class EnrollmentControllerTest extends TestCase
         // Setup grade level fee for 2024
         GradeLevelFee::create([
             'grade_level' => GradeLevel::GRADE_1->value,
+            'payment_plan' => 'annual',
             'school_year_id' => $this->sy2024->id,
             'tuition_fee' => 20000,
             'miscellaneous_fee' => 5000,
@@ -895,6 +925,7 @@ class EnrollmentControllerTest extends TestCase
                 'school_year_id' => $this->sy2025->id, // Guardian tries to set 2025
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => GradeLevel::GRADE_1->value,
+                'payment_plan' => 'annual',
             ]);
 
         $response->assertRedirect(route('guardian.enrollments.index'));
