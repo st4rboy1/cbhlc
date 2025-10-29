@@ -91,9 +91,14 @@ function ActionsCell({ student }: { student: Student }) {
                         <Link href={`/super-admin/students/${student.id}/enrollments`}>View Enrollments</Link>
                     </DropdownMenuItem>
                     {student.activeEnrollmentId && (
-                        <DropdownMenuItem asChild>
-                            <Link href={`/super-admin/enrollments/${student.activeEnrollmentId}`}>Update Payment Status</Link>
-                        </DropdownMenuItem>
+                        <>
+                            <DropdownMenuItem asChild>
+                                <Link href={`/super-admin/enrollments/${student.activeEnrollmentId}/edit`}>Update Enrollment Status</Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link href={`/super-admin/enrollments/${student.activeEnrollmentId}`}>Update Payment Status</Link>
+                            </DropdownMenuItem>
+                        </>
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>Delete Student</DropdownMenuItem>
