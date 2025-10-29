@@ -5,13 +5,9 @@ namespace App\Listeners;
 use App\Models\User;
 use App\Notifications\NewUserRegisteredNotification;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
-class NotifySuperAdminOfNewUser implements ShouldQueue
+class NotifySuperAdminOfNewUser
 {
-    use InteractsWithQueue;
-
     /**
      * Create the event listener.
      */

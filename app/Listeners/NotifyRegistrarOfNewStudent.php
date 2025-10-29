@@ -5,13 +5,9 @@ namespace App\Listeners;
 use App\Events\StudentCreated;
 use App\Models\User;
 use App\Notifications\NewStudentCreatedNotification;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
-class NotifyRegistrarOfNewStudent implements ShouldQueue
+class NotifyRegistrarOfNewStudent
 {
-    use InteractsWithQueue;
-
     /**
      * Create the event listener.
      */
