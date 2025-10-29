@@ -274,6 +274,9 @@ class EnrollmentController extends Controller
         // Load relationships for notifications
         $enrollment->load(['student', 'guardian.user', 'schoolYear']);
 
+        // Dispatch event to notify registrars
+        event(new \App\Events\EnrollmentCreated($enrollment));
+
         // Notify guardian of submission
         if ($guardian->user) {
             /** @var \App\Models\User $user */

@@ -164,6 +164,9 @@ class EnrollmentController extends Controller
             'balance_cents' => $balanceCents,
         ]);
 
+        // Dispatch event to notify registrars
+        event(new \App\Events\EnrollmentCreated($enrollment));
+
         return redirect()->route('admin.enrollments.index')
             ->with('success', 'Enrollment application submitted successfully.');
     }

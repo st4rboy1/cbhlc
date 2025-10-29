@@ -61,9 +61,9 @@ export function NotificationItem({ notification, onRead, onDelete, showActions =
                 <div className={cn('mt-0.5 flex-shrink-0', getIconColor(notification.type))}>{getNotificationIcon(notification.type)}</div>
 
                 <div className="min-w-0 flex-1 space-y-1">
-                    <p className={cn('text-sm', isUnread && 'font-semibold')}>{notification.data.message}</p>
+                    <p className={cn('text-sm text-foreground', isUnread && 'font-semibold')}>{notification.data.message}</p>
 
-                    <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}</p>
+                    <p className="text-xs text-muted-foreground/80">{formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}</p>
 
                     {showActions && !compact && (
                         <div className="mt-2 flex gap-2">
