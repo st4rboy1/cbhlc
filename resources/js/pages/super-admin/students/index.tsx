@@ -14,6 +14,7 @@ export type Student = {
     grade_level: string;
     guardians: { first_name: string; last_name: string }[];
     enrollments: {
+        id: number;
         status: string;
         payment_status: string;
         balance: number;
@@ -64,6 +65,7 @@ export default function StudentsIndex({ students, filters }: Props) {
         paymentStatus: student.enrollments.length > 0 ? student.enrollments[0].payment_status : 'N/A',
         balance: student.enrollments.length > 0 ? parseCurrency(student.enrollments[0].balance) : 0,
         netAmount: student.enrollments.length > 0 ? parseCurrency(student.enrollments[0].net_amount) : 0,
+        activeEnrollmentId: student.enrollments.length > 0 ? student.enrollments[0].id : null,
     }));
 
     return (
