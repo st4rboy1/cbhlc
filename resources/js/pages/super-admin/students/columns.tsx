@@ -26,6 +26,7 @@ export type Student = {
     paymentStatus: string;
     balance: number;
     netAmount: number;
+    activeEnrollmentId: number | null;
 };
 
 function formatCurrency(amount: number) {
@@ -87,6 +88,11 @@ function ActionsCell({ student }: { student: Student }) {
                         <Link href={`/super-admin/students/${student.id}/edit`}>Edit Student</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>View Enrollments</DropdownMenuItem>
+                    {student.activeEnrollmentId && (
+                        <DropdownMenuItem asChild>
+                            <Link href={`/super-admin/enrollments/${student.activeEnrollmentId}`}>Update Payment Status</Link>
+                        </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>Delete Student</DropdownMenuItem>
                 </DropdownMenuContent>
