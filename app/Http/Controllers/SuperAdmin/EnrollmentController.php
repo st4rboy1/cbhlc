@@ -246,14 +246,17 @@ class EnrollmentController extends Controller
 
         DB::transaction(function () use ($validated, $enrollment) {
             $oldStatus = $enrollment->status;
+            $newStatus = $validated['status'] ?? $oldStatus;
 
-            $enrollment->update($validated);
+            // Update enrollment without status (status will be handled by service methods)
+            $dataToUpdate = collect($validated)->except('status')->toArray();
+            $enrollment->update($dataToUpdate);
 
             // Handle status changes
-            if ($oldStatus !== $validated['status']) {
-                if ($validated['status'] === EnrollmentStatus::APPROVED->value) {
+            if ($oldStatus !== $newStatus) {
+                if ($newStatus === EnrollmentStatus::APPROVED->value) {
                     $this->enrollmentService->approveEnrollment($enrollment);
-                } elseif ($validated['status'] === EnrollmentStatus::REJECTED->value) {
+                } elseif ($newStatus === EnrollmentStatus::REJECTED->value) {
                     $this->enrollmentService->rejectEnrollment($enrollment, 'Updated by admin');
                 }
             }
