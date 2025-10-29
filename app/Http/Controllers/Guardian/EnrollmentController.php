@@ -257,6 +257,7 @@ class EnrollmentController extends Controller
             'quarter' => Quarter::from($validated['quarter']),
             'grade_level' => GradeLevel::from($validated['grade_level']),
             'status' => EnrollmentStatus::PENDING,
+            'payment_plan' => $validated['payment_plan'],
             'tuition_fee_cents' => $tuitionFeeCents,
             'miscellaneous_fee_cents' => $miscFeeCents,
             'laboratory_fee_cents' => $laboratoryFeeCents,

@@ -86,6 +86,7 @@ describe('enrollment pending constraint', function () {
             'school_year_id' => \App\Models\SchoolYear::firstOrCreate(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming'])->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => 'Grade 2',
+            'payment_plan' => 'annual',
         ]);
 
         $response->assertSessionHasErrors(['student_id']);
@@ -146,6 +147,7 @@ describe('enrollment pending constraint', function () {
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => 'Grade 1',
+            'payment_plan' => 'annual',
         ]);
 
         $response->assertRedirect(route('guardian.enrollments.index'));
@@ -197,6 +199,7 @@ describe('enrollment pending constraint', function () {
             'school_year_id' => \App\Models\SchoolYear::firstOrCreate(['name' => '2025-2026', 'start_year' => 2025, 'end_year' => 2026, 'start_date' => '2025-06-01', 'end_date' => '2026-05-31', 'status' => 'upcoming'])->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => 'Grade 2',
+            'payment_plan' => 'annual',
         ]);
 
         $response->assertSessionHasErrors(['student_id']);
@@ -246,7 +249,8 @@ describe('enrollment pending constraint', function () {
             'student_id' => $student->id,
             // Note: school_year_id is auto-set from active enrollment period
             'quarter' => Quarter::SECOND->value,
-            'grade_level' => 'Grade 1',
+            'grade_level' => 'Grade 2',
+            'payment_plan' => 'annual',
         ]);
 
         // Error should be on student_id since it validates duplicate enrollments for the school year

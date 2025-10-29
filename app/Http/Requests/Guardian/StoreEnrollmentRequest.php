@@ -149,6 +149,7 @@ class StoreEnrollmentRequest extends FormRequest
                     }
                 },
             ],
+            'payment_plan' => ['required', 'in:annual,semestral,quarterly,monthly'],
         ];
     }
 

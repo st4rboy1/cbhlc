@@ -169,6 +169,7 @@ describe('enrollment controller', function () {
             'school_year_id' => $this->sy2024->id,
             'quarter' => 'First',
             'grade_level' => 'Grade 1',
+            'payment_plan' => 'annual',
         ];
 
         // Need to create guardian-student relationship first
@@ -179,13 +180,14 @@ describe('enrollment controller', function () {
             'is_primary_contact' => true,
         ]);
 
-        $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), $enrollmentData);
+        $response = $this->actingAs($guardianUser)->post(route('guardian.enrollments.store'), $enrollmentData);
 
         $response->assertRedirect(route('guardian.enrollments.index'));
         $this->assertDatabaseHas('enrollments', [
             'student_id' => $student->id,
             'school_year_id' => $this->sy2024->id,
             'grade_level' => 'Grade 1',
+            'payment_plan' => 'annual',
         ]);
     });
 
@@ -241,6 +243,7 @@ describe('enrollment controller', function () {
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Grade 1',
+            'payment_plan' => 'annual',
             'status' => EnrollmentStatus::PENDING,
             'tuition_fee_cents' => 0,
             'miscellaneous_fee_cents' => 0,
@@ -253,11 +256,12 @@ describe('enrollment controller', function () {
         ]);
 
         // Attempt to create duplicate enrollment for same student and school year
-        $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
+        $response = $this->actingAs($guardianUser)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::SECOND->value,
             'grade_level' => 'Grade 2',
+            'payment_plan' => 'annual',
         ]);
 
         $response->assertSessionHasErrors(['student_id']);
@@ -299,6 +303,7 @@ describe('enrollment controller', function () {
             'school_year_id' => $this->sy2024->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => 'Kinder',
+            'payment_plan' => 'annual',
             'status' => EnrollmentStatus::APPROVED, // Make sure they passed
             'tuition_fee_cents' => 0,
             'miscellaneous_fee_cents' => 0,
@@ -322,11 +327,12 @@ describe('enrollment controller', function () {
         ]);
 
         // Create enrollment for different school year - should succeed (progression from Kinder to Grade 1)
-        $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
+        $response = $this->actingAs($guardianUser)->post(route('guardian.enrollments.store'), [
             'student_id' => $student->id,
             'school_year_id' => $this->sy2025->id,
             'quarter' => Quarter::FIRST->value,
             'grade_level' => 'Grade 1',
+            'payment_plan' => 'annual',
         ]);
 
         $response->assertRedirect(route('guardian.enrollments.index'));
@@ -361,11 +367,12 @@ describe('enrollment controller', function () {
             ]);
 
             // New student should be able to select any quarter
-            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('guardian.enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::SECOND->value,
                 'grade_level' => 'Kinder',
+                'payment_plan' => 'annual',
             ]);
 
             $response->assertRedirect(route('guardian.enrollments.index'));
@@ -404,6 +411,7 @@ describe('enrollment controller', function () {
                 'school_year_id' => $this->sy2023->id,
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Kinder',
+                'payment_plan' => 'annual',
                 'status' => EnrollmentStatus::APPROVED,
                 'tuition_fee_cents' => 0,
                 'miscellaneous_fee_cents' => 0,
@@ -416,11 +424,12 @@ describe('enrollment controller', function () {
             ]);
 
             // Try to enroll in second quarter - should be overridden to first quarter
-            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('guardian.enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::SECOND->value,
                 'grade_level' => 'Grade 1',
+                'payment_plan' => 'annual',
             ]);
 
             $response->assertRedirect(route('guardian.enrollments.index'));
@@ -456,17 +465,19 @@ describe('enrollment controller', function () {
             ]);
 
             // New student should be able to enroll in any grade
-            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('guardian.enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => 'Grade 3',
+                'payment_plan' => 'annual',
             ]);
 
             $response->assertRedirect(route('guardian.enrollments.index'));
             $this->assertDatabaseHas('enrollments', [
                 'student_id' => $student->id,
                 'grade_level' => 'Grade 3',
+                'payment_plan' => 'annual',
             ]);
         });
 
@@ -501,6 +512,7 @@ describe('enrollment controller', function () {
                 'school_year_id' => $this->sy2023->id,
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Grade 3',
+                'payment_plan' => 'annual',
                 'status' => EnrollmentStatus::APPROVED,
                 'tuition_fee_cents' => 0,
                 'miscellaneous_fee_cents' => 0,
@@ -513,11 +525,12 @@ describe('enrollment controller', function () {
             ]);
 
             // Try to enroll in lower grade - should fail
-            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('guardian.enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => 'Grade 2', // Lower than current Grade 3
+                'payment_plan' => 'annual',
             ]);
 
             $response->assertSessionHasErrors(['grade_level']);
@@ -555,6 +568,7 @@ describe('enrollment controller', function () {
                 'school_year_id' => $this->sy2023->id,
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Grade 2',
+                'payment_plan' => 'annual',
                 'status' => EnrollmentStatus::APPROVED,
                 'tuition_fee_cents' => 0,
                 'miscellaneous_fee_cents' => 0,
@@ -567,11 +581,12 @@ describe('enrollment controller', function () {
             ]);
 
             // Enroll in next grade level - should succeed
-            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('guardian.enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => 'Grade 3',
+                'payment_plan' => 'annual',
             ]);
 
             $response->assertRedirect(route('guardian.enrollments.index'));
@@ -579,6 +594,7 @@ describe('enrollment controller', function () {
                 'student_id' => $student->id,
                 'school_year_id' => $this->sy2024->id,
                 'grade_level' => 'Grade 3',
+                'payment_plan' => 'annual',
             ]);
         });
 
@@ -613,6 +629,7 @@ describe('enrollment controller', function () {
                 'school_year_id' => $this->sy2023->id,
                 'quarter' => Quarter::FIRST,
                 'grade_level' => 'Grade 1',
+                'payment_plan' => 'annual',
                 'status' => EnrollmentStatus::APPROVED,
                 'tuition_fee_cents' => 0,
                 'miscellaneous_fee_cents' => 0,
@@ -625,11 +642,12 @@ describe('enrollment controller', function () {
             ]);
 
             // Enroll in grade level beyond next (accelerated) - should succeed
-            $response = $this->actingAs($guardianUser)->post(route('enrollments.store'), [
+            $response = $this->actingAs($guardianUser)->post(route('guardian.enrollments.store'), [
                 'student_id' => $student->id,
                 'school_year_id' => $this->sy2024->id,
                 'quarter' => Quarter::FIRST->value,
                 'grade_level' => 'Grade 4', // Skipping Grade 2 and 3
+                'payment_plan' => 'annual',
             ]);
 
             $response->assertRedirect(route('guardian.enrollments.index'));
@@ -637,6 +655,7 @@ describe('enrollment controller', function () {
                 'student_id' => $student->id,
                 'school_year_id' => $this->sy2024->id,
                 'grade_level' => 'Grade 4',
+                'payment_plan' => 'annual',
             ]);
         });
     });
