@@ -55,7 +55,7 @@ class StoreEnrollmentRequestTest extends TestCase
             'student_id' => $student->id,
             'grade_level' => 'Grade 1',
             'school_year_id' => $schoolYear->id,
-            'quarter' => 'first_quarter',
+            'quarter' => 'First',
             'type' => 'new',
             'previous_school' => 'Previous School Name',
             'payment_plan' => 'monthly',

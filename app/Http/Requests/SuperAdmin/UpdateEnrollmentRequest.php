@@ -4,6 +4,7 @@ namespace App\Http\Requests\SuperAdmin;
 
 use App\Enums\EnrollmentStatus;
 use App\Enums\GradeLevel;
+use App\Enums\Quarter;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -29,7 +30,7 @@ class UpdateEnrollmentRequest extends FormRequest
             'guardian_id' => ['required', 'exists:guardians,id'],
             'grade_level' => ['required', Rule::in(GradeLevel::values())],
             'school_year_id' => ['required', 'exists:school_years,id'],
-            'quarter' => ['required', 'string'],
+            'quarter' => ['required', Rule::in(Quarter::values())],
             'type' => ['required', 'in:new,continuing,returnee,transferee'],
             'previous_school' => ['nullable', 'string', 'max:255'],
             'payment_plan' => ['required', 'in:annual,semestral,quarterly,monthly'],
