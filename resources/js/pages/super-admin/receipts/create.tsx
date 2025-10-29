@@ -7,6 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Head, useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { route } from 'ziggy-js';
 
 interface Student {
     id: number;
