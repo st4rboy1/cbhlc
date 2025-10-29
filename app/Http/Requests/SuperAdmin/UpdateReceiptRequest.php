@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\SuperAdmin;
 
+use App\Enums\PaymentMethod;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateReceiptRequest extends FormRequest
 {
@@ -26,7 +28,7 @@ class UpdateReceiptRequest extends FormRequest
             'invoice_id' => ['nullable', 'exists:invoices,id'],
             'receipt_date' => ['required', 'date'],
             'amount' => ['required', 'numeric', 'min:0.01'],
-            'payment_method' => ['required', 'string', 'max:50'],
+            'payment_method' => ['required', Rule::in(PaymentMethod::values())],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }
