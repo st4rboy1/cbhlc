@@ -312,7 +312,7 @@ class EnrollmentController extends Controller
             abort(403, 'You do not have access to view this enrollment.');
         }
 
-        $enrollment->load(['student', 'guardian']);
+        $enrollment->load(['student', 'guardian', 'schoolYear']);
 
         // Load payments for this enrollment
         $payments = Payment::where('invoice_id', $enrollment->id)
@@ -327,7 +327,28 @@ class EnrollmentController extends Controller
             ]);
 
         return Inertia::render('guardian/enrollments/show', [
-            'enrollment' => $enrollment,
+            'enrollment' => [
+                'id' => $enrollment->id,
+                'student' => $enrollment->student,
+                'school_year' => $enrollment->schoolYear->name,
+                'grade_level' => $enrollment->grade_level,
+                'section' => $enrollment->section,
+                'adviser' => $enrollment->adviser,
+                'quarter' => $enrollment->quarter,
+                'status' => $enrollment->status,
+                'payment_status' => $enrollment->payment_status,
+                'tuition_fee_cents' => $enrollment->tuition_fee_cents,
+                'miscellaneous_fee_cents' => $enrollment->miscellaneous_fee_cents,
+                'laboratory_fee_cents' => $enrollment->laboratory_fee_cents,
+                'library_fee_cents' => $enrollment->library_fee_cents,
+                'other_fees_cents' => $enrollment->other_fees_cents,
+                'total_amount_cents' => $enrollment->total_amount_cents,
+                'discount_cents' => $enrollment->discount_cents,
+                'net_amount_cents' => $enrollment->net_amount_cents,
+                'amount_paid_cents' => $enrollment->amount_paid_cents,
+                'balance_cents' => $enrollment->balance_cents,
+                'created_at' => $enrollment->created_at->toISOString(),
+            ],
             'payments' => $payments,
         ]);
     }
