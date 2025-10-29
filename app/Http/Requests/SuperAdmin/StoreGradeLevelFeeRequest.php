@@ -27,8 +27,7 @@ class StoreGradeLevelFeeRequest extends FormRequest
                 'string',
                 'max:50',
                 \Illuminate\Validation\Rule::unique('grade_level_fees')->where(function ($query) {
-                    return $query->where('school_year_id', $this->school_year_id)
-                        ->where('payment_terms', $this->payment_terms);
+                    return $query->where('payment_terms', $this->payment_terms);
                 }),
             ],
             'school_year_id' => ['required', 'exists:school_years,id'],
