@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\SuperAdmin;
 
+use App\Enums\EnrollmentType;
 use App\Enums\GradeLevel;
+use App\Enums\PaymentPlan;
 use App\Enums\Quarter;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -29,9 +31,9 @@ class StoreEnrollmentRequest extends FormRequest
             'grade_level' => ['required', Rule::in(GradeLevel::values())],
             'school_year_id' => ['required', 'exists:school_years,id'],
             'quarter' => ['required', Rule::in(Quarter::values())],
-            'type' => ['required', 'in:new,continuing,returnee,transferee'],
+            'type' => ['required', Rule::in(EnrollmentType::values())],
             'previous_school' => ['nullable', 'required_if:type,transferee', 'string', 'max:255'],
-            'payment_plan' => ['required', 'in:annual,semestral,quarterly,monthly'],
+            'payment_plan' => ['required', Rule::in(PaymentPlan::values())],
         ];
     }
 }
