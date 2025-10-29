@@ -170,7 +170,6 @@ describe('enrollment controller', function () {
             'quarter' => 'First',
             'grade_level' => 'Grade 1',
             'payment_plan' => 'annual',
-            'payment_plan' => 'annual',
         ];
 
         // Need to create guardian-student relationship first
