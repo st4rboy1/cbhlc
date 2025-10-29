@@ -496,7 +496,6 @@ describe('enrollment controller', function () {
 
             $student = Student::factory()->create([
                 'grade_level' => 'Grade 3',
-                'payment_plan' => 'annual',
             ]);
 
             GuardianStudent::create([
@@ -553,7 +552,6 @@ describe('enrollment controller', function () {
 
             $student = Student::factory()->create([
                 'grade_level' => 'Grade 2',
-                'payment_plan' => 'annual',
             ]);
 
             GuardianStudent::create([
@@ -615,7 +613,6 @@ describe('enrollment controller', function () {
 
             $student = Student::factory()->create([
                 'grade_level' => 'Grade 1',
-                'payment_plan' => 'annual',
             ]);
 
             GuardianStudent::create([
