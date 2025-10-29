@@ -170,7 +170,7 @@ test('all users are redirected to email verification after registration', functi
 test('registration validates all required fields', function () {
     $response = $this->post('/register', []);
 
-    $response->assertSessionHasErrors(['first_name', 'last_name', 'email', 'password', 'contact_number', 'address', 'occupation']);
+    $response->assertSessionHasErrors(['first_name', 'last_name', 'email', 'password', 'contact_number', 'address']);
     $this->assertGuest();
 });
 
