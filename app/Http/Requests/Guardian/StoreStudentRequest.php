@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Guardian;
 
+use App\Enums\GradeLevel;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class StoreStudentRequest extends FormRequest
 {
@@ -32,7 +34,7 @@ class StoreStudentRequest extends FormRequest
             'address' => ['required', 'string', 'max:500'],
             'contact_number' => ['nullable', 'string', 'max:20', 'regex:/^[0-9+\-\(\)\s]+$/'],
             'email' => ['nullable', 'email', 'max:255'],
-            'grade_level' => ['required', 'string', 'in:Kinder,Grade 1,Grade 2,Grade 3,Grade 4,Grade 5,Grade 6'],
+            'grade_level' => ['required', Rule::in(GradeLevel::values())],
             'birth_place' => ['required', 'string', 'max:255'],
             'nationality' => ['required', 'string', 'max:100'],
             'religion' => ['required', 'string', 'max:100'],

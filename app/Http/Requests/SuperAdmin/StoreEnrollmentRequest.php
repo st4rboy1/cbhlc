@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\SuperAdmin;
 
+use App\Enums\GradeLevel;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreEnrollmentRequest extends FormRequest
 {
@@ -23,7 +25,7 @@ class StoreEnrollmentRequest extends FormRequest
     {
         return [
             'student_id' => ['required', 'exists:students,id'],
-            'grade_level' => ['required', 'string'],
+            'grade_level' => ['required', Rule::in(GradeLevel::values())],
             'school_year_id' => ['required', 'exists:school_years,id'],
             'quarter' => ['required', 'string'],
             'type' => ['required', 'in:new,continuing,returnee,transferee'],
