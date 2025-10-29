@@ -57,7 +57,7 @@ class UpdateEnrollmentRequestTest extends TestCase
         $data = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
-            'grade_level' => 'grade_1',
+            'grade_level' => 'Grade 1',
             'school_year_id' => $schoolYear->id,
             'quarter' => '1st',
             'type' => 'new',
@@ -81,7 +81,7 @@ class UpdateEnrollmentRequestTest extends TestCase
         $data = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
-            'grade_level' => 'grade_2',
+            'grade_level' => 'Grade 2',
             'school_year_id' => $schoolYear->id,
             'quarter' => '2nd',
             'type' => 'continuing',
@@ -103,7 +103,7 @@ class UpdateEnrollmentRequestTest extends TestCase
         $data = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
-            'grade_level' => 'grade_1',
+            'grade_level' => 'Grade 1',
             'school_year_id' => 99999, // Non-existent ID
             'quarter' => '1st',
             'type' => 'new',
@@ -127,7 +127,7 @@ class UpdateEnrollmentRequestTest extends TestCase
         $data = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
-            'grade_level' => 'grade_1',
+            'grade_level' => 'Grade 1',
             'school_year_id' => $schoolYear->id,
             'quarter' => '1st',
             'type' => 'invalid_type',
@@ -151,7 +151,7 @@ class UpdateEnrollmentRequestTest extends TestCase
         $data = [
             'student_id' => $student->id,
             'guardian_id' => $guardian->id,
-            'grade_level' => 'grade_1',
+            'grade_level' => 'Grade 1',
             'school_year_id' => $schoolYear->id,
             'quarter' => '1st',
             'type' => 'new',
