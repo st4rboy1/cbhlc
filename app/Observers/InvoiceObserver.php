@@ -34,6 +34,11 @@ class InvoiceObserver
     public function created(Invoice $invoice): void
     {
         // Note: Activity logging is handled automatically by LogsActivity trait
+
+        // Notify guardian about the new invoice
+        if ($invoice->enrollment && $invoice->enrollment->guardian && $invoice->enrollment->guardian->user) {
+            $invoice->enrollment->guardian->user->notify(new \App\Notifications\InvoiceCreatedNotification($invoice));
+        }
     }
 
     /**

@@ -63,6 +63,11 @@ class PaymentObserver
         }
 
         // Note: Activity logging is handled automatically by LogsActivity trait
+
+        // Notify guardian about the payment
+        if ($payment->invoice && $payment->invoice->enrollment && $payment->invoice->enrollment->guardian && $payment->invoice->enrollment->guardian->user) {
+            $payment->invoice->enrollment->guardian->user->notify(new \App\Notifications\PaymentReceivedNotification($payment));
+        }
     }
 
     /**
