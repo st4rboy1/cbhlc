@@ -113,10 +113,9 @@ class StoreEnrollmentRequest extends FormRequest
                     }
                 },
             ],
-            'quarter' => ['required', 'string', Rule::in(Quarter::values())],
+            'quarter' => ['required', Rule::in(Quarter::values())],
             'grade_level' => [
                 'required',
-                'string',
                 Rule::in(GradeLevel::values()),
                 function ($attribute, $value, $fail) {
                     $studentId = $this->input('student_id');
