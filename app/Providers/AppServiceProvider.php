@@ -2,11 +2,17 @@
 
 namespace App\Providers;
 
+use App\Events\EnrollmentCreated;
+use App\Events\StudentCreated;
 use App\Listeners\LogAuthenticationActivity;
+use App\Listeners\NotifyRegistrarOfNewEnrollment;
+use App\Listeners\NotifyRegistrarOfNewStudent;
+use App\Listeners\NotifySuperAdminOfNewUser;
 use App\Models\User;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
@@ -33,6 +39,11 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Login::class, [LogAuthenticationActivity::class, 'handleLogin']);
         Event::listen(Logout::class, [LogAuthenticationActivity::class, 'handleLogout']);
         Event::listen(Failed::class, [LogAuthenticationActivity::class, 'handleFailed']);
+
+        // Register notification event listeners
+        Event::listen(Registered::class, NotifySuperAdminOfNewUser::class);
+        Event::listen(StudentCreated::class, NotifyRegistrarOfNewStudent::class);
+        Event::listen(EnrollmentCreated::class, NotifyRegistrarOfNewEnrollment::class);
 
         // Super admin has access to everything
         Gate::before(function (User $user, string $ability) {

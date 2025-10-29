@@ -164,6 +164,9 @@ class StudentController extends Controller
 
         $student = Student::create($studentData);
 
+        // Dispatch event to notify registrars
+        event(new \App\Events\StudentCreated($student));
+
         // Get Guardian model for authenticated user
         $guardian = Guardian::where('user_id', Auth::id())->firstOrFail();
 

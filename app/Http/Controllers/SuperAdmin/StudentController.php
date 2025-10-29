@@ -82,7 +82,7 @@ class StudentController extends Controller
 
         $validated = $request->validated();
 
-        DB::transaction(function () use ($validated) {
+        $student = DB::transaction(function () use ($validated) {
             $student = Student::create([
                 'first_name' => $validated['first_name'],
                 'middle_name' => $validated['middle_name'],
@@ -105,7 +105,12 @@ class StudentController extends Controller
                     'is_primary' => $index === 0,
                 ]);
             }
+
+            return $student;
         });
+
+        // Dispatch event to notify registrars
+        event(new \App\Events\StudentCreated($student));
 
         return redirect()->route('super-admin.students.index')
             ->with('success', 'Student created successfully.');

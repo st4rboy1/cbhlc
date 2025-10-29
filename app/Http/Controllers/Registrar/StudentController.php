@@ -132,6 +132,9 @@ class StudentController extends Controller
 
         $student = Student::create($validated);
 
+        // Dispatch event to notify registrars
+        event(new \App\Events\StudentCreated($student));
+
         return redirect()->route('registrar.students.show', $student->id)
             ->with('success', 'Student created successfully.');
     }
