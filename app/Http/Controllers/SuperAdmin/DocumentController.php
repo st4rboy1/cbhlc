@@ -67,11 +67,8 @@ class DocumentController extends Controller
 
         $document->load(['student.guardians', 'verifiedBy']);
 
-        // Generate temporary signed URL for file viewing
-        $url = Storage::disk('private')->temporaryUrl(
-            $document->file_path,
-            now()->addMinutes(5)
-        );
+        // Generate URL for file viewing using the view route
+        $url = route('super-admin.documents.view', $document);
 
         return Inertia::render('super-admin/documents/show', [
             'document' => $document,
@@ -86,8 +83,19 @@ class DocumentController extends Controller
     {
         Gate::authorize('view', $document);
 
+        // Check if file exists
+        if (! Storage::disk('private')->exists($document->file_path)) {
+            abort(404, 'Document file not found.');
+        }
+
         // Return the file for viewing in browser
-        return Storage::disk('private')->response($document->file_path, $document->original_filename);
+        return response()->file(
+            Storage::disk('private')->path($document->file_path),
+            [
+                'Content-Type' => $document->mime_type,
+                'Content-Disposition' => 'inline; filename="'.$document->original_filename.'"',
+            ]
+        );
     }
 
     /**
