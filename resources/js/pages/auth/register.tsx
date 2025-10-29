@@ -113,7 +113,7 @@ export default function Register() {
 
                             <div className="grid gap-2">
                                 <Label htmlFor="occupation">Occupation</Label>
-                                <Input id="occupation" type="text" required tabIndex={8} name="occupation" placeholder="Your occupation" />
+                                <Input id="occupation" type="text" tabIndex={8} name="occupation" placeholder="Your occupation (optional)" />
                                 <InputError message={errors.occupation} />
                             </div>
 

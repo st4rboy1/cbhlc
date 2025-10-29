@@ -78,7 +78,7 @@ test('registration no longer accepts role parameter', function () {
 test('registration validates required fields', function () {
     $response = $this->post(route('register.store'), []);
 
-    $response->assertSessionHasErrors(['first_name', 'last_name', 'email', 'password', 'contact_number', 'address', 'occupation']);
+    $response->assertSessionHasErrors(['first_name', 'last_name', 'email', 'password', 'contact_number', 'address']);
 });
 
 test('registration validates email format', function () {
