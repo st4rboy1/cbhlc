@@ -4,6 +4,7 @@ namespace App\Http\Requests\Guardian;
 
 use App\Enums\EnrollmentStatus;
 use App\Enums\GradeLevel;
+use App\Enums\PaymentPlan;
 use App\Enums\Quarter;
 use App\Models\Enrollment;
 use App\Models\EnrollmentPeriod;
@@ -148,7 +149,7 @@ class StoreEnrollmentRequest extends FormRequest
                     }
                 },
             ],
-            'payment_plan' => ['required', 'in:annual,semestral,quarterly,monthly'],
+            'payment_plan' => ['required', Rule::in(PaymentPlan::values())],
         ];
     }
 
