@@ -28,9 +28,13 @@ class NotifySuperAdminOfNewUser implements ShouldQueue
         // Get all super admins
         $superAdmins = User::role('super_admin')->get();
 
+        // Get the registered user
+        /** @var User $registeredUser */
+        $registeredUser = $event->user;
+
         // Notify each super admin
         foreach ($superAdmins as $superAdmin) {
-            $superAdmin->notify(new NewUserRegisteredNotification($event->user));
+            $superAdmin->notify(new NewUserRegisteredNotification($registeredUser));
         }
     }
 }
