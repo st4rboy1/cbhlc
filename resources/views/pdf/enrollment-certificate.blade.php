@@ -123,8 +123,8 @@
         <div class="header">
             <div style="font-size: 14px;">Republic of the Philippines</div>
             <div class="school-name">Christian Bible Heritage Learning Center</div>
-            <div>{{ config('app.school_address', 'Lantapan, Bukidnon') }}</div>
-            <div>Tel: {{ config('app.school_phone', '') }}</div>
+            <div>{{ $schoolAddress }}</div>
+            <div>Tel: {{ $schoolPhone }}</div>
         </div>
 
         <div class="certificate-title">Certificate of Enrollment</div>
@@ -139,7 +139,7 @@
             </div>
 
             <p>is officially enrolled in this institution for the</p>
-            <p><strong>School Year {{ $enrollment->school_year }}</strong></p>
+            <p><strong>School Year {{ $enrollment->schoolYear->name }}</strong></p>
         </div>
 
         <div class="details-section">
@@ -172,12 +172,12 @@
 
         <div class="signatures">
             <div class="signature-box">
-                <div class="signature-line">Registrar</div>
-                <div class="signature-title">Christian Bible Heritage Learning Center</div>
+                <div class="signature-line">MARIECHRIS HACHERO</div>
+                <div class="signature-title">Registrar</div>
             </div>
             <div class="signature-box">
-                <div class="signature-line">Principal</div>
-                <div class="signature-title">Christian Bible Heritage Learning Center</div>
+                <div class="signature-line">NORMA ARROYO</div>
+                <div class="signature-title">Principal</div>
             </div>
         </div>
 
