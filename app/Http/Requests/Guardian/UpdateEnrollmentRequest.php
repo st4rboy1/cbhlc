@@ -25,8 +25,8 @@ class UpdateEnrollmentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'quarter' => ['required', 'string', Rule::in(Quarter::values())],
-            'grade_level' => ['required', 'string', Rule::in(GradeLevel::values())],
+            'quarter' => ['required', Rule::in(Quarter::values())],
+            'grade_level' => ['required', Rule::in(GradeLevel::values())],
         ];
     }
 
