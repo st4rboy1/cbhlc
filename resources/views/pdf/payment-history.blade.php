@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Payment History Report</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; }
+        body { font-family: 'DejaVu Sans', sans-serif; font-size: 12px; }
         .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 20px; }
         .school-name { font-size: 24px; font-weight: bold; }
         .report-title { font-size: 18px; margin-top: 10px; }
@@ -22,8 +23,8 @@
 <body>
     <div class="header">
         <div class="school-name">Christian Bible Heritage Learning Center</div>
-        <div>{{ config('app.school_address', 'Lantapan, Bukidnon') }}</div>
-        <div>{{ config('app.school_phone', '') }} | {{ config('app.school_email', 'cbhlc@example.com') }}</div>
+        <div>{{ $schoolAddress }}</div>
+        <div>{{ $schoolPhone }} | {{ $schoolEmail }}</div>
         <div class="report-title">PAYMENT HISTORY REPORT</div>
     </div>
 
@@ -42,7 +43,7 @@
         </div>
         <div class="info-row">
             <strong>School Year:</strong>
-            <span>{{ $enrollment->school_year }}</span>
+            <span>{{ $enrollment->schoolYear->name }}</span>
         </div>
         <div class="info-row">
             <strong>Enrollment ID:</strong>
@@ -118,7 +119,7 @@
                 <tr>
                     <td>{{ $payment->payment_date->format('M d, Y') }}</td>
                     <td>₱{{ number_format($payment->amount, 2) }}</td>
-                    <td>{{ ucfirst($payment->payment_method) }}</td>
+                    <td>{{ ucfirst($payment->payment_method->value) }}</td>
                     <td>{{ $payment->reference_number ?? 'N/A' }}</td>
                     <td style="text-align: right;">₱{{ number_format($runningBalance, 2) }}</td>
                 </tr>

@@ -469,7 +469,12 @@ class EnrollmentController extends Controller
         $enrollment->load([
             'student',
             'invoices.payments',
+            'schoolYear',
         ]);
+
+        $schoolAddress = SchoolInformation::getByKey('school_address', 'Lantapan, Bukidnon');
+        $schoolPhone = SchoolInformation::getByKey('school_phone', '');
+        $schoolEmail = SchoolInformation::getByKey('school_email', 'cbhlc@example.com');
 
         // Get all payments for this enrollment through invoices
         $payments = collect();
@@ -481,6 +486,9 @@ class EnrollmentController extends Controller
         $pdf = Pdf::loadView('pdf.payment-history', [
             'enrollment' => $enrollment,
             'payments' => $payments,
+            'schoolAddress' => $schoolAddress,
+            'schoolPhone' => $schoolPhone,
+            'schoolEmail' => $schoolEmail,
         ])
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
