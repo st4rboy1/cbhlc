@@ -151,6 +151,13 @@ export default function GuardianEnrollmentsIndex({ enrollments, filters, filterO
             {
                 accessorKey: 'created_at',
                 header: 'Submission Date',
+                cell: ({ row }) => {
+                    return new Date(row.original.created_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                    });
+                },
             },
             {
                 id: 'actions',
