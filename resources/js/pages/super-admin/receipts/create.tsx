@@ -4,10 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { store } from '@/routes/super-admin/receipts';
 import { Head, useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
-import { route } from 'ziggy-js';
 
 interface Student {
     id: number;
@@ -74,7 +74,7 @@ export default function ReceiptCreate({ payments, invoices, nextReceiptNumber }:
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-                                post(route('super-admin.receipts.store'));
+                                post(store().url);
                             }}
                             className="space-y-4"
                         >

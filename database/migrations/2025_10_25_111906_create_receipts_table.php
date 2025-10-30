@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('receipts', function (Blueprint $table) {
             $table->id();
             $table->string('receipt_number')->unique()->comment('Official Receipt number (e.g., OR-2025-0001)');
-            $table->foreignId('payment_id')->constrained()->onDelete('cascade');
-            $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
+            $table->foreignId('payment_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('invoice_id')->nullable()->constrained()->onDelete('cascade');
             $table->date('receipt_date');
             $table->decimal('amount', 10, 2)->comment('Amount received');
             $table->string('payment_method')->comment('Method of payment');
