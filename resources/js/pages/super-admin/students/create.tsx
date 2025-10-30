@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { store } from '@/routes/super-admin/students';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -21,14 +22,9 @@ interface Guardian {
     };
 }
 
-interface GradeLevel {
-    name: string;
-    value: string;
-}
-
 interface Props {
     guardians: Guardian[];
-    gradelevels: GradeLevel[];
+    gradelevels: string[];
 }
 
 export default function StudentCreate({ guardians, gradelevels }: Props) {
@@ -42,7 +38,7 @@ export default function StudentCreate({ guardians, gradelevels }: Props) {
         first_name: '',
         middle_name: '',
         last_name: '',
-        birth_date: '',
+        birthdate: '',
         birth_place: '',
         gender: '',
         nationality: '',
@@ -58,7 +54,7 @@ export default function StudentCreate({ guardians, gradelevels }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('super-admin.students.store'));
+        post(store().url);
     };
 
     const handleGuardianToggle = (guardianId: number) => {
@@ -131,15 +127,15 @@ export default function StudentCreate({ guardians, gradelevels }: Props) {
 
                                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                     <div>
-                                        <Label htmlFor="birth_date">Birth Date</Label>
+                                        <Label htmlFor="birthdate">Birth Date</Label>
                                         <Input
-                                            id="birth_date"
+                                            id="birthdate"
                                             type="date"
-                                            value={data.birth_date}
-                                            onChange={(e) => setData('birth_date', e.target.value)}
-                                            className={errors.birth_date ? 'border-red-500' : ''}
+                                            value={data.birthdate}
+                                            onChange={(e) => setData('birthdate', e.target.value)}
+                                            className={errors.birthdate ? 'border-red-500' : ''}
                                         />
-                                        {errors.birth_date && <p className="mt-1 text-sm text-red-500">{errors.birth_date}</p>}
+                                        {errors.birthdate && <p className="mt-1 text-sm text-red-500">{errors.birthdate}</p>}
                                     </div>
 
                                     <div>
@@ -178,8 +174,8 @@ export default function StudentCreate({ guardians, gradelevels }: Props) {
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {gradelevels.map((grade) => (
-                                                    <SelectItem key={grade.value} value={grade.value}>
-                                                        {grade.name}
+                                                    <SelectItem key={grade} value={grade}>
+                                                        {grade}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
