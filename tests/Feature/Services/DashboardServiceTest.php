@@ -153,8 +153,9 @@ test('getStudentDashboardData returns student-specific data', function () {
 });
 
 test('getEnrollmentTrend returns monthly enrollment data', function () {
-    // Create enrollments over different months
-    Carbon::setTestNow(now());
+    // Set a specific test date to avoid month overflow issues
+    // Use the 15th of the month to avoid edge cases
+    Carbon::setTestNow(Carbon::create(2025, 6, 15, 12, 0, 0));
 
     Enrollment::factory()->count(5)->create([
         'created_at' => now()->subMonths(2),
@@ -178,7 +179,9 @@ test('getEnrollmentTrend returns monthly enrollment data', function () {
 });
 
 test('getRevenueChart returns monthly revenue data', function () {
-    Carbon::setTestNow(now());
+    // Set a specific test date to avoid month overflow issues
+    // Use the 15th of the month to avoid edge cases
+    Carbon::setTestNow(Carbon::create(2025, 6, 15, 12, 0, 0));
 
     // Create payments over different months
     Payment::factory()->count(3)->create([
