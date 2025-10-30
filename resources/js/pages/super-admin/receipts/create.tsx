@@ -4,10 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { store } from '@/routes/super-admin/receipts';
 import { Head, useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
-import { route } from 'ziggy-js';
 
 interface Student {
     id: number;
@@ -74,7 +74,7 @@ export default function ReceiptCreate({ payments, invoices, nextReceiptNumber }:
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-                                post(route('super-admin.receipts.store'));
+                                post(store().url);
                             }}
                             className="space-y-4"
                         >
@@ -153,13 +153,12 @@ export default function ReceiptCreate({ payments, invoices, nextReceiptNumber }:
                                         <SelectValue placeholder="Select payment method" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Cash">Cash</SelectItem>
-                                        <SelectItem value="Check">Check</SelectItem>
-                                        <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
-                                        <SelectItem value="Credit Card">Credit Card</SelectItem>
-                                        <SelectItem value="Debit Card">Debit Card</SelectItem>
-                                        <SelectItem value="GCash">GCash</SelectItem>
-                                        <SelectItem value="PayMaya">PayMaya</SelectItem>
+                                        <SelectItem value="cash">Cash</SelectItem>
+                                        <SelectItem value="check">Check</SelectItem>
+                                        <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                                        <SelectItem value="credit_card">Credit Card</SelectItem>
+                                        <SelectItem value="gcash">GCash</SelectItem>
+                                        <SelectItem value="paymaya">PayMaya</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 {errors.payment_method && <p className="text-sm text-red-500">{errors.payment_method}</p>}
