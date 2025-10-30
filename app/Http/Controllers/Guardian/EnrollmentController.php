@@ -13,6 +13,7 @@ use App\Models\Enrollment;
 use App\Models\EnrollmentPeriod;
 use App\Models\GuardianStudent;
 use App\Models\Payment;
+use App\Models\SchoolInformation;
 use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\User;
@@ -97,7 +98,6 @@ class EnrollmentController extends Controller
                 'school_year_id' => $request->school_year_id,
                 'student_id' => $request->student_id,
                 'status' => $request->status,
-                'search' => $request->search,
             ],
             'filterOptions' => [
                 'students' => $students,
@@ -511,10 +511,15 @@ class EnrollmentController extends Controller
             abort(403, 'Certificate only available for enrolled students.');
         }
 
-        $enrollment->load('student', 'guardian');
+        $enrollment->load('student', 'guardian', 'schoolYear');
+
+        $schoolAddress = SchoolInformation::getByKey('school_address', 'Lantapan, Bukidnon');
+        $schoolPhone = SchoolInformation::getByKey('school_phone', '');
 
         $pdf = Pdf::loadView('pdf.enrollment-certificate', [
             'enrollment' => $enrollment,
+            'schoolAddress' => $schoolAddress,
+            'schoolPhone' => $schoolPhone,
         ])
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
