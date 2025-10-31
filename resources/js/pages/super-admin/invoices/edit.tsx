@@ -75,9 +75,9 @@ export default function SuperAdminInvoicesEdit({ invoice, enrollments }: Props) 
         items: invoice.items.map((item) => ({
             id: item.id,
             description: item.description,
-            quantity: item.quantity,
-            unit_price: item.unit_price,
-            amount: item.amount,
+            quantity: Number(item.quantity),
+            unit_price: Number(item.unit_price),
+            amount: Number(item.amount),
         })),
     });
 
@@ -117,13 +117,13 @@ export default function SuperAdminInvoicesEdit({ invoice, enrollments }: Props) 
         const newItems = [...data.items];
         newItems[index] = {
             ...newItems[index],
-            [field]: value,
+            [field]: Number(value),
         };
 
         // Recalculate amount if quantity or unit_price changed
         if (field === 'quantity' || field === 'unit_price') {
-            const quantity = field === 'quantity' ? Number(value) : newItems[index].quantity;
-            const unitPrice = field === 'unit_price' ? Number(value) : newItems[index].unit_price;
+            const quantity = newItems[index].quantity;
+            const unitPrice = newItems[index].unit_price;
             newItems[index].amount = quantity * unitPrice;
         }
 
