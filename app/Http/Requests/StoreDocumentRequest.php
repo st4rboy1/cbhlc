@@ -27,37 +27,27 @@ class StoreDocumentRequest extends FormRequest
             'document' => [
                 'required',
                 'file',
-                'mimes:jpeg,jpg,png,pdf',
+                'mimes:jpeg,jpg,png',
                 'max:51200', // 50MB in KB
                 function ($attribute, $value, $fail) {
                     // Verify actual file content, not just extension
                     $mimeType = $value->getMimeType();
-                    $allowedMimes = ['image/jpeg', 'image/png', 'application/pdf'];
+                    $allowedMimes = ['image/jpeg', 'image/png'];
 
                     if (! in_array($mimeType, $allowedMimes)) {
-                        $fail('The file must be a valid image (JPEG or PNG) or PDF document.');
+                        $fail('The file must be a valid JPEG or PNG image.');
 
                         return;
                     }
 
-                    // Check if file is actually an image (for image types)
-                    if (str_starts_with($mimeType, 'image/')) {
-                        try {
-                            $image = getimagesize($value->path());
-                            if ($image === false) {
-                                $fail('The file is not a valid image.');
-                            }
-                        } catch (\Exception $e) {
-                            $fail('The file could not be validated.');
+                    // Check if file is actually an image
+                    try {
+                        $image = getimagesize($value->path());
+                        if ($image === false) {
+                            $fail('The file is not a valid image.');
                         }
-                    }
-
-                    // For PDFs, verify it's actually a PDF (skip in testing to allow fake files)
-                    if ($mimeType === 'application/pdf' && ! app()->environment('testing')) {
-                        $fileContent = file_get_contents($value->path(), false, null, 0, 4);
-                        if ($fileContent !== '%PDF') {
-                            $fail('The file is not a valid PDF document.');
-                        }
+                    } catch (\Exception $e) {
+                        $fail('The file could not be validated.');
                     }
                 },
             ],
@@ -78,7 +68,7 @@ class StoreDocumentRequest extends FormRequest
         return [
             'document.required' => 'Please select a document to upload.',
             'document.file' => 'The uploaded file is not valid.',
-            'document.mimes' => 'Only JPEG, PNG, and PDF files are allowed.',
+            'document.mimes' => 'Only JPEG and PNG image files are allowed.',
             'document.max' => 'The file size must not exceed 50MB.',
             'document_type.required' => 'Please select a document type.',
         ];
