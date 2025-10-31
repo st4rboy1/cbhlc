@@ -7,10 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { type ColumnDef } from '@tanstack/react-table';
 import { PlusCircle, Search, X } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 interface Enrollment {
     id: number;
@@ -76,12 +77,25 @@ export const paymentStatusColors = {
 } as const;
 
 export default function GuardianEnrollmentsIndex({ enrollments, filters, filterOptions }: Props) {
+    const { props } = usePage();
+    const flash = props.flash as { success?: string; error?: string } | undefined;
+
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Enrollments', href: '/guardian/enrollments' },
     ];
 
     const [searchInput, setSearchInput] = useState(filters.search || '');
+
+    // Show flash messages as toasts
+    useEffect(() => {
+        if (flash?.success) {
+            toast.success(flash.success);
+        }
+        if (flash?.error) {
+            toast.error(flash.error);
+        }
+    }, [flash]);
 
     const handleFilterChange = (key: string, value: string) => {
         router.get(
