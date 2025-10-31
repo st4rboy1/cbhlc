@@ -75,11 +75,6 @@ const billingData = {
             discount: '2%',
         },
         {
-            name: 'Quarterly',
-            description: 'Pay every quarter',
-            discount: '0%',
-        },
-        {
             name: 'Monthly',
             description: 'Pay monthly installments',
             discount: '0%',

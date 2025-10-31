@@ -11,10 +11,9 @@ class PaymentPlanTest extends TestCase
     {
         $values = PaymentPlan::values();
 
-        $this->assertCount(4, $values);
+        $this->assertCount(3, $values);
         $this->assertContains('annual', $values);
         $this->assertContains('semestral', $values);
-        $this->assertContains('quarterly', $values);
         $this->assertContains('monthly', $values);
     }
 
@@ -22,7 +21,6 @@ class PaymentPlanTest extends TestCase
     {
         $this->assertEquals('Annual', PaymentPlan::ANNUAL->label());
         $this->assertEquals('Semestral', PaymentPlan::SEMESTRAL->label());
-        $this->assertEquals('Quarterly', PaymentPlan::QUARTERLY->label());
         $this->assertEquals('Monthly', PaymentPlan::MONTHLY->label());
     }
 
@@ -30,7 +28,6 @@ class PaymentPlanTest extends TestCase
     {
         $this->assertEquals(1, PaymentPlan::ANNUAL->installments());
         $this->assertEquals(2, PaymentPlan::SEMESTRAL->installments());
-        $this->assertEquals(4, PaymentPlan::QUARTERLY->installments());
         $this->assertEquals(10, PaymentPlan::MONTHLY->installments());
     }
 
@@ -38,7 +35,6 @@ class PaymentPlanTest extends TestCase
     {
         $this->assertNotEmpty(PaymentPlan::ANNUAL->description());
         $this->assertNotEmpty(PaymentPlan::SEMESTRAL->description());
-        $this->assertNotEmpty(PaymentPlan::QUARTERLY->description());
         $this->assertNotEmpty(PaymentPlan::MONTHLY->description());
     }
 }

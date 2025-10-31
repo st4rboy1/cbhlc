@@ -48,7 +48,7 @@ class StoreGradeLevelFeeRequestTest extends TestCase
             'school_year_id' => $schoolYear->id,
             'tuition_fee' => 15000.00,
             'miscellaneous_fee' => 2500.00,
-            'payment_terms' => 'ANNUAL',
+            'payment_terms' => 'annual',
             'is_active' => true,
         ];
 
@@ -65,7 +65,7 @@ class StoreGradeLevelFeeRequestTest extends TestCase
             'school_year_id' => 99999,
             'tuition_fee' => 15000.00,
             'miscellaneous_fee' => 2500.00,
-            'payment_terms' => 'ANNUAL',
+            'payment_terms' => 'annual',
         ];
 
         $request = new StoreGradeLevelFeeRequest;

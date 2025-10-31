@@ -229,7 +229,6 @@ class EnrollmentController extends Controller
             'paymentPlans' => [
                 ['label' => 'Annual', 'value' => 'annual'],
                 ['label' => 'Semestral', 'value' => 'semestral'],
-                ['label' => 'Quarterly', 'value' => 'quarterly'],
                 ['label' => 'Monthly', 'value' => 'monthly'],
             ],
         ]);

@@ -34,7 +34,7 @@ class StoreGradeLevelFeeRequest extends FormRequest
             'tuition_fee' => ['required', 'numeric', 'min:0'],
             'miscellaneous_fee' => ['required', 'numeric', 'min:0'],
             'other_fees' => ['nullable', 'numeric', 'min:0'],
-            'payment_terms' => ['required', 'string', 'in:ANNUAL,SEMESTRAL,QUARTERLY,MONTHLY'],
+            'payment_terms' => ['required', 'string', 'in:annual,semestral,monthly'],
             'is_active' => ['boolean'],
         ];
     }

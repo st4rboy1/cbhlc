@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('enrollments', function (Blueprint $table) {
-            $table->string('type')->default('new')->after('grade_level'); // new, continuing, returnee, transferee
-            $table->string('previous_school')->nullable()->after('type');
-            $table->string('payment_plan')->default('monthly')->after('previous_school'); // annual, semestral, monthly
+            $table->string('payment_plan')->nullable()->change();
         });
     }
 
@@ -24,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('enrollments', function (Blueprint $table) {
-            $table->dropColumn(['type', 'previous_school', 'payment_plan']);
+            $table->string('payment_plan')->nullable(false)->default('monthly')->change();
         });
     }
 };

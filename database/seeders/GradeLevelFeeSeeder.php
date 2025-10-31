@@ -21,7 +21,7 @@ class GradeLevelFeeSeeder extends Seeder
             'miscellaneous_fee_cents' => 550000, // ₱5,500.00
             'other_fees_cents' => 0,
             'down_payment_cents' => 0, // Full payment upfront
-            'payment_terms' => 'ANNUAL',
+            'payment_terms' => 'annual',
             'is_active' => true,
         ]);
 
@@ -32,7 +32,7 @@ class GradeLevelFeeSeeder extends Seeder
             'miscellaneous_fee_cents' => 550000, // ₱5,500.00
             'other_fees_cents' => 0,
             'down_payment_cents' => 1500000, // ₱15,000.00 on enrollment
-            'payment_terms' => 'SEMESTRAL',
+            'payment_terms' => 'semestral',
             'is_active' => true,
         ]);
 
@@ -43,7 +43,7 @@ class GradeLevelFeeSeeder extends Seeder
             'miscellaneous_fee_cents' => 550000, // ₱5,500.00
             'other_fees_cents' => 0,
             'down_payment_cents' => 745000, // ₱7,450.00 on enrollment
-            'payment_terms' => 'MONTHLY',
+            'payment_terms' => 'monthly',
             'is_active' => true,
         ]);
 
@@ -55,7 +55,7 @@ class GradeLevelFeeSeeder extends Seeder
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
                 'down_payment_cents' => 0, // Full payment upfront
-                'payment_terms' => 'ANNUAL',
+                'payment_terms' => 'annual',
                 'is_active' => true,
             ]);
         }
@@ -68,7 +68,7 @@ class GradeLevelFeeSeeder extends Seeder
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
                 'down_payment_cents' => 1700000, // ₱17,000.00 on enrollment
-                'payment_terms' => 'SEMESTRAL',
+                'payment_terms' => 'semestral',
                 'is_active' => true,
             ]);
         }
@@ -81,7 +81,7 @@ class GradeLevelFeeSeeder extends Seeder
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
                 'down_payment_cents' => 865000, // ₱8,650.00 on enrollment
-                'payment_terms' => 'MONTHLY',
+                'payment_terms' => 'monthly',
                 'is_active' => true,
             ]);
         }
@@ -94,7 +94,7 @@ class GradeLevelFeeSeeder extends Seeder
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
                 'down_payment_cents' => 0, // Full payment upfront
-                'payment_terms' => 'ANNUAL',
+                'payment_terms' => 'annual',
                 'is_active' => true,
             ]);
         }
@@ -107,7 +107,7 @@ class GradeLevelFeeSeeder extends Seeder
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
                 'down_payment_cents' => 1700000, // ₱17,000.00 on enrollment
-                'payment_terms' => 'SEMESTRAL',
+                'payment_terms' => 'semestral',
                 'is_active' => true,
             ]);
         }
@@ -120,7 +120,7 @@ class GradeLevelFeeSeeder extends Seeder
                 'miscellaneous_fee_cents' => 650000, // ₱6,500.00
                 'other_fees_cents' => 0,
                 'down_payment_cents' => 870000, // ₱8,700.00 on enrollment
-                'payment_terms' => 'MONTHLY',
+                'payment_terms' => 'monthly',
                 'is_active' => true,
             ]);
         }

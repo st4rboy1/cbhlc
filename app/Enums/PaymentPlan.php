@@ -6,7 +6,6 @@ enum PaymentPlan: string
 {
     case ANNUAL = 'annual';
     case SEMESTRAL = 'semestral';
-    case QUARTERLY = 'quarterly';
     case MONTHLY = 'monthly';
 
     public static function values(): array
@@ -19,7 +18,6 @@ enum PaymentPlan: string
         return match ($this) {
             self::ANNUAL => 'Annual',
             self::SEMESTRAL => 'Semestral',
-            self::QUARTERLY => 'Quarterly',
             self::MONTHLY => 'Monthly',
         };
     }
@@ -32,7 +30,6 @@ enum PaymentPlan: string
         return match ($this) {
             self::ANNUAL => 1,
             self::SEMESTRAL => 2,
-            self::QUARTERLY => 4,
             self::MONTHLY => 10, // Typically 10 months in a school year
         };
     }
@@ -45,7 +42,6 @@ enum PaymentPlan: string
         return match ($this) {
             self::ANNUAL => 'Pay full amount once per year',
             self::SEMESTRAL => 'Pay in 2 installments per year',
-            self::QUARTERLY => 'Pay in 4 installments per year',
             self::MONTHLY => 'Pay in 10 monthly installments',
         };
     }
