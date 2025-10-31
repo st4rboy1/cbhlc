@@ -36,7 +36,7 @@ class BillingController extends Controller
 
         // Get enrollments with billing information
         /** @var \Illuminate\Support\Collection<int, array<string, mixed>> $enrollments */
-        $enrollments = Enrollment::with(['student', 'schoolYear'])
+        $enrollments = Enrollment::with(['student', 'schoolYear', 'enrollmentPeriod'])
             ->whereIn('student_id', $studentIds)
             ->where('status', '!=', EnrollmentStatus::REJECTED)
             ->get()
@@ -51,6 +51,7 @@ class BillingController extends Controller
                     // Fallback: Find the fee for the enrollment's grade level
                     $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)
                         ->where('enrollment_period_id', $enrollment->enrollment_period_id)
+                        ->where('is_active', true)
                         ->first();
 
                     $tuitionFee = $fee ? $fee->tuition_fee : 0;
