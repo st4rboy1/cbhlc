@@ -58,6 +58,7 @@ describe('Super Admin Enrollment Update', function () {
             'type' => 'continuing',  // Change type
             'payment_plan' => 'annual',  // Change payment plan
             'status' => EnrollmentStatus::COMPLETED->value,  // Change status
+            'payment_status' => 'paid',  // Change payment status
         ]);
 
         // Should redirect successfully
@@ -73,6 +74,7 @@ describe('Super Admin Enrollment Update', function () {
         expect($enrollment->quarter->value)->toBe('Second');
         expect($enrollment->type)->toBe('continuing');
         expect($enrollment->payment_plan)->toBe('annual');
+        expect($enrollment->payment_status->value)->toBe('paid');
     })->group('super-admin', 'enrollment', 'critical');
 
     test('super admin can update enrollment without changing status', function () {
@@ -105,6 +107,7 @@ describe('Super Admin Enrollment Update', function () {
             'type' => 'new',
             'payment_plan' => 'monthly',
             'status' => EnrollmentStatus::APPROVED->value,  // Same status
+            'payment_status' => 'pending',
         ]);
 
         $response->assertStatus(302);
@@ -151,6 +154,7 @@ describe('Super Admin Enrollment Update', function () {
             'type',
             'payment_plan',
             'status',
+            'payment_status',
         ]);
     })->group('super-admin', 'enrollment', 'validation');
 });

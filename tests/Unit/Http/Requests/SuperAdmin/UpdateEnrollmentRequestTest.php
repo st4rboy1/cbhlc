@@ -46,6 +46,7 @@ class UpdateEnrollmentRequestTest extends TestCase
         $this->assertArrayHasKey('type', $rules);
         $this->assertArrayHasKey('payment_plan', $rules);
         $this->assertArrayHasKey('status', $rules);
+        $this->assertArrayHasKey('payment_status', $rules);
     }
 
     public function test_validation_passes_with_valid_data(): void
@@ -64,6 +65,7 @@ class UpdateEnrollmentRequestTest extends TestCase
             'previous_school' => 'Previous School',
             'payment_plan' => 'monthly',
             'status' => EnrollmentStatus::APPROVED->value,
+            'payment_status' => 'pending',
         ];
 
         $request = new UpdateEnrollmentRequest;
@@ -87,6 +89,7 @@ class UpdateEnrollmentRequestTest extends TestCase
             'type' => 'continuing',
             'payment_plan' => 'annual',
             'status' => EnrollmentStatus::PENDING->value,
+            'payment_status' => 'pending',
         ];
 
         $request = new UpdateEnrollmentRequest;
@@ -109,6 +112,7 @@ class UpdateEnrollmentRequestTest extends TestCase
             'type' => 'new',
             'payment_plan' => 'monthly',
             'status' => EnrollmentStatus::PENDING->value,
+            'payment_status' => 'pending',
         ];
 
         $request = new UpdateEnrollmentRequest;
@@ -133,6 +137,7 @@ class UpdateEnrollmentRequestTest extends TestCase
             'type' => 'invalid_type',
             'payment_plan' => 'monthly',
             'status' => EnrollmentStatus::PENDING->value,
+            'payment_status' => 'pending',
         ];
 
         $request = new UpdateEnrollmentRequest;
@@ -157,6 +162,7 @@ class UpdateEnrollmentRequestTest extends TestCase
             'type' => 'new',
             'payment_plan' => 'invalid_plan',
             'status' => EnrollmentStatus::PENDING->value,
+            'payment_status' => 'pending',
         ];
 
         $request = new UpdateEnrollmentRequest;

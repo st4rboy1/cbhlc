@@ -36,6 +36,7 @@ interface Enrollment {
     school_year: string;
     school_year_id: number;
     status: string;
+    payment_status: string;
     type: string;
     previous_school: string | null;
     payment_plan: string;
@@ -68,6 +69,11 @@ interface PaymentPlan {
     value: string;
 }
 
+interface PaymentStatus {
+    label: string;
+    value: string;
+}
+
 interface SchoolYear {
     id: number;
     name: string;
@@ -82,6 +88,7 @@ interface Props {
     gradelevels: GradeLevel[];
     quarters: Quarter[];
     statuses: Status[];
+    paymentStatuses: PaymentStatus[];
     types: Type[];
     paymentPlans: PaymentPlan[];
     schoolYears: SchoolYear[];
@@ -94,6 +101,7 @@ interface FormData {
     quarter: string;
     school_year_id: string;
     status: string;
+    payment_status: string;
     type: string;
     previous_school: string;
     payment_plan: string;
@@ -106,6 +114,7 @@ export default function SuperAdminEnrollmentsEdit({
     gradelevels,
     quarters,
     statuses,
+    paymentStatuses,
     types,
     paymentPlans,
     schoolYears,
@@ -123,6 +132,7 @@ export default function SuperAdminEnrollmentsEdit({
         quarter: enrollment.quarter,
         school_year_id: enrollment.school_year_id?.toString() || '',
         status: enrollment.status,
+        payment_status: enrollment.payment_status,
         type: enrollment.type,
         previous_school: enrollment.previous_school || '',
         payment_plan: enrollment.payment_plan,
@@ -279,6 +289,27 @@ export default function SuperAdminEnrollmentsEdit({
                                         </Select>
                                         {errors.status && <p className="text-sm text-destructive">{errors.status}</p>}
                                         <p className="text-sm text-muted-foreground">Changing status will trigger appropriate workflows</p>
+                                    </div>
+
+                                    {/* Payment Status */}
+                                    <div className="space-y-2">
+                                        <Label htmlFor="payment_status">
+                                            Payment Status <span className="text-destructive">*</span>
+                                        </Label>
+                                        <Select value={data.payment_status} onValueChange={(value) => setData('payment_status', value)}>
+                                            <SelectTrigger id="payment_status">
+                                                <SelectValue placeholder="Select payment status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {paymentStatuses.map((paymentStatus) => (
+                                                    <SelectItem key={paymentStatus.value} value={paymentStatus.value}>
+                                                        {paymentStatus.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.payment_status && <p className="text-sm text-destructive">{errors.payment_status}</p>}
+                                        <p className="text-sm text-muted-foreground">Update the payment status for this enrollment</p>
                                     </div>
 
                                     {/* Type */}
