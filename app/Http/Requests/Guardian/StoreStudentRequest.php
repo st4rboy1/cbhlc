@@ -44,19 +44,19 @@ class StoreStudentRequest extends FormRequest
 
             // Conditional documents: required for Grade 1 and above, optional for Kinder
             'report_card' => [
-                $this->grade_level === 'Kinder' ? 'nullable' : 'required',
+                Rule::when(fn () => $this->input('grade_level') !== 'Kinder', 'required', 'nullable'),
                 'file',
                 'mimes:jpeg,jpg,png',
                 'max:51200',
             ],
             'form_138' => [
-                $this->grade_level === 'Kinder' ? 'nullable' : 'required',
+                Rule::when(fn () => $this->input('grade_level') !== 'Kinder', 'required', 'nullable'),
                 'file',
                 'mimes:jpeg,jpg,png',
                 'max:51200',
             ],
             'good_moral' => [
-                $this->grade_level === 'Kinder' ? 'nullable' : 'required',
+                Rule::when(fn () => $this->input('grade_level') !== 'Kinder', 'required', 'nullable'),
                 'file',
                 'mimes:jpeg,jpg,png',
                 'max:51200',
