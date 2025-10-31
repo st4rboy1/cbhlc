@@ -141,7 +141,7 @@ describe('invoice controller', function () {
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('shared/invoice')
-            ->where('enrollment.id', $ownEnrollment->id)
+            ->where('invoice.enrollment.id', $ownEnrollment->id)
         );
 
         // Guardian cannot view other child's invoice
