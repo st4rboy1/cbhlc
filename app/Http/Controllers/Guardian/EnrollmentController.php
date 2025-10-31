@@ -116,15 +116,11 @@ class EnrollmentController extends Controller
         $activePeriod = EnrollmentPeriod::active()->first();
 
         if (! $activePeriod) {
-            return back()->withErrors([
-                'enrollment' => 'Enrollment is currently closed. No active enrollment period available.',
-            ]);
+            return redirect()->route('guardian.enrollments.index')->with('error', 'Enrollment is currently closed. No active enrollment period available.');
         }
 
         if (! $activePeriod->isOpen()) {
-            return back()->withErrors([
-                'enrollment' => 'Enrollment period is not currently open. The deadline has passed.',
-            ]);
+            return redirect()->route('guardian.enrollments.index')->with('error', 'Enrollment period is not currently open. The deadline has passed.');
         }
 
         // Get Guardian model for authenticated user
