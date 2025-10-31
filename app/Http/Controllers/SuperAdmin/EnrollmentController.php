@@ -220,6 +220,10 @@ class EnrollmentController extends Controller
                 'label' => $status->label(),
                 'value' => $status->value,
             ], EnrollmentStatus::cases()),
+            'paymentStatuses' => array_map(fn ($status) => [
+                'label' => $status->label(),
+                'value' => $status->value,
+            ], \App\Enums\PaymentStatus::cases()),
             'types' => [
                 ['label' => 'New Student', 'value' => 'new'],
                 ['label' => 'Continuing Student', 'value' => 'continuing'],
