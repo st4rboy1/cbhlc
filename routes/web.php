@@ -142,6 +142,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('users', SuperAdminUserController::class);
 
         // Students Management
+        Route::get('/students/{student}/enrollments', [SuperAdminStudentController::class, 'enrollments'])->name('students.enrollments');
         Route::resource('students', SuperAdminStudentController::class);
 
         // Guardians Management
