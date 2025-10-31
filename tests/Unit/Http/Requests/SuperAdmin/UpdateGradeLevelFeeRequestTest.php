@@ -54,7 +54,7 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
             'tuition_fee' => 30000,
             'miscellaneous_fee' => 5000,
             'other_fees' => 2000,
-            'payment_terms' => 'ANNUAL',
+            'payment_terms' => 'annual',
             'is_active' => true,
         ];
 
@@ -73,7 +73,7 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
             'school_year_id' => $schoolYear->id,
             'tuition_fee' => 32000,
             'miscellaneous_fee' => 5000,
-            'payment_terms' => 'SEMESTRAL',
+            'payment_terms' => 'semestral',
             // No other_fees or is_active (optional)
         ];
 
@@ -90,7 +90,7 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
             'school_year_id' => 99999, // Non-existent ID
             'tuition_fee' => 30000,
             'miscellaneous_fee' => 5000,
-            'payment_terms' => 'ANNUAL',
+            'payment_terms' => 'annual',
         ];
 
         $request = new UpdateGradeLevelFeeRequest;
@@ -109,7 +109,7 @@ class UpdateGradeLevelFeeRequestTest extends TestCase
             'school_year_id' => $schoolYear->id,
             'tuition_fee' => -1000, // Negative value
             'miscellaneous_fee' => 5000,
-            'payment_terms' => 'ANNUAL',
+            'payment_terms' => 'annual',
         ];
 
         $request = new UpdateGradeLevelFeeRequest;
