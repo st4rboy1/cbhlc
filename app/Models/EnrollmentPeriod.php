@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EnrollmentPeriodStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,6 +31,7 @@ class EnrollmentPeriod extends Model
         'early_registration_deadline' => 'date',
         'regular_registration_deadline' => 'date',
         'late_registration_deadline' => 'date',
+        'status' => EnrollmentPeriodStatus::class,
         'allow_new_students' => 'boolean',
         'allow_returning_students' => 'boolean',
     ];
@@ -49,32 +51,32 @@ class EnrollmentPeriod extends Model
             }
 
             // Only one active period at a time
-            if ($period->status === 'active') {
-                static::where('status', 'active')
+            if ($period->status === EnrollmentPeriodStatus::ACTIVE) {
+                static::where('status', EnrollmentPeriodStatus::ACTIVE)
                     ->where('id', '!=', $period->id)
-                    ->update(['status' => 'closed']);
+                    ->update(['status' => EnrollmentPeriodStatus::CLOSED]);
             }
         });
     }
 
     public function scopeActive($query)
     {
-        return $query->where('status', 'active');
+        return $query->where('status', EnrollmentPeriodStatus::ACTIVE);
     }
 
     public function scopeUpcoming($query)
     {
-        return $query->where('status', 'upcoming');
+        return $query->where('status', EnrollmentPeriodStatus::UPCOMING);
     }
 
     public function scopeClosed($query)
     {
-        return $query->where('status', 'closed');
+        return $query->where('status', EnrollmentPeriodStatus::CLOSED);
     }
 
     public function isActive(): bool
     {
-        return $this->status === 'active';
+        return $this->status === EnrollmentPeriodStatus::ACTIVE;
     }
 
     public function isOpen(): bool
