@@ -269,6 +269,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/enrollments/{enrollment}/complete', [RegistrarEnrollmentController::class, 'complete'])->name('enrollments.complete');
         Route::post('/enrollments/{enrollment}/confirm-payment', [RegistrarEnrollmentController::class, 'confirmPayment'])->name('enrollments.confirm-payment');
         Route::put('/enrollments/{enrollment}/payment-status', [RegistrarEnrollmentController::class, 'updatePaymentStatus'])->name('enrollments.update-payment-status');
+        Route::put('/enrollments/{enrollment}/status', [RegistrarEnrollmentController::class, 'updateStatus'])->name('enrollments.update-status');
         Route::post('/enrollments/bulk-approve', [RegistrarEnrollmentController::class, 'bulkApprove'])->name('enrollments.bulk-approve');
         Route::get('/enrollments/export', [RegistrarEnrollmentController::class, 'export'])->name('enrollments.export');
 

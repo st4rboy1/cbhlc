@@ -295,6 +295,32 @@ class EnrollmentController extends Controller
     }
 
     /**
+     * Update enrollment status.
+     */
+    public function updateStatus(\App\Http\Requests\Registrar\UpdateEnrollmentStatusRequest $request, Enrollment $enrollment)
+    {
+        $validated = $request->validated();
+        $oldStatus = $enrollment->status;
+        $newStatus = EnrollmentStatus::from($validated['status']);
+
+        // Update enrollment status
+        $enrollment->update([
+            'status' => $newStatus,
+        ]);
+
+        // Log the status change
+        \Log::info('Enrollment status updated', [
+            'enrollment_id' => $enrollment->id,
+            'old_status' => $oldStatus->value,
+            'new_status' => $newStatus->value,
+            'updated_by' => Auth::id(),
+            'remarks' => $validated['remarks'] ?? null,
+        ]);
+
+        return back()->with('success', "Enrollment status updated to {$newStatus->label()} successfully.");
+    }
+
+    /**
      * Export enrollments to Excel.
      */
     public function export(Request $request)
