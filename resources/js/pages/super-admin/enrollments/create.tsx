@@ -229,7 +229,6 @@ export default function SuperAdminEnrollmentsCreate({ students, gradelevels, qua
                                             <SelectContent>
                                                 <SelectItem value="annual">Annual (Full Payment)</SelectItem>
                                                 <SelectItem value="semestral">Semestral (2 Payments)</SelectItem>
-                                                <SelectItem value="quarterly">Quarterly (4 Payments)</SelectItem>
                                                 <SelectItem value="monthly">Monthly (10 Payments)</SelectItem>
                                             </SelectContent>
                                         </Select>

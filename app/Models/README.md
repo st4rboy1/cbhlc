@@ -123,7 +123,7 @@
 - `quarter` - Quarter of entry
 - `type` - Enum: new, continuing, returnee, transferee (default: 'new')
 - `previous_school` - For transfers
-- `payment_plan` - Enum: annual, semestral, quarterly, monthly (default: 'monthly')
+- `payment_plan` - Enum: annual, semestral, monthly (default: 'monthly')
 - `status` - Enum: pending, approved, rejected, enrolled (default: 'pending')
 - Financial (all stored in cents):
     - `tuition_fee_cents`, `miscellaneous_fee_cents`, `laboratory_fee_cents`, `library_fee_cents`, `sports_fee_cents`

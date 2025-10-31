@@ -277,7 +277,6 @@ export default function GuardianEnrollmentsCreate({
                                         <SelectContent>
                                             <SelectItem value="annual">Annual (Full Year)</SelectItem>
                                             <SelectItem value="semestral">Semestral (Per Semester)</SelectItem>
-                                            <SelectItem value="quarterly">Quarterly (Per Quarter)</SelectItem>
                                             <SelectItem value="monthly">Monthly</SelectItem>
                                         </SelectContent>
                                     </Select>
