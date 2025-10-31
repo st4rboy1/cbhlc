@@ -50,9 +50,9 @@ class DocumentController extends Controller
             $originalName = $file->getClientOriginalName();
             $storedName = Str::random(40).'.'.$file->extension();
 
-            // Store file
+            // Store file (no 'documents/' prefix since disk root is already storage/app/documents)
             $path = $file->storeAs(
-                "documents/{$student->id}",
+                (string) $student->id,
                 $storedName,
                 'private'
             );
