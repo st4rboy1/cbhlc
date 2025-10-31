@@ -22,6 +22,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('payments', function (Blueprint $table) {
+            // For SQLite compatibility, drop unique index before dropping column
+            $table->dropUnique(['receipt_number']);
             $table->dropColumn('receipt_number');
         });
     }

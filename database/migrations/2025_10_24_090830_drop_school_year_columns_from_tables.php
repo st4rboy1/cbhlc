@@ -39,12 +39,12 @@ return new class extends Migration
     {
         // Restore school_year column to enrollments table
         Schema::table('enrollments', function (Blueprint $table) {
-            $table->string('school_year')->after('guardian_id');
+            $table->string('school_year')->nullable()->after('guardian_id');
         });
 
         // Restore school_year column to enrollment_periods table
         Schema::table('enrollment_periods', function (Blueprint $table) {
-            $table->string('school_year', 9)->after('id');
+            $table->string('school_year', 9)->nullable()->after('id');
             $table->index('school_year');
         });
 
@@ -52,7 +52,7 @@ return new class extends Migration
         Schema::table('grade_level_fees', function (Blueprint $table) {
             // Drop new unique constraint
             $table->dropUnique(['grade_level', 'school_year_id', 'payment_terms']);
-            $table->string('school_year')->after('grade_level');
+            $table->string('school_year')->nullable()->after('grade_level');
             // Restore old unique constraint
             $table->unique(['grade_level', 'school_year', 'payment_terms']);
         });
