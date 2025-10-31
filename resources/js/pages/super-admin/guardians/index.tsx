@@ -211,7 +211,8 @@ export default function SuperAdminGuardiansIndex({ guardians, filters, stats }: 
                                                     </Button>
                                                 </Link>
                                                 <Button size="sm" variant="destructive" onClick={() => openDeleteDialog(guardian.id)}>
-                                                    <Trash className="h-4 w-4" />
+                                                    <Trash className="mr-2 h-4 w-4" />
+                                                    Delete
                                                 </Button>
                                             </div>
                                         </TableCell>
