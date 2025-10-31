@@ -88,7 +88,7 @@ class StudentController extends Controller
                 'first_name' => $validated['first_name'],
                 'middle_name' => $validated['middle_name'],
                 'last_name' => $validated['last_name'],
-                'birth_date' => $validated['birth_date'],
+                'birthdate' => $validated['birthdate'],
                 'birth_place' => $validated['birth_place'],
                 'gender' => $validated['gender'],
                 'nationality' => $validated['nationality'],
@@ -103,7 +103,7 @@ class StudentController extends Controller
             foreach ($validated['guardian_ids'] as $index => $guardianId) {
                 $student->guardians()->attach($guardianId, [
                     'relationship_type' => 'guardian',
-                    'is_primary' => $index === 0,
+                    'is_primary_contact' => $index === 0,
                 ]);
             }
 
@@ -180,7 +180,7 @@ class StudentController extends Controller
                 'first_name' => $validated['first_name'],
                 'middle_name' => $validated['middle_name'],
                 'last_name' => $validated['last_name'],
-                'birth_date' => $validated['birth_date'],
+                'birthdate' => $validated['birthdate'],
                 'birth_place' => $validated['birth_place'] ?? null,
                 'gender' => $validated['gender'],
                 'nationality' => $validated['nationality'],
@@ -188,7 +188,7 @@ class StudentController extends Controller
                 'address' => $validated['address'],
                 'phone' => $validated['phone'],
                 'email' => $validated['email'],
-                'grade_level' => $validated['grade'],
+                'grade_level' => $validated['grade_level'],
             ]);
 
             // Sync guardians
@@ -196,7 +196,7 @@ class StudentController extends Controller
             foreach ($validated['guardian_ids'] as $index => $guardianId) {
                 $syncData[$guardianId] = [
                     'relationship_type' => 'guardian',
-                    'is_primary' => $index === 0,
+                    'is_primary_contact' => $index === 0,
                 ];
             }
             $student->guardians()->sync($syncData);
