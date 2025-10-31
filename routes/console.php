@@ -20,3 +20,10 @@ Schedule::command('enrollment:send-payment-reminders')
     ->timezone('Asia/Manila')
     ->withoutOverlapping()
     ->onOneServer();
+
+// Audit logs cleanup - runs daily at 2 AM, keeps logs for 90 days
+Schedule::command('audit-logs:clean --days=90')
+    ->dailyAt('02:00')
+    ->timezone('Asia/Manila')
+    ->withoutOverlapping()
+    ->onOneServer();
