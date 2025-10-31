@@ -56,6 +56,7 @@ interface Invoice {
     total_amount: number;
     paid_amount: number;
     items: InvoiceItem[];
+    discount?: number;
 }
 
 interface Props {
