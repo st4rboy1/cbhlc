@@ -28,7 +28,7 @@ parameters:
         - database/factories/
 
     # Treat PHPDocs as authoritative
-    treatPhpDocTypesAsCertain: true
+    treatPhpDocTypesAsCertain: false
 
     # Report unmatched ignored errors
     reportUnmatchedIgnoredErrors: true
