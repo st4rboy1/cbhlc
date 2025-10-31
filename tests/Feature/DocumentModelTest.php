@@ -207,3 +207,53 @@ test('human file size attribute formats correctly', function () {
     $document = Document::factory()->create(['file_size' => 500]); // 500 B
     expect($document->human_file_size)->toBe('500 B');
 });
+
+test('pending scope filters pending documents', function () {
+    Document::factory()->create(['verification_status' => VerificationStatus::PENDING]);
+    Document::factory()->create(['verification_status' => VerificationStatus::VERIFIED]);
+    Document::factory()->create(['verification_status' => VerificationStatus::REJECTED]);
+    Document::factory()->create(['verification_status' => VerificationStatus::PENDING]);
+
+    $pendingDocs = Document::pending()->get();
+
+    expect($pendingDocs)->toHaveCount(2)
+        ->and($pendingDocs->every(fn ($doc) => $doc->verification_status === VerificationStatus::PENDING))->toBeTrue();
+});
+
+test('verified scope filters verified documents', function () {
+    Document::factory()->create(['verification_status' => VerificationStatus::PENDING]);
+    Document::factory()->create(['verification_status' => VerificationStatus::VERIFIED]);
+    Document::factory()->create(['verification_status' => VerificationStatus::REJECTED]);
+    Document::factory()->create(['verification_status' => VerificationStatus::VERIFIED]);
+
+    $verifiedDocs = Document::verified()->get();
+
+    expect($verifiedDocs)->toHaveCount(2)
+        ->and($verifiedDocs->every(fn ($doc) => $doc->verification_status === VerificationStatus::VERIFIED))->toBeTrue();
+});
+
+test('rejected scope filters rejected documents', function () {
+    Document::factory()->create(['verification_status' => VerificationStatus::PENDING]);
+    Document::factory()->create(['verification_status' => VerificationStatus::VERIFIED]);
+    Document::factory()->create(['verification_status' => VerificationStatus::REJECTED]);
+    Document::factory()->create(['verification_status' => VerificationStatus::REJECTED]);
+
+    $rejectedDocs = Document::rejected()->get();
+
+    expect($rejectedDocs)->toHaveCount(2)
+        ->and($rejectedDocs->every(fn ($doc) => $doc->verification_status === VerificationStatus::REJECTED))->toBeTrue();
+});
+
+test('scopes can be chained with other query methods', function () {
+    $student = Student::factory()->create();
+
+    Document::factory()->create(['student_id' => $student->id, 'verification_status' => VerificationStatus::PENDING]);
+    Document::factory()->create(['student_id' => $student->id, 'verification_status' => VerificationStatus::VERIFIED]);
+    Document::factory()->create(['verification_status' => VerificationStatus::PENDING]); // Different student
+
+    $studentPendingDocs = Document::pending()->where('student_id', $student->id)->get();
+
+    expect($studentPendingDocs)->toHaveCount(1)
+        ->and($studentPendingDocs->first()->student_id)->toBe($student->id)
+        ->and($studentPendingDocs->first()->verification_status)->toBe(VerificationStatus::PENDING);
+});
