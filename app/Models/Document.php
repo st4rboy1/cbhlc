@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\DocumentType;
 use App\Enums\VerificationStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -56,6 +57,30 @@ class Document extends Model
                 'deleted' => 'Document deleted',
                 default => "Document {$eventName}",
             });
+    }
+
+    /**
+     * Scope a query to only include pending documents.
+     */
+    public function scopePending(Builder $query): void
+    {
+        $query->where('verification_status', VerificationStatus::PENDING);
+    }
+
+    /**
+     * Scope a query to only include verified documents.
+     */
+    public function scopeVerified(Builder $query): void
+    {
+        $query->where('verification_status', VerificationStatus::VERIFIED);
+    }
+
+    /**
+     * Scope a query to only include rejected documents.
+     */
+    public function scopeRejected(Builder $query): void
+    {
+        $query->where('verification_status', VerificationStatus::REJECTED);
     }
 
     /**
