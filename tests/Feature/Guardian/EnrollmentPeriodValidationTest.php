@@ -99,9 +99,9 @@ test('guardian cannot view create form when no active enrollment period', functi
         ->from(route('guardian.dashboard'))
         ->get(route('guardian.enrollments.create'));
 
-    $response->assertRedirect(route('guardian.dashboard'));
-    $response->assertSessionHasErrors(['enrollment']);
-    expect(session('errors')->get('enrollment')[0])->toContain('Enrollment is currently closed');
+    $response->assertRedirect(route('guardian.enrollments.index'));
+    $response->assertSessionHas('error');
+    expect(session('error'))->toContain('Enrollment is currently closed');
 });
 
 test('guardian cannot view create form when enrollment period is closed', function () {
@@ -121,9 +121,9 @@ test('guardian cannot view create form when enrollment period is closed', functi
     $response = $this->actingAs($this->guardian)
         ->get(route('guardian.enrollments.create'));
 
-    $response->assertRedirect();
-    $response->assertSessionHasErrors(['enrollment']);
-    expect(session('errors')->get('enrollment')[0])->toContain('not currently open');
+    $response->assertRedirect(route('guardian.enrollments.index'));
+    $response->assertSessionHas('error');
+    expect(session('error'))->toContain('not currently open');
 });
 
 test('guardian can view create form when active enrollment period exists', function () {
