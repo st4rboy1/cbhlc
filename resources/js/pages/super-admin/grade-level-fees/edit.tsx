@@ -199,10 +199,9 @@ export default function SuperAdminGradeLevelFeesEdit({ fee, gradeLevels = [], sc
                                         <SelectValue placeholder="Select payment terms" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="ANNUAL">Annual</SelectItem>
-                                        <SelectItem value="SEMESTRAL">Semestral</SelectItem>
-                                        <SelectItem value="QUARTERLY">Quarterly</SelectItem>
-                                        <SelectItem value="MONTHLY">Monthly</SelectItem>
+                                        <SelectItem value="annual">Annual</SelectItem>
+                                        <SelectItem value="semestral">Semestral</SelectItem>
+                                        <SelectItem value="monthly">Monthly</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 {errors.payment_terms && <p className="text-sm text-red-600">{errors.payment_terms}</p>}
