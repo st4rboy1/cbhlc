@@ -33,25 +33,33 @@ interface Enrollment {
     student: Student;
     school_year?: SchoolYear;
     semester?: string;
-    tuition_fee: number;
-    miscellaneous_fee: number;
-    laboratory_fee: number;
-    library_fee: number;
-    sports_fee: number;
-    total_amount: number;
-    discount: number;
-    net_amount: number;
-    amount_paid: number;
-    balance: number;
-    payment_status: string;
     payment_due_date?: string;
     created_at: string;
 }
 
+interface InvoiceItem {
+    id?: number;
+    description: string;
+    quantity: number;
+    unit_price: number;
+    amount: number;
+}
+
+interface Invoice {
+    id: number;
+    invoice_number: string;
+    enrollment_id: number;
+    enrollment: Enrollment;
+    invoice_date: string;
+    due_date: string;
+    status: string;
+    total_amount: number;
+    paid_amount: number;
+    items: InvoiceItem[];
+}
+
 interface Props {
-    enrollment?: Enrollment;
-    invoiceNumber: string;
-    currentDate: string;
+    invoice: Invoice;
     settings: {
         school_name: string;
         school_address: string;
@@ -64,7 +72,7 @@ interface Props {
     };
 }
 
-export default function Invoice({ enrollment, invoiceNumber, currentDate, settings }: Props) {
+export default function Invoice({ invoice, settings }: Props) {
     const { auth } = usePage<{
         auth: {
             user: {
@@ -159,28 +167,26 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
     };
 
     const handleDownloadPDF = () => {
-        if (!enrollment) return;
+        if (!invoice) return;
         // Navigate to server-side PDF download endpoint using role-based route
-        window.location.href = `${rolePrefix}/invoices/${enrollment.id}/download`;
+        window.location.href = `${rolePrefix}/invoices/${invoice.id}/download`;
     };
 
-    if (!enrollment) {
+    if (!invoice) {
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
                 <Head title="Invoice" />
 
                 <div className="px-4 py-6">
-                    <Heading title="Invoice" description="No enrollment record found" />
+                    <Heading title="Invoice" description="No invoice record found" />
                     <Card className="mx-auto max-w-4xl">
                         <CardContent className="p-8">
                             <div className="flex flex-col items-center justify-center space-y-4 py-12">
                                 <AlertCircle className="h-12 w-12 text-yellow-500" />
                                 <h2 className="text-2xl font-semibold">No Invoice Available</h2>
-                                <p className="text-center text-muted-foreground">
-                                    No enrollment record found. Please complete the enrollment process first.
-                                </p>
-                                <Link href="/enrollment" className="mt-4 inline-block text-primary hover:underline">
-                                    Go to Enrollment →
+                                <p className="text-center text-muted-foreground">No invoice record found. Please ensure the invoice exists.</p>
+                                <Link href="/super-admin/invoices" className="mt-4 inline-block text-primary hover:underline">
+                                    Go to Invoices List →
                                 </Link>
                             </div>
                         </CardContent>
@@ -190,27 +196,22 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
         );
     }
 
-    const parseCurrency = (amount: number) => amount || 0;
+    const enrollment = invoice.enrollment;
 
-    const invoiceItems = [
-        { description: 'Tuition Fee', amount: parseCurrency(enrollment.tuition_fee) },
-        { description: 'Miscellaneous Fee', amount: parseCurrency(enrollment.miscellaneous_fee) },
-    ];
+    const calculateTotalAmount = () => {
+        return invoice.items.reduce((sum, item) => sum + item.amount, 0);
+    };
 
-    // Add optional fees if they exist
-    if (parseCurrency(enrollment.laboratory_fee) > 0) {
-        invoiceItems.push({ description: 'Laboratory Fee', amount: parseCurrency(enrollment.laboratory_fee) });
-    }
-    if (parseCurrency(enrollment.library_fee) > 0) {
-        invoiceItems.push({ description: 'Library Fee', amount: parseCurrency(enrollment.library_fee) });
-    }
-    if (parseCurrency(enrollment.sports_fee) > 0) {
-        invoiceItems.push({ description: 'Sports Fee', amount: parseCurrency(enrollment.sports_fee) });
-    }
+    const calculateNetAmount = () => {
+        // Assuming discount is applied to the total of items
+        const totalItemsAmount = calculateTotalAmount();
+        // For now, let's assume discount is not part of invoice items but a separate field on invoice
+        // If discount is part of invoice items, this logic needs adjustment
+        return totalItemsAmount - (invoice.discount || 0);
+    };
 
-    const getStudentFullName = () => {
-        const middle = enrollment.student.middle_name ? ` ${enrollment.student.middle_name}` : '';
-        return `${enrollment.student.first_name}${middle} ${enrollment.student.last_name}`;
+    const calculateBalanceDue = () => {
+        return calculateNetAmount() - invoice.paid_amount;
     };
 
     return (
@@ -225,8 +226,12 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
 
             <div className="px-4 py-6">
                 <Heading
-                    title={`Invoice ${invoiceNumber}`}
-                    description={enrollment ? `Invoice for ${enrollment.student.first_name} ${enrollment.student.last_name}` : 'Tuition fee invoice'}
+                    title={`Invoice ${invoice.invoice_number}`}
+                    description={
+                        invoice.enrollment
+                            ? `Invoice for ${invoice.enrollment.student.first_name} ${invoice.enrollment.student.last_name}`
+                            : 'Tuition fee invoice'
+                    }
                 />
                 <Card className="mx-auto max-w-4xl">
                     <CardContent className="p-8" ref={invoiceRef}>
@@ -256,11 +261,11 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                                 <div className="mb-4">
                                     <h2 className="text-3xl font-bold">INVOICE</h2>
                                     <Badge variant="outline" className="mt-1">
-                                        {invoiceNumber}
+                                        {invoice.invoice_number}
                                     </Badge>
                                 </div>
                                 <div className="mt-2">
-                                    <PaymentStatusBadge status={enrollment.payment_status} />
+                                    <PaymentStatusBadge status={invoice.status} />
                                 </div>
                             </div>
                         </div>
@@ -272,7 +277,9 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                             <div>
                                 <h3 className="mb-4 text-lg font-semibold">Billed To:</h3>
                                 <div className="space-y-2">
-                                    <p className="font-medium">{getStudentFullName()}</p>
+                                    <p className="font-medium">
+                                        {`${enrollment.student.first_name} ${enrollment.student.middle_name ? enrollment.student.middle_name + ' ' : ''}${enrollment.student.last_name}`}
+                                    </p>
                                     <p className="text-sm text-muted-foreground">Student ID: {enrollment.student.student_id}</p>
                                     <p className="text-sm text-muted-foreground">Grade Level: {enrollment.student.grade_level}</p>
                                     {enrollment.student.section && (
@@ -291,14 +298,14 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                                         <span className="font-medium">Invoice Date:</span>
                                         <span className="flex items-center gap-1">
                                             <Calendar className="h-4 w-4 text-muted-foreground" />
-                                            {currentDate}
+                                            {formatDate(invoice.invoice_date)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="font-medium">Due Date:</span>
                                         <span className="flex items-center gap-1">
                                             <Calendar className="h-4 w-4 text-muted-foreground" />
-                                            {formatDate(enrollment.payment_due_date)}
+                                            {formatDate(invoice.due_date)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
@@ -319,7 +326,7 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {invoiceItems.map((item, index) => (
+                                    {invoice.items.map((item, index) => (
                                         <TableRow key={index}>
                                             <TableCell className="font-medium">{item.description}</TableCell>
                                             <TableCell className="text-right font-semibold">{formatCurrency(item.amount)}</TableCell>
@@ -330,34 +337,34 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                                     </TableRow>
                                     <TableRow>
                                         <TableCell className="text-right font-semibold">Subtotal:</TableCell>
-                                        <TableCell className="text-right font-semibold">
-                                            {formatCurrency(parseCurrency(enrollment.total_amount))}
-                                        </TableCell>
+                                        <TableCell className="text-right font-semibold">{formatCurrency(calculateTotalAmount())}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell className="text-right font-semibold">Less: Discounts & Rebates:</TableCell>
                                         <TableCell className="text-right font-semibold">
-                                            {enrollment.discount > 0 ? `-${formatCurrency(parseCurrency(enrollment.discount))}` : formatCurrency(0)}
+                                            {invoice.total_amount - calculateTotalAmount() > 0
+                                                ? `-${formatCurrency(invoice.total_amount - calculateTotalAmount())}`
+                                                : formatCurrency(0)}
                                         </TableCell>
                                     </TableRow>
                                     <TableRow className="border-t-2">
                                         <TableCell className="text-right text-xl font-bold">NET AMOUNT:</TableCell>
                                         <TableCell className="text-right text-xl font-bold text-primary">
-                                            {formatCurrency(parseCurrency(enrollment.net_amount))}
+                                            {formatCurrency(calculateNetAmount())}
                                         </TableCell>
                                     </TableRow>
-                                    {enrollment.amount_paid > 0 && (
+                                    {invoice.paid_amount > 0 && (
                                         <>
                                             <TableRow>
                                                 <TableCell className="text-right font-semibold text-green-600">Amount Paid:</TableCell>
                                                 <TableCell className="text-right font-semibold text-green-600">
-                                                    {formatCurrency(parseCurrency(enrollment.amount_paid))}
+                                                    {formatCurrency(invoice.paid_amount)}
                                                 </TableCell>
                                             </TableRow>
                                             <TableRow className="border-t">
                                                 <TableCell className="text-right text-xl font-bold">BALANCE DUE:</TableCell>
                                                 <TableCell className="text-right text-xl font-bold text-red-600">
-                                                    {formatCurrency(parseCurrency(enrollment.balance))}
+                                                    {formatCurrency(calculateBalanceDue())}
                                                 </TableCell>
                                             </TableRow>
                                         </>
@@ -367,7 +374,7 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                         </div>
 
                         {/* Payment Status Message */}
-                        {enrollment.payment_status === 'paid' && (
+                        {invoice.status === 'paid' && (
                             <Card className="mb-8 border-green-200 bg-green-50">
                                 <CardContent className="p-4">
                                     <p className="text-center font-semibold text-green-800">✓ This invoice has been fully paid. Thank you!</p>
@@ -375,22 +382,21 @@ export default function Invoice({ enrollment, invoiceNumber, currentDate, settin
                             </Card>
                         )}
 
-                        {enrollment.payment_status === 'partial' && (
+                        {invoice.status === 'partial' && (
                             <Card className="mb-8 border-yellow-200 bg-yellow-50">
                                 <CardContent className="p-4">
                                     <p className="text-center font-semibold text-yellow-800">
-                                        Partial payment received. Balance of {formatCurrency(parseCurrency(enrollment.balance))} is still due.
+                                        Partial payment received. Balance of {formatCurrency(calculateBalanceDue())} is still due.
                                     </p>
                                 </CardContent>
                             </Card>
                         )}
 
-                        {enrollment.payment_status === 'pending' && (
+                        {invoice.status === 'pending' && (
                             <Card className="mb-8 border-red-200 bg-red-50">
                                 <CardContent className="p-4">
                                     <p className="font.semibold text-center text-red-800">
-                                        Payment pending. Please pay {formatCurrency(parseCurrency(enrollment.balance))} by{' '}
-                                        {formatDate(enrollment.payment_due_date)}.
+                                        Payment pending. Please pay {formatCurrency(calculateBalanceDue())} by {formatDate(invoice.due_date)}.
                                     </p>
                                 </CardContent>
                             </Card>
