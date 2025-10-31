@@ -30,7 +30,7 @@ class UpdateStudentRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:100'],
             'middle_name' => ['nullable', 'string', 'max:100'],
             'last_name' => ['required', 'string', 'max:100'],
-            'birth_date' => ['required', 'date', 'before:today'],
+            'birthdate' => ['required', 'date', 'before:today'],
             'birth_place' => ['nullable', 'string', 'max:255'],
             'gender' => ['required', Rule::in(Gender::values())],
             'nationality' => ['nullable', 'string', 'max:100'],

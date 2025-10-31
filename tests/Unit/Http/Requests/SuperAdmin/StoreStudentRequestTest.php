@@ -37,7 +37,7 @@ class StoreStudentRequestTest extends TestCase
 
         $this->assertArrayHasKey('first_name', $rules);
         $this->assertArrayHasKey('last_name', $rules);
-        $this->assertArrayHasKey('birth_date', $rules);
+        $this->assertArrayHasKey('birthdate', $rules);
         $this->assertArrayHasKey('gender', $rules);
         $this->assertArrayHasKey('address', $rules);
         $this->assertArrayHasKey('grade_level', $rules);
@@ -52,7 +52,7 @@ class StoreStudentRequestTest extends TestCase
             'first_name' => 'John',
             'middle_name' => 'Michael',
             'last_name' => 'Doe',
-            'birth_date' => '2010-01-01',
+            'birthdate' => '2010-01-01',
             'birth_place' => 'Manila',
             'gender' => 'Male',
             'nationality' => 'Filipino',
@@ -75,7 +75,7 @@ class StoreStudentRequestTest extends TestCase
         $data = [
             'first_name' => 'John',
             'last_name' => 'Doe',
-            'birth_date' => '2010-01-01',
+            'birthdate' => '2010-01-01',
             'gender' => 'Male',
             'address' => '123 Test Street',
             'grade_level' => 'Grade 1',
@@ -96,7 +96,7 @@ class StoreStudentRequestTest extends TestCase
         $data = [
             'first_name' => 'John',
             'last_name' => 'Doe',
-            'birth_date' => '2010-01-01',
+            'birthdate' => '2010-01-01',
             'gender' => 'invalid',
             'address' => '123 Test Street',
             'grade_level' => 'Grade 1',
@@ -117,7 +117,7 @@ class StoreStudentRequestTest extends TestCase
         $data = [
             'first_name' => 'John',
             'last_name' => 'Doe',
-            'birth_date' => now()->addDay()->format('Y-m-d'),
+            'birthdate' => now()->addDay()->format('Y-m-d'),
             'gender' => 'Male',
             'address' => '123 Test Street',
             'grade_level' => 'Grade 1',
@@ -128,7 +128,7 @@ class StoreStudentRequestTest extends TestCase
         $validator = Validator::make($data, $request->rules());
 
         $this->assertFalse($validator->passes());
-        $this->assertArrayHasKey('birth_date', $validator->errors()->toArray());
+        $this->assertArrayHasKey('birthdate', $validator->errors()->toArray());
     }
 
     public function test_custom_messages(): void

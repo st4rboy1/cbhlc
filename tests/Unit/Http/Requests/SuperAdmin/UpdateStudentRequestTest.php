@@ -58,7 +58,7 @@ class UpdateStudentRequestTest extends TestCase
 
         $this->assertArrayHasKey('first_name', $rules);
         $this->assertArrayHasKey('last_name', $rules);
-        $this->assertArrayHasKey('birth_date', $rules);
+        $this->assertArrayHasKey('birthdate', $rules);
         $this->assertArrayHasKey('gender', $rules);
         $this->assertArrayHasKey('address', $rules);
         $this->assertArrayHasKey('grade_level', $rules);
@@ -78,7 +78,7 @@ class UpdateStudentRequestTest extends TestCase
             'first_name' => 'Updated',
             'middle_name' => 'Middle',
             'last_name' => 'Name',
-            'birth_date' => '2010-01-01',
+            'birthdate' => '2010-01-01',
             'birth_place' => 'Manila',
             'gender' => 'Male',
             'nationality' => 'Filipino',
@@ -122,7 +122,7 @@ class UpdateStudentRequestTest extends TestCase
         $data = [
             'first_name' => 'Updated',
             'last_name' => 'Name',
-            'birth_date' => '2010-01-01',
+            'birthdate' => '2010-01-01',
             'gender' => 'Male',
             'address' => '123 Updated Street',
             'email' => 'test@example.com', // Same email
