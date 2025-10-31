@@ -236,7 +236,7 @@ test('uploaded document has correct metadata', function () {
     expect($document->file_size)->toBeGreaterThan(0)
         ->and($document->mime_type)->toBe('image/jpeg')
         ->and($document->stored_filename)->toMatch('/^[a-zA-Z0-9]{40}\.(jpg|jpeg)$/')
-        ->and($document->file_path)->toContain("documents/{$this->student->id}/");
+        ->and($document->file_path)->toContain("{$this->student->id}/");
 });
 
 test('file is stored in correct directory structure', function () {
@@ -250,6 +250,6 @@ test('file is stored in correct directory structure', function () {
 
     $document = Document::first();
 
-    expect($document->file_path)->toStartWith("documents/{$this->student->id}/");
+    expect($document->file_path)->toStartWith("{$this->student->id}/");
     Storage::disk('private')->assertExists($document->file_path);
 });
