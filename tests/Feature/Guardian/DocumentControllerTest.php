@@ -53,7 +53,7 @@ test('guardian can upload document for their student', function () {
     Storage::disk('private')->assertExists($document->file_path);
 });
 
-test('guardian can upload PDF document', function () {
+test('guardian cannot upload PDF document - only JPEG and PNG allowed', function () {
     $file = UploadedFile::fake()->create('form-138.pdf', 2000, 'application/pdf');
 
     $response = $this->actingAs($this->guardian)
@@ -62,8 +62,10 @@ test('guardian can upload PDF document', function () {
             'document_type' => DocumentType::FORM_138->value,
         ]);
 
-    $response->assertStatus(201);
-    expect(Document::first()->mime_type)->toContain('pdf');
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['document']);
+
+    expect(Document::count())->toBe(0);
 });
 
 test('guardian cannot upload document for student they do not own', function () {
