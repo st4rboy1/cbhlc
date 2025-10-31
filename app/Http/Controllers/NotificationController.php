@@ -56,7 +56,7 @@ class NotificationController extends Controller
         // For Inertia calls, determine destination and redirect
         $route = $this->getNotificationRoute($notification);
 
-        return Inertia::location($route);
+        return redirect($route);
     }
 
     /**
@@ -86,6 +86,24 @@ class NotificationController extends Controller
         // New enrollment for review (Registrar)
         if (str_contains($type, 'NewEnrollmentForReview')) {
             return route('registrar.enrollments.index');
+        }
+
+        // New user registered (Super Admin/Admin)
+        if (str_contains($type, 'NewUserRegistered') || str_contains($type, 'UserEmailVerified')) {
+            if (isset($data['user_id'])) {
+                return route('super-admin.users.show', ['user' => $data['user_id']]);
+            }
+
+            return route('super-admin.users.index');
+        }
+
+        // Payment and Invoice notifications - navigate to invoice details
+        if (str_contains($type, 'PaymentReceived') || str_contains($type, 'InvoiceCreated')) {
+            if (isset($data['invoice_id'])) {
+                return route('guardian.invoices.show', ['invoice' => $data['invoice_id']]);
+            }
+
+            return route('guardian.invoices.index');
         }
 
         // Enrollment period status changed

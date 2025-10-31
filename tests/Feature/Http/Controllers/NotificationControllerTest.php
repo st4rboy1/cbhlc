@@ -164,9 +164,8 @@ class NotificationControllerTest extends TestCase
             ])
             ->post(route('notifications.mark-as-read', $notification->id));
 
-        // Should redirect (Inertia::location returns 409 status with X-Inertia-Location header)
-        $response->assertStatus(409)
-            ->assertHeader('X-Inertia-Location');
+        // Should redirect (redirect() returns 302 status)
+        $response->assertRedirect(route('guardian.dashboard'));
 
         $this->assertNotNull($notification->fresh()->read_at);
     }
@@ -310,12 +309,8 @@ class NotificationControllerTest extends TestCase
             ])
             ->post(route('notifications.mark-as-read', $notification->id));
 
-        $response->assertStatus(409)
-            ->assertHeader('X-Inertia-Location');
-
-        // Verify it redirects to the student documents page
-        $location = $response->headers->get('X-Inertia-Location');
-        $this->assertStringContainsString('/guardian/students/123/documents', $location);
+        // Should redirect to student documents page
+        $response->assertRedirect(route('guardian.students.documents.index', ['student' => 123]));
     }
 
     public function test_enrollment_notification_redirects_to_enrollment_details(): void
@@ -341,11 +336,7 @@ class NotificationControllerTest extends TestCase
             ])
             ->post(route('notifications.mark-as-read', $notification->id));
 
-        $response->assertStatus(409)
-            ->assertHeader('X-Inertia-Location');
-
-        // Verify it redirects to the enrollment details page
-        $location = $response->headers->get('X-Inertia-Location');
-        $this->assertStringContainsString('/guardian/enrollments/789', $location);
+        // Should redirect to enrollment details page
+        $response->assertRedirect(route('guardian.enrollments.show', ['enrollment' => 789]));
     }
 }
