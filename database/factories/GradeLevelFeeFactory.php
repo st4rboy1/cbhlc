@@ -68,7 +68,7 @@ class GradeLevelFeeFactory extends Factory
             'library_fee_cents' => $useFaker ? $this->faker->numberBetween(20000, 50000) : 20000,
             'sports_fee_cents' => $useFaker ? $this->faker->numberBetween(10000, 30000) : 10000,
             'other_fees_cents' => $useFaker ? $this->faker->numberBetween(0, 50000) : 0,
-            'payment_terms' => $useFaker ? $this->faker->randomElement(['ANNUAL', 'SEMESTRAL', 'QUARTERLY', 'MONTHLY']) : 'ANNUAL',
+            'payment_terms' => $useFaker ? $this->faker->randomElement(['annual', 'semestral', 'monthly']) : 'annual',
             'is_active' => true,
         ];
     }
