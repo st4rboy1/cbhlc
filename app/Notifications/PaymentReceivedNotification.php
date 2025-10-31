@@ -34,9 +34,9 @@ class PaymentReceivedNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $invoice = $this->payment->invoice;
-        $amount = $this->payment->amount_cents / 100;
+        $amount = (float) $this->payment->amount;
 
-        return (new MailMessage)
+        $mailMessage = (new MailMessage)
             ->subject('Payment Received')
             ->greeting('Hello '.$notifiable->name.',')
             ->line('We have received your payment. Thank you!')
@@ -45,8 +45,14 @@ class PaymentReceivedNotification extends Notification
             ->line('Amount: ₱'.number_format($amount, 2))
             ->line('Payment Method: '.ucfirst($this->payment->payment_method->value))
             ->line('Payment Date: '.$this->payment->payment_date->format('F d, Y'))
-            ->line('Invoice: '.($invoice ? $invoice->invoice_number : 'N/A'))
-            ->line('A receipt will be generated shortly.');
+            ->line('Invoice: '.($invoice ? $invoice->invoice_number : 'N/A'));
+
+        // Add action button to view invoice if available
+        if ($invoice) {
+            $mailMessage->action('View Invoice', route('guardian.invoices.show', $invoice));
+        }
+
+        return $mailMessage->line('A receipt will be generated shortly.');
     }
 
     /**
@@ -56,13 +62,18 @@ class PaymentReceivedNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        $amount = (float) $this->payment->amount;
+        $invoice = $this->payment->invoice;
+
         return [
             'payment_id' => $this->payment->id,
+            'invoice_id' => $invoice?->id,
             'reference_number' => $this->payment->reference_number,
-            'amount' => $this->payment->amount_cents / 100,
+            'amount' => $amount,
             'payment_method' => $this->payment->payment_method->value,
             'payment_date' => $this->payment->payment_date,
-            'message' => 'Payment of ₱'.number_format($this->payment->amount_cents / 100, 2).' received',
+            'message' => 'Payment of ₱'.number_format($amount, 2).' received',
+            'action_url' => $invoice ? route('guardian.invoices.show', $invoice) : null,
         ];
     }
 }
