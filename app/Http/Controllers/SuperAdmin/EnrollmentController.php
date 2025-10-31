@@ -248,7 +248,7 @@ class EnrollmentController extends Controller
             $oldStatus = $enrollment->status;
             $newStatus = $validated['status'] ?? $oldStatus;
 
-            // Update enrollment without status (status will be handled by service methods)
+            // Update enrollment without status (status will be handled separately)
             $dataToUpdate = collect($validated)->except('status')->toArray();
             $enrollment->update($dataToUpdate);
 
@@ -258,6 +258,10 @@ class EnrollmentController extends Controller
                     $this->enrollmentService->approveEnrollment($enrollment);
                 } elseif ($newStatus === EnrollmentStatus::REJECTED->value) {
                     $this->enrollmentService->rejectEnrollment($enrollment, 'Updated by admin');
+                } else {
+                    // For all other status changes (ENROLLED, COMPLETED, PAID, READY_FOR_PAYMENT, etc.)
+                    // Update the status directly
+                    $enrollment->update(['status' => $newStatus]);
                 }
             }
         });
