@@ -2,6 +2,7 @@
 
 use App\Enums\EnrollmentStatus;
 use App\Enums\GradeLevel;
+use App\Enums\PaymentPlan;
 use App\Enums\PaymentStatus;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
@@ -217,7 +218,7 @@ describe('Guardian BillingController', function () {
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('guardian/billing/index')
-            ->has('paymentPlans', 4) // Annual, Semestral, Quarterly, Monthly
+            ->has('paymentPlans', 3) // Annual, Semestral, Monthly
             ->has('paymentPlans.0', fn ($plan) => $plan
                 ->where('name', 'Annual')
                 ->where('discount', '5%')
@@ -292,22 +293,14 @@ describe('Guardian BillingController', function () {
         );
     });
 
-    test('billing show generates quarterly payment schedule', function () {
-        // Create grade level fee
-        GradeLevelFee::factory()->create([
-            'grade_level' => GradeLevel::GRADE_5->value,
-            'tuition_fee_cents' => 2800000,  // 28000 * 100
-            'miscellaneous_fee_cents' => 700000,  // 7000 * 100
-        ]);
-
+    test('billing show generates monthly payment schedule by default', function () {
         $enrollment = Enrollment::factory()->create([
             'student_id' => $this->student->id,
             'guardian_id' => $this->guardianModel->id,
             'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_5,
-            'tuition_fee_cents' => 2800000,
-            'miscellaneous_fee_cents' => 700000,
-            'total_amount_cents' => 3500000,
+            'payment_plan' => null, // Test default
+            'total_amount_cents' => 4000000, // 40,000
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -316,10 +309,62 @@ describe('Guardian BillingController', function () {
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('guardian/billing/show')
-            ->has('billing.payment_schedule', 4) // 4 quarters
+            ->has('billing.payment_schedule', 10)
             ->has('billing.payment_schedule.0', fn ($schedule) => $schedule
-                ->where('period', 'First Quarter')
-                ->where('amount', '₱8,750.00') // 35000 / 4
+                ->where('period', 'August Payment')
+                ->where('amount', '₱4,000.00') // 40000 / 10
+                ->where('status', 'pending')
+                ->etc()
+            )
+        );
+    });
+
+    test('billing show generates annual payment schedule', function () {
+        $enrollment = Enrollment::factory()->create([
+            'student_id' => $this->student->id,
+            'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
+            'grade_level' => GradeLevel::GRADE_5,
+            'payment_plan' => PaymentPlan::ANNUAL->value,
+            'total_amount_cents' => 3500000, // 35,000
+        ]);
+
+        $response = $this->actingAs($this->guardian)
+            ->get(route('guardian.billing.show', $enrollment));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('guardian/billing/show')
+            ->has('billing.payment_schedule', 1)
+            ->has('billing.payment_schedule.0', fn ($schedule) => $schedule
+                ->where('period', 'Annual Payment')
+                ->where('amount', '₱35,000.00')
+                ->where('status', 'pending')
+                ->etc()
+            )
+        );
+    });
+
+    test('billing show generates semestral payment schedule', function () {
+        $enrollment = Enrollment::factory()->create([
+            'student_id' => $this->student->id,
+            'guardian_id' => $this->guardianModel->id,
+            'school_year_id' => $this->sy2024->id,
+            'grade_level' => GradeLevel::GRADE_5,
+            'payment_plan' => PaymentPlan::SEMESTRAL->value,
+            'total_amount_cents' => 3800000, // 38,000
+        ]);
+
+        $response = $this->actingAs($this->guardian)
+            ->get(route('guardian.billing.show', $enrollment));
+
+        $response->assertStatus(200);
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('guardian/billing/show')
+            ->has('billing.payment_schedule', 2)
+            ->has('billing.payment_schedule.0', fn ($schedule) => $schedule
+                ->where('period', 'First Semester')
+                ->where('amount', '₱19,000.00') // 38000 / 2
                 ->where('status', 'pending')
                 ->etc()
             )
@@ -467,25 +512,6 @@ describe('Guardian BillingController', function () {
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('guardian/billing/show')
             ->where('enrollment.student_name', 'Jane Smith') // No extra space for middle name
-        );
-    });
-
-    test('billing payment schedule uses correct school years', function () {
-        $enrollment = Enrollment::factory()->create([
-            'student_id' => $this->student->id,
-            'guardian_id' => $this->guardianModel->id,
-            'school_year_id' => $this->sy2024->id,
-            'status' => EnrollmentStatus::PENDING->value,
-        ]);
-
-        $response = $this->actingAs($this->guardian)
-            ->get(route('guardian.billing.show', $enrollment));
-
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('guardian/billing/show')
-            ->where('billing.payment_schedule.0.due_date', 'August 15, 2024')
-            ->where('billing.payment_schedule.2.due_date', 'January 15, 2025') // Third quarter in next year
         );
     });
 });
