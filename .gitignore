@@ -37,3 +37,4 @@ coverage.xml
 !/tickets/.gitkeep
 *.pdf
 *.csv
+/tests/Browser/Screenshots
