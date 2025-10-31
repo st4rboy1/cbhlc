@@ -57,7 +57,6 @@ function ActionsCell({ student }: { student: Student }) {
 
     const handleDelete = () => {
         router.delete(`/super-admin/students/${student.id}`, {
-            preserveScroll: true,
             onSuccess: () => {
                 toast.success('Student deleted successfully');
                 setDeleteDialogOpen(false);

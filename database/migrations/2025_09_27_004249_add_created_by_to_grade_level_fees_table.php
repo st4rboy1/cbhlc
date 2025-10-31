@@ -24,9 +24,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('grade_level_fees', function (Blueprint $table) {
-            $table->dropForeign(['created_by']);
-            $table->dropForeign(['updated_by']);
-            $table->dropColumn(['created_by', 'updated_by']);
+            // Check if columns exist before dropping (for SQLite compatibility)
+            if (Schema::hasColumn('grade_level_fees', 'created_by')) {
+                $table->dropForeign(['created_by']);
+                $table->dropColumn('created_by');
+            }
+            if (Schema::hasColumn('grade_level_fees', 'updated_by')) {
+                $table->dropForeign(['updated_by']);
+                $table->dropColumn('updated_by');
+            }
         });
     }
 };
