@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Guardian;
 use App\Http\Controllers\Controller;
 use App\Models\Enrollment;
 use App\Models\Guardian;
+use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -35,24 +36,27 @@ class InvoiceController extends Controller
     /**
      * Display the invoice for a specific enrollment
      */
-    public function show(Request $request, Enrollment $invoice)
+    public function show(Request $request, Invoice $invoice)
     {
         $user = $request->user();
         $guardian = Guardian::where('user_id', $user->id)->firstOrFail();
         $studentIds = $guardian->children()->pluck('students.id');
 
+        // Load the enrollment relationship
+        $invoice->load('enrollment.student', 'enrollment.guardian', 'enrollment.schoolYear');
+        $enrollment = $invoice->enrollment;
+
         // Verify guardian owns this student
-        if (! $studentIds->contains($invoice->student_id)) {
+        if (! $enrollment || ! $studentIds->contains($enrollment->student_id)) {
             abort(404);  // Return 404 for security
         }
 
-        // Load related data
-        $invoice->load(['student', 'guardian', 'schoolYear']);
+        // Get settings
         $settings = Setting::pluck('value', 'key');
 
         return Inertia::render('shared/invoice', [
-            'enrollment' => $invoice,
-            'invoiceNumber' => $invoice->enrollment_id ?? 'No Invoice Available',
+            'enrollment' => $enrollment,
+            'invoiceNumber' => $invoice->invoice_number ?? 'No Invoice Available',
             'currentDate' => now()->format('F d, Y'),
             'settings' => $settings,
         ]);
@@ -61,21 +65,22 @@ class InvoiceController extends Controller
     /**
      * Download invoice as PDF
      */
-    public function download(Enrollment $invoice)
+    public function download(Invoice $invoice)
     {
         $user = auth()->user();
         $guardian = Guardian::where('user_id', $user->id)->firstOrFail();
         $studentIds = $guardian->children()->pluck('students.id');
 
+        // Load the enrollment relationship
+        $invoice->load('enrollment.student', 'enrollment.guardian', 'enrollment.schoolYear');
+        $enrollment = $invoice->enrollment;
+
         // Verify guardian owns this student
-        if (! $studentIds->contains($invoice->student_id)) {
+        if (! $enrollment || ! $studentIds->contains($enrollment->student_id)) {
             abort(404);
         }
 
-        // Load relationships
-        $invoice->load(['student', 'guardian', 'schoolYear']);
-
-        // Get payments for this enrollment
+        // Get payments for this invoice
         $payments = Payment::where('invoice_id', $invoice->id)
             ->orderBy('payment_date', 'asc')
             ->get();
@@ -85,7 +90,7 @@ class InvoiceController extends Controller
 
         // Generate PDF
         $pdf = Pdf::loadView('pdf.invoice', [
-            'enrollment' => $invoice,
+            'enrollment' => $enrollment,
             'payments' => $payments,
             'settings' => $settings,
             'invoiceDate' => now()->format('F d, Y'),
@@ -94,6 +99,6 @@ class InvoiceController extends Controller
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);
 
-        return $pdf->download("invoice-{$invoice->enrollment_id}.pdf");
+        return $pdf->download("invoice-{$invoice->invoice_number}.pdf");
     }
 }

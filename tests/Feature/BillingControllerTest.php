@@ -101,6 +101,14 @@ describe('invoice controller', function () {
             'payment_status' => PaymentStatus::PARTIAL,
         ]);
 
+        // Create invoice for own enrollment
+        $ownInvoice = \App\Models\Invoice::factory()->create([
+            'enrollment_id' => $ownEnrollment->id,
+            'invoice_number' => 'INV-0002',
+            'total_amount' => 30500,
+            'status' => 'sent',
+        ]);
+
         // Create other student
         $otherStudent = Student::factory()->create();
         $otherEnrollment = Enrollment::create([
@@ -120,8 +128,16 @@ describe('invoice controller', function () {
             'payment_status' => PaymentStatus::PENDING,
         ]);
 
+        // Create invoice for other enrollment
+        $otherInvoice = \App\Models\Invoice::factory()->create([
+            'enrollment_id' => $otherEnrollment->id,
+            'invoice_number' => 'INV-0003',
+            'total_amount' => 32000,
+            'status' => 'sent',
+        ]);
+
         // Guardian can view own child's invoice
-        $response = $this->actingAs($guardian)->get(route('guardian.invoices.show', $ownEnrollment));
+        $response = $this->actingAs($guardian)->get(route('guardian.invoices.show', $ownInvoice));
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('shared/invoice')
@@ -129,7 +145,7 @@ describe('invoice controller', function () {
         );
 
         // Guardian cannot view other child's invoice
-        $response = $this->actingAs($guardian)->get(route('guardian.invoices.show', $otherEnrollment));
+        $response = $this->actingAs($guardian)->get(route('guardian.invoices.show', $otherInvoice));
         $response->assertStatus(404);
     });
 
