@@ -7,6 +7,7 @@ use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Registrar\RejectEnrollmentRequest;
 use App\Models\Enrollment;
+use App\Models\EnrollmentPeriod;
 use App\Models\Student;
 use App\Notifications\EnrollmentApprovedNotification;
 use App\Notifications\EnrollmentRejectedNotification;
@@ -66,25 +67,33 @@ class DashboardController extends Controller
             'overdue' => Enrollment::where('payment_status', PaymentStatus::OVERDUE)->count(),
         ];
 
-        // Get upcoming deadlines
-        $currentYear = date('Y');
-        $upcomingDeadlines = [
-            [
-                'title' => 'Early Registration Deadline',
-                'date' => Carbon::parse("$currentYear-05-31")->format('Y-m-d'),
-                'daysLeft' => Carbon::now()->diffInDays(Carbon::parse("$currentYear-05-31"), false),
-            ],
-            [
-                'title' => 'Regular Registration Deadline',
-                'date' => Carbon::parse("$currentYear-06-30")->format('Y-m-d'),
-                'daysLeft' => Carbon::now()->diffInDays(Carbon::parse("$currentYear-06-30"), false),
-            ],
-            [
-                'title' => 'Late Registration Deadline',
-                'date' => Carbon::parse("$currentYear-07-15")->format('Y-m-d'),
-                'daysLeft' => Carbon::now()->diffInDays(Carbon::parse("$currentYear-07-15"), false),
-            ],
-        ];
+        // Get upcoming deadlines from active enrollment period
+        $activePeriod = EnrollmentPeriod::active()->first();
+        $upcomingDeadlines = [];
+
+        if ($activePeriod) {
+            if (! is_null($activePeriod->early_registration_deadline)) {
+                $upcomingDeadlines[] = [
+                    'title' => 'Early Registration Deadline',
+                    'date' => $activePeriod->early_registration_deadline->format('Y-m-d'),
+                    'daysLeft' => (int) Carbon::now()->diffInDays($activePeriod->early_registration_deadline, false),
+                ];
+            }
+            if (! is_null($activePeriod->regular_registration_deadline)) {
+                $upcomingDeadlines[] = [
+                    'title' => 'Regular Registration Deadline',
+                    'date' => $activePeriod->regular_registration_deadline->format('Y-m-d'),
+                    'daysLeft' => (int) Carbon::now()->diffInDays($activePeriod->regular_registration_deadline, false),
+                ];
+            }
+            if (! is_null($activePeriod->late_registration_deadline)) {
+                $upcomingDeadlines[] = [
+                    'title' => 'Late Registration Deadline',
+                    'date' => $activePeriod->late_registration_deadline->format('Y-m-d'),
+                    'daysLeft' => (int) Carbon::now()->diffInDays($activePeriod->late_registration_deadline, false),
+                ];
+            }
+        }
 
         // Get grade level distribution
         $gradeLevelDistribution = Enrollment::where('status', EnrollmentStatus::ENROLLED)
