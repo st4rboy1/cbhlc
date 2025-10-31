@@ -66,57 +66,57 @@ run_check() {
 echo "🔍 Running local CI/CD checks..."
 echo "================================"
 
-# PHP Syntax Check
+# PHP Syntax Check (via Docker/Sail)
 echo "✓ Checking PHP syntax..."
-if ! run_check "PHP syntax" "php_syntax" bash -c 'find . -path "./vendor" -prune -o -path "./storage" -prune -o -name "*.php" -print 2>/dev/null | xargs -n1 php -l'; then
+if ! run_check "PHP syntax" "php_syntax" ./vendor/bin/sail exec -T laravel.test bash -c 'find . -path "./vendor" -prune -o -path "./storage" -prune -o -name "*.php" -print 2>/dev/null | xargs -n1 php -l'; then
     exit 1
 fi
 
-# Laravel Pint (Code Style)
+# Laravel Pint (Code Style) (via Docker/Sail)
 echo "✓ Checking code style with Pint..."
-if ! run_check "Code style" "pint" ./vendor/bin/pint --test; then
-    echo "     Run './vendor/bin/pint' to fix"
+if ! run_check "Code style" "pint" ./vendor/bin/sail exec -T laravel.test ./vendor/bin/pint --test; then
+    echo "     Run './vendor/bin/sail exec laravel.test ./vendor/bin/pint' to fix"
     exit 1
 fi
 
-# PHPStan (Static Analysis)
+# PHPStan (Static Analysis) (via Docker/Sail)
 echo "✓ Running static analysis with PHPStan..."
-if [ -f vendor/bin/phpstan ]; then
-    if ! run_check "Static analysis" "phpstan" ./vendor/bin/phpstan analyse --memory-limit=512M; then
-        echo "     Run './vendor/bin/phpstan analyse' to see issues"
+if ./vendor/bin/sail exec -T laravel.test test -f vendor/bin/phpstan; then
+    if ! run_check "Static analysis" "phpstan" ./vendor/bin/sail exec -T laravel.test ./vendor/bin/phpstan analyse --memory-limit=512M; then
+        echo "     Run './vendor/bin/sail exec laravel.test ./vendor/bin/phpstan analyse' to see issues"
         exit 1
     fi
 else
     echo "  ${YELLOW}⚠️  Static analysis: SKIPPED${NC} (PHPStan not installed)"
 fi
 
-# Composer Audit
+# Composer Audit (via Docker/Sail)
 echo "✓ Checking for security vulnerabilities..."
-if ! run_check "Security audit" "composer_audit" composer audit; then
+if ! run_check "Security audit" "composer_audit" ./vendor/bin/sail exec -T laravel.test composer audit; then
     echo "     ${YELLOW}⚠️  Security vulnerabilities found${NC}"
-    echo "     Run 'composer audit' for details"
+    echo "     Run './vendor/bin/sail exec laravel.test composer audit' for details"
     # Don't exit on security audit failures, just warn
 fi
 
-# Vite Build (must run first to generate route files for TypeScript)
+# Vite Build (via Docker/Sail - must run first to generate route files for TypeScript)
 echo "✓ Building assets with Vite..."
-if ! run_check "Vite build" "vite" npm run build; then
-    echo "     Run 'npm run build' to see issues"
+if ! run_check "Vite build" "vite" ./vendor/bin/sail exec -T laravel.test npm run build; then
+    echo "     Run './vendor/bin/sail exec laravel.test npm run build' to see issues"
     echo "     Common issue: Inertia component paths must use kebab-case"
     echo "     (e.g., 'settings/notifications' not 'Settings/Notifications')"
     exit 1
 fi
 
-# JavaScript/TypeScript checks (run after build to ensure route files exist)
+# JavaScript/TypeScript checks (via Docker/Sail - run after build to ensure route files exist)
 echo "✓ Checking TypeScript..."
-if ! run_check "TypeScript" "typescript" npm run types; then
-    echo "     Run 'npm run types' to see issues"
+if ! run_check "TypeScript" "typescript" ./vendor/bin/sail exec -T laravel.test npm run types; then
+    echo "     Run './vendor/bin/sail exec laravel.test npm run types' to see issues"
     exit 1
 fi
 
 echo "✓ Checking Prettier formatting..."
-if ! run_check "Prettier" "prettier" npm run format:check; then
-    echo "     Run 'npm run format' to fix"
+if ! run_check "Prettier" "prettier" ./vendor/bin/sail exec -T laravel.test npm run format:check; then
+    echo "     Run './vendor/bin/sail exec laravel.test npm run format' to fix"
     exit 1
 fi
 
