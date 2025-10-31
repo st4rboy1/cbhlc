@@ -271,7 +271,7 @@ export default function GuardianEnrollmentsShow({ enrollment, payments }: Props)
                                     {payments.map((payment) => (
                                         <TableRow key={payment.id}>
                                             <TableCell>{formatDate(payment.payment_date)}</TableCell>
-                                            <TableCell>{formatCurrency(payment.amount * 100)}</TableCell>
+                                            <TableCell>{formatCurrency(payment.amount)}</TableCell>
                                             <TableCell className="capitalize">{payment.payment_method.replace('_', ' ')}</TableCell>
                                             <TableCell>{payment.reference_number || 'N/A'}</TableCell>
                                             <TableCell className="text-right">
