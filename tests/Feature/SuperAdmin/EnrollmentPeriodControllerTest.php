@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\EnrollmentPeriodStatus;
 use App\Models\Enrollment;
 use App\Models\EnrollmentPeriod;
 use App\Models\User;
@@ -325,7 +326,7 @@ test('cannot delete active enrollment period', function () {
 
 test('cannot delete period with existing enrollments', function () {
     $period = EnrollmentPeriod::factory()->schoolYear('2025-2026')->create([
-        'status' => 'completed',
+        'status' => EnrollmentPeriodStatus::CLOSED,
         'start_date' => now()->subYear(),
         'end_date' => now()->subMonths(2),
         'regular_registration_deadline' => now()->subMonths(10),
@@ -370,7 +371,7 @@ test('super admin can activate enrollment period', function () {
     $response->assertSessionHas('success');
 
     $period->refresh();
-    expect($period->status)->toBe('active');
+    expect($period->status)->toBe(EnrollmentPeriodStatus::ACTIVE);
 });
 
 test('activating period closes other active periods', function () {
@@ -398,8 +399,8 @@ test('activating period closes other active periods', function () {
     $oldPeriod->refresh();
     $newPeriod->refresh();
 
-    expect($oldPeriod->status)->toBe('closed');
-    expect($newPeriod->status)->toBe('active');
+    expect($oldPeriod->status)->toBe(EnrollmentPeriodStatus::CLOSED);
+    expect($newPeriod->status)->toBe(EnrollmentPeriodStatus::ACTIVE);
 });
 
 test('activating period logs activity', function () {
@@ -443,7 +444,7 @@ test('super admin can close active enrollment period', function () {
     $response->assertSessionHas('success');
 
     $period->refresh();
-    expect($period->status)->toBe('closed');
+    expect($period->status)->toBe(EnrollmentPeriodStatus::CLOSED);
 });
 
 test('cannot close non-active enrollment period', function () {
@@ -462,7 +463,7 @@ test('cannot close non-active enrollment period', function () {
     $response->assertSessionHasErrors('period');
 
     $period->refresh();
-    expect($period->status)->toBe('upcoming');
+    expect($period->status)->toBe(EnrollmentPeriodStatus::UPCOMING);
 });
 
 test('closing period logs activity', function () {
