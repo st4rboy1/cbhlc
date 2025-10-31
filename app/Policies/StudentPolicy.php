@@ -69,7 +69,17 @@ class StudentPolicy
      */
     public function delete(User $user, Student $student): bool
     {
-        return $user->hasAnyRole(['super_admin', 'administrator']);
+        // Super admins and administrators can delete any student
+        if ($user->hasAnyRole(['super_admin', 'administrator'])) {
+            return true;
+        }
+
+        // Guardians can delete (remove) students they are associated with
+        if ($user->hasRole('guardian') && $user->guardian) {
+            return $student->guardians()->where('guardians.id', $user->guardian->id)->exists();
+        }
+
+        return false;
     }
 
     /**
