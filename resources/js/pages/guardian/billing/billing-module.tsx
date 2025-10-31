@@ -5,82 +5,38 @@ import { Input } from '@/components/ui/input';
 import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Clock, DollarSign, Search } from 'lucide-react';
 import { useState } from 'react';
 
-const billingData = {
-    auth: {
-        user: {
-            name: 'Maria',
-            email: 'maria.santos@example.com',
-        },
-    },
-    quote: {
-        message: 'Order your soul. Reduce your wants.',
-        author: 'Augustine',
-    },
-    enrollments: [
-        {
-            id: 1,
-            student_name: 'Juan Garcia Santos',
-            student_id: '2025-2338',
-            school_year: '2022-2023',
-            grade_level: 'Grade 4',
-            status: 'completed',
-            payment_status: 'paid',
-            tuition_fee: '₱0.00',
-            miscellaneous_fee: '₱0.00',
-            total_amount: '₱0.00',
-            raw_total: 0,
-        },
-        {
-            id: 2,
-            student_name: 'Juan Garcia Santos',
-            student_id: '2025-2338',
-            school_year: '2023-2024',
-            grade_level: 'Grade 5',
-            status: 'completed',
-            payment_status: 'paid',
-            tuition_fee: '₱0.00',
-            miscellaneous_fee: '₱0.00',
-            total_amount: '₱0.00',
-            raw_total: 0,
-        },
-        {
-            id: 3,
-            student_name: 'Juan Garcia Santos',
-            student_id: '2025-2338',
-            school_year: '2024-2025',
-            grade_level: 'Grade 6',
-            status: 'enrolled',
-            payment_status: 'partial',
-            tuition_fee: '₱0.00',
-            miscellaneous_fee: '₱0.00',
-            total_amount: '₱0.00',
-            raw_total: 0,
-        },
-    ],
-    summary: {
-        total_due: '₱0.00',
-        total_paid: '₱0.00',
-        pending_count: 0,
-        overdue_count: 0,
-    },
-    paymentPlans: [
-        {
-            name: 'Annual',
-            description: 'Pay in full at the beginning of the school year',
-            discount: '5%',
-        },
-        {
-            name: 'Semestral',
-            description: 'Pay in two installments per semester',
-            discount: '2%',
-        },
-        {
-            name: 'Monthly',
-            description: 'Pay monthly installments',
-            discount: '0%',
-        },
-    ],
-};
+interface Enrollment {
+    id: number;
+    student_name: string;
+    student_id: string;
+    school_year_name: string;
+    grade_level: string;
+    status: string;
+    payment_status: string;
+    tuition_fee: string;
+    miscellaneous_fee: string;
+    total_amount: string;
+    raw_total: number;
+}
+
+interface Summary {
+    total_due: string;
+    total_paid: string;
+    pending_count: number;
+    overdue_count: number;
+}
+
+interface PaymentPlan {
+    name: string;
+    description: string;
+    discount: string;
+}
+
+interface BillingModuleProps {
+    enrollments: Enrollment[];
+    summary: Summary;
+    paymentPlans: PaymentPlan[];
+}
 
 function getPaymentStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
     switch (status) {
@@ -116,16 +72,16 @@ function formatStatusName(status: string) {
     return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
-export function BillingModule() {
+export function BillingModule({ enrollments, summary, paymentPlans }: BillingModuleProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedEnrollment, setExpandedEnrollment] = useState<number | null>(null);
     const [filterStatus, setFilterStatus] = useState<string>('all');
 
-    const filteredEnrollments = billingData.enrollments.filter((enrollment) => {
+    const filteredEnrollments = enrollments.filter((enrollment) => {
         const matchesSearch =
             enrollment.student_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             enrollment.student_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            enrollment.school_year.toLowerCase().includes(searchQuery.toLowerCase());
+            enrollment.school_year_name.toLowerCase().includes(searchQuery.toLowerCase());
 
         const matchesFilter = filterStatus === 'all' || enrollment.payment_status === filterStatus;
 
@@ -142,18 +98,7 @@ export function BillingModule() {
                 {/* Header */}
                 <div className="space-y-2">
                     <h1 className="text-3xl font-semibold text-foreground">Billing & Payments</h1>
-                    <p className="text-sm text-muted-foreground">
-                        {billingData.auth.user.name} • {billingData.auth.user.email}
-                    </p>
                 </div>
-
-                {/* Quote Card */}
-                <Card className="border-l-4 border-l-primary bg-card p-6">
-                    <blockquote className="space-y-2">
-                        <p className="text-base leading-relaxed text-foreground italic">"{billingData.quote.message}"</p>
-                        <footer className="text-sm text-muted-foreground">— {billingData.quote.author}</footer>
-                    </blockquote>
-                </Card>
 
                 {/* Summary Cards */}
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -161,7 +106,7 @@ export function BillingModule() {
                         <div className="flex items-start justify-between">
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Total Due</p>
-                                <p className="text-2xl font-semibold text-foreground">{billingData.summary.total_due}</p>
+                                <p className="text-2xl font-semibold text-foreground">{summary.total_due}</p>
                             </div>
                             <div className="rounded-lg bg-destructive/10 p-2">
                                 <DollarSign className="h-5 w-5 text-destructive" />
@@ -173,7 +118,7 @@ export function BillingModule() {
                         <div className="flex items-start justify-between">
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Total Paid</p>
-                                <p className="text-2xl font-semibold text-foreground">{billingData.summary.total_paid}</p>
+                                <p className="text-2xl font-semibold text-foreground">{summary.total_paid}</p>
                             </div>
                             <div className="rounded-lg bg-primary/10 p-2">
                                 <CheckCircle className="h-5 w-5 text-primary" />
@@ -185,7 +130,7 @@ export function BillingModule() {
                         <div className="flex items-start justify-between">
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Pending Payments</p>
-                                <p className="text-2xl font-semibold text-foreground">{billingData.summary.pending_count}</p>
+                                <p className="text-2xl font-semibold text-foreground">{summary.pending_count}</p>
                             </div>
                             <div className="rounded-lg bg-secondary/10 p-2">
                                 <Clock className="h-5 w-5 text-secondary-foreground" />
@@ -197,7 +142,7 @@ export function BillingModule() {
                         <div className="flex items-start justify-between">
                             <div className="space-y-1">
                                 <p className="text-sm text-muted-foreground">Overdue</p>
-                                <p className="text-2xl font-semibold text-foreground">{billingData.summary.overdue_count}</p>
+                                <p className="text-2xl font-semibold text-foreground">{summary.overdue_count}</p>
                             </div>
                             <div className="rounded-lg bg-destructive/10 p-2">
                                 <AlertCircle className="h-5 w-5 text-destructive" />
@@ -210,7 +155,7 @@ export function BillingModule() {
                 <div className="space-y-4">
                     <h2 className="text-xl font-semibold text-foreground">Available Payment Plans</h2>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                        {billingData.paymentPlans.map((plan, index) => (
+                        {paymentPlans.map((plan, index) => (
                             <Card key={index} className="bg-card p-5 transition-shadow hover:shadow-md">
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
@@ -330,7 +275,7 @@ export function BillingModule() {
                                                             <div className="font-mono text-xs text-muted-foreground">{enrollment.student_id}</div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 text-sm">{enrollment.school_year}</td>
+                                                    <td className="px-6 py-4 text-sm">{enrollment.school_year_name}</td>
                                                     <td className="px-6 py-4 text-sm">{enrollment.grade_level}</td>
                                                     <td className="px-6 py-4">
                                                         <div className="text-sm font-semibold">{enrollment.total_amount}</div>
@@ -379,7 +324,7 @@ export function BillingModule() {
                                                                         <div>
                                                                             <p className="mb-1 text-xs text-muted-foreground">Enrollment Details</p>
                                                                             <p className="text-sm">
-                                                                                {enrollment.school_year} • {enrollment.grade_level}
+                                                                                {enrollment.school_year_name} • {enrollment.grade_level}
                                                                             </p>
                                                                             <div className="mt-2 flex gap-2">
                                                                                 <Badge variant={getEnrollmentStatusVariant(enrollment.status)}>
