@@ -42,8 +42,8 @@ class InvoiceController extends Controller
         $guardian = Guardian::where('user_id', $user->id)->firstOrFail();
         $studentIds = $guardian->children()->pluck('students.id');
 
-        // Load the enrollment relationship
-        $invoice->load('enrollment.student', 'enrollment.guardian', 'enrollment.schoolYear');
+        // Load the enrollment and items relationship
+        $invoice->load('enrollment.student', 'enrollment.guardian', 'enrollment.schoolYear', 'items');
         $enrollment = $invoice->enrollment;
 
         // Verify guardian owns this student
@@ -55,7 +55,7 @@ class InvoiceController extends Controller
         $settings = Setting::pluck('value', 'key');
 
         return Inertia::render('shared/invoice', [
-            'enrollment' => $enrollment,
+            'invoice' => $invoice,
             'invoiceNumber' => $invoice->invoice_number ?? 'No Invoice Available',
             'currentDate' => now()->format('F d, Y'),
             'settings' => $settings,
