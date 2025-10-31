@@ -46,6 +46,28 @@ echo ""
 # Run the local test script
 ./scripts/test-local.sh
 
+# Run browser smoke tests (fast critical path checks)
+echo "🌐 Running browser smoke tests..."
+
+start_time=$(date +%s.%N)
+
+if log_file=$(log_command "browser-smoke" ./vendor/bin/sail test tests/Browser/VisibleBrowserDemo.php); then
+    end_time=$(date +%s.%N)
+    duration=$(awk "BEGIN {printf \"%.1f\", $end_time - $start_time}")
+    printf "  ${GREEN}✅ Browser Tests: PASSED${NC} (${duration}s)\n"
+else
+    end_time=$(date +%s.%N)
+    duration=$(awk "BEGIN {printf \"%.1f\", $end_time - $start_time}")
+    printf "  ${RED}❌ Browser Tests: FAILED${NC} (${duration}s)\n"
+    echo "   See output in: $log_file"
+    echo "   Screenshots saved to: tests/Browser/Screenshots/"
+    echo ""
+    echo "❌ Browser smoke tests failed. Push aborted."
+    exit 1
+fi
+
+echo ""
+
 # Run tests with coverage (optimized with SQLite)
 echo "🧪 Running tests with coverage check..."
 

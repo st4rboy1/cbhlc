@@ -4,6 +4,10 @@ pest()->extend(Tests\DuskTestCase::class)
 //  ->use(Illuminate\Foundation\Testing\DatabaseMigrations::class)
     ->in('Browser');
 
+// Pest v4 Browser Testing Configuration
+// Using HEADLESS mode (default) - fast, perfect for pre-push hooks and CI/CD
+// Screenshots are automatically saved on failures to tests/Browser/Screenshots/
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
