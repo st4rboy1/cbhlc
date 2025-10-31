@@ -50,7 +50,7 @@ class BillingController extends Controller
                 } else {
                     // Fallback: Find the fee for the enrollment's grade level
                     $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)
-                        ->where('school_year_id', $enrollment->school_year_id)
+                        ->where('enrollment_period_id', $enrollment->enrollment_period_id)
                         ->first();
 
                     $tuitionFee = $fee ? $fee->tuition_fee : 0;
@@ -136,7 +136,7 @@ class BillingController extends Controller
             $totalFee = $enrollment->total_amount_cents / 100;
         } else {
             $fee = GradeLevelFee::where('grade_level', $enrollment->grade_level)
-                ->where('school_year_id', $enrollment->school_year_id)
+                ->where('enrollment_period_id', $enrollment->enrollment_period_id)
                 ->first();
 
             $tuitionFee = $fee ? $fee->tuition_fee : 0;
