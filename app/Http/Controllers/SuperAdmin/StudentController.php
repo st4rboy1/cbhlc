@@ -232,26 +232,28 @@ class StudentController extends Controller
     {
         Gate::authorize('view', $student);
 
-        $enrollments = $student->enrollments()
+        $collection = $student->enrollments()
             ->with(['guardian', 'schoolYear'])
             ->latest()
-            ->get()
-            ->map(function (Enrollment $enrollment): array {
-                return [
-                    'id' => $enrollment->id,
-                    'enrollment_id' => $enrollment->enrollment_id,
-                    'status' => $enrollment->status->value,
-                    'grade_level' => $enrollment->grade_level->value,
-                    'quarter' => $enrollment->quarter->value,
-                    'school_year' => $enrollment->schoolYear ? $enrollment->schoolYear->name : 'N/A',
-                    'guardian' => [
-                        'id' => $enrollment->guardian->id,
-                        'first_name' => $enrollment->guardian->first_name,
-                        'last_name' => $enrollment->guardian->last_name,
-                    ],
-                    'created_at' => $enrollment->created_at?->toISOString() ?? '',
-                ];
-            });
+            ->get();
+
+        $enrollments = [];
+        foreach ($collection as $enrollment) {
+            $enrollments[] = [
+                'id' => $enrollment->id,
+                'enrollment_id' => $enrollment->enrollment_id,
+                'status' => $enrollment->status->value,
+                'grade_level' => $enrollment->grade_level->value,
+                'quarter' => $enrollment->quarter->value,
+                'school_year' => $enrollment->schoolYear ? $enrollment->schoolYear->name : 'N/A',
+                'guardian' => [
+                    'id' => $enrollment->guardian->id,
+                    'first_name' => $enrollment->guardian->first_name,
+                    'last_name' => $enrollment->guardian->last_name,
+                ],
+                'created_at' => $enrollment->created_at?->toISOString() ?? '',
+            ];
+        }
 
         return Inertia::render('super-admin/students/enrollments', [
             'student' => $student,
