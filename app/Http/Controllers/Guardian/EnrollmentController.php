@@ -271,20 +271,30 @@ class EnrollmentController extends Controller
         // Load relationships for notifications
         $enrollment->load(['student', 'guardian.user', 'schoolYear']);
 
-        // Dispatch event to notify registrars
-        event(new \App\Events\EnrollmentCreated($enrollment));
+        // Try to send notifications but don't fail if they error
+        try {
+            // Dispatch event to notify registrars
+            event(new \App\Events\EnrollmentCreated($enrollment));
 
-        // Notify guardian of submission
-        if ($guardian->user) {
-            /** @var \App\Models\User $user */
-            $user = $guardian->user;
-            $user->notify(new EnrollmentSubmittedNotification($enrollment));
-        }
+            // Notify guardian of submission
+            if ($guardian->user) {
+                /** @var \App\Models\User $user */
+                $user = $guardian->user;
+                $user->notify(new EnrollmentSubmittedNotification($enrollment));
+            }
 
-        // Notify all registrars and administrators of new enrollment
-        $registrars = User::role(['registrar', 'administrator', 'super_admin'])->get();
-        foreach ($registrars as $registrar) {
-            $registrar->notify(new NewEnrollmentForReviewNotification($enrollment));
+            // Notify all registrars and administrators of new enrollment
+            $registrars = User::role(['registrar', 'administrator', 'super_admin'])->get();
+            foreach ($registrars as $registrar) {
+                $registrar->notify(new NewEnrollmentForReviewNotification($enrollment));
+            }
+        } catch (\Exception $e) {
+            // Log the notification error but don't fail the enrollment submission
+            \Log::error('Failed to send enrollment notifications', [
+                'enrollment_id' => $enrollment->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
 
         return redirect()->route('guardian.enrollments.index')
