@@ -13,6 +13,7 @@ use App\Models\GuardianStudent;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Config;
 
 class UserSeeder extends Seeder
 {
@@ -24,8 +25,17 @@ class UserSeeder extends Seeder
         // Only create default users if we're not in production
         // or if the users table is empty (initial setup)
         if (app()->environment('local', 'testing') || User::count() === 0) {
-            $this->createDefaultUsers();
-            $this->createAdditionalTestData();
+            // Temporarily set mail driver to 'log' to prevent sending actual emails during seeding
+            $originalMailDriver = Config::get('mail.default');
+            Config::set('mail.default', 'log');
+
+            try {
+                $this->createDefaultUsers();
+                $this->createAdditionalTestData();
+            } finally {
+                // Restore original mail driver
+                Config::set('mail.default', $originalMailDriver);
+            }
         }
     }
 
