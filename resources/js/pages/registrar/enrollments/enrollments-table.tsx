@@ -102,9 +102,15 @@ interface ColumnActionProps {
     onApproveClick: (enrollment: Enrollment) => void;
     onRejectClick: (enrollment: Enrollment) => void;
     onUpdatePaymentStatusClick: (enrollment: Enrollment) => void;
+    onUpdateEnrollmentStatusClick: (enrollment: Enrollment) => void;
 }
 
-export const createColumns = ({ onApproveClick, onRejectClick, onUpdatePaymentStatusClick }: ColumnActionProps): ColumnDef<Enrollment>[] => [
+export const createColumns = ({
+    onApproveClick,
+    onRejectClick,
+    onUpdatePaymentStatusClick,
+    onUpdateEnrollmentStatusClick,
+}: ColumnActionProps): ColumnDef<Enrollment>[] => [
     {
         id: 'select',
         header: ({ table }) => (
@@ -247,6 +253,7 @@ export const createColumns = ({ onApproveClick, onRejectClick, onUpdatePaymentSt
                             <DropdownMenuItem onClick={() => handleConfirmPaymentClick(enrollment)}>Confirm Payment</DropdownMenuItem>
                         )}
                         <DropdownMenuItem onClick={() => onUpdatePaymentStatusClick(enrollment)}>Update Payment Status</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onUpdateEnrollmentStatusClick(enrollment)}>Update Enrollment Status</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             );
@@ -291,6 +298,13 @@ export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
     const [paymentStatus, setPaymentStatus] = React.useState('');
     const [updatePaymentRemarks, setUpdatePaymentRemarks] = React.useState('');
     const [updatePaymentErrors, setUpdatePaymentErrors] = React.useState<Record<string, string>>({});
+
+    // State for Update Enrollment Status Modal
+    const [showUpdateEnrollmentStatusModal, setShowUpdateEnrollmentStatusModal] = React.useState(false);
+    const [enrollmentToUpdateStatus, setEnrollmentToUpdateStatus] = React.useState<Enrollment | null>(null);
+    const [enrollmentStatus, setEnrollmentStatus] = React.useState('');
+    const [updateStatusRemarks, setUpdateStatusRemarks] = React.useState('');
+    const [updateStatusErrors, setUpdateStatusErrors] = React.useState<Record<string, string>>({});
 
     const handleApproveClick = React.useCallback((enrollment: Enrollment) => {
         setEnrollmentToApprove(enrollment);
@@ -382,14 +396,48 @@ export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
         );
     };
 
+    const handleUpdateEnrollmentStatusClick = React.useCallback((enrollment: Enrollment) => {
+        setEnrollmentToUpdateStatus(enrollment);
+        setEnrollmentStatus(enrollment.status);
+        setUpdateStatusRemarks('');
+        setUpdateStatusErrors({});
+        setShowUpdateEnrollmentStatusModal(true);
+    }, []);
+
+    const handleUpdateEnrollmentStatusSubmit = () => {
+        if (!enrollmentToUpdateStatus) return;
+
+        router.put(
+            `/registrar/enrollments/${enrollmentToUpdateStatus.id}/status`,
+            {
+                status: enrollmentStatus,
+                remarks: updateStatusRemarks,
+            },
+            {
+                onSuccess: () => {
+                    setShowUpdateEnrollmentStatusModal(false);
+                    setEnrollmentToUpdateStatus(null);
+                    setEnrollmentStatus('');
+                    setUpdateStatusRemarks('');
+                    setUpdateStatusErrors({});
+                    router.reload({ only: ['enrollments'] });
+                },
+                onError: (errors) => {
+                    setUpdateStatusErrors(errors);
+                },
+            },
+        );
+    };
+
     const columns = React.useMemo(
         () =>
             createColumns({
                 onApproveClick: handleApproveClick,
                 onRejectClick: handleRejectClick,
                 onUpdatePaymentStatusClick: handleUpdatePaymentStatusClick,
+                onUpdateEnrollmentStatusClick: handleUpdateEnrollmentStatusClick,
             }),
-        [handleApproveClick, handleRejectClick, handleUpdatePaymentStatusClick],
+        [handleApproveClick, handleRejectClick, handleUpdatePaymentStatusClick, handleUpdateEnrollmentStatusClick],
     );
 
     const table = useReactTable({
@@ -613,6 +661,54 @@ export function EnrollmentsTable({ enrollments }: EnrollmentsTableProps) {
                             Cancel
                         </Button>
                         <Button onClick={handleUpdatePaymentStatusSubmit}>Update</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Update Enrollment Status Modal */}
+            <Dialog open={showUpdateEnrollmentStatusModal} onOpenChange={setShowUpdateEnrollmentStatusModal}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>Update Enrollment Status</DialogTitle>
+                        <DialogDescription>
+                            Update enrollment status for enrollment #{enrollmentToUpdateStatus?.id} - {enrollmentToUpdateStatus?.student.first_name}{' '}
+                            {enrollmentToUpdateStatus?.student.last_name}.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="enrollment_status">Enrollment Status</Label>
+                            <Select value={enrollmentStatus} onValueChange={setEnrollmentStatus}>
+                                <SelectTrigger className={updateStatusErrors.status ? 'border-destructive' : ''}>
+                                    <SelectValue placeholder="Select enrollment status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="pending">Pending Review</SelectItem>
+                                    <SelectItem value="approved">Approved - Awaiting Invoice</SelectItem>
+                                    <SelectItem value="rejected">Rejected</SelectItem>
+                                    <SelectItem value="ready_for_payment">Ready for Payment</SelectItem>
+                                    <SelectItem value="paid">Paid - Awaiting Confirmation</SelectItem>
+                                    <SelectItem value="enrolled">Enrolled</SelectItem>
+                                    <SelectItem value="completed">Completed</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <InputError message={updateStatusErrors.status} className="mt-0" />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="status_remarks">Remarks (Optional)</Label>
+                            <Textarea
+                                id="status_remarks"
+                                placeholder="Enter remarks for status change..."
+                                value={updateStatusRemarks}
+                                onChange={(e) => setUpdateStatusRemarks(e.target.value)}
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowUpdateEnrollmentStatusModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button onClick={handleUpdateEnrollmentStatusSubmit}>Update Status</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
