@@ -6,6 +6,7 @@ use App\Enums\EnrollmentStatus;
 use App\Enums\EnrollmentType;
 use App\Enums\GradeLevel;
 use App\Enums\PaymentPlan;
+use App\Enums\PaymentStatus;
 use App\Enums\Quarter;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -37,6 +38,7 @@ class UpdateEnrollmentRequest extends FormRequest
             'previous_school' => ['nullable', 'string', 'max:255'],
             'payment_plan' => ['required', Rule::in(PaymentPlan::values())],
             'status' => ['required', 'string', 'in:'.implode(',', array_column(EnrollmentStatus::cases(), 'value'))],
+            'payment_status' => ['required', Rule::in(PaymentStatus::values())],
         ];
     }
 }
