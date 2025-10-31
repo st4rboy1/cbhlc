@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SuperAdmin\StoreStudentRequest;
 use App\Http\Requests\SuperAdmin\UpdateStudentRequest;
+use App\Models\Enrollment;
 use App\Models\Guardian;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -222,5 +223,41 @@ class StudentController extends Controller
 
         return redirect()->route('super-admin.students.index')
             ->with('success', 'Student deleted successfully.');
+    }
+
+    /**
+     * Display the student's enrollments.
+     */
+    public function enrollments(Student $student)
+    {
+        Gate::authorize('view', $student);
+
+        $collection = $student->enrollments()
+            ->with(['guardian', 'schoolYear'])
+            ->latest()
+            ->get();
+
+        $enrollments = [];
+        foreach ($collection as $enrollment) {
+            $enrollments[] = [
+                'id' => $enrollment->id,
+                'enrollment_id' => $enrollment->enrollment_id,
+                'status' => $enrollment->status->value,
+                'grade_level' => $enrollment->grade_level->value,
+                'quarter' => $enrollment->quarter->value,
+                'school_year' => $enrollment->schoolYear ? $enrollment->schoolYear->name : 'N/A',
+                'guardian' => [
+                    'id' => $enrollment->guardian->id,
+                    'first_name' => $enrollment->guardian->first_name,
+                    'last_name' => $enrollment->guardian->last_name,
+                ],
+                'created_at' => $enrollment->created_at?->toISOString() ?? '',
+            ];
+        }
+
+        return Inertia::render('super-admin/students/enrollments', [
+            'student' => $student,
+            'enrollments' => $enrollments,
+        ]);
     }
 }
