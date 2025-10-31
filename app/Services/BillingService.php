@@ -166,7 +166,6 @@ class BillingService extends BaseService implements BillingServiceInterface
         $plans = [
             'full' => ['installments' => 1, 'discount' => 0.05],
             'semestral' => ['installments' => 2, 'discount' => 0.03],
-            'quarterly' => ['installments' => 4, 'discount' => 0],
             'monthly' => ['installments' => 10, 'discount' => 0],
         ];
 
@@ -350,29 +349,6 @@ class BillingService extends BaseService implements BillingServiceInterface
                     [
                         'due_date' => now()->addMonths(6),
                         'amount' => ($totalAmount * 0.97) / 2,
-                    ],
-                ],
-            ],
-            'quarterly' => [
-                'name' => 'Quarterly Payment',
-                'installments' => 4,
-                'discount' => 0,
-                'schedule' => [
-                    [
-                        'due_date' => now()->addDays(30),
-                        'amount' => $totalAmount / 4,
-                    ],
-                    [
-                        'due_date' => now()->addMonths(3),
-                        'amount' => $totalAmount / 4,
-                    ],
-                    [
-                        'due_date' => now()->addMonths(6),
-                        'amount' => $totalAmount / 4,
-                    ],
-                    [
-                        'due_date' => now()->addMonths(9),
-                        'amount' => $totalAmount / 4,
                     ],
                 ],
             ],
