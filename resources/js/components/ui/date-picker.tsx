@@ -94,7 +94,7 @@ export function DatePicker({
                     defaultMonth={minAge ? new Date(new Date().setFullYear(new Date().getFullYear() - minAge)) : undefined}
                     captionLayout="dropdown"
                     fromYear={1900}
-                    toYear={new Date().getFullYear()}
+                    toYear={allowFutureDates ? new Date().getFullYear() + 10 : new Date().getFullYear()}
                 />
             </PopoverContent>
         </Popover>
