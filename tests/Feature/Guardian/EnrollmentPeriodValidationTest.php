@@ -89,7 +89,7 @@ test('guardian cannot view create form when no active enrollment period', functi
     // Debug: Check what periods exist
     $periods = EnrollmentPeriod::all();
     expect($periods)->toHaveCount(1);
-    expect($periods->first()->status)->toBe('upcoming');
+    expect($periods->first()->status)->toBe(EnrollmentPeriodStatus::UPCOMING);
 
     // Verify no active periods exist
     $activePeriod = EnrollmentPeriod::where('status', 'active')->first();

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\EnrollmentPeriodStatus;
 use App\Models\EnrollmentPeriod;
 use App\Models\User;
 use App\Notifications\EnrollmentPeriodStatusChangedNotification;
@@ -64,7 +65,7 @@ test('command activates upcoming periods when start date is reached', function (
     Artisan::call('enrollment-periods:update-status');
 
     $period->refresh();
-    expect($period->status)->toBe('active');
+    expect($period->status)->toBe(EnrollmentPeriodStatus::ACTIVE);
 });
 
 test('command closes active periods when end date is passed', function () {
@@ -83,7 +84,7 @@ test('command closes active periods when end date is passed', function () {
     Artisan::call('enrollment-periods:update-status');
 
     $period->refresh();
-    expect($period->status)->toBe('closed');
+    expect($period->status)->toBe(EnrollmentPeriodStatus::CLOSED);
 });
 
 test('command does not change periods that are not ready', function () {
@@ -116,8 +117,8 @@ test('command does not change periods that are not ready', function () {
     $upcomingPeriod->refresh();
     $activePeriod->refresh();
 
-    expect($upcomingPeriod->status)->toBe('upcoming');
-    expect($activePeriod->status)->toBe('active');
+    expect($upcomingPeriod->status)->toBe(EnrollmentPeriodStatus::UPCOMING);
+    expect($activePeriod->status)->toBe(EnrollmentPeriodStatus::ACTIVE);
 });
 
 test('command closes previously active periods when activating new period', function () {
@@ -150,8 +151,8 @@ test('command closes previously active periods when activating new period', func
     $oldPeriod->refresh();
     $newPeriod->refresh();
 
-    expect($oldPeriod->status)->toBe('closed');
-    expect($newPeriod->status)->toBe('active');
+    expect($oldPeriod->status)->toBe(EnrollmentPeriodStatus::CLOSED);
+    expect($newPeriod->status)->toBe(EnrollmentPeriodStatus::ACTIVE);
 });
 
 test('command runs successfully with dry-run option', function () {
@@ -170,7 +171,7 @@ test('command runs successfully with dry-run option', function () {
     Artisan::call('enrollment-periods:update-status', ['--dry-run' => true]);
 
     $period->refresh();
-    expect($period->status)->toBe('upcoming');
+    expect($period->status)->toBe(EnrollmentPeriodStatus::UPCOMING);
 });
 
 test('command sends notifications when notify option is used', function () {
@@ -311,7 +312,7 @@ test('command handles multiple periods correctly', function () {
     Artisan::call('enrollment-periods:update-status');
 
     $toClose->refresh();
-    expect($toClose->status)->toBe('closed');
+    expect($toClose->status)->toBe(EnrollmentPeriodStatus::CLOSED);
 
     $activeCount = EnrollmentPeriod::where('status', 'active')->count();
     expect($activeCount)->toBeGreaterThanOrEqual(1);
