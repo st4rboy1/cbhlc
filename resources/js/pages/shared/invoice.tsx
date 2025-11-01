@@ -200,7 +200,7 @@ export default function Invoice({ invoice, settings }: Props) {
     const enrollment = invoice.enrollment;
 
     const calculateTotalAmount = () => {
-        return invoice.items.reduce((sum, item) => sum + item.amount, 0);
+        return invoice.items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
     };
 
     const calculateNetAmount = () => {
