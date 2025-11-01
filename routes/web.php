@@ -233,6 +233,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Reports Management
         Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/enrollment-statistics', [AdminReportController::class, 'enrollmentStatistics'])->name('reports.enrollment-statistics');
+        Route::get('/reports/student-demographics', [AdminReportController::class, 'studentDemographics'])->name('reports.student-demographics');
+        Route::get('/reports/class-roster', [AdminReportController::class, 'classRoster'])->name('reports.class-roster');
+        Route::get('/reports/filter-options', [AdminReportController::class, 'filterOptions'])->name('reports.filter-options');
 
         // Audit Logs Management
         Route::prefix('audit-logs')->name('audit-logs.')->group(function () {
