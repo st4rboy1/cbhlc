@@ -58,6 +58,7 @@ interface GradeLevelFeesTableProps {
         search: string | null;
         school_year_id: string | null;
         active: string | null;
+        payment_terms?: string | null;
     };
     gradeLevels: string[];
     schoolYears: SchoolYear[];
@@ -66,7 +67,9 @@ interface GradeLevelFeesTableProps {
 export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }: GradeLevelFeesTableProps) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+        paymentTerms: true,
+    });
     const [rowSelection, setRowSelection] = React.useState({});
 
     const table = useReactTable({
@@ -91,14 +94,16 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
     const [gradeLevelFilter, setGradeLevelFilter] = React.useState(filters.search || 'all');
     const [schoolYearId, setSchoolYearId] = React.useState(filters.school_year_id || 'all');
     const [activeFilter, setActiveFilter] = React.useState(filters.active || 'all');
+    const [paymentTermFilter, setPaymentTermFilter] = React.useState(filters.payment_terms || 'all');
 
-    const applyFilters = (gradeLevel?: string, yearId?: string, active?: string) => {
+    const applyFilters = (gradeLevel?: string, yearId?: string, active?: string, paymentTerms?: string) => {
         router.get(
             '/super-admin/grade-level-fees',
             {
                 search: (gradeLevel ?? gradeLevelFilter) !== 'all' ? (gradeLevel ?? gradeLevelFilter) : undefined,
                 school_year_id: (yearId ?? schoolYearId) !== 'all' ? (yearId ?? schoolYearId) : undefined,
                 active: (active ?? activeFilter) !== 'all' ? (active ?? activeFilter) : undefined,
+                payment_terms: (paymentTerms ?? paymentTermFilter) !== 'all' ? (paymentTerms ?? paymentTermFilter) : undefined,
             },
             {
                 preserveState: true,
@@ -167,6 +172,23 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
                         <SelectItem value="all">All</SelectItem>
                         <SelectItem value="true">Active</SelectItem>
                         <SelectItem value="false">Inactive</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Select
+                    value={paymentTermFilter}
+                    onValueChange={(value) => {
+                        setPaymentTermFilter(value);
+                        applyFilters(undefined, undefined, undefined, value);
+                    }}
+                >
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by payment term" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Payment Terms</SelectItem>
+                        <SelectItem value="annual">Annual</SelectItem>
+                        <SelectItem value="semestral">Semestral</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
                     </SelectContent>
                 </Select>
                 <DropdownMenu>
@@ -314,6 +336,11 @@ export const columns: ColumnDef<GradeLevelFee>[] = [
             const amount = parseFloat(row.getValue('totalAmount'));
             return <div className="text-right font-semibold">{formatCurrency(amount)}</div>;
         },
+    },
+    {
+        accessorKey: 'paymentTerms',
+        header: 'Payment Terms',
+        cell: ({ row }) => <div className="capitalize">{row.getValue('paymentTerms')}</div>,
     },
     {
         accessorKey: 'isActive',
