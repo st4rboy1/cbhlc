@@ -345,7 +345,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('delete-gradeLevelFee', function (User $user, $fee) {
-            return $user->hasRole('administrator');
+            return $user->hasRole(['super_admin', 'registrar']);
+        });
+
+        Gate::define('deleteAny-gradeLevelFee', function (User $user) {
+            return $user->hasRole(['super_admin', 'registrar']);
         });
     }
 }
