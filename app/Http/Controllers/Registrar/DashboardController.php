@@ -9,14 +9,16 @@ use App\Http\Requests\Registrar\RejectEnrollmentRequest;
 use App\Models\Enrollment;
 use App\Models\EnrollmentPeriod;
 use App\Models\Student;
-use App\Notifications\EnrollmentApprovedNotification;
 use App\Notifications\EnrollmentRejectedNotification;
+use App\Services\EnrollmentService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
+    public function __construct(protected EnrollmentService $enrollmentService) {}
+
     /**
      * Display the registrar dashboard.
      */
@@ -126,24 +128,7 @@ class DashboardController extends Controller
     {
         $enrollment = Enrollment::findOrFail($enrollmentId);
 
-        if ($enrollment->status !== EnrollmentStatus::PENDING) {
-            return back()->with('error', 'Only pending applications can be approved.');
-        }
-
-        $enrollment->update([
-            'status' => EnrollmentStatus::ENROLLED,
-            'approved_at' => now(),
-            'approved_by' => auth()->id(),
-            'remarks' => $request->input('remarks'),
-        ]);
-
-        // Send approval notification to guardian
-        $enrollment->load(['student', 'guardian.user', 'schoolYear']);
-        if ($enrollment->guardian && $enrollment->guardian->user) {
-            $enrollment->guardian->user->notify(
-                new EnrollmentApprovedNotification($enrollment, $request->input('remarks'))
-            );
-        }
+        $this->enrollmentService->approveEnrollment($enrollment);
 
         return back()->with('success', 'Enrollment application approved and guardian has been notified.');
     }

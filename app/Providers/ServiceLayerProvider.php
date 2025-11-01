@@ -12,6 +12,7 @@ use App\Services\BillingService;
 use App\Services\CurrencyService;
 use App\Services\DashboardService;
 use App\Services\EnrollmentService;
+use App\Services\InvoiceService;
 use App\Services\StudentService;
 use Illuminate\Support\ServiceProvider;
 
@@ -29,7 +30,7 @@ class ServiceLayerProvider extends ServiceProvider
 
         // Register EnrollmentService
         $this->app->bind(EnrollmentServiceInterface::class, function ($app) {
-            return new EnrollmentService(new Enrollment);
+            return new EnrollmentService(new Enrollment, $app->make(InvoiceService::class));
         });
 
         // Register BillingService
