@@ -448,6 +448,8 @@ test('logActivity is called for main operations', function () {
     ]);
     $student = Student::factory()->create();
 
+    $this->invoiceServiceMock->shouldReceive('createInvoiceFromEnrollment')->andReturn(new \App\Models\Invoice(['id' => 1]));
+
     $this->service->getPaginatedEnrollments();
     $this->service->approveEnrollment($enrollment);
     $this->service->getEnrollmentsByStudent($student->id);
