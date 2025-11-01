@@ -45,137 +45,6 @@ export type GradeLevelFee = {
     isActive: boolean;
 };
 
-export const columns: ColumnDef<GradeLevelFee>[] = [
-    {
-        id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: 'gradeLevel',
-        header: ({ column }) => {
-            return (
-                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                    Grade Level
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
-    },
-    {
-        accessorKey: 'schoolYear',
-        header: ({ column }) => {
-            return (
-                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                    School Year
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
-    },
-    {
-        accessorKey: 'tuitionFee',
-        header: () => <div className="text-right">Tuition Fee</div>,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue('tuitionFee'));
-            return <div className="text-right font-medium">{formatCurrency(amount)}</div>;
-        },
-    },
-    {
-        accessorKey: 'miscellaneousFee',
-        header: () => <div className="text-right">Misc. Fee</div>,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue('miscellaneousFee'));
-            return <div className="text-right font-medium">{formatCurrency(amount)}</div>;
-        },
-    },
-    {
-        accessorKey: 'otherFees',
-        header: () => <div className="text-right">Other Fees</div>,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue('otherFees'));
-            return <div className="text-right font-medium">{formatCurrency(amount)}</div>;
-        },
-    },
-    {
-        accessorKey: 'totalAmount',
-        header: () => <div className="text-right">Total</div>,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue('totalAmount'));
-            return <div className="text-right font-semibold">{formatCurrency(amount)}</div>;
-        },
-    },
-    {
-        accessorKey: 'isActive',
-        header: 'Status',
-        cell: ({ row }) => (
-            <Badge variant={row.getValue('isActive') ? 'default' : 'secondary'}>{row.getValue('isActive') ? 'Active' : 'Inactive'}</Badge>
-        ),
-    },
-    {
-        id: 'actions',
-        cell: ({ row }) => {
-            const fee = row.original;
-
-            const handleDelete = () => {
-                if (confirm('Are you sure you want to delete this fee structure?')) {
-                    router.delete(`/super-admin/grade-level-fees/${fee.id}`);
-                }
-            };
-
-            const handleDuplicate = () => {
-                const newSchoolYear = prompt('Enter the school year to duplicate to (e.g., 2025-2026):');
-                if (newSchoolYear) {
-                    router.post(`/super-admin/grade-level-fees/${fee.id}/duplicate`, {
-                        school_year: newSchoolYear,
-                    });
-                }
-            };
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => router.visit(`/super-admin/grade-level-fees/${fee.id}`)}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            View
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.visit(`/super-admin/grade-level-fees/${fee.id}/edit`)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleDuplicate}>
-                            <Copy className="mr-2 h-4 w-4" />
-                            Duplicate
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleDelete} className="text-destructive">
-                            <Trash className="mr-2 h-4 w-4" />
-                            Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        },
-    },
-];
-
 interface SchoolYear {
     id: number;
     name: string;
@@ -189,6 +58,7 @@ interface GradeLevelFeesTableProps {
         search: string | null;
         school_year_id: string | null;
         active: string | null;
+        payment_terms?: string | null;
     };
     gradeLevels: string[];
     schoolYears: SchoolYear[];
@@ -197,7 +67,9 @@ interface GradeLevelFeesTableProps {
 export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }: GradeLevelFeesTableProps) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+        paymentTerms: true,
+    });
     const [rowSelection, setRowSelection] = React.useState({});
 
     const table = useReactTable({
@@ -222,14 +94,16 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
     const [gradeLevelFilter, setGradeLevelFilter] = React.useState(filters.search || 'all');
     const [schoolYearId, setSchoolYearId] = React.useState(filters.school_year_id || 'all');
     const [activeFilter, setActiveFilter] = React.useState(filters.active || 'all');
+    const [paymentTermFilter, setPaymentTermFilter] = React.useState(filters.payment_terms || 'all');
 
-    const applyFilters = (gradeLevel?: string, yearId?: string, active?: string) => {
+    const applyFilters = (gradeLevel?: string, yearId?: string, active?: string, paymentTerms?: string) => {
         router.get(
             '/super-admin/grade-level-fees',
             {
                 search: (gradeLevel ?? gradeLevelFilter) !== 'all' ? (gradeLevel ?? gradeLevelFilter) : undefined,
                 school_year_id: (yearId ?? schoolYearId) !== 'all' ? (yearId ?? schoolYearId) : undefined,
                 active: (active ?? activeFilter) !== 'all' ? (active ?? activeFilter) : undefined,
+                payment_terms: (paymentTerms ?? paymentTermFilter) !== 'all' ? (paymentTerms ?? paymentTermFilter) : undefined,
             },
             {
                 preserveState: true,
@@ -239,9 +113,22 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
         );
     };
 
+    const handleBulkDelete = () => {
+        const selectedIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
+        if (selectedIds.length > 0 && confirm(`Are you sure you want to delete ${selectedIds.length} selected fee structures?`)) {
+            router.delete('/super-admin/grade-level-fees', { data: { ids: selectedIds } });
+        }
+    };
+
     return (
         <div className="w-full">
             <div className="flex items-center gap-4 py-4">
+                {table.getFilteredSelectedRowModel().rows.length > 0 && (
+                    <Button variant="destructive" onClick={handleBulkDelete}>
+                        <Trash className="mr-2 h-4 w-4" />
+                        Delete Selected ({table.getFilteredSelectedRowModel().rows.length})
+                    </Button>
+                )}
                 <Select
                     value={gradeLevelFilter}
                     onValueChange={(value) => {
@@ -285,6 +172,23 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
                         <SelectItem value="all">All</SelectItem>
                         <SelectItem value="true">Active</SelectItem>
                         <SelectItem value="false">Inactive</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Select
+                    value={paymentTermFilter}
+                    onValueChange={(value) => {
+                        setPaymentTermFilter(value);
+                        applyFilters(undefined, undefined, undefined, value);
+                    }}
+                >
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by payment term" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Payment Terms</SelectItem>
+                        <SelectItem value="annual">Annual</SelectItem>
+                        <SelectItem value="semestral">Semestral</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
                     </SelectContent>
                 </Select>
                 <DropdownMenu>
@@ -362,3 +266,139 @@ export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }:
         </div>
     );
 }
+
+export const columns: ColumnDef<GradeLevelFee>[] = [
+    {
+        id: 'select',
+        header: ({ table }) => (
+            <Checkbox
+                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: 'gradeLevel',
+        header: ({ column }) => {
+            return (
+                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                    Grade Level
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            );
+        },
+    },
+    {
+        accessorKey: 'schoolYear',
+        header: ({ column }) => {
+            return (
+                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+                    School Year
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            );
+        },
+    },
+    {
+        accessorKey: 'tuitionFee',
+        header: () => <div className="text-right">Tuition Fee</div>,
+        cell: ({ row }) => {
+            const amount = parseFloat(row.getValue('tuitionFee'));
+            return <div className="text-right font-medium">{formatCurrency(amount)}</div>;
+        },
+    },
+    {
+        accessorKey: 'miscellaneousFee',
+        header: () => <div className="text-right">Misc. Fee</div>,
+        cell: ({ row }) => {
+            const amount = parseFloat(row.getValue('miscellaneousFee'));
+            return <div className="text-right font-medium">{formatCurrency(amount)}</div>;
+        },
+    },
+    {
+        accessorKey: 'otherFees',
+        header: () => <div className="text-right">Other Fees</div>,
+        cell: ({ row }) => {
+            const amount = parseFloat(row.getValue('otherFees'));
+            return <div className="text-right font-medium">{formatCurrency(amount)}</div>;
+        },
+    },
+    {
+        accessorKey: 'totalAmount',
+        header: () => <div className="text-right">Total</div>,
+        cell: ({ row }) => {
+            const amount = parseFloat(row.getValue('totalAmount'));
+            return <div className="text-right font-semibold">{formatCurrency(amount)}</div>;
+        },
+    },
+    {
+        accessorKey: 'paymentTerms',
+        header: 'Payment Terms',
+        cell: ({ row }) => <div className="capitalize">{row.getValue('paymentTerms')}</div>,
+    },
+    {
+        accessorKey: 'isActive',
+        header: 'Status',
+        cell: ({ row }) => (
+            <Badge variant={row.getValue('isActive') ? 'default' : 'secondary'}>{row.getValue('isActive') ? 'Active' : 'Inactive'}</Badge>
+        ),
+    },
+    {
+        id: 'actions',
+        cell: ({ row }) => {
+            const fee = row.original;
+
+            const handleDelete = () => {
+                if (confirm('Are you sure you want to delete this fee structure?')) {
+                    router.delete(`/super-admin/grade-level-fees/${fee.id}`);
+                }
+            };
+
+            const handleDuplicate = () => {
+                const newSchoolYear = prompt('Enter the school year to duplicate to (e.g., 2025-2026):');
+                if (newSchoolYear) {
+                    router.post(`/super-admin/grade-level-fees/${fee.id}/duplicate`, {
+                        school_year: newSchoolYear,
+                    });
+                }
+            };
+
+            return (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => router.visit(`/super-admin/grade-level-fees/${fee.id}`)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.visit(`/super-admin/grade-level-fees/${fee.id}/edit`)}>
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleDuplicate}>
+                            <Copy className="mr-2 h-4 w-4" />
+                            Duplicate
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+                            <Trash className="mr-2 h-4 w-4" />
+                            Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            );
+        },
+    },
+];
