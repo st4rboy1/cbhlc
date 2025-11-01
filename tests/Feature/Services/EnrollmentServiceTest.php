@@ -5,6 +5,7 @@ use App\Enums\PaymentStatus;
 use App\Models\Enrollment;
 use App\Models\Student;
 use App\Services\EnrollmentService;
+use App\Services\InvoiceService;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,8 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     // Seed roles and permissions for each test
     $this->seed(RolesAndPermissionsSeeder::class);
-    $this->service = new EnrollmentService(new Enrollment);
+    $this->invoiceServiceMock = Mockery::mock(InvoiceService::class);
+    $this->service = new EnrollmentService(new Enrollment, $this->invoiceServiceMock);
 
     // Create school year for regular tests
     $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
@@ -187,13 +189,15 @@ test('approveEnrollment updates status to approved', function () {
         'school_year_id' => $this->sy2024->id,
     ]);
 
+    $this->invoiceServiceMock->shouldReceive('createInvoiceFromEnrollment')->andReturn(new \App\Models\Invoice(['id' => 1]));
+
     $result = $this->service->approveEnrollment($enrollment);
 
-    expect($result->status)->toBe(EnrollmentStatus::ENROLLED);
+    expect($result->status)->toBe(EnrollmentStatus::READY_FOR_PAYMENT);
     expect($result->approved_at)->not->toBeNull();
     $this->assertDatabaseHas('enrollments', [
         'id' => $enrollment->id,
-        'status' => EnrollmentStatus::ENROLLED,
+        'status' => EnrollmentStatus::READY_FOR_PAYMENT,
     ]);
 });
 
