@@ -10,14 +10,16 @@ use App\Http\Requests\Registrar\RejectEnrollmentRequest;
 use App\Http\Requests\Registrar\UpdatePaymentStatusRequest;
 use App\Models\Enrollment;
 use App\Models\SchoolYear;
-use App\Notifications\EnrollmentApprovedNotification;
 use App\Notifications\EnrollmentRejectedNotification;
+use App\Services\EnrollmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class EnrollmentController extends Controller
 {
+    public function __construct(protected EnrollmentService $enrollmentService) {}
+
     /**
      * Display a listing of all enrollments.
      */
@@ -87,39 +89,7 @@ class EnrollmentController extends Controller
      */
     public function approve(Request $request, Enrollment $enrollment)
     {
-        if ($enrollment->status !== EnrollmentStatus::PENDING) {
-            return back()->with('error', 'Only pending enrollments can be approved.');
-        }
-
-        // Use database transaction to ensure consistency
-        \DB::transaction(function () use ($request, $enrollment) {
-            // First, approve the enrollment
-            $enrollment->update([
-                'status' => EnrollmentStatus::APPROVED,
-                'approved_at' => now(),
-                'approved_by' => Auth::id(),
-                'remarks' => $request->input('remarks'),
-            ]);
-
-            // Generate invoice for the enrollment
-            $invoiceService = new \App\Services\InvoiceService;
-            $invoice = $invoiceService->createInvoiceFromEnrollment($enrollment);
-
-            // Update enrollment with invoice reference and transition to ready for payment
-            $enrollment->update([
-                'status' => EnrollmentStatus::READY_FOR_PAYMENT,
-                'invoice_id' => $invoice->id,
-                'ready_for_payment_at' => now(),
-            ]);
-
-            // Send notification to guardian about approval and payment requirements
-            $enrollment->load(['student', 'guardian.user', 'schoolYear']);
-            if ($enrollment->guardian && $enrollment->guardian->user) {
-                $enrollment->guardian->user->notify(
-                    new EnrollmentApprovedNotification($enrollment, $request->input('remarks'))
-                );
-            }
-        });
+        $this->enrollmentService->approveEnrollment($enrollment);
 
         return back()->with('success', 'Enrollment approved successfully. Invoice has been generated and notification sent to the guardian.');
     }
@@ -217,13 +187,14 @@ class EnrollmentController extends Controller
         \DB::transaction(function () use ($validated, $enrollment) {
             // Calculate amounts in cents
             $amountPaidCents = (int) ($validated['amount_paid'] * 100);
-            $balanceCents = $enrollment->net_amount_cents - $amountPaidCents;
+            $newAmountPaidCents = $enrollment->amount_paid_cents + $amountPaidCents;
+            $balanceCents = $enrollment->net_amount_cents - $newAmountPaidCents;
 
             // Update enrollment payment details
             $enrollment->update([
                 'status' => EnrollmentStatus::PAID,
                 'payment_status' => $balanceCents <= 0 ? PaymentStatus::PAID : PaymentStatus::PARTIAL,
-                'amount_paid_cents' => $amountPaidCents,
+                'amount_paid_cents' => $newAmountPaidCents,
                 'balance_cents' => max(0, $balanceCents),
                 'payment_reference' => $validated['payment_reference'],
                 'paid_at' => now(),

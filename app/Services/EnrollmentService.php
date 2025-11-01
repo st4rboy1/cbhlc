@@ -17,7 +17,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
     /**
      * EnrollmentService constructor.
      */
-    public function __construct(Enrollment $model)
+    public function __construct(Enrollment $model, protected InvoiceService $invoiceService)
     {
         parent::__construct($model);
     }
@@ -182,9 +182,17 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
             }
 
             $enrollment->update([
-                'status' => EnrollmentStatus::ENROLLED,
+                'status' => EnrollmentStatus::APPROVED,
                 'approved_by' => auth()->id(),
                 'approved_at' => now(),
+            ]);
+
+            $invoice = $this->invoiceService->createInvoiceFromEnrollment($enrollment);
+
+            $enrollment->update([
+                'status' => EnrollmentStatus::READY_FOR_PAYMENT,
+                'invoice_id' => $invoice->id,
+                'ready_for_payment_at' => now(),
             ]);
 
             $this->logActivity('approveEnrollment', ['enrollment_id' => $enrollment->id]);
