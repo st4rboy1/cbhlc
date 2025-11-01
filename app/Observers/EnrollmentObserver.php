@@ -4,8 +4,6 @@ namespace App\Observers;
 
 use App\Enums\EnrollmentStatus;
 use App\Enums\PaymentStatus;
-use App\Mail\EnrollmentApproved;
-use App\Mail\EnrollmentRejected;
 use App\Mail\EnrollmentSubmitted;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
@@ -78,11 +76,6 @@ class EnrollmentObserver
      */
     public function updated(Enrollment $enrollment): void
     {
-        // Send email notifications based on status change
-        if ($enrollment->wasChanged('status')) {
-            $this->sendStatusChangeEmail($enrollment);
-        }
-
         // Update student's grade level if enrollment is approved or enrolled
         if ($enrollment->wasChanged('status') && ($enrollment->status->value === 'approved' || $enrollment->status->value === 'enrolled')) {
             $enrollment->student->update([
@@ -150,30 +143,6 @@ class EnrollmentObserver
             $enrollment->miscellaneous_fee = 0;
             $enrollment->total_amount = 0;
             $enrollment->balance = 0;
-        }
-    }
-
-    /**
-     * Send status change email notifications.
-     */
-    private function sendStatusChangeEmail(Enrollment $enrollment): void
-    {
-        if (! $enrollment->guardian || ! $enrollment->guardian->user || empty($enrollment->guardian->user->email)) {
-            return;
-        }
-
-        $newStatus = $enrollment->status->value;
-        $email = $enrollment->guardian->user->email;
-
-        switch ($newStatus) {
-            case 'approved':
-            case 'enrolled':
-                Mail::to($email)->queue(new EnrollmentApproved($enrollment));
-                break;
-            case 'rejected':
-                $reason = $enrollment->remarks ?? 'No specific reason provided';
-                Mail::to($email)->queue(new EnrollmentRejected($enrollment, $reason));
-                break;
         }
     }
 }
