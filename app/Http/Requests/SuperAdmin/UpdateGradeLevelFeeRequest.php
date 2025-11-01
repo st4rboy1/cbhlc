@@ -34,7 +34,7 @@ class UpdateGradeLevelFeeRequest extends FormRequest
                         return $query->where('payment_terms', $this->payment_terms);
                     }),
             ],
-            'school_year_id' => ['required', 'exists:school_years,id'],
+            'school_year_id' => ['nullable', 'exists:school_years,id'],
             'tuition_fee' => ['required', 'numeric', 'min:0'],
             'miscellaneous_fee' => ['required', 'numeric', 'min:0'],
             'other_fees' => ['nullable', 'numeric', 'min:0'],

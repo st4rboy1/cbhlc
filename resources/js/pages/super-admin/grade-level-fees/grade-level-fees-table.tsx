@@ -45,6 +45,206 @@ export type GradeLevelFee = {
     isActive: boolean;
 };
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    status: string;
+    is_active: boolean;
+}
+
+interface GradeLevelFeesTableProps {
+    fees: GradeLevelFee[];
+    filters: {
+        search: string | null;
+        school_year_id: string | null;
+        active: string | null;
+    };
+    gradeLevels: string[];
+    schoolYears: SchoolYear[];
+}
+
+export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }: GradeLevelFeesTableProps) {
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [rowSelection, setRowSelection] = React.useState({});
+
+    const table = useReactTable({
+        data: fees,
+        columns,
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        onColumnVisibilityChange: setColumnVisibility,
+        onRowSelectionChange: setRowSelection,
+        state: {
+            sorting,
+            columnFilters,
+            columnVisibility,
+            rowSelection,
+        },
+    });
+
+    const [gradeLevelFilter, setGradeLevelFilter] = React.useState(filters.search || 'all');
+    const [schoolYearId, setSchoolYearId] = React.useState(filters.school_year_id || 'all');
+    const [activeFilter, setActiveFilter] = React.useState(filters.active || 'all');
+
+    const applyFilters = (gradeLevel?: string, yearId?: string, active?: string) => {
+        router.get(
+            '/super-admin/grade-level-fees',
+            {
+                search: (gradeLevel ?? gradeLevelFilter) !== 'all' ? (gradeLevel ?? gradeLevelFilter) : undefined,
+                school_year_id: (yearId ?? schoolYearId) !== 'all' ? (yearId ?? schoolYearId) : undefined,
+                active: (active ?? activeFilter) !== 'all' ? (active ?? activeFilter) : undefined,
+            },
+            {
+                preserveState: true,
+                replace: true,
+                preserveScroll: true,
+            },
+        );
+    };
+
+    const handleBulkDelete = () => {
+        const selectedIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
+        if (selectedIds.length > 0 && confirm(`Are you sure you want to delete ${selectedIds.length} selected fee structures?`)) {
+            router.delete('/super-admin/grade-level-fees', { data: { ids: selectedIds } });
+        }
+    };
+
+    return (
+        <div className="w-full">
+            <div className="flex items-center gap-4 py-4">
+                {table.getFilteredSelectedRowModel().rows.length > 0 && (
+                    <Button variant="destructive" onClick={handleBulkDelete}>
+                        <Trash className="mr-2 h-4 w-4" />
+                        Delete Selected ({table.getFilteredSelectedRowModel().rows.length})
+                    </Button>
+                )}
+                <Select
+                    value={gradeLevelFilter}
+                    onValueChange={(value) => {
+                        setGradeLevelFilter(value);
+                        applyFilters(value, undefined, undefined);
+                    }}
+                >
+                    <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Filter by grade level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Grade Levels</SelectItem>
+                        {gradeLevels.map((level) => (
+                            <SelectItem key={level} value={level}>
+                                {level}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <div className="w-[200px]">
+                    <SchoolYearFilter
+                        value={schoolYearId}
+                        onChange={(value) => {
+                            setSchoolYearId(value);
+                            applyFilters(undefined, value, undefined);
+                        }}
+                        schoolYears={schoolYears}
+                    />
+                </div>
+                <Select
+                    value={activeFilter}
+                    onValueChange={(value) => {
+                        setActiveFilter(value);
+                        applyFilters(undefined, undefined, value);
+                    }}
+                >
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="true">Active</SelectItem>
+                        <SelectItem value="false">Inactive</SelectItem>
+                    </SelectContent>
+                </Select>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="ml-auto">
+                            Columns <ChevronDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        {table
+                            .getAllColumns()
+                            .filter((column) => column.getCanHide())
+                            .map((column) => {
+                                return (
+                                    <DropdownMenuCheckboxItem
+                                        key={column.id}
+                                        className="capitalize"
+                                        checked={column.getIsVisible()}
+                                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                                    >
+                                        {column.id}
+                                    </DropdownMenuCheckboxItem>
+                                );
+                            })}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+            <div className="overflow-hidden rounded-md border">
+                <Table>
+                    <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead key={header.id}>
+                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                        </TableHead>
+                                    );
+                                })}
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows?.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                    No grade level fees found.
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+            <div className="flex items-center justify-end space-x-2 py-4">
+                <div className="flex-1 text-sm text-muted-foreground">
+                    {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
+                </div>
+                <div className="space-x-2">
+                    <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+                        Previous
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+                        Next
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export const columns: ColumnDef<GradeLevelFee>[] = [
     {
         id: 'select',
@@ -175,190 +375,3 @@ export const columns: ColumnDef<GradeLevelFee>[] = [
         },
     },
 ];
-
-interface SchoolYear {
-    id: number;
-    name: string;
-    status: string;
-    is_active: boolean;
-}
-
-interface GradeLevelFeesTableProps {
-    fees: GradeLevelFee[];
-    filters: {
-        search: string | null;
-        school_year_id: string | null;
-        active: string | null;
-    };
-    gradeLevels: string[];
-    schoolYears: SchoolYear[];
-}
-
-export function GradeLevelFeesTable({ fees, filters, gradeLevels, schoolYears }: GradeLevelFeesTableProps) {
-    const [sorting, setSorting] = React.useState<SortingState>([]);
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-    const [rowSelection, setRowSelection] = React.useState({});
-
-    const table = useReactTable({
-        data: fees,
-        columns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
-        getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
-        state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection,
-        },
-    });
-
-    const [gradeLevelFilter, setGradeLevelFilter] = React.useState(filters.search || 'all');
-    const [schoolYearId, setSchoolYearId] = React.useState(filters.school_year_id || 'all');
-    const [activeFilter, setActiveFilter] = React.useState(filters.active || 'all');
-
-    const applyFilters = (gradeLevel?: string, yearId?: string, active?: string) => {
-        router.get(
-            '/super-admin/grade-level-fees',
-            {
-                search: (gradeLevel ?? gradeLevelFilter) !== 'all' ? (gradeLevel ?? gradeLevelFilter) : undefined,
-                school_year_id: (yearId ?? schoolYearId) !== 'all' ? (yearId ?? schoolYearId) : undefined,
-                active: (active ?? activeFilter) !== 'all' ? (active ?? activeFilter) : undefined,
-            },
-            {
-                preserveState: true,
-                replace: true,
-                preserveScroll: true,
-            },
-        );
-    };
-
-    return (
-        <div className="w-full">
-            <div className="flex items-center gap-4 py-4">
-                <Select
-                    value={gradeLevelFilter}
-                    onValueChange={(value) => {
-                        setGradeLevelFilter(value);
-                        applyFilters(value, undefined, undefined);
-                    }}
-                >
-                    <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="Filter by grade level" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All Grade Levels</SelectItem>
-                        {gradeLevels.map((level) => (
-                            <SelectItem key={level} value={level}>
-                                {level}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-                <div className="w-[200px]">
-                    <SchoolYearFilter
-                        value={schoolYearId}
-                        onChange={(value) => {
-                            setSchoolYearId(value);
-                            applyFilters(undefined, value, undefined);
-                        }}
-                        schoolYears={schoolYears}
-                    />
-                </div>
-                <Select
-                    value={activeFilter}
-                    onValueChange={(value) => {
-                        setActiveFilter(value);
-                        applyFilters(undefined, undefined, value);
-                    }}
-                >
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="all">All</SelectItem>
-                        <SelectItem value="true">Active</SelectItem>
-                        <SelectItem value="false">Inactive</SelectItem>
-                    </SelectContent>
-                </Select>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
-                            Columns <ChevronDown className="ml-2 h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        {table
-                            .getAllColumns()
-                            .filter((column) => column.getCanHide())
-                            .map((column) => {
-                                return (
-                                    <DropdownMenuCheckboxItem
-                                        key={column.id}
-                                        className="capitalize"
-                                        checked={column.getIsVisible()}
-                                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                                    >
-                                        {column.id}
-                                    </DropdownMenuCheckboxItem>
-                                );
-                            })}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-            <div className="overflow-hidden rounded-md border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                                        </TableHead>
-                                    );
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No grade level fees found.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
-                </div>
-                <div className="space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-                        Previous
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-                        Next
-                    </Button>
-                </div>
-            </div>
-        </div>
-    );
-}
