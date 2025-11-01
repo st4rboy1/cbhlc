@@ -204,15 +204,11 @@ export default function Invoice({ invoice, settings }: Props) {
     };
 
     const calculateNetAmount = () => {
-        // Assuming discount is applied to the total of items
-        const totalItemsAmount = calculateTotalAmount();
-        // For now, let's assume discount is not part of invoice items but a separate field on invoice
-        // If discount is part of invoice items, this logic needs adjustment
-        return totalItemsAmount - (invoice.discount || 0);
+        return invoice.total_amount - (invoice.discount || 0);
     };
 
     const calculateBalanceDue = () => {
-        return calculateNetAmount() - invoice.paid_amount;
+        return calculateNetAmount() - (Number(invoice.paid_amount) || 0);
     };
 
     return (
@@ -343,9 +339,7 @@ export default function Invoice({ invoice, settings }: Props) {
                                     <TableRow>
                                         <TableCell className="text-right font-semibold">Less: Discounts & Rebates:</TableCell>
                                         <TableCell className="text-right font-semibold">
-                                            {invoice.total_amount - calculateTotalAmount() > 0
-                                                ? `-${formatCurrency(invoice.total_amount - calculateTotalAmount())}`
-                                                : formatCurrency(0)}
+                                            {invoice.discount ? `-${formatCurrency(invoice.discount)}` : formatCurrency(0)}
                                         </TableCell>
                                     </TableRow>
                                     <TableRow className="border-t-2">
