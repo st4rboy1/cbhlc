@@ -223,8 +223,19 @@ test('enrollment periods are paginated', function () {
 });
 
 test('enrollment periods are ordered by start date descending', function () {
-    $older = EnrollmentPeriod::factory()->create(['start_date' => now()->subMonths(2)]);
-    $newer = EnrollmentPeriod::factory()->create(['start_date' => now()]);
+    $olderStart = now()->subMonths(2);
+    $older = EnrollmentPeriod::factory()->create([
+        'start_date' => $olderStart,
+        'end_date' => $olderStart->copy()->addMonths(2),
+        'regular_registration_deadline' => $olderStart->copy()->addMonth(),
+    ]);
+
+    $newerStart = now();
+    $newer = EnrollmentPeriod::factory()->create([
+        'start_date' => $newerStart,
+        'end_date' => $newerStart->copy()->addMonths(2),
+        'regular_registration_deadline' => $newerStart->copy()->addMonth(),
+    ]);
 
     $response = $this->actingAs($this->admin)->get(route('admin.enrollment-periods.index'));
 
