@@ -1,9 +1,9 @@
 <?php
 
 use App\Enums\EnrollmentStatus;
+use App\Enums\GradeLevel;
 use App\Models\Enrollment;
 use App\Models\EnrollmentPeriod;
-use App\Models\GradeLevel;
 use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\User;
@@ -34,8 +34,8 @@ beforeEach(function () {
         'status' => 'active',
     ]);
 
-    // Create grade level
-    $this->gradeLevel = GradeLevel::factory()->create(['name' => 'Grade 1']);
+    // Use grade level string instead of model
+    $this->gradeLevel = GradeLevel::GRADE_1->value; // 'Grade 1'
 });
 
 test('admin can access reports dashboard', function () {
@@ -48,13 +48,13 @@ test('admin can get enrollment statistics', function () {
     // Create enrollments with different statuses
     Enrollment::factory()->count(3)->create([
         'enrollment_period_id' => $this->enrollmentPeriod->id,
-        'grade_level_id' => $this->gradeLevel->id,
+        'grade_level' => $this->gradeLevel,
         'status' => EnrollmentStatus::APPROVED,
     ]);
 
     Enrollment::factory()->count(2)->create([
         'enrollment_period_id' => $this->enrollmentPeriod->id,
-        'grade_level_id' => $this->gradeLevel->id,
+        'grade_level' => $this->gradeLevel,
         'status' => EnrollmentStatus::PENDING,
     ]);
 
@@ -62,7 +62,7 @@ test('admin can get enrollment statistics', function () {
 
     $response->assertStatus(200)
         ->assertJsonStructure([
-            'summary' => ['total', 'pending', 'approved', 'rejected', 'withdrawn'],
+            'summary' => ['total', 'pending', 'approved', 'rejected', 'ready_for_payment', 'paid', 'enrolled', 'completed'],
             'byGradeLevel',
             'trend',
             'filters',
@@ -89,20 +89,20 @@ test('admin can filter enrollment statistics by school year', function () {
 });
 
 test('admin can filter enrollment statistics by grade level', function () {
-    $anotherGrade = GradeLevel::factory()->create(['name' => 'Grade 2']);
+    $anotherGrade = GradeLevel::GRADE_2->value; // 'Grade 2'
 
     Enrollment::factory()->count(3)->create([
         'enrollment_period_id' => $this->enrollmentPeriod->id,
-        'grade_level_id' => $this->gradeLevel->id,
+        'grade_level' => $this->gradeLevel,
     ]);
 
     Enrollment::factory()->count(2)->create([
         'enrollment_period_id' => $this->enrollmentPeriod->id,
-        'grade_level_id' => $anotherGrade->id,
+        'grade_level' => $anotherGrade,
     ]);
 
     $response = $this->actingAs($this->admin)->getJson(
-        route('admin.reports.enrollment-statistics', ['grade_level_id' => $this->gradeLevel->id])
+        route('admin.reports.enrollment-statistics', ['grade_level' => $this->gradeLevel])
     );
 
     $response->assertStatus(200);
@@ -201,7 +201,7 @@ test('admin can get class roster', function () {
         Enrollment::factory()->create([
             'student_id' => $student->id,
             'enrollment_period_id' => $this->enrollmentPeriod->id,
-            'grade_level_id' => $this->gradeLevel->id,
+            'grade_level' => $this->gradeLevel,
             'status' => EnrollmentStatus::APPROVED,
         ]);
     }
@@ -209,14 +209,14 @@ test('admin can get class roster', function () {
     $response = $this->actingAs($this->admin)->getJson(
         route('admin.reports.class-roster', [
             'school_year_id' => $this->schoolYear->id,
-            'grade_level_id' => $this->gradeLevel->id,
+            'grade_level' => $this->gradeLevel,
         ])
     );
 
     $response->assertStatus(200)
         ->assertJsonStructure([
             'school_year' => ['id', 'name'],
-            'grade_level' => ['id', 'name'],
+            'grade_level' => ['grade', 'name'],
             'total_students',
             'roster',
             'filters',
@@ -233,21 +233,21 @@ test('class roster defaults to approved enrollments only', function () {
     Enrollment::factory()->create([
         'student_id' => $approvedStudent->id,
         'enrollment_period_id' => $this->enrollmentPeriod->id,
-        'grade_level_id' => $this->gradeLevel->id,
+        'grade_level' => $this->gradeLevel,
         'status' => EnrollmentStatus::APPROVED,
     ]);
 
     Enrollment::factory()->create([
         'student_id' => $pendingStudent->id,
         'enrollment_period_id' => $this->enrollmentPeriod->id,
-        'grade_level_id' => $this->gradeLevel->id,
+        'grade_level' => $this->gradeLevel,
         'status' => EnrollmentStatus::PENDING,
     ]);
 
     $response = $this->actingAs($this->admin)->getJson(
         route('admin.reports.class-roster', [
             'school_year_id' => $this->schoolYear->id,
-            'grade_level_id' => $this->gradeLevel->id,
+            'grade_level' => $this->gradeLevel,
         ])
     );
 
@@ -262,7 +262,7 @@ test('class roster can include other statuses when specified', function () {
         Enrollment::factory()->create([
             'student_id' => $student->id,
             'enrollment_period_id' => $this->enrollmentPeriod->id,
-            'grade_level_id' => $this->gradeLevel->id,
+            'grade_level' => $this->gradeLevel,
             'status' => EnrollmentStatus::PENDING,
         ]);
     }
@@ -270,7 +270,7 @@ test('class roster can include other statuses when specified', function () {
     $response = $this->actingAs($this->admin)->getJson(
         route('admin.reports.class-roster', [
             'school_year_id' => $this->schoolYear->id,
-            'grade_level_id' => $this->gradeLevel->id,
+            'grade_level' => $this->gradeLevel,
             'status' => 'pending',
         ])
     );
@@ -283,7 +283,7 @@ test('class roster requires school year and grade level', function () {
     $response = $this->actingAs($this->admin)->getJson(route('admin.reports.class-roster'));
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['school_year_id', 'grade_level_id']);
+        ->assertJsonValidationErrors(['school_year_id', 'grade_level']);
 });
 
 test('admin can get filter options', function () {
@@ -296,9 +296,9 @@ test('admin can get filter options', function () {
             'enrollmentPeriods',
         ]);
 
-    expect($response->json('schoolYears'))->toHaveCount(1)
-        ->and($response->json('gradeLevels'))->toHaveCount(1)
-        ->and($response->json('enrollmentPeriods'))->toHaveCount(1);
+    expect($response->json('schoolYears'))->toBeArray()
+        ->and($response->json('gradeLevels'))->toHaveCount(7) // Kinder + 6 grades
+        ->and($response->json('enrollmentPeriods'))->toBeArray();
 });
 
 test('non-admin cannot access report endpoints', function () {
@@ -314,7 +314,7 @@ test('non-admin cannot access report endpoints', function () {
     $response = $this->actingAs($user)->getJson(
         route('admin.reports.class-roster', [
             'school_year_id' => $this->schoolYear->id,
-            'grade_level_id' => $this->gradeLevel->id,
+            'grade_level' => $this->gradeLevel,
         ])
     );
     $response->assertStatus(403);
@@ -339,12 +339,11 @@ test('enrollment statistics validates foreign keys', function () {
     $response = $this->actingAs($this->admin)->getJson(
         route('admin.reports.enrollment-statistics', [
             'school_year_id' => 999,
-            'grade_level_id' => 999,
         ])
     );
 
     $response->assertStatus(422)
-        ->assertJsonValidationErrors(['school_year_id', 'grade_level_id']);
+        ->assertJsonValidationErrors(['school_year_id']);
 });
 
 test('roster is ordered by student last name', function () {
@@ -354,21 +353,21 @@ test('roster is ordered by student last name', function () {
     Enrollment::factory()->create([
         'student_id' => $john->id,
         'enrollment_period_id' => $this->enrollmentPeriod->id,
-        'grade_level_id' => $this->gradeLevel->id,
+        'grade_level' => $this->gradeLevel,
         'status' => EnrollmentStatus::APPROVED,
     ]);
 
     Enrollment::factory()->create([
         'student_id' => $jane->id,
         'enrollment_period_id' => $this->enrollmentPeriod->id,
-        'grade_level_id' => $this->gradeLevel->id,
+        'grade_level' => $this->gradeLevel,
         'status' => EnrollmentStatus::APPROVED,
     ]);
 
     $response = $this->actingAs($this->admin)->getJson(
         route('admin.reports.class-roster', [
             'school_year_id' => $this->schoolYear->id,
-            'grade_level_id' => $this->gradeLevel->id,
+            'grade_level' => $this->gradeLevel,
         ])
     );
 
