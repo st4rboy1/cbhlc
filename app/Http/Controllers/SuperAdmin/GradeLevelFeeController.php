@@ -41,7 +41,17 @@ class GradeLevelFeeController extends Controller
             $query->where('is_active', $request->get('active') === 'true');
         }
 
-        $fees = $query->latest()->paginate(15)->withQueryString();
+        $fees = $query->latest()->paginate(15)->withQueryString()->through(fn ($fee) => [
+            'id' => $fee->id,
+            'grade_level' => $fee->grade_level,
+            'school_year' => $fee->schoolYear?->name,
+            'tuition_fee' => $fee->tuition_fee,
+            'miscellaneous_fee' => $fee->miscellaneous_fee,
+            'other_fees' => $fee->other_fees,
+            'total_amount' => $fee->total_amount,
+            'payment_terms' => $fee->payment_terms,
+            'is_active' => $fee->is_active,
+        ]);
 
         // Get school years filtered by active and upcoming status only (no past years)
         $schoolYears = \App\Models\SchoolYear::whereIn('status', ['active', 'upcoming'])
