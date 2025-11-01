@@ -8,6 +8,7 @@ use App\Enums\PaymentStatus;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
 use App\Models\Student;
+use App\Notifications\EnrollmentApprovedNotification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -197,7 +198,13 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
 
             $this->logActivity('approveEnrollment', ['enrollment_id' => $enrollment->id]);
 
-            // Email notification and student grade level update are handled by EnrollmentObserver
+            // Send notification to guardian about approval and payment requirements
+            $enrollment->load(['student', 'guardian.user', 'schoolYear']);
+            if ($enrollment->guardian && $enrollment->guardian->user) {
+                $enrollment->guardian->user->notify(
+                    new EnrollmentApprovedNotification($enrollment)
+                );
+            }
 
             return $enrollment->fresh(['student', 'guardian', 'approver']);
         });
