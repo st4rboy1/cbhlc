@@ -331,6 +331,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
+| Public API Routes
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('api')->name('api.')->group(function () {
+    Route::get('/enrollment-period/active', [\App\Http\Controllers\Api\EnrollmentPeriodController::class, 'active'])->name('enrollment-period.active');
+});
+
+/*
+|--------------------------------------------------------------------------
 | Include other route files
 |--------------------------------------------------------------------------
 */
