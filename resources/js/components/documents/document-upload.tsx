@@ -31,7 +31,7 @@ const DOCUMENT_TYPES = [
 ];
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB in bytes
-const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
+const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png'];
 
 export function DocumentUpload({ studentId, documentType: defaultDocumentType, onSuccess, onError }: DocumentUploadProps) {
     const [file, setFile] = useState<File | null>(null);
@@ -45,7 +45,7 @@ export function DocumentUpload({ studentId, documentType: defaultDocumentType, o
 
     const validateFile = (file: File): string | null => {
         if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-            return 'Please select a JPEG, PNG, or PDF file';
+            return 'Please select a JPEG or PNG image file';
         }
         if (file.size > MAX_FILE_SIZE) {
             return 'File size must be less than 50MB';
@@ -217,7 +217,7 @@ export function DocumentUpload({ studentId, documentType: defaultDocumentType, o
                     <input
                         ref={fileInputRef}
                         type="file"
-                        accept=".jpg,.jpeg,.png,.pdf"
+                        accept=".jpg,.jpeg,.png"
                         onChange={handleFileInputChange}
                         className="hidden"
                         disabled={isUploading}
@@ -232,7 +232,7 @@ export function DocumentUpload({ studentId, documentType: defaultDocumentType, o
                                 </button>
                                 {' or drag and drop'}
                             </div>
-                            <p className="text-xs text-muted-foreground">JPEG, PNG or PDF (max. 50MB)</p>
+                            <p className="text-xs text-muted-foreground">JPEG or PNG only (max. 50MB)</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
