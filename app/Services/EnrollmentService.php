@@ -5,19 +5,22 @@ namespace App\Services;
 use App\Contracts\Services\EnrollmentServiceInterface;
 use App\Enums\EnrollmentStatus;
 use App\Enums\PaymentStatus;
+use App\Mail\EnrollmentApproved;
+use App\Mail\EnrollmentRejected;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class EnrollmentService extends BaseService implements EnrollmentServiceInterface
 {
     /**
      * EnrollmentService constructor.
      */
-    public function __construct(Enrollment $model)
+    public function __construct(Enrollment $model, protected InvoiceService $invoiceService)
     {
         parent::__construct($model);
     }
@@ -182,14 +185,28 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
             }
 
             $enrollment->update([
-                'status' => EnrollmentStatus::ENROLLED,
+                'status' => EnrollmentStatus::APPROVED,
                 'approved_by' => auth()->id(),
                 'approved_at' => now(),
             ]);
 
+            $invoice = $this->invoiceService->createInvoiceFromEnrollment($enrollment);
+
+            $enrollment->update([
+                'status' => EnrollmentStatus::READY_FOR_PAYMENT,
+                'invoice_id' => $invoice->id,
+                'ready_for_payment_at' => now(),
+            ]);
+
             $this->logActivity('approveEnrollment', ['enrollment_id' => $enrollment->id]);
 
-            // Email notification and student grade level update are handled by EnrollmentObserver
+            // Send notification to guardian about approval and payment requirements
+            $enrollment->load(['student', 'guardian.user', 'schoolYear']);
+            if ($enrollment->guardian && $enrollment->guardian->user && $enrollment->guardian->user->email) {
+                Mail::to($enrollment->guardian->user->email)->queue(
+                    new EnrollmentApproved($enrollment)
+                );
+            }
 
             return $enrollment->fresh(['student', 'guardian', 'approver']);
         });
@@ -232,6 +249,12 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
             ]);
 
             // Email notification is handled by EnrollmentObserver
+            $enrollment->load(['student', 'guardian.user', 'schoolYear']);
+            if ($enrollment->guardian && $enrollment->guardian->user && $enrollment->guardian->user->email) {
+                Mail::to($enrollment->guardian->user->email)->queue(
+                    new EnrollmentRejected($enrollment, $reason)
+                );
+            }
 
             return $enrollment->fresh(['student', 'guardian', 'approver']);
         });
@@ -259,7 +282,12 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                         'approved_at' => now(),
                     ]);
 
-                    // Email notification and student grade level update are handled by EnrollmentObserver
+                    $enrollment->load(['student', 'guardian.user', 'schoolYear']);
+                    if ($enrollment->guardian && $enrollment->guardian->user && $enrollment->guardian->user->email) {
+                        Mail::to($enrollment->guardian->user->email)->queue(
+                            new EnrollmentApproved($enrollment)
+                        );
+                    }
 
                     $count++;
                 }

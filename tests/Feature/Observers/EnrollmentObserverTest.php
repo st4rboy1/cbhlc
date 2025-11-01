@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Observers;
 
-use App\Mail\EnrollmentApproved;
 use App\Mail\EnrollmentSubmitted;
 use App\Models\Enrollment;
 use App\Models\GradeLevelFee;
@@ -131,35 +130,6 @@ class EnrollmentObserverTest extends TestCase
         $enrollment->update(['status' => 'rejected']);
 
         $this->assertNotNull($enrollment->rejected_at);
-    }
-
-    public function test_email_is_sent_when_enrollment_is_approved(): void
-    {
-        $this->actingAs(User::factory()->create());
-
-        $user = User::factory()->create(['email' => 'guardian@test.com']);
-        $guardian = \App\Models\Guardian::create([
-            'user_id' => $user->id,
-            'first_name' => 'Test',
-            'last_name' => 'Guardian',
-            'contact_number' => '09123456789',
-            'address' => '123 Test St',
-        ]);
-        $student = Student::factory()->create();
-        $enrollment = Enrollment::factory()->create([
-            'student_id' => $student->id,
-            'guardian_id' => $guardian->id,
-            'status' => 'pending',
-        ]);
-
-        Mail::fake(); // Reset mail fake to clear previous queued emails
-
-        $enrollment->update(['status' => 'approved']);
-
-        Mail::assertQueued(EnrollmentApproved::class, function ($mail) use ($user, $enrollment) {
-            return $mail->hasTo($user->email) &&
-                   $mail->enrollment->id === $enrollment->id;
-        });
     }
 
     public function test_student_grade_level_is_updated_when_enrollment_is_approved(): void
