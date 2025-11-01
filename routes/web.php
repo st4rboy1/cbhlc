@@ -170,6 +170,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/documents/{document}/reject', [SuperAdminDocumentController::class, 'reject'])->name('documents.reject');
 
         // Grade Level Fees Management
+        Route::delete('/grade-level-fees', [SuperAdminGradeLevelFeeController::class, 'destroy'])->name('grade-level-fees.bulk-destroy');
         Route::resource('grade-level-fees', SuperAdminGradeLevelFeeController::class);
         Route::post('/grade-level-fees/{gradeLevelFee}/duplicate', [SuperAdminGradeLevelFeeController::class, 'duplicate'])->name('grade-level-fees.duplicate');
 

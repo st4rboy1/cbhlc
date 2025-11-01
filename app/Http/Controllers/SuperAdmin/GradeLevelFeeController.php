@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SuperAdmin\StoreGradeLevelFeeRequest;
 use App\Http\Requests\SuperAdmin\UpdateGradeLevelFeeRequest;
+use App\Models\EnrollmentPeriod;
 use App\Models\GradeLevelFee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -82,6 +83,18 @@ class GradeLevelFeeController extends Controller
 
         $validated = $request->validated();
 
+        // Find or create enrollment period for the target school year
+        $enrollmentPeriod = EnrollmentPeriod::firstOrCreate(
+            ['school_year_id' => $validated['school_year_id']],
+            [
+                'start_date' => now()->startOfYear(),
+                'end_date' => now()->endOfYear(),
+                'status' => 'upcoming',
+            ]
+        );
+
+        $validated['enrollment_period_id'] = $enrollmentPeriod->id;
+
         GradeLevelFee::create($validated);
 
         return redirect()->route('super-admin.grade-level-fees.index')
@@ -137,14 +150,30 @@ class GradeLevelFeeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(GradeLevelFee $gradeLevelFee)
+    public function destroy(Request $request)
     {
-        Gate::authorize('delete', $gradeLevelFee);
+        $ids = $request->input('ids');
 
-        $gradeLevelFee->delete();
+        if (empty($ids)) {
+            $singleId = $request->route('grade_level_fee');
+            if ($singleId) {
+                $ids = [$singleId];
+            } else {
+                return redirect()->route('super-admin.grade-level-fees.index')
+                    ->with('error', 'No grade level fees selected for deletion.');
+            }
+        }
+
+        // Authorize deletion for each individual fee or for the bulk action
+        foreach ($ids as $id) {
+            $gradeLevelFee = GradeLevelFee::findOrFail($id);
+            Gate::authorize('delete-gradeLevelFee', $gradeLevelFee);
+        }
+
+        GradeLevelFee::whereIn('id', $ids)->delete();
 
         return redirect()->route('super-admin.grade-level-fees.index')
-            ->with('success', 'Grade level fee deleted successfully.');
+            ->with('success', 'Selected grade level fees deleted successfully.');
     }
 
     /**
@@ -159,7 +188,7 @@ class GradeLevelFeeController extends Controller
         ]);
 
         // Get or create enrollment period for the target school year
-        $enrollmentPeriod = \App\Models\EnrollmentPeriod::firstOrCreate(
+        $enrollmentPeriod = EnrollmentPeriod::firstOrCreate(
             ['school_year_id' => $validated['school_year_id']],
             [
                 'start_date' => now()->startOfYear(),
