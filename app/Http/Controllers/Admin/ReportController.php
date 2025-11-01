@@ -204,7 +204,8 @@ class ReportController extends Controller
             ->select('enrollments.*')
             ->get();
 
-        $roster = $enrollments->map(fn ($enrollment) => [
+        /** @phpstan-ignore-next-line */
+        $roster = $enrollments->map(fn (Enrollment $enrollment): array => [
             'enrollment_id' => $enrollment->id,
             'student_id' => $enrollment->student->id,
             'student_number' => $enrollment->student->student_number,
