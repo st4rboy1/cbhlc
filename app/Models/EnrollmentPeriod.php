@@ -93,6 +93,29 @@ class EnrollmentPeriod extends Model
         return max(0, now()->diffInDays($this->regular_registration_deadline, false));
     }
 
+    public function activate(): bool
+    {
+        if ($this->status === EnrollmentPeriodStatus::ACTIVE) {
+            return true; // Already active
+        }
+
+        // Close all other active periods
+        static::where('status', EnrollmentPeriodStatus::ACTIVE)
+            ->where('id', '!=', $this->id)
+            ->update(['status' => EnrollmentPeriodStatus::CLOSED]);
+
+        return $this->update(['status' => EnrollmentPeriodStatus::ACTIVE]);
+    }
+
+    public function close(): bool
+    {
+        if ($this->status === EnrollmentPeriodStatus::CLOSED) {
+            return true; // Already closed
+        }
+
+        return $this->update(['status' => EnrollmentPeriodStatus::CLOSED]);
+    }
+
     public function schoolYear(): BelongsTo
     {
         return $this->belongsTo(SchoolYear::class);
