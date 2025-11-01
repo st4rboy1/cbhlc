@@ -50,6 +50,16 @@ class PaymentService
             $invoice->update(['status' => InvoiceStatus::OVERDUE]);
         }
 
+        // Update enrollment payment status
+        $enrollment = $invoice->enrollment;
+        if ($enrollment) {
+            $enrollment->update([
+                'amount_paid_cents' => $totalPaid * 100,
+                'balance_cents' => $enrollment->net_amount_cents - ($totalPaid * 100),
+                'payment_status' => $enrollment->balance_cents <= 0 ? 'paid' : 'partial',
+            ]);
+        }
+
         return $invoice->fresh();
     }
 
