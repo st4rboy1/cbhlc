@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class EnrollmentPeriod extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'school_year_id',
@@ -129,5 +132,13 @@ class EnrollmentPeriod extends Model
     public function gradeLevelFees(): HasMany
     {
         return $this->hasMany(GradeLevelFee::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['school_year_id', 'start_date', 'end_date', 'status', 'early_registration_deadline', 'regular_registration_deadline', 'late_registration_deadline', 'allow_new_students', 'allow_returning_students'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
     }
 }
