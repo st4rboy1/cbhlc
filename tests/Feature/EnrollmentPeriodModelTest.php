@@ -106,16 +106,20 @@ test('isActive method returns true for active periods', function () {
 });
 
 test('isOpen method returns true when period is active and within date range', function () {
+    $startDate1 = now()->subDays(5);
     $openPeriod = EnrollmentPeriod::factory()->create([
         'status' => EnrollmentPeriodStatus::ACTIVE,
-        'start_date' => now()->subDays(5),
+        'start_date' => $startDate1,
         'end_date' => now()->addDays(5),
+        'regular_registration_deadline' => $startDate1->copy()->addDays(3),
     ]);
 
+    $startDate2 = now()->addDays(5);
     $futurePeriod = EnrollmentPeriod::factory()->create([
         'status' => EnrollmentPeriodStatus::ACTIVE,
-        'start_date' => now()->addDays(5),
+        'start_date' => $startDate2,
         'end_date' => now()->addDays(15),
+        'regular_registration_deadline' => $startDate2->copy()->addDays(5),
     ]);
 
     expect($openPeriod->isOpen())->toBeTrue()
@@ -123,8 +127,11 @@ test('isOpen method returns true when period is active and within date range', f
 });
 
 test('getDaysRemaining returns correct days for active period', function () {
+    $startDate = now();
     $period = EnrollmentPeriod::factory()->create([
         'status' => EnrollmentPeriodStatus::ACTIVE,
+        'start_date' => $startDate,
+        'end_date' => $startDate->copy()->addMonths(2),
         'regular_registration_deadline' => now()->addDays(10),
     ]);
 
