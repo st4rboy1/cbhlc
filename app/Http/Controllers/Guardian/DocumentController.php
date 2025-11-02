@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DocumentController extends Controller
@@ -22,7 +24,7 @@ class DocumentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Student $student): JsonResponse
+    public function index(Student $student): InertiaResponse
     {
         $this->authorize('view', $student);
 
@@ -31,7 +33,8 @@ class DocumentController extends Controller
             ->latest('upload_date')
             ->get();
 
-        return response()->json([
+        return Inertia::render('guardian/students/documents/index', [
+            'student' => $student->only(['id', 'first_name', 'middle_name', 'last_name', 'student_id']),
             'documents' => $documents,
         ]);
     }
