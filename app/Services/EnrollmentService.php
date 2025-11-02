@@ -209,7 +209,6 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
 
             $enrollment->update([
                 'status' => EnrollmentStatus::READY_FOR_PAYMENT,
-                'invoice_id' => $invoice->id,
                 'ready_for_payment_at' => now(),
             ]);
 

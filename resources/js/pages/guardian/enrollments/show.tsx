@@ -45,6 +45,7 @@ interface Payment {
     amount: number;
     payment_method: string;
     reference_number: string | null;
+    balance_after_cents: number;
 }
 
 interface Props {
@@ -193,6 +194,8 @@ export default function GuardianEnrollmentsShow({ enrollment, payments }: Props)
                                 <PaymentStatusBadge status={enrollment.payment_status} />
                             </div>
                             <Separator />
+
+                            {/* Fee Breakdown */}
                             <div className="space-y-2">
                                 <p className="text-sm font-semibold">Fee Breakdown</p>
                                 <div className="flex items-center justify-between text-sm">
@@ -223,28 +226,32 @@ export default function GuardianEnrollmentsShow({ enrollment, payments }: Props)
                                 )}
                             </div>
                             <Separator />
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-muted-foreground">Total Amount</p>
-                                <p className="font-semibold">{formatCurrency(enrollment.total_amount_cents)}</p>
-                            </div>
-                            {enrollment.discount_cents > 0 && (
+
+                            {/* Summary */}
+                            <div className="space-y-2">
+                                <p className="text-sm font-semibold">Summary</p>
                                 <div className="flex items-center justify-between">
-                                    <p className="text-sm font-medium text-muted-foreground">Discount</p>
-                                    <p className="font-semibold text-green-600">-{formatCurrency(enrollment.discount_cents)}</p>
+                                    <p className="text-sm font-medium text-muted-foreground">Total Amount Due</p>
+                                    <p className="font-semibold">{formatCurrency(enrollment.total_amount_cents)}</p>
                                 </div>
-                            )}
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-muted-foreground">Net Amount</p>
-                                <p className="text-lg font-bold">{formatCurrency(enrollment.net_amount_cents)}</p>
-                            </div>
-                            <Separator />
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-muted-foreground">Amount Paid</p>
-                                <p className="font-semibold">{formatCurrency(enrollment.amount_paid_cents)}</p>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <p className="text-sm font-medium text-muted-foreground">Balance</p>
-                                <p className="text-lg font-bold">{formatCurrency(enrollment.balance_cents)}</p>
+                                {enrollment.discount_cents > 0 && (
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-sm font-medium text-muted-foreground">Discount</p>
+                                        <p className="font-semibold text-green-600">-{formatCurrency(enrollment.discount_cents)}</p>
+                                    </div>
+                                )}
+                                <div className="flex items-center justify-between">
+                                    <p className="text-sm font-medium text-muted-foreground">Net Amount Due</p>
+                                    <p className="text-lg font-bold">{formatCurrency(enrollment.net_amount_cents)}</p>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <p className="text-sm font-medium text-muted-foreground">Total Amount Paid</p>
+                                    <p className="font-semibold">{formatCurrency(enrollment.amount_paid_cents)}</p>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <p className="text-sm font-medium text-muted-foreground">Outstanding Balance</p>
+                                    <p className="text-lg font-bold">{formatCurrency(enrollment.balance_cents)}</p>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -263,6 +270,7 @@ export default function GuardianEnrollmentsShow({ enrollment, payments }: Props)
                                         <TableHead>Amount</TableHead>
                                         <TableHead>Payment Method</TableHead>
                                         <TableHead>Reference Number</TableHead>
+                                        <TableHead className="text-right">Balance After</TableHead>
                                         <TableHead className="text-right">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -273,6 +281,7 @@ export default function GuardianEnrollmentsShow({ enrollment, payments }: Props)
                                             <TableCell>{formatCurrency(payment.amount)}</TableCell>
                                             <TableCell className="capitalize">{payment.payment_method.replace('_', ' ')}</TableCell>
                                             <TableCell>{payment.reference_number || 'N/A'}</TableCell>
+                                            <TableCell className="text-right">{formatCurrency(payment.balance_after_cents)}</TableCell>
                                             <TableCell className="text-right">
                                                 <Button size="sm" variant="ghost" asChild>
                                                     <a href={`/payments/${payment.id}/receipt`} download>
