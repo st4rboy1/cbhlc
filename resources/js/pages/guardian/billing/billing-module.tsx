@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Link } from '@inertiajs/react';
 import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Clock, DollarSign, Search } from 'lucide-react';
 import { useState } from 'react';
 
@@ -270,10 +271,15 @@ export function BillingModule({ enrollments, summary, paymentPlans }: BillingMod
                                                         #{enrollment.id.toString().padStart(4, '0')}
                                                     </td>
                                                     <td className="px-6 py-4">
-                                                        <div className="space-y-1">
-                                                            <div className="text-sm font-medium">{enrollment.student_name}</div>
+                                                        <Link
+                                                            href={route('guardian.billing.show', { enrollment: enrollment.id })}
+                                                            className="group block space-y-1"
+                                                        >
+                                                            <div className="text-sm font-medium group-hover:text-primary">
+                                                                {enrollment.student_name}
+                                                            </div>
                                                             <div className="font-mono text-xs text-muted-foreground">{enrollment.student_id}</div>
-                                                        </div>
+                                                        </Link>
                                                     </td>
                                                     <td className="px-6 py-4 text-sm">{enrollment.school_year_name}</td>
                                                     <td className="px-6 py-4 text-sm">{enrollment.grade_level}</td>
