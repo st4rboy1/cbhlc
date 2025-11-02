@@ -204,20 +204,20 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 }
             }
 
-            // Generate invoice after sending billing notification
-            $invoice = $this->invoiceService->createInvoiceFromEnrollment($enrollment);
+            // Invoice generation is now handled manually.
+            // $invoice = $this->invoiceService->createInvoiceFromEnrollment($enrollment);
 
             $enrollment->update([
                 'status' => EnrollmentStatus::READY_FOR_PAYMENT,
                 'ready_for_payment_at' => now(),
             ]);
 
-            // Explicitly send InvoiceCreatedNotification after invoice generation
-            if ($enrollment->guardian && $enrollment->guardian->user) {
-                $enrollment->guardian->user->notify(
-                    new \App\Notifications\InvoiceCreatedNotification($invoice)
-                );
-            }
+            // InvoiceCreatedNotification is no longer sent automatically.
+            // if ($enrollment->guardian && $enrollment->guardian->user) {
+            //     $enrollment->guardian->user->notify(
+            //         new \App\Notifications\InvoiceCreatedNotification($invoice)
+            //     );
+            // }
 
             $this->logActivity('approveEnrollment', ['enrollment_id' => $enrollment->id]);
 

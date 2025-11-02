@@ -61,7 +61,7 @@ class Enrollment extends Model
         'approved_at',
         'rejected_at',
         'approved_by',
-        'invoice_id',
+        // 'invoice_id', // Removed as enrollment does not belong to a single invoice
         'payment_reference',
         'ready_for_payment_at',
         'paid_at',
@@ -168,10 +168,10 @@ class Enrollment extends Model
     /**
      * Get the invoice associated with the enrollment
      */
-    public function invoice(): BelongsTo
-    {
-        return $this->belongsTo(Invoice::class);
-    }
+    // public function invoice(): BelongsTo
+    // {
+    //     return $this->belongsTo(Invoice::class);
+    // }
 
     /**
      * Calculate the total amount before discount

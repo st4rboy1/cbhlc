@@ -27,11 +27,16 @@ interface Enrollment {
     enrollment_id: string;
     student: Student;
     school_year?: SchoolYear;
+}
+
+interface Invoice {
+    id: number;
+    invoice_number: string;
+    enrollment: Enrollment;
     total_amount: number;
-    amount_paid: number;
-    balance: number;
-    payment_status: string;
-    created_at: string;
+    paid_amount: number;
+    status: string;
+    due_date: string;
 }
 
 interface PaginationLink {
@@ -51,14 +56,14 @@ interface PaginationMeta {
 }
 
 interface Props {
-    enrollments: {
-        data: Enrollment[];
+    invoices: {
+        data: Invoice[];
         links: PaginationLink[];
         meta: PaginationMeta;
     };
 }
 
-export default function GuardianInvoicesIndex({ enrollments }: Props) {
+export default function GuardianInvoicesIndex({ invoices }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Invoices', href: '/guardian/invoices' },
@@ -71,19 +76,19 @@ export default function GuardianInvoicesIndex({ enrollments }: Props) {
         }).format(amount);
     };
 
-    const columns: ColumnDef<Enrollment>[] = [
+    const columns: ColumnDef<Invoice>[] = [
         {
-            accessorKey: 'enrollment_id',
+            accessorKey: 'invoice_number',
             header: 'Invoice Number',
             cell: ({ row }) => {
-                return <span className="font-mono text-sm">{row.original.enrollment_id}</span>;
+                return <span className="font-mono text-sm">{row.original.invoice_number}</span>;
             },
         },
         {
-            accessorKey: 'student',
+            accessorKey: 'enrollment.student',
             header: 'Student',
             cell: ({ row }) => {
-                const student = row.original.student;
+                const student = row.original.enrollment.student;
                 const fullName = `${student.first_name}${student.middle_name ? ` ${student.middle_name}` : ''} ${student.last_name}`;
                 return (
                     <div>
@@ -94,50 +99,50 @@ export default function GuardianInvoicesIndex({ enrollments }: Props) {
             },
         },
         {
-            accessorKey: 'school_year',
+            accessorKey: 'enrollment.school_year',
             header: 'School Year',
             cell: ({ row }) => {
-                return <span>{row.original.school_year?.name || '-'}</span>;
+                return <span>{row.original.enrollment.school_year?.name || '-'}</span>;
             },
         },
         {
             accessorKey: 'total_amount',
             header: 'Total Amount',
             cell: ({ row }) => {
-                return <span className="font-medium">{formatCurrency(row.original.total_amount)}</span>;
+                return <span className="font-medium">{formatCurrency(row.original.total_amount ?? 0)}</span>;
             },
         },
         {
-            accessorKey: 'amount_paid',
+            accessorKey: 'paid_amount',
             header: 'Amount Paid',
             cell: ({ row }) => {
-                return <span className="text-green-600">{formatCurrency(row.original.amount_paid)}</span>;
+                return <span className="text-green-600">{formatCurrency(row.original.paid_amount ?? 0)}</span>;
             },
         },
         {
             accessorKey: 'balance',
             header: 'Balance',
             cell: ({ row }) => {
-                const balance = row.original.balance;
+                const balance = (row.original.total_amount ?? 0) - (row.original.paid_amount ?? 0);
                 return <span className={balance > 0 ? 'font-medium text-red-600' : 'text-muted-foreground'}>{formatCurrency(balance)}</span>;
             },
         },
         {
-            accessorKey: 'payment_status',
+            accessorKey: 'status',
             header: 'Status',
             cell: ({ row }) => {
-                return <PaymentStatusBadge status={row.original.payment_status} />;
+                return <PaymentStatusBadge status={row.original.status} />;
             },
         },
         {
             id: 'actions',
             header: 'Actions',
             cell: ({ row }) => {
-                const enrollment = row.original;
+                const invoice = row.original;
                 return (
                     <div className="flex gap-2">
                         <Button variant="outline" size="sm" asChild>
-                            <Link href={`/guardian/invoices/${enrollment.id}`}>
+                            <Link href={`/guardian/invoices/${invoice.id}`}>
                                 <Eye className="mr-2 h-4 w-4" />
                                 View
                             </Link>
@@ -146,7 +151,7 @@ export default function GuardianInvoicesIndex({ enrollments }: Props) {
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                                window.location.href = `/guardian/invoices/${enrollment.id}/download`;
+                                window.location.href = `/guardian/invoices/${invoice.id}/download`;
                             }}
                         >
                             <Download className="mr-2 h-4 w-4" />
@@ -165,7 +170,7 @@ export default function GuardianInvoicesIndex({ enrollments }: Props) {
             <div className="space-y-6">
                 <Heading title="Invoices" description="View and download invoices for your children's enrollments" />
 
-                <DataTable columns={columns} data={enrollments.data} />
+                <DataTable columns={columns} data={invoices.data} />
             </div>
         </AppLayout>
     );
