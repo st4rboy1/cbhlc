@@ -36,7 +36,7 @@ class EnrollmentApprovedNotification extends Notification
     {
         $student = $this->enrollment->student;
         $mail = (new MailMessage)
-            ->subject('Enrollment Application Approved - '.$student->full_name)
+            ->subject('Enrollment Application Approved (ID: '.$this->enrollment->enrollment_id.') - '.$student->full_name)
             ->greeting('Congratulations, '.$this->enrollment->guardian->name.'!')
             ->line('We are pleased to inform you that the enrollment application for '.$student->full_name.' has been approved.')
             ->line('Enrollment Details:')
@@ -68,17 +68,33 @@ class EnrollmentApprovedNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        $student = $this->enrollment->student;
+
+        $details = [
+            'Student' => $student->full_name,
+            'Grade Level' => $this->enrollment->grade_level->label(),
+            'School Year' => $this->enrollment->schoolYear->name,
+            'Application ID' => $this->enrollment->enrollment_id,
+            'Approval Date' => $this->enrollment->approved_at->format('F d, Y'),
+        ];
+
+        if ($this->remarks) {
+            $details['Remarks'] = $this->remarks;
+        }
+
         return [
             'enrollment_id' => $this->enrollment->id,
             'application_id' => $this->enrollment->enrollment_id,
             'student_id' => $this->enrollment->student_id,
-            'student_name' => $this->enrollment->student->full_name,
+            'student_name' => $student->full_name,
             'grade_level' => $this->enrollment->grade_level->label(),
             'school_year' => $this->enrollment->schoolYear->name,
             'approved_at' => $this->enrollment->approved_at,
             'status' => 'approved',
             'remarks' => $this->remarks,
-            'message' => 'Enrollment application approved for '.$this->enrollment->student->full_name,
+            'message' => 'Enrollment application approved for '.$student->full_name,
+            'details' => $details,
+            'action_url' => route('guardian.billing.show', $this->enrollment),
         ];
     }
 }

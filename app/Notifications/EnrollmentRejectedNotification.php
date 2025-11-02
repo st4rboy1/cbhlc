@@ -64,16 +64,26 @@ class EnrollmentRejectedNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
+        $student = $this->enrollment->student;
+
         return [
             'enrollment_id' => $this->enrollment->id,
             'application_id' => $this->enrollment->enrollment_id,
             'student_id' => $this->enrollment->student_id,
-            'student_name' => $this->enrollment->student->full_name,
+            'student_name' => $student->full_name,
             'grade_level' => $this->enrollment->grade_level->label(),
             'school_year' => $this->enrollment->schoolYear->name,
             'status' => 'rejected',
             'reason' => $this->reason,
-            'message' => 'Enrollment application for '.$this->enrollment->student->full_name.' requires your attention',
+            'message' => 'Enrollment application for '.$student->full_name.' requires your attention',
+            'details' => [
+                'Student' => $student->full_name,
+                'Grade Level' => $this->enrollment->grade_level->label(),
+                'School Year' => $this->enrollment->schoolYear->name,
+                'Application ID' => $this->enrollment->enrollment_id,
+                'Reason' => $this->reason,
+            ],
+            'action_url' => url('/contact'),
         ];
     }
 }
