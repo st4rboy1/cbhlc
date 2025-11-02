@@ -97,6 +97,27 @@ class DocumentController extends Controller
     }
 
     /**
+     * Download the specified document file.
+     */
+    public function download(Document $document)
+    {
+        $this->authorize('download', $document);
+
+        // Log document download
+        activity()
+            ->performedOn($document)
+            ->withProperties([
+                'document_type' => $document->document_type,
+                'student_id' => $document->student_id,
+                'action' => 'downloaded',
+            ])
+            ->log('Document downloaded by '.auth()->user()->name);
+
+        // Return the file for download
+        return Storage::disk('private')->download($document->file_path, $document->original_filename);
+    }
+
+    /**
      * Verify the specified document.
      */
     public function verify(Document $document)
