@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { DocumentStatusBadge, EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -11,22 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import axios from 'axios';
-import {
-    Calendar,
-    CheckCircle2,
-    Clock,
-    Download,
-    Edit,
-    Eye,
-    FileText,
-    GraduationCap,
-    Mail,
-    MapPin,
-    Phone,
-    Upload,
-    User,
-    XCircle,
-} from 'lucide-react';
+import { Calendar, Clock, Download, Edit, Eye, FileText, GraduationCap, Mail, MapPin, Phone, Upload, User } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface Enrollment {
@@ -74,20 +59,6 @@ interface Props {
     canEnroll: boolean;
     enrollmentMessage?: string | null;
 }
-
-const statusColors = {
-    pending: 'secondary',
-    enrolled: 'default',
-    rejected: 'destructive',
-    completed: 'outline',
-} as const;
-
-const paymentStatusColors = {
-    pending: 'secondary',
-    partial: 'outline',
-    paid: 'default',
-    overdue: 'destructive',
-} as const;
 
 export default function GuardianStudentsShow({ student, canEnroll, enrollmentMessage }: Props) {
     const [downloadingId, setDownloadingId] = useState<number | null>(null);
@@ -410,19 +381,10 @@ export default function GuardianStudentsShow({ student, canEnroll, enrollmentMes
                                             <TableCell>{enrollment.grade_level}</TableCell>
                                             <TableCell>{enrollment.quarter}</TableCell>
                                             <TableCell>
-                                                <Badge variant={statusColors[enrollment.status as keyof typeof statusColors] || 'default'}>
-                                                    {enrollment.status}
-                                                </Badge>
+                                                <EnrollmentStatusBadge status={enrollment.status} />
                                             </TableCell>
                                             <TableCell>
-                                                <Badge
-                                                    variant={
-                                                        paymentStatusColors[enrollment.payment_status as keyof typeof paymentStatusColors] ||
-                                                        'default'
-                                                    }
-                                                >
-                                                    {enrollment.payment_status}
-                                                </Badge>
+                                                <PaymentStatusBadge status={enrollment.payment_status} />
                                             </TableCell>
                                             <TableCell>
                                                 {new Date(enrollment.created_at).toLocaleDateString('en-US', {
@@ -546,24 +508,7 @@ export default function GuardianStudentsShow({ student, canEnroll, enrollmentMes
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        {document.verification_status === 'pending' && (
-                                                            <Badge variant="secondary" className="flex items-center gap-1">
-                                                                <Clock className="h-3 w-3" />
-                                                                Pending Review
-                                                            </Badge>
-                                                        )}
-                                                        {document.verification_status === 'verified' && (
-                                                            <Badge variant="default" className="flex items-center gap-1">
-                                                                <CheckCircle2 className="h-3 w-3" />
-                                                                Verified
-                                                            </Badge>
-                                                        )}
-                                                        {document.verification_status === 'rejected' && (
-                                                            <Badge variant="destructive" className="flex items-center gap-1">
-                                                                <XCircle className="h-3 w-3" />
-                                                                Rejected
-                                                            </Badge>
-                                                        )}
+                                                        <DocumentStatusBadge status={document.verification_status} />
                                                     </div>
                                                 </div>
 

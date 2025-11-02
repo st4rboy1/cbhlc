@@ -1,3 +1,4 @@
+import { EnrollmentStatusBadge } from '@/components/status-badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -47,25 +48,6 @@ const dashboardData = {
         },
     ],
 };
-
-function getStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
-    switch (status) {
-        case 'completed':
-            return 'default';
-        case 'enrolled':
-            return 'secondary';
-        case 'pending':
-            return 'outline';
-        case 'rejected':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
-}
-
-function formatStatusName(status: string) {
-    return status.charAt(0).toUpperCase() + status.slice(1);
-}
 
 function calculateAge(birthdate: string) {
     const birth = new Date(birthdate);
@@ -187,9 +169,7 @@ export function GuardianDashboard() {
                                                     </td>
                                                     <td className="px-6 py-4">
                                                         {student.latestEnrollment ? (
-                                                            <Badge variant={getStatusVariant(student.latestEnrollment.status)}>
-                                                                {formatStatusName(student.latestEnrollment.status)}
-                                                            </Badge>
+                                                            <EnrollmentStatusBadge status={student.latestEnrollment.status} />
                                                         ) : (
                                                             <Badge variant="outline">No enrollment</Badge>
                                                         )}
@@ -244,12 +224,7 @@ export function GuardianDashboard() {
                                                                             </div>
                                                                             <div>
                                                                                 <p className="text-xs text-muted-foreground">Status</p>
-                                                                                <Badge
-                                                                                    variant={getStatusVariant(student.latestEnrollment.status)}
-                                                                                    className="mt-1"
-                                                                                >
-                                                                                    {formatStatusName(student.latestEnrollment.status)}
-                                                                                </Badge>
+                                                                                <EnrollmentStatusBadge status={student.latestEnrollment.status} />
                                                                             </div>
                                                                         </div>
                                                                     </div>

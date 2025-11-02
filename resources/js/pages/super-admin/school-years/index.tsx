@@ -1,3 +1,4 @@
+import { SchoolYearStatusBadge } from '@/components/status-badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
@@ -56,15 +57,7 @@ export default function SchoolYearsIndex({ schoolYears, activeSchoolYear }: Prop
         {
             accessorKey: 'status',
             header: 'Status',
-            cell: ({ row }) => {
-                const statusColors: Record<string, 'default' | 'secondary' | 'outline'> = {
-                    upcoming: 'secondary',
-                    active: 'default',
-                    completed: 'outline',
-                };
-                const variant = statusColors[row.original.status] || 'default';
-                return <Badge variant={variant}>{row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1)}</Badge>;
-            },
+            cell: ({ row }) => <SchoolYearStatusBadge status={row.original.status} />,
         },
         {
             accessorKey: 'start_date',

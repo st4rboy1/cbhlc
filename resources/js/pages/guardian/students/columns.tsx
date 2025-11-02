@@ -1,3 +1,4 @@
+import { EnrollmentStatusBadge } from '@/components/status-badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,13 +29,6 @@ export interface Student {
         grade_level: string;
     } | null;
 }
-
-const statusColors = {
-    pending: 'secondary',
-    enrolled: 'default',
-    rejected: 'destructive',
-    completed: 'outline',
-} as const;
 
 function calculateAge(birthdate: string): number {
     const birth = new Date(birthdate);
@@ -108,11 +102,7 @@ export const columns: ColumnDef<Student>[] = [
             if (!enrollment) {
                 return <Badge variant="outline">No enrollment</Badge>;
             }
-            return (
-                <Badge variant={statusColors[enrollment.status as keyof typeof statusColors] || 'default'}>
-                    {enrollment.status.charAt(0).toUpperCase() + enrollment.status.slice(1)}
-                </Badge>
-            );
+            return <EnrollmentStatusBadge status={enrollment.status} />;
         },
     },
     {

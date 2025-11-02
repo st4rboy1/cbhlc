@@ -1,9 +1,9 @@
-import { Badge } from '@/components/ui/badge';
+import { DocumentStatusBadge, EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { formatCurrency, formatStatusName, getPaymentStatusVariant, getStatusVariant } from '@/pages/registrar/enrollments/enrollments-table';
+import { formatCurrency } from '@/pages/registrar/enrollments/enrollments-table';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { ExternalLink, FileText } from 'lucide-react';
@@ -72,7 +72,7 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                             </div>
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Status</p>
-                                <Badge variant={getStatusVariant(enrollment.status)}>{formatStatusName(enrollment.status)}</Badge>
+                                <EnrollmentStatusBadge status={enrollment.status} />
                             </div>
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">School Year</p>
@@ -116,9 +116,7 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                         <CardContent className="grid gap-4">
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Payment Status</p>
-                                <Badge variant={getPaymentStatusVariant(enrollment.payment_status)}>
-                                    {formatStatusName(enrollment.payment_status)}
-                                </Badge>
+                                <PaymentStatusBadge status={enrollment.payment_status} />
                             </div>
                             <Separator />
                             <div className="space-y-2">
@@ -197,17 +195,7 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <Badge
-                                                variant={
-                                                    doc.verification_status === 'verified'
-                                                        ? 'default'
-                                                        : doc.verification_status === 'rejected'
-                                                          ? 'destructive'
-                                                          : 'secondary'
-                                                }
-                                            >
-                                                {doc.verification_status}
-                                            </Badge>
+                                            <DocumentStatusBadge status={doc.verification_status} />
                                             <Link href={route('documents.view', { document: doc.id })} target="_blank">
                                                 <Button variant="outline" size="sm">
                                                     <ExternalLink className="mr-2 h-4 w-4" />
