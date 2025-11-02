@@ -79,7 +79,7 @@ class PaymentController extends Controller
         Gate::authorize('create', Payment::class);
 
         $invoices = Invoice::with(['enrollment.student', 'enrollment.guardian.user'])
-            ->whereIn('status', ['sent', 'overdue'])
+            ->whereIn('status', ['sent', 'overdue', 'partial'])
             ->get();
 
         return Inertia::render('super-admin/payments/create', [

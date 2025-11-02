@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Enrollment;
+use App\Enums\PaymentPlan;
 use App\Models\GradeLevelFee;
-use App\Models\Guardian;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,27 +15,6 @@ class TuitionController extends Controller
      */
     public function index(Request $request)
     {
-        $user = $request->user();
-        $enrollments = collect();
-
-        // Get enrollments based on user role
-        if ($user->hasRole(['super_admin', 'administrator', 'registrar'])) {
-            // Admin users can see all enrollments
-            $enrollments = Enrollment::with(['student', 'guardian'])
-                ->latest()
-                ->paginate(10);
-        } elseif ($user->hasRole('guardian')) {
-            // Guardians can only see their children's enrollments
-            $guardian = Guardian::where('user_id', $user->id)->first();
-            if ($guardian) {
-                $studentIds = $guardian->children()->pluck('students.id');
-                $enrollments = Enrollment::with(['student', 'guardian'])
-                    ->whereIn('student_id', $studentIds)
-                    ->latest()
-                    ->paginate(10);
-            }
-        }
-
         // Get configurable grade level fees for current school year
         $gradeLevelFees = GradeLevelFee::currentSchoolYear()
             ->active()
@@ -59,10 +37,17 @@ class TuitionController extends Controller
 
         $settings = Setting::pluck('value', 'key');
 
+        $paymentPlans = collect(PaymentPlan::cases())->map(fn ($plan) => [
+            'value' => $plan->value,
+            'label' => $plan->label(),
+            'installments' => $plan->installments(),
+            'description' => $plan->description(),
+        ]);
+
         return Inertia::render('shared/tuition', [
-            'enrollments' => $enrollments,
             'gradeLevelFees' => $gradeLevelFees,
             'settings' => $settings,
+            'paymentPlans' => $paymentPlans,
         ]);
     }
 }
