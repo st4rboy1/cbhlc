@@ -320,19 +320,26 @@ class EnrollmentController extends Controller
 
         $enrollment->load(['student', 'guardian', 'schoolYear']);
 
+        // Ensure enrollment payment details are up-to-date
+        $enrollment->updatePaymentDetails();
+
         // Load payments for this enrollment through the payments relationship
         $paymentsCollection = $enrollment->payments()
             ->orderBy('payment_date', 'desc')
             ->get();
 
         $payments = [];
-        foreach ($paymentsCollection as $payment) {
+        $runningBalance = $enrollment->net_amount_cents; // Start with the total net amount due for the enrollment
+
+        foreach ($paymentsCollection->sortBy('payment_date') as $payment) {
+            $runningBalance -= ($payment->amount * 100); // Subtract payment amount (converted to cents)
             $payments[] = [
                 'id' => $payment->id,
                 'payment_date' => $payment->payment_date->toISOString(),
-                'amount' => $payment->amount * 100, // Convert pesos to cents for frontend
+                'amount' => $payment->amount * 100, // Amount in cents
                 'payment_method' => $payment->payment_method->value,
                 'reference_number' => $payment->reference_number,
+                'balance_after_cents' => $runningBalance, // Add balance after this payment
             ];
         }
 

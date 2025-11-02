@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\EnrollmentStatus;
 use App\Enums\GradeLevel;
+use App\Enums\PaymentPlan;
 use App\Enums\PaymentStatus;
 use App\Enums\Quarter;
 use App\Models\Enrollment;
@@ -82,6 +83,7 @@ class EnrollmentFactory extends Factory
             'enrollment_period_id' => EnrollmentPeriod::factory(),
             'quarter' => $this->faker->randomElement(Quarter::values()),
             'grade_level' => $this->faker->randomElement(GradeLevel::values()),
+            'payment_plan' => $this->faker->randomElement(PaymentPlan::values()),
             'status' => $status,
             'tuition_fee_cents' => $tuitionFee,
             'miscellaneous_fee_cents' => $miscFee,
