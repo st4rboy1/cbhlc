@@ -1,5 +1,5 @@
 import { SchoolYearFilter } from '@/components/school-year-filter';
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/ui/data-table';
@@ -60,21 +60,6 @@ interface Props {
         statuses: FilterOption[];
     };
 }
-
-export const statusColors = {
-    pending: 'secondary',
-    approved: 'default',
-    enrolled: 'default',
-    rejected: 'destructive',
-    completed: 'secondary',
-} as const;
-
-export const paymentStatusColors = {
-    pending: 'secondary',
-    partial: 'outline',
-    paid: 'default',
-    overdue: 'destructive',
-} as const;
 
 export default function GuardianEnrollmentsIndex({ enrollments, filters, filterOptions }: Props) {
     const { props } = usePage();
@@ -147,20 +132,12 @@ export default function GuardianEnrollmentsIndex({ enrollments, filters, filterO
             {
                 accessorKey: 'status',
                 header: 'Status',
-                cell: ({ row }) => {
-                    const status = row.original.status;
-                    return <Badge variant={statusColors[status as keyof typeof statusColors] || 'default'}>{status}</Badge>;
-                },
+                cell: ({ row }) => <EnrollmentStatusBadge status={row.original.status} />,
             },
             {
                 accessorKey: 'payment_status',
                 header: 'Payment Status',
-                cell: ({ row }) => {
-                    const paymentStatus = row.original.payment_status;
-                    return (
-                        <Badge variant={paymentStatusColors[paymentStatus as keyof typeof paymentStatusColors] || 'default'}>{paymentStatus}</Badge>
-                    );
-                },
+                cell: ({ row }) => <PaymentStatusBadge status={row.original.payment_status} />,
             },
             {
                 accessorKey: 'created_at',

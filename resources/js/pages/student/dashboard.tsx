@@ -1,5 +1,5 @@
 import Heading from '@/components/heading';
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentStatusBadge } from '@/components/status-badges';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
@@ -88,9 +88,7 @@ export default function StudentDashboard() {
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground">Enrollment Status</p>
-                                <Badge variant="default" className="mt-1">
-                                    {studentInfo.enrollmentStatus}
-                                </Badge>
+                                <EnrollmentStatusBadge status={studentInfo.enrollmentStatus} />
                             </div>
                         </div>
                     </CardContent>
