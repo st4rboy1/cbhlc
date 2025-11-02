@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Link } from '@inertiajs/react';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertCircle, Bell, CheckCircle, FileText, Info, XCircle } from 'lucide-react';
 
@@ -10,8 +9,6 @@ interface NotificationItemProps {
         type: string;
         data: {
             message: string;
-            details?: Record<string, string>;
-            action_url?: string;
             [key: string]: unknown;
         };
         read_at: string | null;
@@ -66,16 +63,6 @@ export function NotificationItem({ notification, onRead, onDelete, showActions =
                 <div className="min-w-0 flex-1 space-y-1">
                     <p className={cn('text-sm text-foreground', isUnread && 'font-semibold')}>{notification.data.message}</p>
 
-                    {notification.data.details && (
-                        <div className="mt-2 text-xs text-muted-foreground">
-                            {Object.entries(notification.data.details).map(([key, value]) => (
-                                <p key={key}>
-                                    <strong>{key}:</strong> {value}
-                                </p>
-                            ))}
-                        </div>
-                    )}
-
                     <p className="text-xs text-muted-foreground/80">{formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}</p>
 
                     {showActions && !compact && (
@@ -89,13 +76,6 @@ export function NotificationItem({ notification, onRead, onDelete, showActions =
                                 <Button size="sm" variant="ghost" onClick={onDelete} className="h-7 px-2 text-xs text-destructive">
                                     Delete
                                 </Button>
-                            )}
-                            {notification.data.action_url && (
-                                <Link href={notification.data.action_url}>
-                                    <Button size="sm" variant="ghost" className="h-7 px-2 text-xs">
-                                        View Details
-                                    </Button>
-                                </Link>
                             )}
                         </div>
                     )}

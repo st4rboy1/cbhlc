@@ -73,13 +73,6 @@ class PaymentReceivedNotification extends Notification
             'payment_method' => $this->payment->payment_method->value,
             'payment_date' => $this->payment->payment_date,
             'message' => 'Payment of ₱'.number_format($amount, 2).' received',
-            'details' => [
-                'Reference Number' => $this->payment->reference_number,
-                'Amount' => '₱'.number_format($amount, 2),
-                'Payment Method' => ucfirst($this->payment->payment_method->value),
-                'Payment Date' => $this->payment->payment_date->format('F d, Y'),
-                'Invoice' => ($invoice ? $invoice->invoice_number : 'N/A'),
-            ],
             'action_url' => $invoice ? route('guardian.invoices.show', $invoice) : null,
         ];
     }

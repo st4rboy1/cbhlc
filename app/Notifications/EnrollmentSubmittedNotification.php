@@ -57,24 +57,15 @@ class EnrollmentSubmittedNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $student = $this->enrollment->student;
-
         return [
             'enrollment_id' => $this->enrollment->id,
             'application_id' => $this->enrollment->enrollment_id,
             'student_id' => $this->enrollment->student_id,
-            'student_name' => $student->full_name,
+            'student_name' => $this->enrollment->student->full_name,
             'grade_level' => $this->enrollment->grade_level->label(),
             'school_year' => $this->enrollment->schoolYear->name,
             'status' => 'submitted',
-            'message' => 'Enrollment application submitted for '.$student->full_name,
-            'details' => [
-                'Student' => $student->full_name,
-                'Grade Level' => $this->enrollment->grade_level->label(),
-                'School Year' => $this->enrollment->schoolYear->name,
-                'Application ID' => $this->enrollment->enrollment_id,
-            ],
-            'action_url' => route('guardian.enrollments.show', $this->enrollment),
+            'message' => 'Enrollment application submitted for '.$this->enrollment->student->full_name,
         ];
     }
 }

@@ -62,14 +62,6 @@ class NewStudentCreatedNotification extends Notification
             'email' => $this->student->email,
             'created_at' => $this->student->created_at,
             'message' => 'New student '.$this->student->full_name.' has been added',
-            'details' => [
-                'Student ID' => $this->student->student_id,
-                'Name' => $this->student->full_name,
-                'Grade Level' => ($this->student->grade_level instanceof \BackedEnum ? $this->student->grade_level->value : $this->student->grade_level),
-                'Email' => $this->student->email,
-                'Added on' => $this->student->created_at->format('F d, Y h:i A'),
-            ],
-            'action_url' => route('registrar.students.show', $this->student),
         ];
     }
 }

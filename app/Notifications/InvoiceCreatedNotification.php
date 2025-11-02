@@ -57,9 +57,6 @@ class InvoiceCreatedNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $enrollment = $this->invoice->enrollment;
-        $student = $enrollment?->student;
-
         return [
             'invoice_id' => $this->invoice->id,
             'invoice_number' => $this->invoice->invoice_number,
@@ -67,14 +64,6 @@ class InvoiceCreatedNotification extends Notification
             'due_date' => $this->invoice->due_date,
             'status' => $this->invoice->status->value,
             'message' => 'New invoice '.$this->invoice->invoice_number.' has been generated',
-            'details' => [
-                'Invoice Number' => $this->invoice->invoice_number,
-                'Student' => ($student ? $student->full_name : 'N/A'),
-                'Amount' => '₱'.number_format((float) $this->invoice->total_amount, 2),
-                'Due Date' => ($this->invoice->due_date ? $this->invoice->due_date->format('F d, Y') : 'N/A'),
-                'Status' => ucfirst($this->invoice->status->value),
-            ],
-            'action_url' => route('guardian.invoices.show', $this->invoice),
         ];
     }
 }

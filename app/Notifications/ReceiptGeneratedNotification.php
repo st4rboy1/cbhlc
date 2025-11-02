@@ -55,23 +55,12 @@ class ReceiptGeneratedNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $payment = $this->receipt->payment;
-        $amount = $payment ? $payment->amount_cents / 100 : 0;
-        $invoice = $payment ? $payment->invoice : null;
-
         return [
             'receipt_id' => $this->receipt->id,
             'receipt_number' => $this->receipt->receipt_number,
-            'amount' => $amount,
+            'amount' => $this->receipt->payment ? $this->receipt->payment->amount_cents / 100 : 0,
             'issue_date' => $this->receipt->created_at,
             'message' => 'Receipt '.$this->receipt->receipt_number.' has been generated',
-            'details' => [
-                'Receipt Number' => $this->receipt->receipt_number,
-                'Amount' => '₱'.number_format($amount, 2),
-                'Issue Date' => $this->receipt->created_at->format('F d, Y'),
-                'Payment Reference' => ($payment ? $payment->reference_number : 'N/A'),
-            ],
-            'action_url' => $invoice ? route('guardian.invoices.show', $invoice) : null,
         ];
     }
 }

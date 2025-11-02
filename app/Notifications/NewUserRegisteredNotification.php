@@ -55,8 +55,6 @@ class NewUserRegisteredNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $roles = $this->user->roles->pluck('name')->map(fn ($role) => ucwords(str_replace('_', ' ', $role)))->implode(', ');
-
         return [
             'user_id' => $this->user->id,
             'user_name' => $this->user->name,
@@ -64,13 +62,6 @@ class NewUserRegisteredNotification extends Notification
             'roles' => $this->user->roles->pluck('name')->toArray(),
             'registered_at' => $this->user->created_at,
             'message' => 'New user '.$this->user->name.' has registered',
-            'details' => [
-                'Name' => $this->user->name,
-                'Email' => $this->user->email,
-                'Role(s)' => $roles,
-                'Registration Date' => $this->user->created_at->format('F d, Y h:i A'),
-            ],
-            'action_url' => route('super-admin.users.show', $this->user),
         ];
     }
 }

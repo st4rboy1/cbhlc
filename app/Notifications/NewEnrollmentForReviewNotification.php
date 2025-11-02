@@ -57,28 +57,17 @@ class NewEnrollmentForReviewNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $student = $this->enrollment->student;
-
         return [
             'enrollment_id' => $this->enrollment->id,
             'application_id' => $this->enrollment->enrollment_id,
             'student_id' => $this->enrollment->student_id,
-            'student_name' => $student->full_name,
+            'student_name' => $this->enrollment->student->full_name,
             'grade_level' => $this->enrollment->grade_level->label(),
             'school_year' => $this->enrollment->schoolYear->name,
             'guardian_name' => $this->enrollment->guardian->name,
             'submitted_at' => $this->enrollment->created_at,
             'status' => 'pending_review',
             'message' => 'New enrollment application from '.$this->enrollment->guardian->name.' requires review',
-            'details' => [
-                'Student' => $student->full_name,
-                'Grade Level' => $this->enrollment->grade_level->label(),
-                'School Year' => $this->enrollment->schoolYear->name,
-                'Application ID' => $this->enrollment->enrollment_id,
-                'Submitted by' => $this->enrollment->guardian->name,
-                'Submission Date' => $this->enrollment->created_at->format('F d, Y'),
-            ],
-            'action_url' => route('registrar.enrollments.show', $this->enrollment),
         ];
     }
 }

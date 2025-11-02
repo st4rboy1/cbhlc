@@ -58,28 +58,16 @@ class NewEnrollmentCreatedNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $student = $this->enrollment->student;
-
         return [
             'enrollment_id' => $this->enrollment->id,
             'enrollment_number' => $this->enrollment->enrollment_id,
             'student_id' => $this->enrollment->student_id,
-            'student_name' => $student->full_name,
+            'student_name' => $this->enrollment->student->full_name,
             'grade_level' => $this->enrollment->grade_level->label(),
             'school_year' => $this->enrollment->schoolYear->name,
             'status' => $this->enrollment->status->value,
             'created_at' => $this->enrollment->created_at,
-            'message' => 'New enrollment for '.$student->full_name.' has been created',
-            'details' => [
-                'Student' => $student->full_name,
-                'Student ID' => $student->student_id,
-                'Grade Level' => $this->enrollment->grade_level->label(),
-                'School Year' => $this->enrollment->schoolYear->name,
-                'Quarter' => $this->enrollment->quarter->label(),
-                'Status' => ucfirst($this->enrollment->status->value),
-                'Created on' => $this->enrollment->created_at->format('F d, Y h:i A'),
-            ],
-            'action_url' => route('registrar.enrollments.show', $this->enrollment),
+            'message' => 'New enrollment for '.$this->enrollment->student->full_name.' has been created',
         ];
     }
 }

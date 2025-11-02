@@ -66,21 +66,6 @@ class EnrollmentPeriodStatusChangedNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $message = 'Enrollment period statuses have been updated.';
-        $details = [];
-
-        if ($this->data['activated'] > 0) {
-            $details['Activated Periods'] = $this->data['activated'];
-        }
-
-        if ($this->data['closed'] > 0) {
-            $details['Closed Periods'] = $this->data['closed'];
-        }
-
-        return [
-            'message' => $message,
-            'details' => $details,
-            'action_url' => route('super-admin.enrollment-periods.index'),
-        ];
+        return $this->data;
     }
 }

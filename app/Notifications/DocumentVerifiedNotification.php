@@ -57,12 +57,6 @@ class DocumentVerifiedNotification extends Notification
             'student_id' => $this->document->student_id,
             'student_name' => $this->document->student->full_name,
             'verified_at' => $this->document->verified_at,
-            'details' => [
-                'Document Type' => $this->document->document_type->label(),
-                'Student' => $this->document->student->full_name,
-                'Verified Date' => $this->document->verified_at->format('F d, Y'),
-            ],
-            'action_url' => route('guardian.students.documents.index', $this->document->student),
         ];
     }
 }
