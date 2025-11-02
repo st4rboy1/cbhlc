@@ -5,7 +5,7 @@ namespace App\Services;
 class CurrencyService
 {
     /**
-     * Format a value as Philippine Peso currency
+     * Format a value as the application's configured currency.
      */
     public static function format(float $amount): string
     {
@@ -27,11 +27,13 @@ class CurrencyService
     }
 
     /**
-     * Format a value in cents as Philippine Peso currency
+     * Format a value in cents as the application's configured currency.
      */
     public static function formatCents(int $amountInCents): string
     {
-        return self::format($amountInCents / 100);
+        $divisor = 10 ** config('currency.default.decimal_places', 2);
+
+        return self::format($amountInCents / $divisor);
     }
 
     /**
@@ -51,18 +53,22 @@ class CurrencyService
     }
 
     /**
-     * Convert dollars to cents for storage
+     * Convert to cents for storage
      */
     public static function toCents(float $amount): int
     {
-        return (int) round($amount * 100);
+        $divisor = 10 ** config('currency.default.decimal_places', 2);
+
+        return (int) round($amount * $divisor);
     }
 
     /**
-     * Convert cents to dollars for display
+     * Convert cents to the main currency unit for display
      */
     public static function fromCents(int $amountInCents): float
     {
-        return $amountInCents / 100;
+        $divisor = 10 ** config('currency.default.decimal_places', 2);
+
+        return $amountInCents / $divisor;
     }
 }

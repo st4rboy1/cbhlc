@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { formatCurrency } from '@/lib/format-currency';
 import { store } from '@/routes/super-admin/receipts';
 import { Head, useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
@@ -90,8 +91,8 @@ export default function ReceiptCreate({ payments, invoices, nextReceiptNumber }:
                                             const amount = typeof payment.amount === 'number' ? payment.amount : parseFloat(payment.amount || '0');
                                             return (
                                                 <SelectItem key={payment.id} value={payment.id.toString()}>
-                                                    {student ? `${student.first_name} ${student.last_name}` : 'Unknown Student'} - ₱
-                                                    {amount.toLocaleString()}
+                                                    {student ? `${student.first_name} ${student.last_name}` : 'Unknown Student'} -{' '}
+                                                    {formatCurrency(amount)}
                                                 </SelectItem>
                                             );
                                         })}
