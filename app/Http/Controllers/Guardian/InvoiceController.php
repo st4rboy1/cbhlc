@@ -23,13 +23,15 @@ class InvoiceController extends Controller
         $guardian = Guardian::where('user_id', $user->id)->firstOrFail();
         $studentIds = $guardian->children()->pluck('students.id');
 
-        $enrollments = Enrollment::with(['student', 'guardian', 'schoolYear'])
-            ->whereIn('student_id', $studentIds)
+        $enrollmentIds = Enrollment::whereIn('student_id', $studentIds)->pluck('id');
+
+        $invoices = Invoice::with(['enrollment.student', 'enrollment.guardian', 'enrollment.schoolYear'])
+            ->whereIn('enrollment_id', $enrollmentIds)
             ->latest()
             ->paginate(10);
 
         return Inertia::render('guardian/invoices/index', [
-            'enrollments' => $enrollments,
+            'invoices' => $invoices,
         ]);
     }
 

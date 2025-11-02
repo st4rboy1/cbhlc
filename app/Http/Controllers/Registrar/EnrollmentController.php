@@ -91,7 +91,7 @@ class EnrollmentController extends Controller
     {
         $this->enrollmentService->approveEnrollment($enrollment);
 
-        return back()->with('success', 'Enrollment approved successfully. Invoice has been generated and notification sent to the guardian.');
+        return back()->with('success', 'Enrollment approved successfully. Billing/payment schedule information has been generated and notification sent to the guardian. Invoice generation is now handled manually.');
     }
 
     /**
