@@ -242,6 +242,7 @@ describe('Guardian BillingController', function () {
             'grade_level' => GradeLevel::GRADE_3,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PENDING,
+            'payment_plan' => PaymentPlan::MONTHLY,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -271,6 +272,7 @@ describe('Guardian BillingController', function () {
             'grade_level' => GradeLevel::GRADE_4,
             'status' => EnrollmentStatus::ENROLLED,
             'payment_status' => PaymentStatus::PARTIAL,
+            'payment_plan' => PaymentPlan::MONTHLY,
             'tuition_fee_cents' => 2600000,
             'miscellaneous_fee_cents' => 650000,
             'total_amount_cents' => 3250000,
@@ -299,7 +301,7 @@ describe('Guardian BillingController', function () {
             'guardian_id' => $this->guardianModel->id,
             'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_5,
-            'payment_plan' => null, // Test default
+            'payment_plan' => PaymentPlan::MONTHLY, // Set to monthly for default test
             'total_amount_cents' => 4000000, // 40,000
         ]);
 
@@ -325,7 +327,7 @@ describe('Guardian BillingController', function () {
             'guardian_id' => $this->guardianModel->id,
             'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_5,
-            'payment_plan' => PaymentPlan::ANNUAL->value,
+            'payment_plan' => PaymentPlan::ANNUAL,
             'total_amount_cents' => 3500000, // 35,000
         ]);
 
@@ -351,7 +353,7 @@ describe('Guardian BillingController', function () {
             'guardian_id' => $this->guardianModel->id,
             'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_5,
-            'payment_plan' => PaymentPlan::SEMESTRAL->value,
+            'payment_plan' => PaymentPlan::SEMESTRAL,
             'total_amount_cents' => 3800000, // 38,000
         ]);
 
@@ -377,6 +379,7 @@ describe('Guardian BillingController', function () {
             'guardian_id' => $this->guardianModel->id,
             'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
+            'payment_plan' => PaymentPlan::MONTHLY,
             'tuition_fee_cents' => 2000000,
             'miscellaneous_fee_cents' => 500000,
             'total_amount_cents' => 2500000,
@@ -403,6 +406,7 @@ describe('Guardian BillingController', function () {
             'student_id' => $otherStudent->id,
             'guardian_id' => Guardian::factory()->create()->id,
             'school_year_id' => $this->sy2024->id,
+            'payment_plan' => PaymentPlan::MONTHLY,
         ]);
 
         $response = $this->actingAs($this->guardian)
@@ -418,6 +422,7 @@ describe('Guardian BillingController', function () {
             'guardian_id' => $this->guardianModel->id,
             'school_year_id' => $this->sy2024->id,
             'grade_level' => GradeLevel::GRADE_6,
+            'payment_plan' => PaymentPlan::MONTHLY,
             'tuition_fee_cents' => 0,
             'miscellaneous_fee_cents' => 0,
             'total_amount_cents' => 0,
@@ -503,6 +508,7 @@ describe('Guardian BillingController', function () {
             'guardian_id' => $this->guardianModel->id,
             'school_year_id' => $this->sy2024->id,
             'status' => EnrollmentStatus::PENDING->value,
+            'payment_plan' => PaymentPlan::MONTHLY,
         ]);
 
         $response = $this->actingAs($this->guardian)

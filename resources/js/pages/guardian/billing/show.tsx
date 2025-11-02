@@ -17,6 +17,7 @@ interface EnrollmentDetails {
     grade_level: string;
     status: string;
     payment_status: string;
+    payment_plan: string;
 }
 
 interface BillingDetails {
@@ -79,6 +80,10 @@ export default function GuardianBillingShow({ enrollment, billing, paymentInstru
                         <div>
                             <p className="text-sm font-medium text-gray-500">Payment Status:</p>
                             <p className="text-lg font-semibold text-gray-900">{enrollment.payment_status}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium text-gray-500">Payment Terms:</p>
+                            <p className="text-lg font-semibold text-gray-900">{enrollment.payment_plan}</p>
                         </div>
                     </div>
                 </div>

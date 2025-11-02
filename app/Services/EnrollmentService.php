@@ -190,23 +190,26 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 'approved_at' => now(),
             ]);
 
-            $invoice = $this->invoiceService->createInvoiceFromEnrollment($enrollment);
+            // Send notification to guardian about approval and payment requirements
+            $enrollment->load(['student', 'guardian.user', 'schoolYear']);
+            if ($enrollment->guardian && $enrollment->guardian->user) {
+                $enrollment->guardian->user->notify(
+                    new \App\Notifications\EnrollmentApprovedNotification($enrollment)
+                );
+                // Also send email
+                if ($enrollment->guardian->user->email) {
+                    Mail::to($enrollment->guardian->user->email)->queue(
+                        new \App\Mail\EnrollmentApproved($enrollment)
+                    );
+                }
+            }
 
             $enrollment->update([
                 'status' => EnrollmentStatus::READY_FOR_PAYMENT,
-                'invoice_id' => $invoice->id,
                 'ready_for_payment_at' => now(),
             ]);
 
             $this->logActivity('approveEnrollment', ['enrollment_id' => $enrollment->id]);
-
-            // Send notification to guardian about approval and payment requirements
-            $enrollment->load(['student', 'guardian.user', 'schoolYear']);
-            if ($enrollment->guardian && $enrollment->guardian->user && $enrollment->guardian->user->email) {
-                Mail::to($enrollment->guardian->user->email)->queue(
-                    new EnrollmentApproved($enrollment)
-                );
-            }
 
             return $enrollment->fresh(['student', 'guardian', 'approver']);
         });

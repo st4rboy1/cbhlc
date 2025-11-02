@@ -92,7 +92,7 @@ class EnrollmentApprovedNotification extends Notification
             'approved_at' => $this->enrollment->approved_at,
             'status' => 'approved',
             'remarks' => $this->remarks,
-            'message' => 'Enrollment application approved for '.$student->full_name,
+            'message' => 'Enrollment application approved for '.$student->full_name.'. View billing information and payment plans.',
             'details' => $details,
             'action_url' => route('guardian.billing.show', $this->enrollment),
         ];

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Link } from '@inertiajs/react';
 import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Clock, DollarSign, Search } from 'lucide-react';
 import { useState } from 'react';
+import { route } from 'ziggy-js';
 
 interface Enrollment {
     id: number;

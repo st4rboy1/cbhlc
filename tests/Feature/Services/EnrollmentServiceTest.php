@@ -17,6 +17,16 @@ beforeEach(function () {
     // Seed roles and permissions for each test
     $this->seed(RolesAndPermissionsSeeder::class);
     $this->invoiceServiceMock = Mockery::mock(InvoiceService::class);
+
+    // Ensure the mock is set up before the service is instantiated where it might use the mock
+    $this->invoiceServiceMock->shouldReceive('createInvoiceFromEnrollment')
+        ->andReturnUsing(function () {
+            return \App\Models\Invoice::factory()->create([
+                'total_amount' => 1000,
+                'due_date' => now()->addDays(30),
+            ]);
+        });
+
     $this->service = new EnrollmentService(new Enrollment, $this->invoiceServiceMock);
 
     // Create school year for regular tests
@@ -189,7 +199,14 @@ test('approveEnrollment updates status to approved', function () {
         'school_year_id' => $this->sy2024->id,
     ]);
 
-    $this->invoiceServiceMock->shouldReceive('createInvoiceFromEnrollment')->andReturn(new \App\Models\Invoice(['id' => 1]));
+    $this->invoiceServiceMock->shouldReceive('createInvoiceFromEnrollment')
+        ->andReturnUsing(function () use ($enrollment) {
+            return \App\Models\Invoice::factory()->create([
+                'enrollment_id' => $enrollment->id,
+                'total_amount' => 1000,
+                'due_date' => now()->addDays(30),
+            ]);
+        });
 
     $result = $this->service->approveEnrollment($enrollment);
 

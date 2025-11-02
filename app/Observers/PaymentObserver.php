@@ -2,8 +2,6 @@
 
 namespace App\Observers;
 
-use App\Enums\InvoiceStatus;
-use App\Enums\PaymentStatus;
 use App\Models\Payment;
 
 class PaymentObserver
@@ -29,37 +27,11 @@ class PaymentObserver
      */
     public function created(Payment $payment): void
     {
-        // Update invoice balance
+        // Update invoice balance and status
         if ($payment->invoice) {
+            /** @var \App\Models\Invoice $invoice */
             $invoice = $payment->invoice;
-            $invoice->paid_amount += ($payment->amount_cents / 100);
-
-            // Update invoice status
-            $balance = $invoice->total_amount - $invoice->paid_amount;
-            if ($balance <= 0) {
-                $invoice->status = InvoiceStatus::PAID;
-                $invoice->paid_at = now();
-            } else {
-                $invoice->status = InvoiceStatus::PARTIALLY_PAID;
-            }
-
-            $invoice->save();
-        }
-
-        // Update enrollment if payment is for an enrollment invoice
-        if ($payment->invoice && $payment->invoice->enrollment) {
-            $enrollment = $payment->invoice->enrollment;
-            $enrollment->amount_paid += ($payment->amount_cents / 100);
-            $enrollment->balance = $enrollment->total_amount - $enrollment->amount_paid;
-
-            // Update payment status
-            if ($enrollment->balance <= 0) {
-                $enrollment->payment_status = PaymentStatus::PAID;
-            } else {
-                $enrollment->payment_status = PaymentStatus::PARTIAL;
-            }
-
-            $enrollment->save();
+            $invoice->updatePaidAmount();
         }
 
         // Note: Activity logging is handled automatically by LogsActivity trait
@@ -77,25 +49,10 @@ class PaymentObserver
     {
         // Recalculate invoice balance if amount changed
         if ($payment->wasChanged('amount_cents')) {
-            $oldAmount = $payment->getOriginal('amount_cents');
-            $difference = $payment->amount_cents - $oldAmount;
-
             if ($payment->invoice) {
+                /** @var \App\Models\Invoice $invoice */
                 $invoice = $payment->invoice;
-                $invoice->paid_amount += ($difference / 100);
-
-                // Update invoice status
-                $balance = $invoice->total_amount - $invoice->paid_amount;
-                if ($balance <= 0) {
-                    $invoice->status = InvoiceStatus::PAID;
-                    $invoice->paid_at = now();
-                } elseif ($invoice->paid_amount > 0) {
-                    $invoice->status = InvoiceStatus::PARTIALLY_PAID;
-                } else {
-                    $invoice->status = InvoiceStatus::SENT;
-                }
-
-                $invoice->save();
+                $invoice->updatePaidAmount();
             }
         }
 
@@ -109,18 +66,9 @@ class PaymentObserver
     {
         // Restore invoice balance
         if ($payment->invoice) {
+            /** @var \App\Models\Invoice $invoice */
             $invoice = $payment->invoice;
-            $invoice->paid_amount -= ($payment->amount_cents / 100);
-
-            // Update invoice status
-            if ($invoice->paid_amount > 0) {
-                $invoice->status = InvoiceStatus::PARTIALLY_PAID;
-            } else {
-                $invoice->status = InvoiceStatus::SENT;
-                $invoice->paid_at = null;
-            }
-
-            $invoice->save();
+            $invoice->updatePaidAmount();
         }
 
         // Note: Activity logging is handled automatically by LogsActivity trait

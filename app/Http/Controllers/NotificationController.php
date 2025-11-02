@@ -75,7 +75,13 @@ class NotificationController extends Controller
         }
 
         // Enrollment notifications - navigate to enrollment details or list
-        if (str_contains($type, 'EnrollmentApproved') || str_contains($type, 'EnrollmentRejected') || str_contains($type, 'EnrollmentSubmitted')) {
+        if (str_contains($type, 'EnrollmentApproved')) {
+            if (isset($data['enrollment_id'])) {
+                return route('guardian.billing.show', ['enrollment' => $data['enrollment_id']]);
+            }
+        }
+
+        if (str_contains($type, 'EnrollmentRejected') || str_contains($type, 'EnrollmentSubmitted')) {
             if (isset($data['enrollment_id'])) {
                 return route('guardian.enrollments.show', ['enrollment' => $data['enrollment_id']]);
             }

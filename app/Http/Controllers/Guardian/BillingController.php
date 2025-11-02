@@ -152,8 +152,8 @@ class BillingController extends Controller
         $startYear = substr($schoolYearName, 0, 4);
         $endYear = substr($schoolYearName, 5, 4);
 
-        switch ($paymentPlan) {
-            case PaymentPlan::ANNUAL->value:
+        switch ($enrollment->payment_plan) {
+            case PaymentPlan::ANNUAL:
                 $paymentSchedule = [
                     [
                         'period' => 'Annual Payment',
@@ -163,7 +163,7 @@ class BillingController extends Controller
                     ],
                 ];
                 break;
-            case PaymentPlan::SEMESTRAL->value:
+            case PaymentPlan::SEMESTRAL:
                 $semestralAmount = $totalFee / 2;
                 $paymentSchedule = [
                     [
@@ -180,7 +180,7 @@ class BillingController extends Controller
                     ],
                 ];
                 break;
-            case PaymentPlan::MONTHLY->value:
+            case PaymentPlan::MONTHLY:
             default:
                 $monthlyAmount = $totalFee / 10;
                 $months = [
@@ -211,6 +211,7 @@ class BillingController extends Controller
                 'grade_level' => $enrollment->grade_level,
                 'status' => $enrollment->status->value,
                 'payment_status' => $enrollment->payment_status->value,
+                'payment_plan' => $enrollment->payment_plan->label(),
             ],
             'billing' => [
                 'tuition_fee' => $this->currencyService->format($tuitionFee),

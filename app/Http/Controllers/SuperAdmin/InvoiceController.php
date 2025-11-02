@@ -88,8 +88,16 @@ class InvoiceController extends Controller
 
         $validated = $request->validated();
 
-        DB::transaction(function () use ($validated) {
+        $invoice = DB::transaction(function () use ($validated) {
             $invoice = $this->invoiceService->createInvoice($validated);
+
+            // Notify guardian about the new invoice
+            $invoice->load(['enrollment.guardian.user']);
+            if ($invoice->enrollment && $invoice->enrollment->guardian && $invoice->enrollment->guardian->user) {
+                $invoice->enrollment->guardian->user->notify(new \App\Notifications\InvoiceCreatedNotification($invoice));
+            }
+
+            return $invoice;
         });
 
         return redirect()->route('super-admin.invoices.index')
