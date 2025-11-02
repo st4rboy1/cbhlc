@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class MoneyCast implements CastsAttributes
 {
     /**
-     * Cast the given value to dollars.
+     * Cast the given value to the application's configured currency unit.
      *
      * @param  array<string, mixed>  $attributes
      */
@@ -21,7 +21,9 @@ class MoneyCast implements CastsAttributes
             return 0.0;
         }
 
-        return (float) ($centsValue / 100);
+        $divisor = 10 ** config('currency.default.decimal_places', 2);
+
+        return (float) ($centsValue / $divisor);
     }
 
     /**
@@ -37,7 +39,9 @@ class MoneyCast implements CastsAttributes
             return [$centsKey => null];
         }
 
-        return [$centsKey => (int) ((float) $value * 100)];
+        $divisor = 10 ** config('currency.default.decimal_places', 2);
+
+        return [$centsKey => (int) ((float) $value * $divisor)];
     }
 
     /**
