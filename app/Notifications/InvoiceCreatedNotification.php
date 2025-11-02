@@ -46,7 +46,7 @@ class InvoiceCreatedNotification extends Notification
             ->line('Amount: ₱'.number_format((float) $this->invoice->total_amount, 2))
             ->line('Due Date: '.($this->invoice->due_date ? $this->invoice->due_date->format('F d, Y') : 'N/A'))
             ->line('Status: '.ucfirst($this->invoice->status->value))
-            ->action('View Invoice', route('guardian.invoices.show', $this->invoice))
+            ->action('View Invoice', route('guardian.invoices.show', ['invoice' => $this->invoice->id]))
             ->line('Please ensure payment is made before the due date.');
     }
 
@@ -74,7 +74,7 @@ class InvoiceCreatedNotification extends Notification
                 'Due Date' => ($this->invoice->due_date ? $this->invoice->due_date->format('F d, Y') : 'N/A'),
                 'Status' => ucfirst($this->invoice->status->value),
             ],
-            'action_url' => route('guardian.invoices.show', $this->invoice),
+            'action_url' => '/guardian/invoices/'.$this->invoice->id,
         ];
     }
 }

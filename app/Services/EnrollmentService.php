@@ -190,6 +190,21 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 'approved_at' => now(),
             ]);
 
+            // Send notification to guardian about approval and payment requirements
+            $enrollment->load(['student', 'guardian.user', 'schoolYear']);
+            if ($enrollment->guardian && $enrollment->guardian->user) {
+                $enrollment->guardian->user->notify(
+                    new \App\Notifications\EnrollmentApprovedNotification($enrollment)
+                );
+                // Also send email
+                if ($enrollment->guardian->user->email) {
+                    Mail::to($enrollment->guardian->user->email)->queue(
+                        new \App\Mail\EnrollmentApproved($enrollment)
+                    );
+                }
+            }
+
+            // Generate invoice after sending billing notification
             $invoice = $this->invoiceService->createInvoiceFromEnrollment($enrollment);
 
             $enrollment->update([
@@ -198,15 +213,14 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
                 'ready_for_payment_at' => now(),
             ]);
 
-            $this->logActivity('approveEnrollment', ['enrollment_id' => $enrollment->id]);
-
-            // Send notification to guardian about approval and payment requirements
-            $enrollment->load(['student', 'guardian.user', 'schoolYear']);
-            if ($enrollment->guardian && $enrollment->guardian->user && $enrollment->guardian->user->email) {
-                Mail::to($enrollment->guardian->user->email)->queue(
-                    new EnrollmentApproved($enrollment)
+            // Explicitly send InvoiceCreatedNotification after invoice generation
+            if ($enrollment->guardian && $enrollment->guardian->user) {
+                $enrollment->guardian->user->notify(
+                    new \App\Notifications\InvoiceCreatedNotification($invoice)
                 );
             }
+
+            $this->logActivity('approveEnrollment', ['enrollment_id' => $enrollment->id]);
 
             return $enrollment->fresh(['student', 'guardian', 'approver']);
         });
