@@ -58,6 +58,12 @@ class DocumentRejectedNotification extends Notification
             'student_name' => $this->document->student->full_name,
             'rejection_reason' => $this->document->rejection_reason,
             'rejected_at' => $this->document->verified_at,
+            'details' => [
+                'Document Type' => $this->document->document_type->label(),
+                'Student' => $this->document->student->full_name,
+                'Reason' => $this->document->rejection_reason,
+            ],
+            'action_url' => route('guardian.students.documents.index', $this->document->student),
         ];
     }
 }
