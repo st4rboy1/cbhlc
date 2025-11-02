@@ -337,6 +337,6 @@ class NotificationControllerTest extends TestCase
             ->post(route('notifications.mark-as-read', $notification->id));
 
         // Should redirect to enrollment details page
-        $response->assertRedirect(route('guardian.enrollments.show', ['enrollment' => 789]));
+        $response->assertRedirect(route('guardian.billing.show', ['enrollment' => 789]));
     }
 }
