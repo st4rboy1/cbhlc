@@ -56,39 +56,28 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $enrollment = null;
+        $enrollmentsQuery = Enrollment::with(['student', 'guardian']);
 
         if ($user->hasRole('guardian')) {
             $guardian = \App\Models\Guardian::where('user_id', $user->id)->first();
             if ($guardian) {
                 $studentIds = $guardian->children()->pluck('students.id');
-                $enrollment = Enrollment::with(['student', 'guardian'])
-                    ->whereIn('student_id', $studentIds)
-                    ->latest()
-                    ->first();
+                $enrollmentsQuery->whereIn('student_id', $studentIds);
+            } else {
+                // If no guardian profile, return empty enrollments
+                $enrollmentsQuery->whereRaw('0 = 1'); // Effectively return no results
             }
         } elseif ($user->hasRole(['super_admin', 'administrator', 'registrar'])) {
-            // For admin users, show the most recent enrollment overall
-            $enrollment = Enrollment::with(['student', 'guardian'])
-                ->latest()
-                ->first();
+            // Admin users can see all enrollments
+            // No additional filtering needed for the query
         }
+
+        $enrollments = $enrollmentsQuery->latest()->paginate(10);
 
         $settings = Setting::pluck('value', 'key');
 
-        if (! $enrollment) {
-            return Inertia::render('shared/invoice', [
-                'enrollment' => null,
-                'invoiceNumber' => 'No Invoice Available',
-                'currentDate' => now()->format('F d, Y'),
-                'settings' => $settings,
-            ]);
-        }
-
-        return Inertia::render('shared/invoice', [
-            'enrollment' => $enrollment,
-            'invoiceNumber' => $enrollment->enrollment_id ?? 'No Invoice Available',
-            'currentDate' => now()->format('F d, Y'),
+        return Inertia::render('guardian/invoices/index', [
+            'enrollments' => $enrollments,
             'settings' => $settings,
         ]);
     }
