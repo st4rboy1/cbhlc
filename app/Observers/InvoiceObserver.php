@@ -36,9 +36,10 @@ class InvoiceObserver
         // Note: Activity logging is handled automatically by LogsActivity trait
 
         // Notify guardian about the new invoice
-        if ($invoice->enrollment && $invoice->enrollment->guardian && $invoice->enrollment->guardian->user) {
-            $invoice->enrollment->guardian->user->notify(new \App\Notifications\InvoiceCreatedNotification($invoice));
-        }
+        // Removed: This notification is now handled by EnrollmentApprovedNotification
+        // if ($invoice->enrollment && $invoice->enrollment->guardian && $invoice->enrollment->guardian->user) {
+        //     $invoice->enrollment->guardian->user->notify(new \App\Notifications\InvoiceCreatedNotification($invoice));
+        // }
     }
 
     /**
