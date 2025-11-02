@@ -86,6 +86,7 @@ class Enrollment extends Model
         'grade_level' => \App\Enums\GradeLevel::class,
         'status' => EnrollmentStatus::class,
         'payment_status' => PaymentStatus::class,
+        'payment_plan' => \App\Enums\PaymentPlan::class,
         // Money casts - convert cents to dollars
         'tuition_fee' => MoneyCast::class,
         'miscellaneous_fee' => MoneyCast::class,
@@ -204,6 +205,28 @@ class Enrollment extends Model
     public function isFullyPaid(): bool
     {
         return $this->payment_status === PaymentStatus::PAID || $this->balance_cents <= 0;
+    }
+
+    /**
+     * Update the enrollment's payment details based on associated invoices.
+     */
+    public function updatePaymentDetails(): void
+    {
+        $totalPaidCents = $this->invoices->sum(fn ($invoice) => $invoice->paid_amount * 100);
+        $this->amount_paid_cents = $totalPaidCents;
+        $this->balance_cents = $this->net_amount_cents - $totalPaidCents;
+
+        if ($this->balance_cents <= 0) {
+            $this->payment_status = PaymentStatus::PAID;
+            $this->status = EnrollmentStatus::ENROLLED; // Transition to ENROLLED
+        } elseif ($this->amount_paid_cents > 0) {
+            $this->payment_status = PaymentStatus::PARTIAL;
+            $this->status = EnrollmentStatus::ENROLLED; // Transition to ENROLLED even for partial payments
+        } else {
+            $this->payment_status = PaymentStatus::PENDING;
+        }
+
+        $this->save();
     }
 
     /**

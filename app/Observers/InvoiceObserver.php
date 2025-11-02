@@ -36,9 +36,10 @@ class InvoiceObserver
         // Note: Activity logging is handled automatically by LogsActivity trait
 
         // Notify guardian about the new invoice
-        if ($invoice->enrollment && $invoice->enrollment->guardian && $invoice->enrollment->guardian->user) {
-            $invoice->enrollment->guardian->user->notify(new \App\Notifications\InvoiceCreatedNotification($invoice));
-        }
+        // Removed: This notification is now handled by EnrollmentApprovedNotification
+        // if ($invoice->enrollment && $invoice->enrollment->guardian && $invoice->enrollment->guardian->user) {
+        //     $invoice->enrollment->guardian->user->notify(new \App\Notifications\InvoiceCreatedNotification($invoice));
+        // }
     }
 
     /**
@@ -67,12 +68,10 @@ class InvoiceObserver
         // Note: Activity logging is handled automatically by LogsActivity trait
 
         // Update enrollment payment status if invoice is fully paid
-        if ($invoice->wasChanged('status') && $invoice->status === InvoiceStatus::PAID && $invoice->enrollment) {
-            $invoice->enrollment->update([
-                'payment_status' => 'paid',
-                'amount_paid' => $invoice->paid_amount,
-                'balance' => 0,
-            ]);
+        if ($invoice->enrollment) {
+            /** @var \App\Models\Enrollment $enrollment */
+            $enrollment = $invoice->enrollment;
+            $enrollment->updatePaymentDetails();
         }
     }
 
