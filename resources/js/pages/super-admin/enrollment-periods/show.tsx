@@ -1,3 +1,4 @@
+import { EnrollmentPeriodStatusBadge } from '@/components/status-badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Calendar, CheckCircle2, Clock, Edit, Trash2, XCircle } from 'lucide-react';
+import { Calendar, CheckCircle2, Edit, Trash2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export type EnrollmentPeriod = {
@@ -27,26 +28,12 @@ interface Props {
     period: EnrollmentPeriod;
 }
 
-const statusColors = {
-    active: 'default',
-    upcoming: 'secondary',
-    closed: 'outline',
-} as const;
-
-const statusIcons = {
-    active: CheckCircle2,
-    upcoming: Clock,
-    closed: XCircle,
-};
-
 export default function EnrollmentPeriodShow({ period }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Enrollment Periods', href: '/super-admin/enrollment-periods' },
         { title: period.school_year, href: `/super-admin/enrollment-periods/${period.id}` },
     ];
-
-    const StatusIcon = statusIcons[period.status as keyof typeof statusIcons];
 
     const handleActivate = () => {
         if (confirm('Are you sure you want to activate this enrollment period? This will close any currently active period.')) {
@@ -142,10 +129,7 @@ export default function EnrollmentPeriodShow({ period }: Props) {
                                     <Calendar className="h-5 w-5" />
                                     {period.school_year}
                                 </CardTitle>
-                                <Badge variant={statusColors[period.status as keyof typeof statusColors] || 'default'} className="gap-1">
-                                    {StatusIcon && <StatusIcon className="h-3 w-3" />}
-                                    {period.status}
-                                </Badge>
+                                <EnrollmentPeriodStatusBadge status={period.status} />
                             </div>
                             <CardDescription>School year enrollment period</CardDescription>
                         </CardHeader>

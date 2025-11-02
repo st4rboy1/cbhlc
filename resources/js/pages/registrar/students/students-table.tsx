@@ -13,7 +13,7 @@ import {
 import { ChevronDown, MoreHorizontal } from 'lucide-react';
 import * as React from 'react';
 
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -50,40 +50,6 @@ interface Student {
 
 interface StudentsTableProps {
     students: Student[];
-}
-
-export function getStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
-    switch (status) {
-        case 'completed':
-            return 'default';
-        case 'enrolled':
-            return 'secondary';
-        case 'pending':
-            return 'outline';
-        case 'rejected':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
-}
-
-export function getPaymentStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
-    switch (status) {
-        case 'paid':
-            return 'default';
-        case 'partial':
-            return 'secondary';
-        case 'pending':
-            return 'outline';
-        case 'overdue':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
-}
-
-export function formatStatusName(status: string) {
-    return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
 export function calculateAge(birthdate: string) {
@@ -180,12 +146,8 @@ export const columns: ColumnDef<Student>[] = [
                                 {latestEnrollment.enrollment_id} • {latestEnrollment.school_year}
                             </div>
                             <div className="flex gap-2">
-                                <Badge variant={getStatusVariant(latestEnrollment.status)} className="text-xs">
-                                    {formatStatusName(latestEnrollment.status)}
-                                </Badge>
-                                <Badge variant={getPaymentStatusVariant(latestEnrollment.payment_status)} className="text-xs">
-                                    {formatStatusName(latestEnrollment.payment_status)}
-                                </Badge>
+                                <EnrollmentStatusBadge status={latestEnrollment.status} />
+                                <PaymentStatusBadge status={latestEnrollment.payment_status} />
                             </div>
                         </div>
                     ) : (

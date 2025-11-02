@@ -1,10 +1,9 @@
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { paymentStatusColors, statusColors } from '@/pages/guardian/enrollments/index';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Download } from 'lucide-react';
@@ -107,7 +106,7 @@ export default function GuardianEnrollmentsShow({ enrollment, payments }: Props)
                             </div>
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Status</p>
-                                <Badge variant={statusColors[enrollment.status] || 'default'}>{enrollment.status}</Badge>
+                                <EnrollmentStatusBadge status={enrollment.status} />
                             </div>
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">School Year</p>
@@ -191,7 +190,7 @@ export default function GuardianEnrollmentsShow({ enrollment, payments }: Props)
                         <CardContent className="grid gap-4">
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Payment Status</p>
-                                <Badge variant={paymentStatusColors[enrollment.payment_status] || 'default'}>{enrollment.payment_status}</Badge>
+                                <PaymentStatusBadge status={enrollment.payment_status} />
                             </div>
                             <Separator />
                             <div className="space-y-2">

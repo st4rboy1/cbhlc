@@ -1,3 +1,4 @@
+import { EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -37,40 +38,6 @@ interface BillingModuleProps {
     enrollments: Enrollment[];
     summary: Summary;
     paymentPlans: PaymentPlan[];
-}
-
-function getPaymentStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
-    switch (status) {
-        case 'paid':
-            return 'default';
-        case 'partial':
-            return 'secondary';
-        case 'pending':
-            return 'outline';
-        case 'overdue':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
-}
-
-function getEnrollmentStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
-    switch (status) {
-        case 'completed':
-            return 'default';
-        case 'enrolled':
-            return 'secondary';
-        case 'pending':
-            return 'outline';
-        case 'rejected':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
-}
-
-function formatStatusName(status: string) {
-    return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
 export function BillingModule({ enrollments, summary, paymentPlans }: BillingModuleProps) {
@@ -287,14 +254,10 @@ export function BillingModule({ enrollments, summary, paymentPlans }: BillingMod
                                                         <div className="text-sm font-semibold">{enrollment.total_amount}</div>
                                                     </td>
                                                     <td className="px-6 py-4">
-                                                        <Badge variant={getPaymentStatusVariant(enrollment.payment_status)}>
-                                                            {formatStatusName(enrollment.payment_status)}
-                                                        </Badge>
+                                                        <PaymentStatusBadge status={enrollment.payment_status} />
                                                     </td>
                                                     <td className="px-6 py-4">
-                                                        <Badge variant={getEnrollmentStatusVariant(enrollment.status)}>
-                                                            {formatStatusName(enrollment.status)}
-                                                        </Badge>
+                                                        <EnrollmentStatusBadge status={enrollment.status} />
                                                     </td>
                                                 </tr>
                                                 {expandedEnrollment === enrollment.id && (
@@ -333,12 +296,8 @@ export function BillingModule({ enrollments, summary, paymentPlans }: BillingMod
                                                                                 {enrollment.school_year_name} • {enrollment.grade_level}
                                                                             </p>
                                                                             <div className="mt-2 flex gap-2">
-                                                                                <Badge variant={getEnrollmentStatusVariant(enrollment.status)}>
-                                                                                    {formatStatusName(enrollment.status)}
-                                                                                </Badge>
-                                                                                <Badge variant={getPaymentStatusVariant(enrollment.payment_status)}>
-                                                                                    {formatStatusName(enrollment.payment_status)}
-                                                                                </Badge>
+                                                                                <EnrollmentStatusBadge status={enrollment.status} />
+                                                                                <PaymentStatusBadge status={enrollment.payment_status} />
                                                                             </div>
                                                                         </div>
                                                                     </div>
