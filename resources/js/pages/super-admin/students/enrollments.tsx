@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -34,23 +34,6 @@ interface Enrollment {
 interface Props {
     student: Student;
     enrollments: Enrollment[];
-}
-
-function getStatusVariant(status: string): 'default' | 'secondary' | 'destructive' | 'outline' {
-    switch (status) {
-        case 'enrolled':
-        case 'completed':
-        case 'paid':
-        case 'approved':
-            return 'default';
-        case 'pending':
-        case 'ready_for_payment':
-            return 'secondary';
-        case 'rejected':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
 }
 
 export default function StudentEnrollments({ student, enrollments }: Props) {
@@ -119,9 +102,7 @@ export default function StudentEnrollments({ student, enrollments }: Props) {
                                                 {enrollment.guardian.first_name} {enrollment.guardian.last_name}
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant={getStatusVariant(enrollment.status)} className="capitalize">
-                                                    {enrollment.status.replace('_', ' ')}
-                                                </Badge>
+                                                <EnrollmentStatusBadge status={enrollment.status} />
                                             </TableCell>
                                             <TableCell>{new Date(enrollment.created_at).toLocaleDateString()}</TableCell>
                                             <TableCell>

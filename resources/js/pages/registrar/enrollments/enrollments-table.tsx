@@ -13,7 +13,7 @@ import {
 import { ChevronDown, MoreHorizontal } from 'lucide-react';
 import * as React from 'react';
 
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -61,40 +61,6 @@ export function formatCurrency(cents: number) {
         style: 'currency',
         currency: 'PHP',
     }).format(cents / 100);
-}
-
-export function getStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
-    switch (status) {
-        case 'completed':
-            return 'default';
-        case 'enrolled':
-            return 'secondary';
-        case 'pending':
-            return 'outline';
-        case 'rejected':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
-}
-
-export function getPaymentStatusVariant(status: string): 'default' | 'secondary' | 'outline' | 'destructive' {
-    switch (status) {
-        case 'paid':
-            return 'default';
-        case 'partial':
-            return 'secondary';
-        case 'pending':
-            return 'outline';
-        case 'overdue':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
-}
-
-export function formatStatusName(status: string) {
-    return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
 // Define a type for the functions that will be passed to the columns
@@ -168,11 +134,7 @@ export const createColumns = ({
     {
         accessorKey: 'status',
         header: 'Status',
-        cell: ({ row }) => (
-            <Badge variant={getStatusVariant(row.getValue('status'))} className="text-xs">
-                {formatStatusName(row.getValue('status'))}
-            </Badge>
-        ),
+        cell: ({ row }) => <EnrollmentStatusBadge status={row.getValue('status')} />,
     },
     {
         accessorKey: 'net_amount_cents',
@@ -200,11 +162,7 @@ export const createColumns = ({
     {
         accessorKey: 'payment_status',
         header: 'Payment',
-        cell: ({ row }) => (
-            <Badge variant={getPaymentStatusVariant(row.getValue('payment_status'))} className="text-xs">
-                {formatStatusName(row.getValue('payment_status'))}
-            </Badge>
-        ),
+        cell: ({ row }) => <PaymentStatusBadge status={row.getValue('payment_status')} />,
     },
     {
         id: 'actions',

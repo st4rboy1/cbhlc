@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentPeriodStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Calendar, CheckCircle2, Clock, PlusCircle, XCircle } from 'lucide-react';
+import { Calendar, PlusCircle } from 'lucide-react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -51,18 +51,6 @@ interface Props {
     periods: PaginatedEnrollmentPeriods;
     activePeriod: EnrollmentPeriod | null;
 }
-
-const statusColors = {
-    active: 'default',
-    upcoming: 'secondary',
-    closed: 'outline',
-} as const;
-
-const statusIcons = {
-    active: CheckCircle2,
-    upcoming: Clock,
-    closed: XCircle,
-};
 
 export default function EnrollmentPeriodsIndex({ periods, activePeriod }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -216,56 +204,47 @@ export default function EnrollmentPeriodsIndex({ periods, activePeriod }: Props)
                                         </TableCell>
                                     </TableRow>
                                 ) : (
-                                    periods.data.map((period) => {
-                                        const StatusIcon = statusIcons[period.status as keyof typeof statusIcons];
-                                        return (
-                                            <TableRow key={period.id}>
-                                                <TableCell className="font-medium">{period.school_year.name}</TableCell>
-                                                <TableCell>
-                                                    <Badge
-                                                        variant={statusColors[period.status as keyof typeof statusColors] || 'default'}
-                                                        className="gap-1"
-                                                    >
-                                                        {StatusIcon && <StatusIcon className="h-3 w-3" />}
-                                                        {period.status}
-                                                    </Badge>
-                                                </TableCell>
-                                                <TableCell>{format(new Date(period.start_date), 'MMM d, yyyy')}</TableCell>
-                                                <TableCell>{format(new Date(period.end_date), 'MMM d, yyyy')}</TableCell>
-                                                <TableCell>{format(new Date(period.regular_registration_deadline), 'MMM d, yyyy')}</TableCell>
-                                                <TableCell>{period.enrollments_count || 0}</TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex justify-end gap-2">
-                                                        <Link href={`/super-admin/enrollment-periods/${period.id}`}>
-                                                            <Button variant="outline" size="sm">
-                                                                View
-                                                            </Button>
-                                                        </Link>
-                                                        {period.status === 'upcoming' && (
-                                                            <Button variant="default" size="sm" onClick={() => handleActivate(period.id)}>
-                                                                Activate
-                                                            </Button>
-                                                        )}
-                                                        {period.status === 'active' && (
-                                                            <Button variant="outline" size="sm" onClick={() => handleClose(period.id)}>
-                                                                Close
-                                                            </Button>
-                                                        )}
-                                                        <Link href={`/super-admin/enrollment-periods/${period.id}/edit`}>
-                                                            <Button variant="outline" size="sm">
-                                                                Edit
-                                                            </Button>
-                                                        </Link>
-                                                        {period.status !== 'active' && (period.enrollments_count || 0) === 0 && (
-                                                            <Button variant="destructive" size="sm" onClick={() => handleDelete(period.id)}>
-                                                                Delete
-                                                            </Button>
-                                                        )}
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })
+                                    periods.data.map((period) => (
+                                        <TableRow key={period.id}>
+                                            <TableCell className="font-medium">{period.school_year.name}</TableCell>
+                                            <TableCell>
+                                                <EnrollmentPeriodStatusBadge status={period.status} />
+                                            </TableCell>
+                                            <TableCell>{format(new Date(period.start_date), 'MMM d, yyyy')}</TableCell>
+                                            <TableCell>{format(new Date(period.end_date), 'MMM d, yyyy')}</TableCell>
+                                            <TableCell>{format(new Date(period.regular_registration_deadline), 'MMM d, yyyy')}</TableCell>
+                                            <TableCell>{period.enrollments_count || 0}</TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Link href={`/super-admin/enrollment-periods/${period.id}`}>
+                                                        <Button variant="outline" size="sm">
+                                                            View
+                                                        </Button>
+                                                    </Link>
+                                                    {period.status === 'upcoming' && (
+                                                        <Button variant="default" size="sm" onClick={() => handleActivate(period.id)}>
+                                                            Activate
+                                                        </Button>
+                                                    )}
+                                                    {period.status === 'active' && (
+                                                        <Button variant="outline" size="sm" onClick={() => handleClose(period.id)}>
+                                                            Close
+                                                        </Button>
+                                                    )}
+                                                    <Link href={`/super-admin/enrollment-periods/${period.id}/edit`}>
+                                                        <Button variant="outline" size="sm">
+                                                            Edit
+                                                        </Button>
+                                                    </Link>
+                                                    {period.status !== 'active' && (period.enrollments_count || 0) === 0 && (
+                                                        <Button variant="destructive" size="sm" onClick={() => handleDelete(period.id)}>
+                                                            Delete
+                                                        </Button>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
                                 )}
                             </TableBody>
                         </Table>

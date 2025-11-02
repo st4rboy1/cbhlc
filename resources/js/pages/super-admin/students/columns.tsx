@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
@@ -34,22 +34,6 @@ function formatCurrency(amount: number) {
         style: 'currency',
         currency: 'PHP',
     }).format(amount);
-}
-
-function getStatusVariant(status: string): 'default' | 'secondary' | 'destructive' | 'outline' {
-    switch (status) {
-        case 'enrolled':
-        case 'completed':
-        case 'paid':
-            return 'default';
-        case 'pending':
-            return 'secondary';
-        case 'overdue':
-        case 'rejected':
-            return 'destructive';
-        default:
-            return 'outline';
-    }
 }
 
 function ActionsCell({ student }: { student: Student }) {
@@ -159,20 +143,12 @@ export const columns: ColumnDef<Student>[] = [
     {
         accessorKey: 'enrollmentStatus',
         header: 'Enrollment',
-        cell: ({ row }) => (
-            <Badge variant={getStatusVariant(row.getValue('enrollmentStatus'))} className="capitalize">
-                {row.getValue('enrollmentStatus')}
-            </Badge>
-        ),
+        cell: ({ row }) => <EnrollmentStatusBadge status={row.getValue('enrollmentStatus')} />,
     },
     {
         accessorKey: 'paymentStatus',
         header: 'Payment',
-        cell: ({ row }) => (
-            <Badge variant={getStatusVariant(row.getValue('paymentStatus'))} className="capitalize">
-                {row.getValue('paymentStatus')}
-            </Badge>
-        ),
+        cell: ({ row }) => <PaymentStatusBadge status={row.getValue('paymentStatus')} />,
     },
     {
         accessorKey: 'balance',
