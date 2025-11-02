@@ -134,10 +134,14 @@ test('guardian can list documents for their student', function () {
     Document::factory()->count(3)->create(['student_id' => $this->student->id]);
 
     $response = $this->actingAs($this->guardian)
-        ->getJson(route('guardian.students.documents.index', $this->student));
+        ->get(route('guardian.students.documents.index', $this->student));
 
     $response->assertStatus(200)
-        ->assertJsonCount(3, 'documents');
+        ->assertInertia(fn ($page) => $page
+            ->component('guardian/students/documents/index')
+            ->has('documents', 3)
+            ->has('student')
+        );
 });
 
 test('guardian cannot list documents for student they do not own', function () {
@@ -145,7 +149,7 @@ test('guardian cannot list documents for student they do not own', function () {
     Document::factory()->count(3)->create(['student_id' => $otherStudent->id]);
 
     $response = $this->actingAs($this->guardian)
-        ->getJson(route('guardian.students.documents.index', $otherStudent));
+        ->get(route('guardian.students.documents.index', $otherStudent));
 
     $response->assertStatus(403);
 });
