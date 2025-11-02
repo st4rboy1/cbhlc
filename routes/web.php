@@ -166,6 +166,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Documents Management
         Route::resource('documents', SuperAdminDocumentController::class)->only(['index', 'show', 'destroy']);
         Route::get('/documents/{document}/view', [SuperAdminDocumentController::class, 'view'])->name('documents.view');
+        Route::get('/documents/{document}/download', [SuperAdminDocumentController::class, 'download'])->name('documents.download');
         Route::post('/documents/{document}/verify', [SuperAdminDocumentController::class, 'verify'])->name('documents.verify');
         Route::post('/documents/{document}/reject', [SuperAdminDocumentController::class, 'reject'])->name('documents.reject');
 
@@ -229,6 +230,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/documents/pending', [AdminDocumentController::class, 'pending'])->name('documents.pending');
         Route::get('/documents/{document}', [AdminDocumentController::class, 'show'])->name('documents.show');
         Route::get('/documents/{document}/view', [AdminDocumentController::class, 'view'])->name('documents.view');
+        Route::get('/documents/{document}/download', [AdminDocumentController::class, 'download'])->name('documents.download');
         Route::post('/documents/{document}/verify', [AdminDocumentController::class, 'verify'])->name('documents.verify');
         Route::post('/documents/{document}/reject', [AdminDocumentController::class, 'reject'])->name('documents.reject');
 
@@ -290,6 +292,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/documents/pending', [RegistrarDocumentController::class, 'pending'])->name('documents.pending');
         Route::get('/documents/{document}', [RegistrarDocumentController::class, 'show'])->name('documents.show');
         Route::get('/documents/{document}/view', [RegistrarDocumentController::class, 'view'])->name('documents.view');
+        Route::get('/documents/{document}/download', [RegistrarDocumentController::class, 'download'])->name('documents.download');
         Route::post('/documents/{document}/verify', [RegistrarDocumentController::class, 'verify'])->name('documents.verify');
         Route::post('/documents/{document}/reject', [RegistrarDocumentController::class, 'reject'])->name('documents.reject');
 
