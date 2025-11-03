@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Registrar;
 
+use App\Enums\EnrollmentStatus;
 use App\Enums\GradeLevel;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Registrar\StoreStudentRequest;
@@ -43,11 +44,35 @@ class StudentController extends Controller
             $query->where('section', $request->section);
         }
 
+        // Determine the enrollment status to filter by
+        $filterStatus = $request->get('status');
+
+        // If status is 'pending', change it to 'enrolled' as per user's request
+        if ($filterStatus === EnrollmentStatus::PENDING->value) {
+            $filterStatus = EnrollmentStatus::ENROLLED->value;
+        }
+
+        // Apply enrollment status filter
+        if ($filterStatus) {
+            $query->whereHas('enrollments', function ($q) use ($filterStatus) {
+                $q->where('status', $filterStatus)
+                    ->latest('created_at')
+                    ->limit(1);
+            });
+        } else {
+            // Default to showing only enrolled students if no status filter is provided
+            $query->whereHas('enrollments', function ($q) {
+                $q->where('status', EnrollmentStatus::ENROLLED->value)
+                    ->latest('created_at')
+                    ->limit(1);
+            });
+        }
+
         $students = $query->paginate(20);
 
         return Inertia::render('registrar/students/index', [
             'students' => $students,
-            'filters' => $request->only(['search', 'grade_level', 'section']),
+            'filters' => $request->only(['search', 'grade_level', 'section', 'status']),
             'gradeLevels' => GradeLevel::values(),
         ]);
     }

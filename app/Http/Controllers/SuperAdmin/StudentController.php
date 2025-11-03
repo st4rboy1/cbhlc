@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\SuperAdmin;
 
+use App\Enums\EnrollmentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SuperAdmin\StoreStudentRequest;
 use App\Http\Requests\SuperAdmin\UpdateStudentRequest;
@@ -42,10 +43,25 @@ class StudentController extends Controller
             $query->where('grade_level', $request->get('grade_level'));
         }
 
-        // Filter by enrollment status
-        if ($request->filled('status')) {
-            $query->whereHas('enrollments', function ($q) use ($request) {
-                $q->where('status', $request->get('status'))
+        // Determine the enrollment status to filter by
+        $filterStatus = $request->get('status');
+
+        // If status is 'pending', change it to 'enrolled' as per user's request
+        if ($filterStatus === EnrollmentStatus::PENDING->value) {
+            $filterStatus = EnrollmentStatus::ENROLLED->value;
+        }
+
+        // Apply enrollment status filter
+        if ($filterStatus) {
+            $query->whereHas('enrollments', function ($q) use ($filterStatus) {
+                $q->where('status', $filterStatus)
+                    ->latest()
+                    ->limit(1);
+            });
+        } else {
+            // Default to showing only enrolled students if no status filter is provided
+            $query->whereHas('enrollments', function ($q) {
+                $q->where('status', EnrollmentStatus::ENROLLED->value)
                     ->latest()
                     ->limit(1);
             });
