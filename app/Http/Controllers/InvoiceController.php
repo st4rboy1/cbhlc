@@ -72,12 +72,12 @@ class InvoiceController extends Controller
             // No additional filtering needed for the query
         }
 
-        $enrollments = $enrollmentsQuery->latest()->paginate(10);
+        $invoices = $enrollmentsQuery->latest()->paginate(10);
 
         $settings = Setting::pluck('value', 'key');
 
         return Inertia::render('guardian/invoices/index', [
-            'enrollments' => $enrollments,
+            'invoices' => $invoices,
             'settings' => $settings,
         ]);
     }
