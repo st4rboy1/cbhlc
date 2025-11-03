@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/pages/registrar/enrollments/enrollments-table';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { ExternalLink, FileText } from 'lucide-react';
 
 interface Document {
@@ -25,7 +25,7 @@ interface Enrollment {
         student_id: string;
         documents: Document[];
     };
-    guardian: { name: string };
+    guardian: { first_name: string; last_name: string };
     school_year: string;
     quarter: string;
     grade_level: string;
@@ -104,7 +104,9 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                             </div>
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Guardian Name</p>
-                                <p className="text-lg font-semibold">{enrollment.guardian?.name || 'N/A'}</p>
+                                <p className="text-lg font-semibold">
+                                    {enrollment.guardian ? `${enrollment.guardian.first_name} ${enrollment.guardian.last_name}` : 'N/A'}
+                                </p>
                             </div>
                         </CardContent>
                     </Card>
@@ -123,54 +125,54 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                                 <p className="text-sm font-semibold">Fee Breakdown</p>
                                 <div className="flex items-center justify-between text-sm">
                                     <p className="text-muted-foreground">Tuition Fee</p>
-                                    <p>{formatCurrency(enrollment.tuition_fee_cents)}</p>
+                                    <p>{formatCurrency(enrollment.tuition_fee_cents / 100)}</p>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
                                     <p className="text-muted-foreground">Miscellaneous Fee</p>
-                                    <p>{formatCurrency(enrollment.miscellaneous_fee_cents)}</p>
+                                    <p>{formatCurrency(enrollment.miscellaneous_fee_cents / 100)}</p>
                                 </div>
                                 {enrollment.laboratory_fee_cents > 0 && (
                                     <div className="flex items-center justify-between text-sm">
                                         <p className="text-muted-foreground">Laboratory Fee</p>
-                                        <p>{formatCurrency(enrollment.laboratory_fee_cents)}</p>
+                                        <p>{formatCurrency(enrollment.laboratory_fee_cents / 100)}</p>
                                     </div>
                                 )}
                                 {enrollment.library_fee_cents > 0 && (
                                     <div className="flex items-center justify-between text-sm">
                                         <p className="text-muted-foreground">Library Fee</p>
-                                        <p>{formatCurrency(enrollment.library_fee_cents)}</p>
+                                        <p>{formatCurrency(enrollment.library_fee_cents / 100)}</p>
                                     </div>
                                 )}
                                 {enrollment.other_fees_cents > 0 && (
                                     <div className="flex items-center justify-between text-sm">
                                         <p className="text-muted-foreground">Other Fees</p>
-                                        <p>{formatCurrency(enrollment.other_fees_cents)}</p>
+                                        <p>{formatCurrency(enrollment.other_fees_cents / 100)}</p>
                                     </div>
                                 )}
                             </div>
                             <Separator />
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Total Amount</p>
-                                <p className="text-lg font-semibold">{formatCurrency(enrollment.total_amount_cents)}</p>
+                                <p className="text-lg font-semibold">{formatCurrency(enrollment.total_amount_cents / 100)}</p>
                             </div>
                             {enrollment.discount_cents > 0 && (
                                 <div className="flex items-center justify-between">
                                     <p className="text-sm font-medium text-muted-foreground">Discount</p>
-                                    <p className="text-lg font-semibold text-green-600">-{formatCurrency(enrollment.discount_cents)}</p>
+                                    <p className="text-lg font-semibold text-green-600">-{formatCurrency(enrollment.discount_cents / 100)}</p>
                                 </div>
                             )}
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Net Amount</p>
-                                <p className="text-lg font-semibold">{formatCurrency(enrollment.net_amount_cents)}</p>
+                                <p className="text-lg font-semibold">{formatCurrency(enrollment.net_amount_cents / 100)}</p>
                             </div>
                             <Separator />
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Amount Paid</p>
-                                <p className="text-lg font-semibold">{formatCurrency(enrollment.amount_paid_cents)}</p>
+                                <p className="text-lg font-semibold">{formatCurrency(enrollment.amount_paid_cents / 100)}</p>
                             </div>
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Balance</p>
-                                <p className="text-lg font-semibold">{formatCurrency(enrollment.balance_cents)}</p>
+                                <p className="text-lg font-semibold">{formatCurrency(enrollment.balance_cents / 100)}</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -196,12 +198,16 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <DocumentStatusBadge status={doc.verification_status} />
-                                            <Link href={route('documents.view', { document: doc.id })} target="_blank">
+                                            <a
+                                                href={route('registrar.documents.view', { document: doc.id })}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
                                                 <Button variant="outline" size="sm">
                                                     <ExternalLink className="mr-2 h-4 w-4" />
                                                     View
                                                 </Button>
-                                            </Link>
+                                            </a>
                                         </div>
                                     </div>
                                 ))}
