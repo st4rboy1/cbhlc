@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
+import { formatCurrency } from '@/lib/format-currency';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
@@ -66,10 +67,6 @@ export default function ReceiptsIndex({ receipts }: Props) {
         { title: 'Receipts', href: '/super-admin/receipts' },
     ];
 
-    const formatAmount = (amount: number): string => {
-        return `₱${amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    };
-
     const columns: ColumnDef<Receipt>[] = [
         {
             accessorKey: 'receipt_number',
@@ -102,7 +99,7 @@ export default function ReceiptsIndex({ receipts }: Props) {
         {
             accessorKey: 'amount',
             header: 'Amount',
-            cell: ({ row }) => <span className="font-medium">{formatAmount(row.original.amount)}</span>,
+            cell: ({ row }) => <span className="font-medium">{formatCurrency(row.original.amount)}</span>,
         },
         {
             accessorKey: 'payment_method',

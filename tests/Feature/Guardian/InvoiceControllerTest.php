@@ -49,6 +49,14 @@ beforeEach(function () {
         'status' => EnrollmentStatus::ENROLLED,
     ]);
 
+    // Create an invoice for the enrollment
+    $this->invoice = Invoice::factory()->create([
+        'enrollment_id' => $this->enrollment->id,
+        'invoice_number' => 'INV-'.now()->year.'-001',
+        'total_amount' => 1000.00,
+        'status' => InvoiceStatus::DRAFT,
+    ]);
+
     // Create settings
     Setting::create(['key' => 'school_name', 'value' => 'Christian Bible Heritage Learning Center']);
     Setting::create(['key' => 'school_address', 'value' => '123 Main St']);
