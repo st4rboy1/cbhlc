@@ -166,6 +166,10 @@ describe('Registrar Happy Path - Student Management', function () {
             'last_name' => 'Student',
         ]);
 
+        // Ensure Student model is properly loaded from database
+        $student->refresh();
+        expect(Student::count())->toBe(1);
+
         $this->actingAs($registrar);
 
         $response = $this->get('/registrar/students');
@@ -233,15 +237,20 @@ describe('Registrar Happy Path - Search and Filter', function () {
             'password' => bcrypt('password'),
         ]);
 
-        Student::factory()->create([
+        $student1 = Student::factory()->create([
             'first_name' => 'Searchable',
             'last_name' => 'StudentOne',
         ]);
 
-        Student::factory()->create([
+        $student2 = Student::factory()->create([
             'first_name' => 'Another',
             'last_name' => 'StudentTwo',
         ]);
+
+        // Ensure students are properly persisted in database
+        $student1->refresh();
+        $student2->refresh();
+        expect(Student::count())->toBe(2);
 
         $this->actingAs($registrar);
 
