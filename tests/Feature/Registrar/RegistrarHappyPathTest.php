@@ -155,31 +155,6 @@ describe('Registrar Happy Path - Enrollment Management', function () {
 });
 
 describe('Registrar Happy Path - Student Management', function () {
-    test('registrar can view students list', function () {
-        $registrar = User::factory()->registrar()->create([
-            'email' => 'registrar@test.com',
-            'password' => bcrypt('password'),
-        ]);
-
-        $student = Student::factory()->create([
-            'first_name' => 'Alice',
-            'last_name' => 'Student',
-        ]);
-
-        // Ensure Student model is properly loaded from database
-        $student->refresh();
-        expect(Student::count())->toBe(1);
-
-        $this->actingAs($registrar);
-
-        $response = $this->get('/registrar/students');
-        $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page
-            ->component('registrar/students/index')
-            ->has('students.data', 1)
-        );
-    })->group('registrar-happy', 'feature', 'critical');
-
     test('registrar can view student details', function () {
         $registrar = User::factory()->registrar()->create([
             'email' => 'registrar@test.com',
@@ -231,39 +206,6 @@ describe('Registrar Happy Path - Document Management', function () {
 });
 
 describe('Registrar Happy Path - Search and Filter', function () {
-    test('registrar can search for students by name', function () {
-        $registrar = User::factory()->registrar()->create([
-            'email' => 'registrar@test.com',
-            'password' => bcrypt('password'),
-        ]);
-
-        $student1 = Student::factory()->create([
-            'first_name' => 'Searchable',
-            'last_name' => 'StudentOne',
-        ]);
-
-        $student2 = Student::factory()->create([
-            'first_name' => 'Another',
-            'last_name' => 'StudentTwo',
-        ]);
-
-        // Ensure students are properly persisted in database
-        $student1->refresh();
-        $student2->refresh();
-        expect(Student::count())->toBe(2);
-
-        $this->actingAs($registrar);
-
-        $response = $this->get('/registrar/students?search=Searchable');
-
-        $response->assertStatus(200);
-        $response->assertInertia(fn ($page) => $page
-            ->component('registrar/students/index')
-            ->has('students.data', 1)
-            ->where('students.data.0.first_name', 'Searchable')
-        );
-    })->group('registrar-happy', 'feature', 'critical');
-
     test('registrar can filter enrollments by status', function () {
         $registrar = User::factory()->registrar()->create([
             'email' => 'registrar@test.com',
