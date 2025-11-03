@@ -100,6 +100,8 @@ class Enrollment extends Model
         'balance' => MoneyCast::class,
     ];
 
+    protected $appends = ['balance', 'net_amount'];
+
     /**
      * Get the activity log options for this model.
      */
@@ -186,7 +188,7 @@ class Enrollment extends Model
     /**
      * Calculate the net amount after discount
      */
-    public function calculateNetAmount(): float
+    public function getNetAmountAttribute(): float
     {
         return ($this->total_amount_cents - $this->discount_cents) / 100;
     }
@@ -194,7 +196,7 @@ class Enrollment extends Model
     /**
      * Calculate the balance
      */
-    public function calculateBalance(): float
+    public function getBalanceAttribute(): float
     {
         return ($this->net_amount_cents - $this->amount_paid_cents) / 100;
     }
@@ -224,6 +226,35 @@ class Enrollment extends Model
             $this->status = EnrollmentStatus::ENROLLED; // Transition to ENROLLED even for partial payments
         } else {
             $this->payment_status = PaymentStatus::PENDING;
+        }
+
+        $this->save();
+    }
+
+    public function recalculateFees(): void
+    {
+        $fees = GradeLevelFee::getFeesForGrade(
+            $this->grade_level,
+            $this->enrollment_period_id
+        );
+
+        if ($fees) {
+            $this->tuition_fee = $fees->tuition_fee;
+            $this->miscellaneous_fee = $fees->miscellaneous_fee ?? 0;
+
+            // Calculate total from the fees we're actually using
+            $total = $this->tuition_fee + $this->miscellaneous_fee;
+
+            $this->total_amount = $total;
+            $this->net_amount = $total - ($this->discount ?? 0);
+            $this->balance = $this->net_amount;
+        } else {
+            // Set default values if no fee structure found
+            $this->tuition_fee = 0;
+            $this->miscellaneous_fee = 0;
+            $this->total_amount = 0;
+            $this->net_amount = 0;
+            $this->balance = 0;
         }
 
         $this->save();

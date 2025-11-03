@@ -27,7 +27,8 @@ class EnrollmentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Enrollment::with(['student', 'guardian.user']);
+        $query = Enrollment::with(['student', 'guardian.user'])
+            ->selectRaw('*, (net_amount_cents - amount_paid_cents) / 100 as balance');
 
         // Exclude completed and enrolled enrollments (they should appear in Students page only)
         $query->whereNotIn('status', [
@@ -78,6 +79,9 @@ class EnrollmentController extends Controller
     public function show(Enrollment $enrollment)
     {
         $enrollment->load(['student.documents', 'guardian']);
+
+        $enrollment->recalculateFees();
+        $enrollment->updatePaymentDetails();
 
         return Inertia::render('registrar/enrollments/show', [
             'enrollment' => $enrollment,
