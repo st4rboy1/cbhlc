@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatCurrency } from '@/lib/format-currency';
 import {
     AlertCircle,
     CheckCircle,
@@ -330,7 +331,7 @@ export function ExpandedDashboard({ stats }: Props) {
                             <DollarSign className="h-4 w-4 text-green-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">${stats.totalRevenue.toLocaleString()}</div>
+                            <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
                             <p className="flex items-center gap-1 text-xs text-muted-foreground">
                                 <TrendingUp className="h-3 w-3 text-green-500" />
                                 <span>This school year</span>
@@ -343,7 +344,7 @@ export function ExpandedDashboard({ stats }: Props) {
                             <DollarSign className="h-4 w-4 text-green-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">${stats.totalCollected.toLocaleString()}</div>
+                            <div className="text-2xl font-bold">{formatCurrency(stats.totalCollected)}</div>
                             <p className="text-xs text-muted-foreground">{stats.collectionRate}% collection rate</p>
                         </CardContent>
                     </Card>
@@ -353,7 +354,7 @@ export function ExpandedDashboard({ stats }: Props) {
                             <DollarSign className="h-4 w-4 text-blue-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">${stats.totalExpectedRevenue.toLocaleString()}</div>
+                            <div className="text-2xl font-bold">{formatCurrency(stats.totalExpectedRevenue)}</div>
                             <p className="text-xs text-muted-foreground">Total expected this year</p>
                         </CardContent>
                     </Card>
@@ -363,7 +364,7 @@ export function ExpandedDashboard({ stats }: Props) {
                             <DollarSign className="h-4 w-4 text-orange-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">${stats.potentialIncomingRevenue.toLocaleString()}</div>
+                            <div className="text-2xl font-bold">{formatCurrency(stats.potentialIncomingRevenue)}</div>
                             <p className="text-xs text-muted-foreground">Outstanding balance</p>
                         </CardContent>
                     </Card>
@@ -400,7 +401,7 @@ export function ExpandedDashboard({ stats }: Props) {
                             <DollarSign className="h-4 w-4 text-orange-500" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">${stats.totalBalance.toLocaleString()}</div>
+                            <div className="text-2xl font-bold">{formatCurrency(stats.totalBalance)}</div>
                             <p className="text-xs text-muted-foreground">Pending collection</p>
                         </CardContent>
                     </Card>

@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import { formatCurrency } from '@/lib/format-currency';
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Calendar, DollarSign, FileText, User } from 'lucide-react';
 
@@ -52,10 +53,6 @@ interface Props {
 }
 
 export default function ReceiptShow({ receipt }: Props) {
-    const formatAmount = (amount: number): string => {
-        return `₱${amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    };
-
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this receipt? This action cannot be undone.')) {
             router.delete(`/super-admin/receipts/${receipt.id}`);
@@ -104,7 +101,7 @@ export default function ReceiptShow({ receipt }: Props) {
                             <DollarSign className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{formatAmount(receipt.amount)}</div>
+                            <div className="text-2xl font-bold">{formatCurrency(receipt.amount)}</div>
                             <p className="text-xs text-muted-foreground">Payment amount</p>
                         </CardContent>
                     </Card>
@@ -157,7 +154,7 @@ export default function ReceiptShow({ receipt }: Props) {
                                     </div>
                                 )}
                                 <div>
-                                    <span className="font-medium">Payment Amount:</span> {formatAmount(receipt.payment.amount)}
+                                    <span className="font-medium">Payment Amount:</span> {formatCurrency(receipt.payment.amount)}
                                 </div>
                                 <Link href={`/super-admin/payments/${receipt.payment.id}`}>
                                     <Button variant="outline" size="sm" className="mt-2">
