@@ -62,18 +62,26 @@ test('guardian can view invoices list', function () {
     $response->assertStatus(200)
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('guardian/invoices/index')
-            ->has('enrollments')
+            ->has('invoices')
         );
 });
 
 test('invoices list shows guardian enrollments', function () {
+    // Create invoice for the enrollment
+    Invoice::factory()->create([
+        'enrollment_id' => $this->enrollment->id,
+        'invoice_number' => 'INV-2024-001',
+        'total_amount' => 25000.00,
+        'status' => InvoiceStatus::SENT,
+    ]);
+
     $response = $this->actingAs($this->guardian)
         ->get(route('guardian.invoices.index'));
 
     $response->assertStatus(200)
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('guardian/invoices/index')
-            ->has('enrollments.data', 1)
+            ->has('invoices.data', 1)
         );
 });
 
@@ -235,14 +243,30 @@ test('invoice shows payments when available', function () {
 });
 
 test('invoices list only shows guardian own students', function () {
+    // Create invoice for this guardian's enrollment
+    Invoice::factory()->create([
+        'enrollment_id' => $this->enrollment->id,
+        'invoice_number' => 'INV-2024-001',
+        'total_amount' => 25000.00,
+        'status' => InvoiceStatus::SENT,
+    ]);
+
     // Create another guardian with their student and enrollment
     $otherGuardian = Guardian::factory()->create();
     $otherStudent = Student::factory()->create(['first_name' => 'Other']);
     $otherGuardian->children()->attach($otherStudent->id);
 
-    Enrollment::factory()->create([
+    $otherEnrollment = Enrollment::factory()->create([
         'student_id' => $otherStudent->id,
         'school_year_id' => $this->schoolYear->id,
+    ]);
+
+    // Create invoice for other guardian's enrollment
+    Invoice::factory()->create([
+        'enrollment_id' => $otherEnrollment->id,
+        'invoice_number' => 'INV-2024-002',
+        'total_amount' => 30000.00,
+        'status' => InvoiceStatus::SENT,
     ]);
 
     $response = $this->actingAs($this->guardian)
@@ -250,8 +274,8 @@ test('invoices list only shows guardian own students', function () {
 
     $response->assertStatus(200)
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->has('enrollments.data', 1)
-            ->where('enrollments.data.0.student.first_name', 'John')
+            ->has('invoices.data', 1)
+            ->where('invoices.data.0.enrollment.student.first_name', 'John')
         );
 });
 
