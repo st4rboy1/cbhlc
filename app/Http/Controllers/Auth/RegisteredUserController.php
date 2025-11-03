@@ -84,10 +84,21 @@ class RegisteredUserController extends Controller
 
             DB::commit();
 
+            Log::info('User and guardian created successfully', ['email' => $request->email]);
+
             event(new Registered($user));
 
-            // Send email verification notification
-            $user->sendEmailVerificationNotification();
+            // Send email verification notification - wrapped in try-catch to prevent registration failure
+            try {
+                $user->sendEmailVerificationNotification();
+                Log::info('Verification email sent', ['email' => $request->email]);
+            } catch (\Exception $emailException) {
+                // Log the error but don't fail the registration
+                Log::error('Failed to send verification email but registration succeeded', [
+                    'email' => $request->email,
+                    'error' => $emailException->getMessage(),
+                ]);
+            }
 
             // Log in the user but they will be redirected to verification notice
             Auth::login($user);
