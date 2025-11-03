@@ -4,10 +4,10 @@ use App\Enums\EnrollmentPeriodStatus;
 use App\Models\EnrollmentPeriod;
 use App\Models\User;
 use App\Notifications\EnrollmentPeriodStatusChangedNotification;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\assertDatabaseHas;
 
@@ -16,9 +16,8 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     Notification::fake();
 
-    // Create roles for testing
-    Role::create(['name' => 'super_admin']);
-    Role::create(['name' => 'administrator']);
+    // Seed roles and permissions
+    $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create school years
     $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([

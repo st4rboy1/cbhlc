@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Student;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Tests\Feature\Services\TestService;
@@ -8,6 +9,7 @@ use Tests\Feature\Services\TestService;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
     $this->service = new TestService;
 });
 

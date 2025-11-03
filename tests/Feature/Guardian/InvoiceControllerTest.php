@@ -11,19 +11,20 @@ use App\Models\Payment;
 use App\Models\SchoolYear;
 use App\Models\Setting;
 use App\Models\Student;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    // Create roles
-    $guardianRole = \Spatie\Permission\Models\Role::create(['name' => 'guardian', 'guard_name' => 'web']);
+    // Seed roles and permissions
+    $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create guardian user and associated Guardian model
     $guardianModel = Guardian::factory()->create();
     $this->guardian = $guardianModel->user;
-    $this->guardian->assignRole($guardianRole);
+    $this->guardian->assignRole('guardian');
     $this->guardianModel = $guardianModel;
 
     // Create school year

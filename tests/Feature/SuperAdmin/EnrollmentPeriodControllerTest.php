@@ -4,8 +4,8 @@ use App\Enums\EnrollmentPeriodStatus;
 use App\Models\Enrollment;
 use App\Models\EnrollmentPeriod;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -14,10 +14,8 @@ use function Pest\Laravel\assertDatabaseMissing;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    // Create roles
-    Role::create(['name' => 'super_admin']);
-    Role::create(['name' => 'administrator']);
-    Role::create(['name' => 'guardian']);
+    // Seed roles and permissions
+    $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create school year
     $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
