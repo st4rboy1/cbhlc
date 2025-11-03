@@ -49,6 +49,14 @@ beforeEach(function () {
         'status' => EnrollmentStatus::ENROLLED,
     ]);
 
+    // Create an invoice for the enrollment
+    $this->invoice = Invoice::factory()->create([
+        'enrollment_id' => $this->enrollment->id,
+        'invoice_number' => 'INV-'.now()->year.'-001',
+        'total_amount' => 1000.00,
+        'status' => InvoiceStatus::DRAFT,
+    ]);
+
     // Create settings
     Setting::create(['key' => 'school_name', 'value' => 'Christian Bible Heritage Learning Center']);
     Setting::create(['key' => 'school_address', 'value' => '123 Main St']);
@@ -62,7 +70,7 @@ test('guardian can view invoices list', function () {
     $response->assertStatus(200)
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('guardian/invoices/index')
-            ->has('enrollments')
+            ->has('invoices')
         );
 });
 
@@ -73,7 +81,7 @@ test('invoices list shows guardian enrollments', function () {
     $response->assertStatus(200)
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('guardian/invoices/index')
-            ->has('enrollments.data', 1)
+            ->has('invoices.data', 1)
         );
 });
 
@@ -250,8 +258,8 @@ test('invoices list only shows guardian own students', function () {
 
     $response->assertStatus(200)
         ->assertInertia(fn (AssertableInertia $page) => $page
-            ->has('enrollments.data', 1)
-            ->where('enrollments.data.0.student.first_name', 'John')
+            ->has('invoices.data', 1)
+            ->where('invoices.data.0.enrollment.student.first_name', 'John')
         );
 });
 
