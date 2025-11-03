@@ -279,6 +279,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/enrollments/{enrollment}/status', [RegistrarEnrollmentController::class, 'updateStatus'])->name('enrollments.update-status');
         Route::post('/enrollments/bulk-approve', [RegistrarEnrollmentController::class, 'bulkApprove'])->name('enrollments.bulk-approve');
         Route::get('/enrollments/export', [RegistrarEnrollmentController::class, 'export'])->name('enrollments.export');
+        Route::get('/enrollments/{enrollment}/certificate', [RegistrarEnrollmentController::class, 'downloadCertificate'])->name('enrollments.certificate');
+        Route::get('/enrollments/{enrollment}/payment-history', [RegistrarEnrollmentController::class, 'downloadPaymentHistory'])->name('enrollments.payment-history');
 
         // Quick actions for dashboard
         Route::post('/enrollments/{enrollment}/quick-approve', [RegistrarDashboardController::class, 'quickApprove'])->name('enrollments.quick-approve');
