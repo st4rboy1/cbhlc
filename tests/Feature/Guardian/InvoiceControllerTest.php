@@ -50,6 +50,14 @@ beforeEach(function () {
         'status' => EnrollmentStatus::ENROLLED,
     ]);
 
+    // Create an invoice for the enrollment
+    $this->invoice = Invoice::factory()->create([
+        'enrollment_id' => $this->enrollment->id,
+        'invoice_number' => 'INV-'.now()->year.'-001',
+        'total_amount' => 1000.00,
+        'status' => InvoiceStatus::DRAFT,
+    ]);
+
     // Create settings
     Setting::create(['key' => 'school_name', 'value' => 'Christian Bible Heritage Learning Center']);
     Setting::create(['key' => 'school_address', 'value' => '123 Main St']);
@@ -68,13 +76,6 @@ test('guardian can view invoices list', function () {
 });
 
 test('invoices list shows guardian enrollments', function () {
-    // Create invoice for the enrollment
-    Invoice::factory()->create([
-        'enrollment_id' => $this->enrollment->id,
-        'invoice_number' => 'INV-2024-001',
-        'total_amount' => 25000.00,
-        'status' => InvoiceStatus::SENT,
-    ]);
 
     $response = $this->actingAs($this->guardian)
         ->get(route('guardian.invoices.index'));
@@ -244,13 +245,6 @@ test('invoice shows payments when available', function () {
 });
 
 test('invoices list only shows guardian own students', function () {
-    // Create invoice for this guardian's enrollment
-    Invoice::factory()->create([
-        'enrollment_id' => $this->enrollment->id,
-        'invoice_number' => 'INV-2024-001',
-        'total_amount' => 25000.00,
-        'status' => InvoiceStatus::SENT,
-    ]);
 
     // Create another guardian with their student and enrollment
     $otherGuardian = Guardian::factory()->create();

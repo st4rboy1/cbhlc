@@ -35,7 +35,15 @@ beforeEach(function () {
 describe('Registrar StudentController', function () {
     test('registrar can view students index', function () {
         // Create students
-        Student::factory()->count(3)->create();
+        $students = Student::factory()->count(3)->create();
+
+        // Create enrollments for the students
+        foreach ($students as $student) {
+            Enrollment::factory()->create([
+                'student_id' => $student->id,
+                'status' => \App\Enums\EnrollmentStatus::ENROLLED,
+            ]);
+        }
 
         $response = $this->actingAs($this->registrar)
             ->get(route('registrar.students.index'));
@@ -51,7 +59,15 @@ describe('Registrar StudentController', function () {
 
     test('students index shows paginated results', function () {
         // Create 20 students for pagination
-        Student::factory()->count(20)->create();
+        $students = Student::factory()->count(20)->create();
+
+        // Create enrollments for the students
+        foreach ($students as $student) {
+            Enrollment::factory()->create([
+                'student_id' => $student->id,
+                'status' => \App\Enums\EnrollmentStatus::ENROLLED,
+            ]);
+        }
 
         $response = $this->actingAs($this->registrar)
             ->get(route('registrar.students.index'));
@@ -65,18 +81,28 @@ describe('Registrar StudentController', function () {
     });
 
     test('students index search by name works', function () {
-        Student::factory()->create([
+        $student1 = Student::factory()->create([
             'first_name' => 'John',
             'last_name' => 'Doe',
             'email' => 'john.doe@example.com',
             'student_id' => 'STU-JOHN-001',
         ]);
 
-        Student::factory()->create([
+        Enrollment::factory()->create([
+            'student_id' => $student1->id,
+            'status' => \App\Enums\EnrollmentStatus::ENROLLED,
+        ]);
+
+        $student2 = Student::factory()->create([
             'first_name' => 'Jane',
             'last_name' => 'Smith',
             'email' => 'jane.smith@example.com',
             'student_id' => 'STU-JANE-001',
+        ]);
+
+        Enrollment::factory()->create([
+            'student_id' => $student2->id,
+            'status' => \App\Enums\EnrollmentStatus::ENROLLED,
         ]);
 
         $response = $this->actingAs($this->registrar)
@@ -91,12 +117,22 @@ describe('Registrar StudentController', function () {
     });
 
     test('students index search by student ID works', function () {
-        Student::factory()->create([
+        $student1 = Student::factory()->create([
             'student_id' => 'STU-001',
         ]);
 
-        Student::factory()->create([
+        Enrollment::factory()->create([
+            'student_id' => $student1->id,
+            'status' => \App\Enums\EnrollmentStatus::ENROLLED,
+        ]);
+
+        $student2 = Student::factory()->create([
             'student_id' => 'STU-002',
+        ]);
+
+        Enrollment::factory()->create([
+            'student_id' => $student2->id,
+            'status' => \App\Enums\EnrollmentStatus::ENROLLED,
         ]);
 
         $response = $this->actingAs($this->registrar)
@@ -111,12 +147,22 @@ describe('Registrar StudentController', function () {
     });
 
     test('students index filter by grade level works', function () {
-        Student::factory()->create([
+        $student1 = Student::factory()->create([
             'grade_level' => GradeLevel::GRADE_1,
         ]);
 
-        Student::factory()->create([
+        Enrollment::factory()->create([
+            'student_id' => $student1->id,
+            'status' => \App\Enums\EnrollmentStatus::ENROLLED,
+        ]);
+
+        $student2 = Student::factory()->create([
             'grade_level' => GradeLevel::GRADE_2,
+        ]);
+
+        Enrollment::factory()->create([
+            'student_id' => $student2->id,
+            'status' => \App\Enums\EnrollmentStatus::ENROLLED,
         ]);
 
         $response = $this->actingAs($this->registrar)
@@ -131,12 +177,22 @@ describe('Registrar StudentController', function () {
     });
 
     test('students index filter by section works', function () {
-        Student::factory()->create([
+        $student1 = Student::factory()->create([
             'section' => 'A',
         ]);
 
-        Student::factory()->create([
+        Enrollment::factory()->create([
+            'student_id' => $student1->id,
+            'status' => \App\Enums\EnrollmentStatus::ENROLLED,
+        ]);
+
+        $student2 = Student::factory()->create([
             'section' => 'B',
+        ]);
+
+        Enrollment::factory()->create([
+            'student_id' => $student2->id,
+            'status' => \App\Enums\EnrollmentStatus::ENROLLED,
         ]);
 
         $response = $this->actingAs($this->registrar)
