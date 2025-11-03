@@ -20,12 +20,12 @@ beforeEach(function () {
     \Spatie\Permission\Models\Role::create(['name' => 'registrar', 'guard_name' => 'web']);
 
     // Create guardian user and associated Guardian model
-    $guardianModel = Guardian::factory()->create();
-    $this->guardian = $guardianModel->user;
+    $this->guardianModel = Guardian::factory()->create();
+    $this->guardian = $this->guardianModel->user;
     $this->guardian->assignRole($guardianRole);
 
     $this->student = Student::factory()->create();
-    $this->student->guardians()->attach($guardianModel->id);
+    $this->student->guardians()->attach($this->guardianModel->id);
 });
 
 test('guardian can upload document for their student', function () {
@@ -258,4 +258,142 @@ test('file is stored in correct directory structure', function () {
 
     expect($document->file_path)->toStartWith("{$this->student->id}/");
     Storage::disk('private')->assertExists($document->file_path);
+});
+
+test('guardian can download document with valid signed URL', function () {
+    // Upload a real file first
+    $file = UploadedFile::fake()->image('test-document.jpg');
+
+    $this->actingAs($this->guardian)
+        ->postJson(route('guardian.students.documents.store', $this->student), [
+            'document' => $file,
+            'document_type' => DocumentType::BIRTH_CERTIFICATE->value,
+        ]);
+
+    $document = Document::first();
+
+    // Get the document to retrieve signed URL
+    $showResponse = $this->actingAs($this->guardian)
+        ->getJson(route('guardian.students.documents.show', [$this->student, $document]));
+
+    $signedUrl = $showResponse->json('url');
+
+    // Download using signed URL
+    $response = $this->actingAs($this->guardian)
+        ->get($signedUrl);
+
+    $response->assertStatus(200)
+        ->assertDownload($document->original_filename);
+});
+
+test('document download requires valid signature', function () {
+    $document = Document::factory()->create(['student_id' => $this->student->id]);
+
+    // Try to download without valid signature
+    $response = $this->actingAs($this->guardian)
+        ->getJson(route('guardian.students.documents.download', [$this->student, $document]));
+
+    $response->assertStatus(403)
+        ->assertJson(['message' => 'Invalid or expired download link.']);
+});
+
+test('show returns 404 when document does not belong to student', function () {
+    // Create document for different student
+    $otherStudent = Student::factory()->create();
+    $document = Document::factory()->create(['student_id' => $otherStudent->id]);
+
+    // Try to view document with wrong student context (this guardian owns this->student)
+    // But document belongs to otherStudent
+    $this->guardianModel->children()->attach($otherStudent->id);
+
+    $response = $this->actingAs($this->guardian)
+        ->getJson(route('guardian.students.documents.show', [$this->student, $document]));
+
+    // Should return 404 because document.student_id !== student.id
+    $response->assertStatus(404)
+        ->assertJson(['message' => 'Document not found for this student.']);
+});
+
+test('destroy returns 404 when document does not belong to student', function () {
+    // Create document for different student
+    $otherStudent = Student::factory()->create();
+    $document = Document::factory()->pending()->create(['student_id' => $otherStudent->id]);
+
+    // Make guardian own both students
+    $this->guardianModel->children()->attach($otherStudent->id);
+
+    $response = $this->actingAs($this->guardian)
+        ->deleteJson(route('guardian.students.documents.destroy', [$this->student, $document]));
+
+    // Should return 404 because document.student_id !== student.id
+    $response->assertStatus(404)
+        ->assertJson(['message' => 'Document not found for this student.']);
+});
+
+test('destroy deletes physical file when it exists', function () {
+    // Upload a real file first
+    $file = UploadedFile::fake()->image('test-delete.jpg');
+
+    $this->actingAs($this->guardian)
+        ->postJson(route('guardian.students.documents.store', $this->student), [
+            'document' => $file,
+            'document_type' => DocumentType::BIRTH_CERTIFICATE->value,
+        ]);
+
+    $document = Document::first();
+
+    // Verify file exists before deletion
+    Storage::disk('private')->assertExists($document->file_path);
+
+    $response = $this->actingAs($this->guardian)
+        ->deleteJson(route('guardian.students.documents.destroy', [$this->student, $document]));
+
+    $response->assertStatus(200);
+
+    // Verify file no longer exists
+    Storage::disk('private')->assertMissing($document->file_path);
+});
+
+test('download logs activity', function () {
+    // Upload a real file first
+    $file = UploadedFile::fake()->image('test-log.jpg');
+
+    $this->actingAs($this->guardian)
+        ->postJson(route('guardian.students.documents.store', $this->student), [
+            'document' => $file,
+            'document_type' => DocumentType::BIRTH_CERTIFICATE->value,
+        ]);
+
+    $document = Document::first();
+
+    // Get signed URL
+    $showResponse = $this->actingAs($this->guardian)
+        ->getJson(route('guardian.students.documents.show', [$this->student, $document]));
+
+    $signedUrl = $showResponse->json('url');
+
+    // Download document
+    $this->actingAs($this->guardian)
+        ->get($signedUrl);
+
+    // Check activity log
+    $this->assertDatabaseHas('activity_log', [
+        'subject_type' => Document::class,
+        'subject_id' => $document->id,
+        'description' => 'Document downloaded',
+    ]);
+});
+
+test('show logs document access', function () {
+    $document = Document::factory()->create(['student_id' => $this->student->id]);
+
+    $this->actingAs($this->guardian)
+        ->getJson(route('guardian.students.documents.show', [$this->student, $document]));
+
+    // Check activity log
+    $this->assertDatabaseHas('activity_log', [
+        'subject_type' => Document::class,
+        'subject_id' => $document->id,
+        'description' => 'Document accessed',
+    ]);
 });
