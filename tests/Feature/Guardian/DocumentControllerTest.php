@@ -6,6 +6,7 @@ use App\Models\Document;
 use App\Models\Guardian;
 use App\Models\Student;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -15,14 +16,13 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     Storage::fake('private');
 
-    // Create roles
-    $guardianRole = \Spatie\Permission\Models\Role::create(['name' => 'guardian', 'guard_name' => 'web']);
-    \Spatie\Permission\Models\Role::create(['name' => 'registrar', 'guard_name' => 'web']);
+    // Seed roles and permissions
+    $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create guardian user and associated Guardian model
     $this->guardianModel = Guardian::factory()->create();
     $this->guardian = $this->guardianModel->user;
-    $this->guardian->assignRole($guardianRole);
+    $this->guardian->assignRole('guardian');
 
     $this->student = Student::factory()->create();
     $this->student->guardians()->attach($this->guardianModel->id);

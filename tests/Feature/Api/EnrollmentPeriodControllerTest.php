@@ -3,11 +3,13 @@
 use App\Enums\EnrollmentPeriodStatus;
 use App\Models\EnrollmentPeriod;
 use App\Models\SchoolYear;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
     $this->schoolYear = SchoolYear::factory()->create([
         'start_year' => 2024,
         'end_year' => 2025,

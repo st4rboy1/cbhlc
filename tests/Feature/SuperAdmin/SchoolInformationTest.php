@@ -4,8 +4,8 @@ namespace Tests\Feature\SuperAdmin;
 
 use App\Models\SchoolInformation;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class SchoolInformationTest extends TestCase
@@ -24,11 +24,8 @@ class SchoolInformationTest extends TestCase
     {
         parent::setUp();
 
-        // Create roles directly
-        Role::create(['name' => 'super_admin', 'guard_name' => 'web']);
-        Role::create(['name' => 'administrator', 'guard_name' => 'web']);
-        Role::create(['name' => 'registrar', 'guard_name' => 'web']);
-        Role::create(['name' => 'guardian', 'guard_name' => 'web']);
+        // Seed roles and permissions
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         // Create users with different roles
         $this->superAdmin = User::factory()->create();

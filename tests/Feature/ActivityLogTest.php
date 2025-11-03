@@ -9,22 +9,20 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Student;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Activitylog\Models\Activity;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    // Create roles
-    Role::create(['name' => 'super_admin']);
-    Role::create(['name' => 'administrator']);
-    Role::create(['name' => 'guardian']);
+    // Seed roles and permissions
+    $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create test user
     $this->user = User::factory()->create();

@@ -9,6 +9,7 @@ use App\Models\Enrollment;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\EnrollmentService;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -22,6 +23,7 @@ class EmailNotificationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->seed(RolesAndPermissionsSeeder::class);
         $this->service = app(EnrollmentService::class);
         Mail::fake();
 

@@ -4,17 +4,14 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Receipt;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    // Seed necessary roles for testing
-    Role::create(['name' => 'guardian']);
-    Role::create(['name' => 'super_admin']);
-    Role::create(['name' => 'administrator']);
-    Role::create(['name' => 'registrar']);
+    // Seed roles and permissions
+    $this->seed(RolesAndPermissionsSeeder::class);
 });
 
 test('receipt can be created with valid data', function () {

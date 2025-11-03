@@ -6,11 +6,11 @@ use App\Models\Student;
 use App\Models\User;
 use App\Notifications\DocumentRejectedNotification;
 use App\Notifications\DocumentVerifiedNotification;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
@@ -21,11 +21,8 @@ beforeEach(function () {
     Storage::fake('private');
     Notification::fake();
 
-    // Create roles
-    Role::create(['name' => 'super_admin']);
-    Role::create(['name' => 'administrator']);
-    Role::create(['name' => 'registrar']);
-    Role::create(['name' => 'guardian']);
+    // Seed roles and permissions
+    $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create registrar user
     $this->registrar = User::factory()->create();

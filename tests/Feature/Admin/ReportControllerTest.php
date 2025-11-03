@@ -7,15 +7,14 @@ use App\Models\EnrollmentPeriod;
 use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Permission\Models\Role;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    // Create roles
-    Role::create(['name' => 'administrator']);
-    Role::create(['name' => 'guardian']);
+    // Seed roles and permissions
+    $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create administrator user
     $this->admin = User::factory()->create();
