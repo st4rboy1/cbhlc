@@ -20,6 +20,8 @@ interface Student {
         grade_level: string;
         status: string;
         payment_status: string;
+        balance: number;
+        net_amount: number;
     }[];
 }
 

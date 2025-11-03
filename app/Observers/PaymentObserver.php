@@ -32,6 +32,13 @@ class PaymentObserver
             /** @var \App\Models\Invoice $invoice */
             $invoice = $payment->invoice;
             $invoice->updatePaidAmount();
+
+            // Update enrollment balance and status
+            if ($invoice->enrollment) {
+                /** @var \App\Models\Enrollment $enrollment */
+                $enrollment = $invoice->enrollment;
+                $enrollment->updatePaymentDetails();
+            }
         }
 
         // Note: Activity logging is handled automatically by LogsActivity trait
@@ -53,6 +60,13 @@ class PaymentObserver
                 /** @var \App\Models\Invoice $invoice */
                 $invoice = $payment->invoice;
                 $invoice->updatePaidAmount();
+
+                // Update enrollment balance and status
+                if ($invoice->enrollment) {
+                    /** @var \App\Models\Enrollment $enrollment */
+                    $enrollment = $invoice->enrollment;
+                    $enrollment->updatePaymentDetails();
+                }
             }
         }
 
@@ -69,6 +83,13 @@ class PaymentObserver
             /** @var \App\Models\Invoice $invoice */
             $invoice = $payment->invoice;
             $invoice->updatePaidAmount();
+
+            // Update enrollment balance and status
+            if ($invoice->enrollment) {
+                /** @var \App\Models\Enrollment $enrollment */
+                $enrollment = $invoice->enrollment;
+                $enrollment->updatePaymentDetails();
+            }
         }
 
         // Note: Activity logging is handled automatically by LogsActivity trait
