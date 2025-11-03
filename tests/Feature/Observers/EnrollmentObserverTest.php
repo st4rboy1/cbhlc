@@ -78,6 +78,7 @@ class EnrollmentObserverTest extends TestCase
         $enrollment = Enrollment::factory()->create([
             'grade_level' => 'Grade 1',
             'school_year_id' => $this->sy2024->id,
+            'enrollment_period_id' => $this->enrollmentPeriod->id,
             'tuition_fee' => null,
         ]);
 

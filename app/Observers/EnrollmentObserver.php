@@ -125,7 +125,7 @@ class EnrollmentObserver
     {
         $fees = GradeLevelFee::getFeesForGrade(
             $enrollment->grade_level,
-            $enrollment->school_year_id
+            $enrollment->enrollment_period_id
         );
 
         if ($fees) {
@@ -136,12 +136,14 @@ class EnrollmentObserver
             $total = $enrollment->tuition_fee + $enrollment->miscellaneous_fee;
 
             $enrollment->total_amount = $total;
-            $enrollment->balance = $total;
+            $enrollment->net_amount = $total - ($enrollment->discount ?? 0);
+            $enrollment->balance = $enrollment->net_amount;
         } else {
             // Set default values if no fee structure found
             $enrollment->tuition_fee = 0;
             $enrollment->miscellaneous_fee = 0;
             $enrollment->total_amount = 0;
+            $enrollment->net_amount = 0;
             $enrollment->balance = 0;
         }
     }

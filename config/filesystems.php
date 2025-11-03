@@ -40,7 +40,7 @@ return [
 
         'private' => [
             'driver' => 'local',
-            'root' => storage_path('app/documents'),
+            'root' => storage_path('app'),
             'visibility' => 'private',
             'throw' => false,
             'report' => false,

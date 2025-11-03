@@ -256,7 +256,7 @@ test('file is stored in correct directory structure', function () {
 
     $document = Document::first();
 
-    expect($document->file_path)->toStartWith("{$this->student->id}/");
+    expect($document->file_path)->toStartWith("documents/{$this->student->id}/");
     Storage::disk('private')->assertExists($document->file_path);
 });
 
