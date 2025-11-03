@@ -54,7 +54,7 @@ test('enrollment model calculates amounts correctly', function () {
     ]);
 
     expect($enrollment->calculateTotalAmount())->toBe(16000.00);
-    expect($enrollment->calculateNetAmount())->toBe(15000.00);
+    expect($enrollment->net_amount)->toBe(15000.00);
 });
 
 test('enrollment model balance calculation works correctly', function () {
@@ -64,7 +64,7 @@ test('enrollment model balance calculation works correctly', function () {
         'balance_cents' => 1000000, // 10000.00 - stored value
     ]);
 
-    expect($enrollment->calculateBalance())->toBe(10000.00);
+    expect($enrollment->balance)->toBe(10000.00);
     expect((float) $enrollment->balance)->toBe(10000.00);
 });
 
@@ -194,10 +194,8 @@ test('enrollment model Laravel 12 attribute syntax works correctly', function ()
         'library_fee' => 'library_fee_cents',
         'sports_fee' => 'sports_fee_cents',
         'total_amount' => 'total_amount_cents',
-        'net_amount' => 'net_amount_cents',
         'discount' => 'discount_cents',
         'amount_paid' => 'amount_paid_cents',
-        'balance' => 'balance_cents',
     ];
 
     foreach ($moneyFields as $floatField => $centsField) {

@@ -45,11 +45,20 @@ interface Student {
         grade_level: string;
         status: string;
         payment_status: string;
+        balance: number;
+        net_amount: number;
     }[];
 }
 
 interface StudentsTableProps {
     students: Student[];
+}
+
+function formatCurrency(amount: number) {
+    return new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+    }).format(amount);
 }
 
 export function calculateAge(birthdate: string) {
@@ -156,6 +165,22 @@ export const columns: ColumnDef<Student>[] = [
                     )}
                 </div>
             );
+        },
+    },
+    {
+        accessorKey: 'balance',
+        header: () => <div className="text-right">Balance</div>,
+        cell: ({ row }) => {
+            const latestEnrollment = row.original.enrollments[0];
+            const amount = latestEnrollment ? latestEnrollment.balance : 0;
+
+            if (!Number.isFinite(amount)) {
+                return <div className="text-right font-medium">N/A</div>;
+            }
+
+            const formatted = formatCurrency(amount);
+
+            return <div className="text-right font-medium">{formatted}</div>;
         },
     },
     {
