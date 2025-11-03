@@ -103,6 +103,25 @@ describe('Registrar Browser Tests - Enrollment Management', function () {
 });
 
 describe('Registrar Browser Tests - Student Management', function () {
+    test('registrar can view students list page', function () {
+        $registrar = User::factory()->registrar()->create([
+            'email' => 'registrar@test.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $student = Student::factory()->create([
+            'first_name' => 'Alice',
+            'middle_name' => null,
+            'last_name' => 'StudentList',
+        ]);
+
+        $this->actingAs($registrar);
+
+        visit('/registrar/students')
+            ->waitForText('Students')
+            ->assertSee('Alice StudentList');
+    })->group('registrar-browser', 'critical');
+
     test('registrar can view student details page directly', function () {
         $registrar = User::factory()->registrar()->create([
             'email' => 'registrar@test.com',
@@ -120,6 +139,34 @@ describe('Registrar Browser Tests - Student Management', function () {
         visit("/registrar/students/{$student->id}")
             ->waitForText('Bob StudentDetail')
             ->assertSee('Bob StudentDetail');
+    })->group('registrar-browser', 'critical');
+
+    test('registrar can search students by name', function () {
+        $registrar = User::factory()->registrar()->create([
+            'email' => 'registrar@test.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        Student::factory()->create([
+            'first_name' => 'FindMe',
+            'middle_name' => null,
+            'last_name' => 'SearchTest',
+        ]);
+
+        Student::factory()->create([
+            'first_name' => 'Other',
+            'middle_name' => null,
+            'last_name' => 'Student',
+        ]);
+
+        $this->actingAs($registrar);
+
+        visit('/registrar/students')
+            ->waitForText('Students')
+            ->type('[placeholder="Filter by name..."]', 'FindMe')
+            ->wait(1)
+            ->assertSee('FindMe SearchTest')
+            ->assertDontSee('Other Student');
     })->group('registrar-browser', 'critical');
 });
 
