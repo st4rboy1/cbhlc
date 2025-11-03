@@ -55,7 +55,7 @@ class DocumentController extends Controller
 
             // Store file (no 'documents/' prefix since disk root is already storage/app/documents)
             $path = $file->storeAs(
-                (string) $student->id,
+                'documents/'.(string) $student->id,
                 $storedName,
                 'private'
             );
