@@ -126,7 +126,7 @@ export function SuperAdminSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={mainNavItems} label="Platform" />
             </SidebarContent>
 
             <SidebarFooter>
