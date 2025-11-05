@@ -6,7 +6,35 @@ import { Separator } from '@/components/ui/separator';
 import { Head } from '@inertiajs/react';
 import { Award, BookOpen, Eye, Facebook, GraduationCap, Heart, Mail, MapPin, Phone, Star, Target, Users } from 'lucide-react';
 
-export default function About() {
+interface SchoolInformation {
+    id: number;
+    key: string;
+    value: string | null;
+    type: string;
+    group: string;
+    label: string;
+    description: string | null;
+    order: number;
+}
+
+interface GroupedInformation {
+    contact?: SchoolInformation[];
+    hours?: SchoolInformation[];
+    social?: SchoolInformation[];
+    about?: SchoolInformation[];
+}
+
+interface Props {
+    schoolInformation?: GroupedInformation;
+}
+
+export default function About({ schoolInformation }: Props) {
+    // Helper function to get value by key
+    const getValue = (group: keyof GroupedInformation, key: string, defaultValue: string = '') => {
+        const item = schoolInformation?.[group]?.find((item) => item.key === key);
+        return item?.value || defaultValue;
+    };
+
     const values = [
         {
             icon: Heart,
@@ -49,6 +77,12 @@ export default function About() {
             description: 'Preparing graduates who excel academically and demonstrate strong Christian values.',
         },
     ];
+
+    const schoolName = getValue('contact', 'school_name', 'Christian Bible Heritage Learning Center');
+    const schoolAddress = getValue('contact', 'school_address', 'Bayabas Ext. NAPICO Manggahan 1611 Pasig, Philippines');
+    const schoolPhone = getValue('contact', 'school_phone', '+63 123 456 7890');
+    const schoolEmail = getValue('contact', 'school_email', 'christianbibleheritage@gmail.com');
+    const facebookUrl = getValue('social', 'facebook_url', 'https://www.facebook.com/CBHLC.Pasig');
 
     return (
         <>
@@ -219,7 +253,7 @@ export default function About() {
                                         <Icon iconNode={MapPin} className="h-6 w-6" />
                                     </div>
                                     <h3 className="mb-2 text-lg font-semibold">Address</h3>
-                                    <p className="text-blue-100">Bayabas Ext. NAPICO Manggahan 1611 Pasig, Philippines</p>
+                                    <p className="text-blue-100">{schoolAddress}</p>
                                 </div>
 
                                 <div className="text-center">
@@ -228,7 +262,7 @@ export default function About() {
                                     </div>
                                     <h3 className="mb-2 text-lg font-semibold">Phone</h3>
                                     <p className="text-blue-100">
-                                        Contact us for inquiries
+                                        {schoolPhone}
                                         <br />
                                         Mon - Fri: 8:00 AM - 4:30 PM
                                     </p>
@@ -240,7 +274,7 @@ export default function About() {
                                     </div>
                                     <h3 className="mb-2 text-lg font-semibold">Email</h3>
                                     <p className="text-blue-100">
-                                        christianbibleheritage@gmail.com
+                                        {schoolEmail}
                                         <br />
                                     </p>
                                 </div>
@@ -252,7 +286,7 @@ export default function About() {
                                 <h3 className="mb-6 text-xl font-semibold">Follow Us</h3>
                                 <div className="flex justify-center space-x-6">
                                     <a
-                                        href="https://www.facebook.com/CBHLC.Pasig"
+                                        href={facebookUrl}
                                         className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white hover:text-blue-600"
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -273,7 +307,7 @@ export default function About() {
                                 <Icon iconNode={GraduationCap} className="h-8 w-8" />
                                 <span className="text-2xl font-bold">CBHLC</span>
                             </div>
-                            <p className="mb-4 text-slate-400">Christian Bible Heritage Learning Center</p>
+                            <p className="mb-4 text-slate-400">{schoolName}</p>
                             <p className="text-sm text-slate-500">©2025 CBHLC | All rights reserved</p>
                         </div>
                     </div>

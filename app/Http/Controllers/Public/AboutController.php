@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\SchoolInformation;
 use Inertia\Inertia;
 
 class AboutController extends Controller
@@ -12,6 +13,8 @@ class AboutController extends Controller
      */
     public function index()
     {
-        return Inertia::render('public/about');
+        return Inertia::render('public/about', [
+            'schoolInformation' => SchoolInformation::getGrouped(),
+        ]);
     }
 }
