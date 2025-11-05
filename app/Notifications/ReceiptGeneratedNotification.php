@@ -57,7 +57,6 @@ class ReceiptGeneratedNotification extends Notification
     {
         $payment = $this->receipt->payment;
         $amount = $payment ? $payment->amount_cents / 100 : 0;
-        $invoice = $payment ? $payment->invoice : null;
 
         return [
             'receipt_id' => $this->receipt->id,
@@ -71,7 +70,7 @@ class ReceiptGeneratedNotification extends Notification
                 'Issue Date' => $this->receipt->created_at->format('F d, Y'),
                 'Payment Reference' => ($payment ? $payment->reference_number : 'N/A'),
             ],
-            'action_url' => $invoice ? route('guardian.invoices.show', $invoice) : null,
+            'action_url' => route('guardian.receipts.show', $this->receipt),
         ];
     }
 }

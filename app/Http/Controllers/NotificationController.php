@@ -64,8 +64,13 @@ class NotificationController extends Controller
      */
     private function getNotificationRoute($notification): string
     {
-        $type = $notification->type;
         $data = $notification->data;
+
+        if (isset($data['action_url'])) {
+            return $data['action_url'];
+        }
+
+        $type = $notification->type;
 
         // Document notifications - navigate to student documents page
         if (str_contains($type, 'DocumentRejected') || str_contains($type, 'DocumentVerified')) {
