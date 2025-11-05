@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SuperAdmin\RejectDocumentRequest;
 use App\Models\Document;
+use App\Models\Student;
 use App\Notifications\DocumentRejectedNotification;
 use App\Notifications\DocumentVerifiedNotification;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -24,37 +25,59 @@ class DocumentController extends Controller
     {
         Gate::authorize('viewAny', Document::class);
 
-        $query = Document::with(['student', 'verifiedBy']);
-
-        // Apply filters
-        if ($request->filled('verification_status')) {
-            $query->where('verification_status', $request->get('verification_status'));
-        }
-
-        if ($request->filled('document_type')) {
-            $query->where('document_type', $request->get('document_type'));
-        }
+        $studentsQuery = Student::with(['documents' => function ($query) use ($request) {
+            if ($request->filled('verification_status')) {
+                $query->where('verification_status', $request->get('verification_status'));
+            }
+            if ($request->filled('document_type')) {
+                $query->where('document_type', $request->get('document_type'));
+            }
+            if ($request->filled('search')) {
+                $search = $request->get('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('original_filename', 'like', "%{$search}%");
+                });
+            }
+        }, 'documents.verifiedBy']);
 
         if ($request->filled('student_id')) {
-            $query->where('student_id', $request->get('student_id'));
+            $studentsQuery->where('id', $request->get('student_id'));
         }
 
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('original_filename', 'like', "%{$search}%")
-                    ->orWhereHas('student', function ($studentQuery) use ($search) {
-                        $studentQuery->where('first_name', 'like', "%{$search}%")
-                            ->orWhere('last_name', 'like', "%{$search}%");
+            $studentsQuery->where(function ($query) use ($search) {
+                $query->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhereHas('documents', function ($documentQuery) use ($search) {
+                        $documentQuery->where('original_filename', 'like', "%{$search}%");
                     });
             });
         }
 
-        $documents = $query->latest('upload_date')->paginate(20)->withQueryString();
+        // Apply sorting to students
+        if ($request->filled('sort_by') && $request->filled('sort_direction')) {
+            $studentsQuery->orderBy($request->get('sort_by'), $request->get('sort_direction'));
+        } else {
+            $studentsQuery->latest('created_at'); // Default sort for students
+        }
+
+        $studentsWithDocuments = $studentsQuery->paginate(20)->withQueryString();
+
+        $allStudents = Student::select('id', 'first_name', 'last_name')
+            ->orderBy('first_name')
+            ->get()
+            ->map(function ($student) {
+                return [
+                    'value' => $student->id,
+                    'label' => "{$student->first_name} {$student->last_name}",
+                ];
+            });
 
         return Inertia::render('super-admin/documents/index', [
-            'documents' => $documents,
-            'filters' => $request->only(['verification_status', 'document_type', 'student_id', 'search']),
+            'studentsWithDocuments' => $studentsWithDocuments,
+            'filters' => $request->only(['verification_status', 'document_type', 'student_id', 'search', 'sort_by', 'sort_direction']),
+            'students' => $allStudents,
         ]);
     }
 
@@ -165,7 +188,7 @@ class DocumentController extends Controller
             ->performedOn($document)
             ->withProperties([
                 'document_type' => $document->document_type,
-                'student_id' => $document->student_id,
+                'student_id' => $document->student->id,
                 'rejection_reason' => $request->validated()['notes'],
             ])
             ->log('Document rejected');
