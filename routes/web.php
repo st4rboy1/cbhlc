@@ -321,9 +321,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/billing', [GuardianBillingController::class, 'index'])->name('billing.index');
         Route::get('/billing/{enrollment}', [GuardianBillingController::class, 'show'])->name('billing.show');
 
+        // Receipt Management
+        Route::get('/receipts', [\App\Http\Controllers\Guardian\ReceiptController::class, 'index'])->name('receipts.index');
+        Route::get('/receipts/{receipt}', [\App\Http\Controllers\Guardian\ReceiptController::class, 'show'])->name('receipts.show');
+
         // Invoice Management
         Route::resource('invoices', \App\Http\Controllers\Guardian\InvoiceController::class)->only(['index', 'show']);
         Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Guardian\InvoiceController::class, 'download'])->name('invoices.download');
+
+        // Payment Management
+        Route::get('/payments', [\App\Http\Controllers\Guardian\PaymentController::class, 'index'])->name('payments.index');
 
         // Document Management
         Route::get('/students/{student}/documents', [\App\Http\Controllers\Guardian\DocumentController::class, 'index'])->name('students.documents.index');

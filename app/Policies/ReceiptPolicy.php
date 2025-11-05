@@ -20,7 +20,15 @@ class ReceiptPolicy
      */
     public function view(User $user, Receipt $receipt): bool
     {
-        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar']);
+        if ($user->hasAnyRole(['super_admin', 'administrator', 'registrar'])) {
+            return true;
+        }
+
+        if ($user->hasRole('guardian')) {
+            return $receipt->payment?->invoice?->enrollment?->guardian_id === $user->guardian?->id;
+        }
+
+        return false;
     }
 
     /**
