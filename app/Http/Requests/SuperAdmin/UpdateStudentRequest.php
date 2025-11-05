@@ -27,19 +27,19 @@ class UpdateStudentRequest extends FormRequest
         $student = $this->route('student');
 
         return [
-            'first_name' => ['required', 'string', 'max:100'],
+            'first_name' => ['sometimes', 'string', 'max:100'],
             'middle_name' => ['nullable', 'string', 'max:100'],
-            'last_name' => ['required', 'string', 'max:100'],
-            'birthdate' => ['required', 'date', 'before:today'],
+            'last_name' => ['sometimes', 'string', 'max:100'],
+            'birthdate' => ['sometimes', 'date', 'before:today'],
             'birth_place' => ['nullable', 'string', 'max:255'],
-            'gender' => ['required', Rule::in(Gender::values())],
+            'gender' => ['sometimes', Rule::in(Gender::values())],
             'nationality' => ['nullable', 'string', 'max:100'],
             'religion' => ['nullable', 'string', 'max:100'],
-            'address' => ['required', 'string', 'max:500'],
+            'address' => ['sometimes', 'string', 'max:500'],
             'phone' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'unique:students,email,'.$student->id],
-            'grade_level' => ['required', Rule::in(GradeLevel::values())],
-            'guardian_ids' => ['required', 'array', 'min:1'],
+            'grade_level' => ['sometimes', Rule::in(GradeLevel::values())],
+            'guardian_ids' => ['sometimes', 'array', 'min:1'],
             'guardian_ids.*' => ['exists:guardians,id'],
         ];
     }
