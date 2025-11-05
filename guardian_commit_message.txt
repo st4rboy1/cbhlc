@@ -1,0 +1,25 @@
+feat: Implement dedicated guardian billing modules and fix notification redirect
+
+This commit introduces dedicated modules for guardians to manage their billing information and fixes a notification redirection issue:
+
+- **Dedicated Receipt Module for Guardians:**
+  - Updated `ReceiptPolicy` (`app/Policies/ReceiptPolicy.php`) to allow guardians to view their own receipts.
+  - Created a new `Guardian/ReceiptController` (`app/Http/Controllers/Guardian/ReceiptController.php`) with `index` and `show` methods.
+  - Added new routes for `guardian.receipts.index` and `guardian.receipts.show` in `routes/web.php`.
+  - Created new views for guardians to see the list of receipts (`resources/js/pages/guardian/receipts/index.tsx`) and a single receipt (`resources/js/pages/guardian/receipts/show.tsx`).
+  - Updated the `ReceiptGeneratedNotification` (`app/Notifications/ReceiptGeneratedNotification.php`) to use the new `guardian.receipts.show` route, ensuring correct redirection from notifications.
+
+- **Dedicated Payment Module for Guardians:**
+  - Created a new `Guardian/PaymentController` (`app/Http/Controllers/Guardian/PaymentController.php`) with an `index` method to fetch and display a list of the guardian's payments.
+  - Created a `PaymentPolicy` (`app/Policies/PaymentPolicy.php`) to handle authorization for guardian payments.
+  - Added a new route for `guardian.payments.index` in `routes/web.php`.
+  - Created a new view for the guardian to see the list of payments (`resources/js/pages/guardian/payments/index.tsx`).
+
+- **Sidebar Restructuring and Navigation Fixes:**
+  - Restructured the `GuardianSidebar` (`resources/js/components/sidebars/guardian-sidebar.tsx`) to have a "Billing" top-level menu with "Enrollment Billing", "Invoices", "Payments", and "Receipts" as sub-menu items.
+  - Updated the `NavMain` component (`resources/js/components/nav-main.tsx`) to accept a `label` prop for custom group labels, improving sidebar organization.
+  - Updated the `NotificationController` (`app/Http/Controllers/NotificationController.php`) to prioritize the `action_url` from notification data, fixing the issue where clicking receipt notifications did nothing.
+
+- **Billing Page Fix:**
+  - Added conditional rendering to the `guardian/billing/show.tsx` file to display a message when the payment schedule is empty, addressing the blank payment schedule issue.
+  - Fixed "Call to a member function label() on null" error in `Guardian/BillingController.php` by adding a null check for `payment_plan` and using the null-safe operator.

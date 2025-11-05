@@ -152,52 +152,54 @@ class BillingController extends Controller
         $startYear = substr($schoolYearName, 0, 4);
         $endYear = substr($schoolYearName, 5, 4);
 
-        switch ($enrollment->payment_plan) {
-            case PaymentPlan::ANNUAL:
-                $paymentSchedule = [
-                    [
-                        'period' => 'Annual Payment',
-                        'due_date' => 'August 15, '.$startYear,
-                        'amount' => $this->currencyService->format($totalFee),
-                        'status' => 'pending',
-                    ],
-                ];
-                break;
-            case PaymentPlan::SEMESTRAL:
-                $semestralAmount = $totalFee / 2;
-                $paymentSchedule = [
-                    [
-                        'period' => 'First Semester',
-                        'due_date' => 'August 15, '.$startYear,
-                        'amount' => $this->currencyService->format($semestralAmount),
-                        'status' => 'pending',
-                    ],
-                    [
-                        'period' => 'Second Semester',
-                        'due_date' => 'January 15, '.$endYear,
-                        'amount' => $this->currencyService->format($semestralAmount),
-                        'status' => 'pending',
-                    ],
-                ];
-                break;
-            case PaymentPlan::MONTHLY:
-            default:
-                $monthlyAmount = $totalFee / 10;
-                $months = [
-                    'August', 'September', 'October', 'November', 'December',
-                    'January', 'February', 'March', 'April', 'May',
-                ];
-                $paymentSchedule = [];
-                foreach ($months as $index => $month) {
-                    $year = ($index < 5) ? $startYear : $endYear;
-                    $paymentSchedule[] = [
-                        'period' => $month.' Payment',
-                        'due_date' => $month.' 15, '.$year,
-                        'amount' => $this->currencyService->format($monthlyAmount),
-                        'status' => 'pending',
+        if ($paymentPlan) {
+            switch ($paymentPlan) {
+                case PaymentPlan::ANNUAL:
+                    $paymentSchedule = [
+                        [
+                            'period' => 'Annual Payment',
+                            'due_date' => 'August 15, '.$startYear,
+                            'amount' => $this->currencyService->format($totalFee),
+                            'status' => 'pending',
+                        ],
                     ];
-                }
-                break;
+                    break;
+                case PaymentPlan::SEMESTRAL:
+                    $semestralAmount = $totalFee / 2;
+                    $paymentSchedule = [
+                        [
+                            'period' => 'First Semester',
+                            'due_date' => 'August 15, '.$startYear,
+                            'amount' => $this->currencyService->format($semestralAmount),
+                            'status' => 'pending',
+                        ],
+                        [
+                            'period' => 'Second Semester',
+                            'due_date' => 'January 15, '.$endYear,
+                            'amount' => $this->currencyService->format($semestralAmount),
+                            'status' => 'pending',
+                        ],
+                    ];
+                    break;
+                case PaymentPlan::MONTHLY:
+                default:
+                    $monthlyAmount = $totalFee / 10;
+                    $months = [
+                        'August', 'September', 'October', 'November', 'December',
+                        'January', 'February', 'March', 'April', 'May',
+                    ];
+                    $paymentSchedule = [];
+                    foreach ($months as $index => $month) {
+                        $year = ($index < 5) ? $startYear : $endYear;
+                        $paymentSchedule[] = [
+                            'period' => $month.' Payment',
+                            'due_date' => $month.' 15, '.$year,
+                            'amount' => $this->currencyService->format($monthlyAmount),
+                            'status' => 'pending',
+                        ];
+                    }
+                    break;
+            }
         }
 
         return Inertia::render('guardian/billing/show', [
@@ -211,7 +213,7 @@ class BillingController extends Controller
                 'grade_level' => $enrollment->grade_level,
                 'status' => $enrollment->status->value,
                 'payment_status' => $enrollment->payment_status->value,
-                'payment_plan' => $enrollment->payment_plan->label(),
+                'payment_plan' => $enrollment->payment_plan?->label(),
             ],
             'billing' => [
                 'tuition_fee' => $this->currencyService->format($tuitionFee),

@@ -111,46 +111,50 @@ export default function GuardianBillingShow({ enrollment, billing, paymentInstru
                 <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
                     <h2 className="mb-4 text-2xl font-semibold text-gray-800">Payment Schedule</h2>
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                        Period
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                        Due Date
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                        Amount
-                                    </th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
-                                        Status
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200 bg-white">
-                                {billing.payment_schedule.map((item, index) => (
-                                    <tr key={index}>
-                                        <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900">{item.period}</td>
-                                        <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">{item.due_date}</td>
-                                        <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">{item.amount}</td>
-                                        <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
-                                            <span
-                                                className={`inline-flex rounded-full px-2 text-xs leading-5 font-semibold ${
-                                                    item.status === 'pending'
-                                                        ? 'bg-yellow-100 text-yellow-800'
-                                                        : item.status === 'paid'
-                                                          ? 'bg-green-100 text-green-800'
-                                                          : 'bg-gray-100 text-gray-800'
-                                                }`}
-                                            >
-                                                {item.status}
-                                            </span>
-                                        </td>
+                        {billing.payment_schedule.length > 0 ? (
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                                            Period
+                                        </th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                                            Due Date
+                                        </th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                                            Amount
+                                        </th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                                            Status
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200 bg-white">
+                                    {billing.payment_schedule.map((item, index) => (
+                                        <tr key={index}>
+                                            <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-900">{item.period}</td>
+                                            <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">{item.due_date}</td>
+                                            <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">{item.amount}</td>
+                                            <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
+                                                <span
+                                                    className={`inline-flex rounded-full px-2 text-xs leading-5 font-semibold ${
+                                                        item.status === 'pending'
+                                                            ? 'bg-yellow-100 text-yellow-800'
+                                                            : item.status === 'paid'
+                                                              ? 'bg-green-100 text-green-800'
+                                                              : 'bg-gray-100 text-gray-800'
+                                                    }`}
+                                                >
+                                                    {item.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        ) : (
+                            <p className="text-center text-gray-500">No payment schedule available for this enrollment.</p>
+                        )}
                     </div>
                 </div>
 
