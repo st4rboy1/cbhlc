@@ -1,10 +1,12 @@
 import Heading from '@/components/heading';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { CalendarDays, DollarSign, MapPin } from 'lucide-react';
+import { useState } from 'react';
 
 interface GradeLevelFeeDetail {
     tuition: number;
@@ -13,6 +15,14 @@ interface GradeLevelFeeDetail {
     library: number;
     sports: number;
     total: number;
+    payment_plans: Record<
+        string,
+        {
+            label: string;
+            installments: number;
+            amount_per_installment: number;
+        }
+    >;
 }
 
 interface PaymentPlanDetail {
@@ -41,6 +51,8 @@ export default function Tuition({ gradeLevelFees, settings, paymentPlans }: Prop
         },
     ];
 
+    const [selectedPaymentPlan, setSelectedPaymentPlan] = useState<string>(paymentPlans[0]?.value || '');
+
     const parseCurrency = (amount: number) => amount || 0;
 
     const formatCurrency = (amount: number) => {
@@ -64,46 +76,69 @@ export default function Tuition({ gradeLevelFees, settings, paymentPlans }: Prop
                             <CardTitle>Grade Level Fees Reference</CardTitle>
                         </CardHeader>
                         <CardContent>
+                            <div className="mb-4 flex items-center gap-2">
+                                <span className="text-sm font-medium">View by Payment Plan:</span>
+                                <Select value={selectedPaymentPlan} onValueChange={setSelectedPaymentPlan}>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Select a plan" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {paymentPlans.map((plan) => (
+                                            <SelectItem key={plan.value} value={plan.value}>
+                                                {plan.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                {Object.entries(gradeLevelFees).map(([level, fees]) => (
-                                    <Card key={level} className="p-4">
-                                        <CardTitle className="mb-2 text-lg">{level}</CardTitle>
-                                        <Separator className="my-2" />
-                                        <div className="space-y-1 text-sm">
-                                            <div className="flex justify-between">
-                                                <span>Tuition Fee:</span>
-                                                <span className="font-medium">{formatCurrency(parseCurrency(fees.tuition))}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span>Miscellaneous Fee:</span>
-                                                <span className="font-medium">{formatCurrency(parseCurrency(fees.miscellaneous))}</span>
-                                            </div>
-                                            {parseCurrency(fees.laboratory) > 0 && (
-                                                <div className="flex justify-between">
-                                                    <span>Laboratory Fee:</span>
-                                                    <span className="font-medium">{formatCurrency(parseCurrency(fees.laboratory))}</span>
-                                                </div>
-                                            )}
-                                            {parseCurrency(fees.library) > 0 && (
-                                                <div className="flex justify-between">
-                                                    <span>Library Fee:</span>
-                                                    <span className="font-medium">{formatCurrency(parseCurrency(fees.library))}</span>
-                                                </div>
-                                            )}
-                                            {parseCurrency(fees.sports) > 0 && (
-                                                <div className="flex justify-between">
-                                                    <span>Sports Fee:</span>
-                                                    <span className="font-medium">{formatCurrency(parseCurrency(fees.sports))}</span>
-                                                </div>
-                                            )}
+                                {Object.entries(gradeLevelFees).map(([level, fees]) => {
+                                    const planDetails = fees.payment_plans[selectedPaymentPlan];
+                                    return (
+                                        <Card key={level} className="p-4">
+                                            <CardTitle className="mb-2 text-lg">{level}</CardTitle>
                                             <Separator className="my-2" />
-                                            <div className="flex justify-between font-semibold">
-                                                <span>Total:</span>
-                                                <span>{formatCurrency(parseCurrency(fees.total))}</span>
+                                            <div className="space-y-1 text-sm">
+                                                <div className="flex justify-between">
+                                                    <span>Tuition Fee:</span>
+                                                    <span className="font-medium">{formatCurrency(parseCurrency(fees.tuition))}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>Miscellaneous Fee:</span>
+                                                    <span className="font-medium">{formatCurrency(parseCurrency(fees.miscellaneous))}</span>
+                                                </div>
+                                                {parseCurrency(fees.laboratory) > 0 && (
+                                                    <div className="flex justify-between">
+                                                        <span>Laboratory Fee:</span>
+                                                        <span className="font-medium">{formatCurrency(parseCurrency(fees.laboratory))}</span>
+                                                    </div>
+                                                )}
+                                                {parseCurrency(fees.library) > 0 && (
+                                                    <div className="flex justify-between">
+                                                        <span>Library Fee:</span>
+                                                        <span className="font-medium">{formatCurrency(parseCurrency(fees.library))}</span>
+                                                    </div>
+                                                )}
+                                                {parseCurrency(fees.sports) > 0 && (
+                                                    <div className="flex justify-between">
+                                                        <span>Sports Fee:</span>
+                                                        <span className="font-medium">{formatCurrency(parseCurrency(fees.sports))}</span>
+                                                    </div>
+                                                )}
+                                                <Separator className="my-2" />
+                                                <div className="flex justify-between font-semibold">
+                                                    <span>Total per {planDetails?.label || 'Installment'}:</span>
+                                                    <span>{formatCurrency(parseCurrency(planDetails?.amount_per_installment || 0))}</span>
+                                                </div>
+                                                {planDetails && planDetails.installments > 1 && (
+                                                    <p className="text-right text-xs text-muted-foreground">
+                                                        ({planDetails.installments} installments)
+                                                    </p>
+                                                )}
                                             </div>
-                                        </div>
-                                    </Card>
-                                ))}
+                                        </Card>
+                                    );
+                                })}
                             </div>
                         </CardContent>
                     </Card>
