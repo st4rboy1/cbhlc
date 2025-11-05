@@ -51,10 +51,10 @@ interface Props {
 
 export default function ReceiptEdit({ receipt, payments, invoices }: Props) {
     const { data, setData, put, processing, errors, wasSuccessful } = useForm({
-        payment_id: receipt.payment_id?.toString() || '',
-        invoice_id: receipt.invoice_id?.toString() || '',
+        payment_id: receipt.payment_id?.toString() || null,
+        invoice_id: receipt.invoice_id?.toString() || null,
         receipt_date: receipt.receipt_date || '',
-        amount: receipt.amount.toString() || '',
+        amount: receipt.amount?.toString() || '',
         payment_method: receipt.payment_method || '',
         notes: receipt.notes || '',
     });
@@ -91,12 +91,15 @@ export default function ReceiptEdit({ receipt, payments, invoices }: Props) {
                         >
                             <div>
                                 <Label>Payment (Optional)</Label>
-                                <Select value={data.payment_id} onValueChange={(value) => setData('payment_id', value)}>
+                                <Select
+                                    value={data.payment_id || ''}
+                                    onValueChange={(value) => setData('payment_id', value === 'none-selected' ? null : value)}
+                                >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select a payment" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">None</SelectItem>
+                                        <SelectItem value="none-selected">None</SelectItem>
                                         {payments.map((payment) => {
                                             const student = payment.invoice?.enrollment?.student;
                                             return (
@@ -113,12 +116,15 @@ export default function ReceiptEdit({ receipt, payments, invoices }: Props) {
 
                             <div>
                                 <Label>Invoice (Optional)</Label>
-                                <Select value={data.invoice_id} onValueChange={(value) => setData('invoice_id', value)}>
+                                <Select
+                                    value={data.invoice_id || ''}
+                                    onValueChange={(value) => setData('invoice_id', value === 'none-selected' ? null : value)}
+                                >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select an invoice" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">None</SelectItem>
+                                        <SelectItem value="none-selected">None</SelectItem>
                                         {invoices.map((invoice) => {
                                             const student = invoice.enrollment?.student;
                                             return (

@@ -55,7 +55,7 @@ export default function StudentEdit({ student, guardians, gradelevels }: Props) 
         address: student.address,
         phone: student.phone,
         email: student.email,
-        grade: student.grade,
+        grade_level: student.grade,
         guardian_ids: student.guardians.map((g) => g.id),
     });
 
@@ -183,8 +183,8 @@ export default function StudentEdit({ student, guardians, gradelevels }: Props) 
                                 </div>
                                 <div>
                                     <Label htmlFor="grade">Grade</Label>
-                                    <Select value={data.grade} onValueChange={(value) => setData('grade', value)}>
-                                        <SelectTrigger className={errors.grade ? 'border-red-500' : ''}>
+                                    <Select value={data.grade_level} onValueChange={(value) => setData('grade_level', value)}>
+                                        <SelectTrigger className={errors.grade_level ? 'border-red-500' : ''}>
                                             <SelectValue placeholder="Select Grade Level" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -195,7 +195,7 @@ export default function StudentEdit({ student, guardians, gradelevels }: Props) 
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    {errors.grade && <p className="mt-1 text-sm text-red-500">{errors.grade}</p>}
+                                    {errors.grade_level && <p className="mt-1 text-sm text-red-500">{errors.grade_level}</p>}
                                 </div>
                                 <div className="col-span-full">
                                     <Label htmlFor="address">Address</Label>
