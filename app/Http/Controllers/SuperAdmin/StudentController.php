@@ -192,30 +192,20 @@ class StudentController extends Controller
         $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $student) {
-            $student->update([
-                'first_name' => $validated['first_name'],
-                'middle_name' => $validated['middle_name'],
-                'last_name' => $validated['last_name'],
-                'birthdate' => $validated['birthdate'],
-                'birth_place' => $validated['birth_place'] ?? null,
-                'gender' => $validated['gender'],
-                'nationality' => $validated['nationality'],
-                'religion' => $validated['religion'],
-                'address' => $validated['address'],
-                'phone' => $validated['phone'],
-                'email' => $validated['email'],
-                'grade_level' => $validated['grade_level'],
-            ]);
+            $studentData = collect($validated)->except('guardian_ids')->all();
+            $student->update($studentData);
 
-            // Sync guardians
-            $syncData = [];
-            foreach ($validated['guardian_ids'] as $index => $guardianId) {
-                $syncData[$guardianId] = [
-                    'relationship_type' => 'guardian',
-                    'is_primary_contact' => $index === 0,
-                ];
+            if (isset($validated['guardian_ids'])) {
+                // Sync guardians
+                $syncData = [];
+                foreach ($validated['guardian_ids'] as $index => $guardianId) {
+                    $syncData[$guardianId] = [
+                        'relationship_type' => 'guardian',
+                        'is_primary_contact' => $index === 0,
+                    ];
+                }
+                $student->guardians()->sync($syncData);
             }
-            $student->guardians()->sync($syncData);
         });
 
         return redirect()->route('super-admin.students.index')
