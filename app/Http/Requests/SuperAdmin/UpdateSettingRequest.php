@@ -23,7 +23,7 @@ class UpdateSettingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'key' => ['required', 'string', 'max:255', Rule::unique('settings', 'key')->ignore($this->setting)],
+            'key' => ['required', 'string', 'max:255', Rule::unique('system_settings', 'key')->ignore($this->setting)],
             'value' => ['nullable', 'string'],
         ];
     }

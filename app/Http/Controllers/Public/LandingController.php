@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\SchoolInformation;
 use Inertia\Inertia;
 
 class LandingController extends Controller
@@ -12,6 +13,8 @@ class LandingController extends Controller
      */
     public function index()
     {
-        return Inertia::render('public/landing');
+        return Inertia::render('public/landing', [
+            'schoolInformation' => SchoolInformation::getGrouped(),
+        ]);
     }
 }
