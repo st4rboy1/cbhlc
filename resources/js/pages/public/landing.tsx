@@ -7,7 +7,35 @@ import { register } from '@/routes';
 import { Head, Link } from '@inertiajs/react';
 import { BookOpen, CheckCircle, Facebook, GraduationCap, Heart, Mail, MapPin, Phone, Users } from 'lucide-react';
 
-export default function Landing() {
+interface SchoolInformation {
+    id: number;
+    key: string;
+    value: string | null;
+    type: string;
+    group: string;
+    label: string;
+    description: string | null;
+    order: number;
+}
+
+interface GroupedInformation {
+    contact?: SchoolInformation[];
+    hours?: SchoolInformation[];
+    social?: SchoolInformation[];
+    about?: SchoolInformation[];
+}
+
+interface Props {
+    schoolInformation?: GroupedInformation;
+}
+
+export default function Landing({ schoolInformation }: Props) {
+    // Helper function to get value by key
+    const getValue = (group: keyof GroupedInformation, key: string, defaultValue: string = '') => {
+        const item = schoolInformation?.[group]?.find((item) => item.key === key);
+        return item?.value || defaultValue;
+    };
+
     const features = [
         {
             icon: BookOpen,
@@ -38,6 +66,13 @@ export default function Landing() {
         'Student-Centered Approach',
     ];
 
+    const schoolName = getValue('contact', 'school_name', '');
+    const schoolDescription = getValue('about', 'school_description', '');
+    const schoolPhone = getValue('contact', 'school_phone', '');
+    const schoolEmail = getValue('contact', 'school_email', '');
+    const schoolAddress = getValue('contact', 'school_address', '');
+    const facebookUrl = getValue('social', 'facebook_url', '');
+
     return (
         <>
             <Head title="Welcome">
@@ -52,7 +87,7 @@ export default function Landing() {
                     <div className="container mx-auto px-6 py-20">
                         <div className="text-center">
                             <Badge variant="secondary" className="mb-6">
-                                Christian Bible Heritage Learning Center
+                                {schoolName}
                             </Badge>
                             <h1 className="mb-6 text-4xl leading-tight font-bold text-slate-800 md:text-6xl lg:text-7xl">
                                 Nurturing Hearts,
@@ -173,10 +208,8 @@ export default function Landing() {
                                     <Icon iconNode={GraduationCap} className="h-8 w-8" />
                                     <span className="text-2xl font-bold">CBHLC</span>
                                 </div>
-                                <p className="mb-4 text-slate-400">Christian Bible Heritage Learning Center</p>
-                                <p className="text-sm text-slate-500">
-                                    Providing quality Christian education that develops academic excellence, strong character, and faithful leaders.
-                                </p>
+                                <p className="mb-4 text-slate-400">{schoolName}</p>
+                                <p className="text-sm text-slate-500">{schoolDescription}</p>
                             </div>
 
                             {/* Contact Info */}
@@ -185,15 +218,15 @@ export default function Landing() {
                                 <div className="space-y-3">
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={Phone} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-white">+63 123 456 7890</span>
+                                        <span className="text-sm text-white">{schoolPhone}</span>
                                     </div>
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={Mail} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-white">christianbibleheritage@gmail.com</span>
+                                        <span className="text-sm text-white">{schoolEmail}</span>
                                     </div>
                                     <div className="flex items-center justify-center space-x-2 md:justify-start">
                                         <Icon iconNode={MapPin} className="h-4 w-4 text-blue-400" />
-                                        <span className="text-sm text-white">Bayabas Ext. NAPICO Manggahan 1611 Pasig, Philippines</span>
+                                        <span className="text-sm text-white">{schoolAddress}</span>
                                     </div>
                                 </div>
                             </div>
@@ -216,7 +249,7 @@ export default function Landing() {
                         <div className="border-t border-slate-700 pt-8 text-center">
                             <div className="mb-6 flex justify-center space-x-6">
                                 <a
-                                    href="https://www.facebook.com/CBHLC.Pasig"
+                                    href={facebookUrl}
                                     className="text-slate-400 transition-colors hover:text-white"
                                     target="_blank"
                                     rel="noopener noreferrer"

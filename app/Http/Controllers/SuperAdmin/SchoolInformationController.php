@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SchoolInformation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -52,6 +53,9 @@ class SchoolInformationController extends Controller
                 ['value' => $value]
             );
         }
+
+        // Manually clear the cache to ensure the changes are reflected immediately
+        Cache::forget('school_information');
 
         return redirect()->back()->with('success', 'School information updated successfully.');
     }
