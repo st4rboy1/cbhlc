@@ -78,11 +78,11 @@ export default function About({ schoolInformation }: Props) {
         },
     ];
 
-    const schoolName = getValue('contact', 'school_name', 'Christian Bible Heritage Learning Center');
-    const schoolAddress = getValue('contact', 'school_address', 'Bayabas Ext. NAPICO Manggahan 1611 Pasig, Philippines');
-    const schoolPhone = getValue('contact', 'school_phone', '+63 123 456 7890');
-    const schoolEmail = getValue('contact', 'school_email', 'christianbibleheritage@gmail.com');
-    const facebookUrl = getValue('social', 'facebook_url', 'https://www.facebook.com/CBHLC.Pasig');
+    const schoolName = getValue('contact', 'school_name', '');
+    const schoolAddress = getValue('contact', 'school_address', '');
+    const schoolPhone = getValue('contact', 'school_phone', '');
+    const schoolEmail = getValue('contact', 'school_email', '');
+    const facebookUrl = getValue('social', 'facebook_url', '');
 
     return (
         <>
