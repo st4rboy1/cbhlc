@@ -12,7 +12,7 @@ class ReceiptPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar']);
+        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar', 'guardian']) || $user->is_active;
     }
 
     /**
@@ -28,7 +28,8 @@ class ReceiptPolicy
             return $receipt->payment?->invoice?->enrollment?->guardian_id === $user->guardian?->id;
         }
 
-        return false;
+        // Allow any authenticated user to view a receipt if they are the receivedBy user
+        return $receipt->received_by === $user->id;
     }
 
     /**

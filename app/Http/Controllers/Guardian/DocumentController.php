@@ -42,7 +42,7 @@ class DocumentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreDocumentRequest $request, Student $student): JsonResponse
+    public function store(StoreDocumentRequest $request, Student $student)
     {
         // Authorize user can upload documents for this student
         $this->authorize('uploadDocument', [Document::class, $student]);
@@ -72,20 +72,14 @@ class DocumentController extends Controller
                 'verification_status' => VerificationStatus::PENDING,
             ]);
 
-            return response()->json([
-                'message' => 'Document uploaded successfully',
-                'document' => $document->load('student:id,first_name,last_name'),
-            ], 201);
+            return redirect()->back()->with('success', 'Document uploaded successfully.');
         } catch (\Exception $e) {
             \Log::error('Document upload failed', [
                 'student_id' => $student->id,
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'message' => 'Failed to upload document. Please try again.',
-                'error' => config('app.debug') ? $e->getMessage() : null,
-            ], 500);
+            return redirect()->back()->with('error', 'Failed to upload document. Please try again.');
         }
     }
 
@@ -129,15 +123,13 @@ class DocumentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Student $student, Document $document): JsonResponse
+    public function destroy(Student $student, Document $document)
     {
         $this->authorize('delete', $document);
 
         // Ensure document belongs to student
         if ($document->student_id !== $student->id) {
-            return response()->json([
-                'message' => 'Document not found for this student.',
-            ], 404);
+            return redirect()->back()->with('error', 'Document not found for this student.');
         }
 
         try {
@@ -148,18 +140,14 @@ class DocumentController extends Controller
 
             $document->delete();
 
-            return response()->json([
-                'message' => 'Document deleted successfully.',
-            ]);
+            return redirect()->back()->with('success', 'Document deleted successfully.');
         } catch (\Exception $e) {
             \Log::error('Document deletion failed', [
                 'document_id' => $document->id,
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'message' => 'Failed to delete document. Please try again.',
-            ], 500);
+            return redirect()->back()->with('error', 'Failed to delete document. Please try again.');
         }
     }
 
