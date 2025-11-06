@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
+import { SortingState } from '@tanstack/react-table';
 import { PlusCircle, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { columns, type Enrollment } from './columns';
@@ -36,6 +37,8 @@ interface Props {
         status?: string;
         grade?: string;
         school_year_id?: string;
+        sort_by?: string;
+        sort_direction?: string;
     };
     statuses: Array<{ label: string; value: string }>;
     schoolYears: SchoolYear[];
@@ -46,6 +49,9 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
     const [status, setStatus] = useState(filters.status || 'all');
     const [grade, setGrade] = useState(filters.grade || 'all');
     const [schoolYearId, setSchoolYearId] = useState(filters.school_year_id || 'all');
+    const [sorting, setSorting] = useState<SortingState>(
+        filters.sort_by && filters.sort_direction ? [{ id: filters.sort_by, desc: filters.sort_direction === 'desc' }] : [],
+    );
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
@@ -61,6 +67,8 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
                 status: status && status !== 'all' ? status : undefined,
                 grade: grade && grade !== 'all' ? grade : undefined,
                 school_year_id: schoolYearId && schoolYearId !== 'all' ? schoolYearId : undefined,
+                sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
             },
             {
                 preserveState: true,
@@ -68,7 +76,7 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
                 only: ['enrollments'],
             },
         );
-    }, [status, grade, schoolYearId]);
+    }, [status, grade, schoolYearId, sorting]);
 
     const handleSearch = () => {
         router.get(
@@ -78,6 +86,8 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
                 status: status && status !== 'all' ? status : undefined,
                 grade: grade && grade !== 'all' ? grade : undefined,
                 school_year_id: schoolYearId && schoolYearId !== 'all' ? schoolYearId : undefined,
+                sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
             },
             {
                 preserveState: true,
@@ -91,6 +101,7 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
         setStatus('all');
         setGrade('all');
         setSchoolYearId('all');
+        setSorting([]);
         router.get('/super-admin/enrollments', {}, { preserveState: true, preserveScroll: true });
     };
 
@@ -193,7 +204,7 @@ export default function SuperAdminEnrollmentsIndex({ enrollments, filters, statu
                 </Card>
 
                 {/* Data Table */}
-                <DataTable columns={columns} data={enrollments.data} />
+                <DataTable columns={columns} data={enrollments.data} sorting={sorting} onSortingChange={setSorting} />
 
                 {/* Pagination */}
                 {enrollments.last_page > 1 && (

@@ -66,7 +66,8 @@ test('valid jpeg image passes mime type validation', function () {
             'document_type' => DocumentType::BIRTH_CERTIFICATE->value,
         ]);
 
-    $response->assertStatus(201);
+    $response->assertStatus(201)
+        ->assertJson(['message' => 'Document uploaded successfully.']);
     expect(Document::count())->toBe(1);
 });
 
@@ -79,8 +80,8 @@ test('valid png image passes mime type validation', function () {
             'document_type' => DocumentType::BIRTH_CERTIFICATE->value,
         ]);
 
-    $response->assertStatus(201);
-    expect(Document::count())->toBe(1);
+    $response->assertStatus(201)
+        ->assertJson(['message' => 'Document uploaded successfully.']);
 });
 
 test('file content verification rejects non-image files with image extension', function () {
@@ -109,7 +110,8 @@ test('rate limiting prevents more than 5 uploads per minute', function () {
                 'document_type' => DocumentType::BIRTH_CERTIFICATE->value,
             ]);
 
-        $response->assertStatus(201);
+        $response->assertStatus(201)
+            ->assertJson(['message' => 'Document uploaded successfully.']);
     }
 
     // 6th upload should be rate limited
@@ -173,7 +175,8 @@ test('guardian can delete pending documents', function () {
         ->deleteJson(route('guardian.students.documents.destroy', [$this->student, $document]));
 
     $response->assertStatus(200);
-    expect(Document::count())->toBe(0);
+    expect(Document::withTrashed()->count())->toBe(1);
+    expect($document->fresh()->trashed())->toBeTrue();
 });
 
 test('guardian cannot delete verified documents', function () {
@@ -338,7 +341,8 @@ test('uploaded files are stored with random filenames', function () {
             'document_type' => DocumentType::BIRTH_CERTIFICATE->value,
         ]);
 
-    $response->assertStatus(201);
+    $response->assertStatus(201)
+        ->assertJson(['message' => 'Document uploaded successfully.']);
 
     $document = Document::first();
 
@@ -356,7 +360,8 @@ test('uploaded files are stored in private disk', function () {
             'document_type' => DocumentType::BIRTH_CERTIFICATE->value,
         ]);
 
-    $response->assertStatus(201);
+    $response->assertStatus(201)
+        ->assertJson(['message' => 'Document uploaded successfully.']);
 
     $document = Document::first();
 
@@ -374,6 +379,9 @@ test('deleted documents remove physical files', function () {
             'document' => $file,
             'document_type' => DocumentType::BIRTH_CERTIFICATE->value,
         ]);
+
+    $response->assertStatus(201)
+        ->assertJson(['message' => 'Document uploaded successfully.']);
 
     $document = Document::first();
     $filePath = $document->file_path;

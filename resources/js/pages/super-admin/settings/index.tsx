@@ -4,8 +4,9 @@ import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { Eye, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Setting {
     id: number;
@@ -24,7 +25,12 @@ interface PaginatedSettings {
 }
 
 interface Props {
-    settings: PaginatedSettings;
+    settings: PaginatedSettings & {
+        filters: {
+            sort_by?: string;
+            sort_direction?: string;
+        };
+    };
 }
 
 export default function SettingsIndex({ settings }: Props) {
@@ -32,6 +38,28 @@ export default function SettingsIndex({ settings }: Props) {
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Settings', href: '/super-admin/settings' },
     ];
+
+    const [sorting, setSorting] = useState<SortingState>(
+        settings.filters.sort_by && settings.filters.sort_direction
+            ? [{ id: settings.filters.sort_by, desc: settings.filters.sort_direction === 'desc' }]
+            : [],
+    );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            router.get(
+                route('super-admin.settings.index'),
+                {
+                    ...settings.filters,
+                    sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                    sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+                },
+                { preserveState: true, replace: true },
+            );
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [sorting]);
 
     const columns: ColumnDef<Setting>[] = [
         {
@@ -92,7 +120,7 @@ export default function SettingsIndex({ settings }: Props) {
                         </Button>
                     </Link>
                 </div>
-                <DataTable columns={columns} data={settings.data} />
+                <DataTable columns={columns} data={settings.data} sorting={sorting} onSortingChange={setSorting} />
             </div>
         </AppLayout>
     );

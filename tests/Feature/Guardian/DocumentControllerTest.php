@@ -39,7 +39,7 @@ test('guardian can upload document for their student', function () {
 
     $response->assertStatus(201)
         ->assertJson([
-            'message' => 'Document uploaded successfully',
+            'message' => 'Document uploaded successfully.',
         ]);
 
     expect(Document::count())->toBe(1);
@@ -177,12 +177,12 @@ test('guardian cannot view document from another student', function () {
 
 test('guardian can delete pending document', function () {
     $document = Document::factory()->pending()->create(['student_id' => $this->student->id]);
-
     $response = $this->actingAs($this->guardian)
         ->deleteJson(route('guardian.students.documents.destroy', [$this->student, $document]));
 
     $response->assertStatus(200);
-    expect(Document::count())->toBe(0);
+    expect(Document::withTrashed()->count())->toBe(1);
+    expect($document->fresh()->trashed())->toBeTrue();
 });
 
 test('guardian can delete rejected document', function () {
@@ -192,7 +192,8 @@ test('guardian can delete rejected document', function () {
         ->deleteJson(route('guardian.students.documents.destroy', [$this->student, $document]));
 
     $response->assertStatus(200);
-    expect(Document::count())->toBe(0);
+    expect(Document::withTrashed()->count())->toBe(1);
+    expect($document->fresh()->trashed())->toBeTrue();
 });
 
 test('guardian cannot delete verified document', function () {

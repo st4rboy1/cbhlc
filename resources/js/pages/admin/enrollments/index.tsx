@@ -3,13 +3,20 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Paginated } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import { SortingState } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Enrollment, columns } from './columns';
 
 interface Props {
     enrollments: Paginated<Enrollment>;
-    filters: Record<string, string>;
+    filters: {
+        status?: string;
+        search?: string;
+        sort_by?: string;
+        sort_direction?: string;
+    };
     statusCounts: {
         all: number;
         pending: number;
@@ -25,6 +32,26 @@ export default function EnrollmentsIndex({ enrollments, filters, statusCounts }:
         { title: 'Admin', href: '/admin/dashboard' },
         { title: 'Enrollments', href: '/admin/enrollments' },
     ];
+
+    const [sorting, setSorting] = useState<SortingState>(
+        filters.sort_by && filters.sort_direction ? [{ id: filters.sort_by, desc: filters.sort_direction === 'desc' }] : [],
+    );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            router.get(
+                route('admin.enrollments.index'),
+                {
+                    ...filters,
+                    sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                    sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+                },
+                { preserveState: true, replace: true },
+            );
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [sorting]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -48,7 +75,7 @@ export default function EnrollmentsIndex({ enrollments, filters, statusCounts }:
                 <EnrollmentFilters filters={filters} statusCounts={statusCounts} />
 
                 <div className="mt-6">
-                    <DataTable columns={columns} data={enrollments.data} />
+                    <DataTable columns={columns} data={enrollments.data} sorting={sorting} onSortingChange={setSorting} />
                 </div>
 
                 <div className="mt-4 flex items-center justify-between border-t pt-4">

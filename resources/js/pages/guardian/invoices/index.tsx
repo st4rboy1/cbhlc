@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { type ColumnDef } from '@tanstack/react-table';
+import { Head, Link, router } from '@inertiajs/react';
+import { type ColumnDef, SortingState } from '@tanstack/react-table';
 import { Download, Eye } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Student {
     id: number;
@@ -61,13 +62,37 @@ interface Props {
         links: PaginationLink[];
         meta: PaginationMeta;
     };
+    filters: {
+        sort_by?: string;
+        sort_direction?: string;
+    };
 }
 
-export default function GuardianInvoicesIndex({ invoices }: Props) {
+export default function GuardianInvoicesIndex({ invoices, filters }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Invoices', href: '/guardian/invoices' },
     ];
+
+    const [sorting, setSorting] = useState<SortingState>(
+        filters.sort_by && filters.sort_direction ? [{ id: filters.sort_by, desc: filters.sort_direction === 'desc' }] : [],
+    );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            router.get(
+                route('guardian.invoices.index'),
+                {
+                    ...filters,
+                    sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                    sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+                },
+                { preserveState: true, replace: true },
+            );
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [sorting]);
 
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('en-PH', {
@@ -170,7 +195,7 @@ export default function GuardianInvoicesIndex({ invoices }: Props) {
             <div className="space-y-6">
                 <Heading title="Invoices" description="View and download invoices for your children's enrollments" />
 
-                <DataTable columns={columns} data={invoices.data} />
+                <DataTable columns={columns} data={invoices.data} sorting={sorting} onSortingChange={setSorting} />
             </div>
         </AppLayout>
     );
