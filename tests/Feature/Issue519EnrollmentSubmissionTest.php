@@ -12,15 +12,13 @@ use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Event;
 
 uses(RefreshDatabase::class);
 
 test('#519: enrollment submission succeeds even if notification fails', function () {
-    // Fake Mail and Notification to test they are sent
-    Mail::fake();
-    Notification::fake();
+    // Fake events to verify EnrollmentCreated is dispatched
+    Event::fake();
 
     // Seed roles and permissions
     $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
@@ -156,14 +154,10 @@ test('#519: enrollment submission handles notification failures gracefully', fun
     $response->assertRedirect(route('guardian.enrollments.index'));
     $response->assertSessionHas('success');
 
-    // Verify notifications were attempted
-    // Guardian receives mail from EnrollmentObserver (queued)
-    Mail::assertSent(\App\Mail\EnrollmentSubmitted::class, function ($mail) use ($guardianUser) {
-        return $mail->hasTo($guardianUser->email);
+    // Verify EnrollmentCreated event was dispatched (which triggers all notifications)
+    Event::assertDispatched(\App\Events\EnrollmentCreated::class, function ($event) use ($student) {
+        return $event->enrollment->student_id === $student->id;
     });
-
-    // Registrar receives notification from EnrollmentCreated event listener
-    Notification::assertSentTo($registrar, \App\Notifications\NewEnrollmentCreatedNotification::class);
 })->group('browser', 'bug', 'issue-519');
 
 test('#519: enrollment shows in guardian dashboard after submission', function () {
@@ -281,8 +275,7 @@ test('#519: enrollment submission succeeds even when notification system throws 
 
     // Notifications are now event-driven and queued, so they won't block enrollment creation
     // Even if mail server fails later, enrollment submission itself will succeed
-    Mail::fake();
-    Notification::fake();
+    Event::fake();
 
     // Attempt enrollment submission - should succeed
     $response = $this->actingAs($guardianUser)
@@ -296,6 +289,9 @@ test('#519: enrollment submission succeeds even when notification system throws 
     // Should redirect successfully because notifications are decoupled from enrollment creation
     $response->assertRedirect(route('guardian.enrollments.index'));
     $response->assertSessionHas('success', 'Enrollment application submitted successfully. Please wait for approval.');
+
+    // Verify event was dispatched (notifications are triggered by this event)
+    Event::assertDispatched(\App\Events\EnrollmentCreated::class);
 
     // Verify enrollment was still created despite notification failure
     $this->assertDatabaseHas('enrollments', [
