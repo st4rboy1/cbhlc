@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { type ColumnDef } from '@tanstack/react-table';
+import { type ColumnDef, SortingState } from '@tanstack/react-table';
 import { PlusCircle, Search, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
@@ -53,6 +53,8 @@ interface Props {
         student_id?: string;
         status?: string;
         search?: string;
+        sort_by?: string;
+        sort_direction?: string;
     };
     filterOptions: {
         students: FilterOption[];
@@ -71,6 +73,9 @@ export default function GuardianEnrollmentsIndex({ enrollments, filters, filterO
     ];
 
     const [searchInput, setSearchInput] = useState(filters.search || '');
+    const [sorting, setSorting] = useState<SortingState>(
+        filters.sort_by && filters.sort_direction ? [{ id: filters.sort_by, desc: filters.sort_direction === 'desc' }] : [],
+    );
 
     // Show flash messages as toasts
     useEffect(() => {
@@ -88,17 +93,31 @@ export default function GuardianEnrollmentsIndex({ enrollments, filters, filterO
             {
                 ...filters,
                 [key]: value || undefined,
+                sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
             },
             {
                 preserveState: true,
-                preserveScroll: true,
+                replace: true,
             },
         );
     };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        handleFilterChange('search', searchInput);
+        router.get(
+            '/guardian/enrollments',
+            {
+                ...filters,
+                search: searchInput,
+                sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
     };
 
     const handleClearFilters = () => {
@@ -266,7 +285,7 @@ export default function GuardianEnrollmentsIndex({ enrollments, filters, filterO
                             </div>
                         </div>
 
-                        <DataTable columns={columns} data={enrollments.data} />
+                        <DataTable columns={columns} data={enrollments.data} sorting={sorting} onSortingChange={setSorting} />
                     </CardContent>
                 </Card>
             </div>

@@ -5,8 +5,9 @@ import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib/format-currency';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { Eye, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Student {
     id: number;
@@ -58,7 +59,12 @@ interface PaginatedReceipts {
 }
 
 interface Props {
-    receipts: PaginatedReceipts;
+    receipts: PaginatedReceipts & {
+        filters: {
+            sort_by?: string;
+            sort_direction?: string;
+        };
+    };
 }
 
 export default function ReceiptsIndex({ receipts }: Props) {
@@ -66,6 +72,28 @@ export default function ReceiptsIndex({ receipts }: Props) {
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Receipts', href: '/super-admin/receipts' },
     ];
+
+    const [sorting, setSorting] = useState<SortingState>(
+        receipts.filters.sort_by && receipts.filters.sort_direction
+            ? [{ id: receipts.filters.sort_by, desc: receipts.filters.sort_direction === 'desc' }]
+            : [],
+    );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            router.get(
+                route('super-admin.receipts.index'),
+                {
+                    ...receipts.filters,
+                    sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                    sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+                },
+                { preserveState: true, replace: true },
+            );
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [sorting]);
 
     const columns: ColumnDef<Receipt>[] = [
         {
@@ -139,7 +167,7 @@ export default function ReceiptsIndex({ receipts }: Props) {
                         </Button>
                     </Link>
                 </div>
-                <DataTable columns={columns} data={receipts.data} />
+                <DataTable columns={columns} data={receipts.data} sorting={sorting} onSortingChange={setSorting} />
             </div>
         </AppLayout>
     );

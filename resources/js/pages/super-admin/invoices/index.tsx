@@ -9,9 +9,10 @@ import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
+import { SortingState } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { CalendarIcon, PlusCircle, Search } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { columns } from './columns';
 
 interface Student {
@@ -56,6 +57,8 @@ interface Props {
         status?: string;
         from_date?: string;
         to_date?: string;
+        sort_by?: string;
+        sort_direction?: string;
     };
 }
 
@@ -64,11 +67,30 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
     const [status, setStatus] = useState(filters.status || 'all');
     const [fromDate, setFromDate] = useState<Date | undefined>(filters.from_date ? new Date(filters.from_date) : undefined);
     const [toDate, setToDate] = useState<Date | undefined>(filters.to_date ? new Date(filters.to_date) : undefined);
+    const [sorting, setSorting] = useState<SortingState>(
+        filters.sort_by && filters.sort_direction ? [{ id: filters.sort_by, desc: filters.sort_direction === 'desc' }] : [],
+    );
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'Invoices', href: '/super-admin/invoices' },
     ];
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            router.get(
+                route('super-admin.invoices.index'),
+                {
+                    ...filters,
+                    sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                    sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+                },
+                { preserveState: true, replace: true },
+            );
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [sorting]);
 
     const handleSearch = () => {
         router.get(
@@ -78,6 +100,8 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                 status: status && status !== 'all' ? status : undefined,
                 from_date: fromDate ? format(fromDate, 'yyyy-MM-dd') : undefined,
                 to_date: toDate ? format(toDate, 'yyyy-MM-dd') : undefined,
+                sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
             },
             {
                 preserveState: true,
@@ -91,6 +115,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
         setStatus('all');
         setFromDate(undefined);
         setToDate(undefined);
+        setSorting([]);
         router.get('/super-admin/invoices', {}, { preserveState: true, preserveScroll: true });
     };
 
@@ -198,7 +223,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
                 </Card>
 
                 {/* Data Table */}
-                <DataTable columns={columns} data={invoices.data} />
+                <DataTable columns={columns} data={invoices.data} sorting={sorting} onSortingChange={setSorting} />
 
                 {/* Pagination */}
                 {invoices.last_page > 1 && (
