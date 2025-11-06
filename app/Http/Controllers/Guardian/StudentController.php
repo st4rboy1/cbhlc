@@ -200,29 +200,40 @@ class StudentController extends Controller
 
         foreach ($documentMappings as $field => $documentType) {
             if ($request->hasFile($field)) {
-                $file = $request->file($field);
-                $originalName = $file->getClientOriginalName();
-                $storedName = Str::random(40).'.'.$file->extension();
+                try {
+                    $file = $request->file($field);
+                    $originalName = $file->getClientOriginalName();
+                    $storedName = Str::random(40).'.'.$file->extension();
 
-                // Store file in private storage
-                $path = $file->storeAs(
-                    "documents/{$student->id}",
-                    $storedName,
-                    'private'
-                );
+                    // Store file in private storage
+                    $path = $file->storeAs(
+                        "documents/{$student->id}",
+                        $storedName,
+                        'private'
+                    );
 
-                // Create document record
-                Document::create([
-                    'student_id' => $student->id,
-                    'document_type' => $documentType,
-                    'original_filename' => $originalName,
-                    'stored_filename' => $storedName,
-                    'file_path' => $path,
-                    'file_size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType(),
-                    'upload_date' => now(),
-                    'verification_status' => VerificationStatus::PENDING,
-                ]);
+                    // Create document record
+                    Document::create([
+                        'student_id' => $student->id,
+                        'document_type' => $documentType,
+                        'original_filename' => $originalName,
+                        'stored_filename' => $storedName,
+                        'file_path' => $path,
+                        'file_size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType(),
+                        'upload_date' => now(),
+                        'verification_status' => VerificationStatus::PENDING,
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Document upload failed for student creation', [
+                        'student_id' => $student->id,
+                        'document_type' => $documentType->value,
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ]);
+                    // Optionally, you might want to return an error to the user here
+                    // or add a warning to the session.
+                }
             }
         }
 

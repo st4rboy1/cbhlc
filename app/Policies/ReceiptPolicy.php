@@ -12,7 +12,7 @@ class ReceiptPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar', 'guardian']) || $user->is_active;
+        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar']) || $user->is_active;
     }
 
     /**
