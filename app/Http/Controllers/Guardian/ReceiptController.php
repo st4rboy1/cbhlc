@@ -53,9 +53,9 @@ class ReceiptController extends Controller
 
     public function show(Receipt $receipt)
     {
-        Gate::authorize('view', $receipt);
-
         $receipt->load(['payment.invoice.enrollment.student', 'invoice.enrollment.student', 'receivedBy']);
+
+        Gate::authorize('view', $receipt);
 
         return Inertia::render('guardian/receipts/show', [
             'receipt' => $receipt,

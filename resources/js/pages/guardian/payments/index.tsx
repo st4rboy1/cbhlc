@@ -60,7 +60,7 @@ export default function PaymentsIndex({ payments }: Props) {
     ];
 
     const [sorting, setSorting] = useState<SortingState>(
-        payments.filters.sort_by && payments.filters.sort_direction
+        payments.filters?.sort_by && payments.filters?.sort_direction
             ? [{ id: payments.filters.sort_by, desc: payments.filters.sort_direction === 'desc' }]
             : [],
     );

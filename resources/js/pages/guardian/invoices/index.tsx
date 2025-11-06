@@ -75,7 +75,7 @@ export default function GuardianInvoicesIndex({ invoices, filters }: Props) {
     ];
 
     const [sorting, setSorting] = useState<SortingState>(
-        filters.sort_by && filters.sort_direction ? [{ id: filters.sort_by, desc: filters.sort_direction === 'desc' }] : [],
+        filters?.sort_by && filters?.sort_direction ? [{ id: filters.sort_by, desc: filters.sort_direction === 'desc' }] : [],
     );
 
     useEffect(() => {
