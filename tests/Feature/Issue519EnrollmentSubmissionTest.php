@@ -157,8 +157,8 @@ test('#519: enrollment submission handles notification failures gracefully', fun
     $response->assertSessionHas('success');
 
     // Verify notifications were attempted
-    // Guardian receives mail from EnrollmentObserver
-    Mail::assertQueued(\App\Mail\EnrollmentSubmitted::class, function ($mail) use ($guardianUser) {
+    // Guardian receives mail from EnrollmentObserver (queued)
+    Mail::assertSent(\App\Mail\EnrollmentSubmitted::class, function ($mail) use ($guardianUser) {
         return $mail->hasTo($guardianUser->email);
     });
 
