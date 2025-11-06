@@ -48,7 +48,7 @@ class UserSeeder extends Seeder
         $superAdmin = User::firstOrCreate(
             ['email' => 'admin@cbhlc.edu'], // changed from super.admin@cbhlc.edu to admin@cbhlc.edu temporarily
             [
-                'name' => 'Super Admin',
+                'name' => 'Admin', // changed from Super Admin to Admin temporarily
                 'email_verified_at' => now(),
                 'password' => bcrypt('password'),
             ]
