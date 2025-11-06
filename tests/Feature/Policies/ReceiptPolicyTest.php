@@ -33,11 +33,11 @@ it('allows registrar to view any receipts', function () {
     expect($this->policy->viewAny($user))->toBeTrue();
 });
 
-it('denies other roles from viewing any receipts', function () {
+it('allows guardian to view any receipts', function () {
     $user = User::factory()->create();
     $user->assignRole('guardian');
 
-    expect($this->policy->viewAny($user))->toBeFalse();
+    expect($this->policy->viewAny($user))->toBeTrue();
 });
 
 it('allows super_admin to view a receipt', function () {

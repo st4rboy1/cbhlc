@@ -40,7 +40,7 @@ export default function SettingsIndex({ settings }: Props) {
     ];
 
     const [sorting, setSorting] = useState<SortingState>(
-        settings.filters.sort_by && settings.filters.sort_direction
+        settings.filters?.sort_by && settings.filters?.sort_direction
             ? [{ id: settings.filters.sort_by, desc: settings.filters.sort_direction === 'desc' }]
             : [],
     );
