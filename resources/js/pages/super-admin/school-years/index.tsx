@@ -46,7 +46,7 @@ export default function SchoolYearsIndex({ schoolYears, activeSchoolYear }: Prop
     ];
 
     const [sorting, setSorting] = useState<SortingState>(
-        schoolYears.filters.sort_by && schoolYears.filters.sort_direction
+        schoolYears.filters?.sort_by && schoolYears.filters?.sort_direction
             ? [{ id: schoolYears.filters.sort_by, desc: schoolYears.filters.sort_direction === 'desc' }]
             : [],
     );

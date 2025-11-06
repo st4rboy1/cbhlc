@@ -12,7 +12,7 @@ class ReceiptPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar']) || $user->is_active;
+        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar', 'guardian']) || $user->is_active;
     }
 
     /**
@@ -25,6 +25,11 @@ class ReceiptPolicy
         }
 
         if ($user->hasRole('guardian')) {
+            // Ensure the guardian relationship is loaded for the user
+            if (! $user->relationLoaded('guardian')) {
+                $user->load('guardian');
+            }
+
             return $receipt->payment?->invoice?->enrollment?->guardian_id === $user->guardian?->id;
         }
 

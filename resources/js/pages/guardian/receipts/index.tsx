@@ -74,7 +74,7 @@ export default function ReceiptsIndex({ receipts }: Props) {
     ];
 
     const [sorting, setSorting] = useState<SortingState>(
-        receipts.filters.sort_by && receipts.filters.sort_direction
+        receipts.filters?.sort_by && receipts.filters?.sort_direction
             ? [{ id: receipts.filters.sort_by, desc: receipts.filters.sort_direction === 'desc' }]
             : [],
     );
