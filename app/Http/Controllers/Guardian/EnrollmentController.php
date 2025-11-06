@@ -17,8 +17,6 @@ use App\Models\SchoolInformation;
 use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\User;
-use App\Notifications\EnrollmentSubmittedNotification;
-use App\Notifications\NewEnrollmentForReviewNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -271,31 +269,9 @@ class EnrollmentController extends Controller
         // Load relationships for notifications
         $enrollment->load(['student', 'guardian.user', 'schoolYear']);
 
-        // Try to send notifications but don't fail if they error
-        try {
-            // Dispatch event to notify registrars
-            event(new \App\Events\EnrollmentCreated($enrollment));
-
-            // Notify guardian of submission
-            if ($guardian->user) {
-                /** @var \App\Models\User $user */
-                $user = $guardian->user;
-                $user->notify(new EnrollmentSubmittedNotification($enrollment));
-            }
-
-            // Notify all registrars and administrators of new enrollment
-            $registrars = User::role(['registrar', 'administrator', 'super_admin'])->get();
-            foreach ($registrars as $registrar) {
-                $registrar->notify(new NewEnrollmentForReviewNotification($enrollment));
-            }
-        } catch (\Exception $e) {
-            // Log the notification error but don't fail the enrollment submission
-            \Log::error('Failed to send enrollment notifications', [
-                'enrollment_id' => $enrollment->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-        }
+        // Dispatch event to notify registrars - EnrollmentObserver will handle guardian notification
+        // NotifyRegistrarOfNewEnrollment listener will handle registrar notifications
+        event(new \App\Events\EnrollmentCreated($enrollment));
 
         return redirect()->route('guardian.enrollments.index')
             ->with('success', 'Enrollment application submitted successfully. Please wait for approval.');
