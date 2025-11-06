@@ -1,6 +1,7 @@
 import {
     type ColumnDef,
     type ColumnFiltersState,
+    type OnChangeFn,
     type SortingState,
     type VisibilityState,
     flexRender,
@@ -17,10 +18,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
+    sorting: SortingState;
+    onSortingChange: OnChangeFn<SortingState>;
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = useState<SortingState>([]);
+export function DataTable<TData, TValue>({ columns, data, sorting, onSortingChange }: DataTableProps<TData, TValue>) {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const [rowSelection, setRowSelection] = useState({});
@@ -28,7 +30,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     const table = useReactTable({
         data,
         columns,
-        onSortingChange: setSorting,
+        onSortingChange: onSortingChange,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),

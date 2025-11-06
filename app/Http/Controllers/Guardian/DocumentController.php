@@ -72,12 +72,20 @@ class DocumentController extends Controller
                 'verification_status' => VerificationStatus::PENDING,
             ]);
 
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Document uploaded successfully.'], 201);
+            }
+
             return redirect()->back()->with('success', 'Document uploaded successfully.');
         } catch (\Exception $e) {
             \Log::error('Document upload failed', [
                 'student_id' => $student->id,
                 'error' => $e->getMessage(),
             ]);
+
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Failed to upload document. Please try again.'], 500);
+            }
 
             return redirect()->back()->with('error', 'Failed to upload document. Please try again.');
         }
@@ -129,16 +137,21 @@ class DocumentController extends Controller
 
         // Ensure document belongs to student
         if ($document->student_id !== $student->id) {
+            if (request()->wantsJson()) {
+                return response()->json([
+                    'message' => 'Document not found for this student.',
+                ], 404);
+            }
+
             return redirect()->back()->with('error', 'Document not found for this student.');
         }
 
         try {
-            // Delete physical file
-            if (Storage::disk('private')->exists($document->file_path)) {
-                Storage::disk('private')->delete($document->file_path);
-            }
-
             $document->delete();
+
+            if (request()->wantsJson()) {
+                return response()->json(['message' => 'Document deleted successfully.'], 200);
+            }
 
             return redirect()->back()->with('success', 'Document deleted successfully.');
         } catch (\Exception $e) {
@@ -146,6 +159,10 @@ class DocumentController extends Controller
                 'document_id' => $document->id,
                 'error' => $e->getMessage(),
             ]);
+
+            if (request()->wantsJson()) {
+                return response()->json(['message' => 'Failed to delete document. Please try again.'], 500);
+            }
 
             return redirect()->back()->with('error', 'Failed to delete document. Please try again.');
         }

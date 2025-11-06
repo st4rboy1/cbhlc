@@ -5,8 +5,9 @@ import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { Calendar, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface SchoolYear {
     id: number;
@@ -29,7 +30,12 @@ interface PaginatedSchoolYears {
 }
 
 interface Props {
-    schoolYears: PaginatedSchoolYears;
+    schoolYears: PaginatedSchoolYears & {
+        filters: {
+            sort_by?: string;
+            sort_direction?: string;
+        };
+    };
     activeSchoolYear: SchoolYear | null;
 }
 
@@ -38,6 +44,28 @@ export default function SchoolYearsIndex({ schoolYears, activeSchoolYear }: Prop
         { title: 'Super Admin', href: '/super-admin/dashboard' },
         { title: 'School Years', href: '/super-admin/school-years' },
     ];
+
+    const [sorting, setSorting] = useState<SortingState>(
+        schoolYears.filters.sort_by && schoolYears.filters.sort_direction
+            ? [{ id: schoolYears.filters.sort_by, desc: schoolYears.filters.sort_direction === 'desc' }]
+            : [],
+    );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            router.get(
+                route('super-admin.school-years.index'),
+                {
+                    ...schoolYears.filters,
+                    sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                    sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+                },
+                { preserveState: true, replace: true },
+            );
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [sorting]);
 
     const columns: ColumnDef<SchoolYear>[] = [
         {
@@ -110,7 +138,7 @@ export default function SchoolYearsIndex({ schoolYears, activeSchoolYear }: Prop
                         </Button>
                     </Link>
                 </div>
-                <DataTable columns={columns} data={schoolYears.data} />
+                <DataTable columns={columns} data={schoolYears.data} sorting={sorting} onSortingChange={setSorting} />
             </div>
         </AppLayout>
     );

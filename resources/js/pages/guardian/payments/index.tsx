@@ -5,8 +5,9 @@ import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib/format-currency';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, SortingState } from '@tanstack/react-table';
 import { Eye } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface Student {
     id: number;
@@ -44,7 +45,12 @@ interface PaginatedPayments {
 }
 
 interface Props {
-    payments: PaginatedPayments;
+    payments: PaginatedPayments & {
+        filters: {
+            sort_by?: string;
+            sort_direction?: string;
+        };
+    };
 }
 
 export default function PaymentsIndex({ payments }: Props) {
@@ -52,6 +58,28 @@ export default function PaymentsIndex({ payments }: Props) {
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Payments', href: '/guardian/payments' },
     ];
+
+    const [sorting, setSorting] = useState<SortingState>(
+        payments.filters.sort_by && payments.filters.sort_direction
+            ? [{ id: payments.filters.sort_by, desc: payments.filters.sort_direction === 'desc' }]
+            : [],
+    );
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            router.get(
+                route('guardian.payments.index'),
+                {
+                    ...payments.filters,
+                    sort_by: sorting.length > 0 ? sorting[0].id : undefined,
+                    sort_direction: sorting.length > 0 ? (sorting[0].desc ? 'desc' : 'asc') : undefined,
+                },
+                { preserveState: true, replace: true },
+            );
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [sorting]);
 
     const columns: ColumnDef<Payment>[] = [
         {
@@ -121,7 +149,7 @@ export default function PaymentsIndex({ payments }: Props) {
                         <p className="mt-1 text-sm text-muted-foreground">View your payment history</p>
                     </div>
                 </div>
-                <DataTable columns={columns} data={payments.data} />
+                <DataTable columns={columns} data={payments.data} sorting={sorting} onSortingChange={setSorting} />
             </div>
         </AppLayout>
     );
