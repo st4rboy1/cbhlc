@@ -341,6 +341,12 @@ export default function SuperAdminInvoicesShow({ invoice }: Props) {
                                     View Enrollment
                                 </Button>
                             </Link>
+                            <a href={`/super-admin/invoices/${invoice.id}/download`} target="_blank">
+                                <Button variant="outline" size="sm">
+                                    <FileText className="mr-2 h-4 w-4" />
+                                    Download Invoice
+                                </Button>
+                            </a>
                             {remainingBalance > 0 && (
                                 <Link href={`/super-admin/payments/create?invoice_id=${invoice.id}`}>
                                     <Button variant="default" size="sm">

@@ -331,7 +331,7 @@ class EnrollmentController extends Controller
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);
 
-        return $pdf->download("enrollment-certificate-{$enrollment->enrollment_id}.pdf");
+        return $pdf->stream("enrollment-certificate-{$enrollment->enrollment_id}.pdf");
     }
 
     /**
@@ -369,6 +369,6 @@ class EnrollmentController extends Controller
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);
 
-        return $pdf->download("payment-history-{$enrollment->student->last_name}-{$enrollment->enrollment_id}.pdf");
+        return $pdf->stream("payment-history-{$enrollment->student->last_name}-{$enrollment->enrollment_id}.pdf");
     }
 }

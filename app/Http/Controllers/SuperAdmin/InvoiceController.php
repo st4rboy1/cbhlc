@@ -8,7 +8,9 @@ use App\Http\Requests\SuperAdmin\UpdateInvoiceRequest;
 use App\Models\Enrollment;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\SchoolInformation; // Added this line
 use App\Services\InvoiceService;
+use Barryvdh\DomPDF\Facade\Pdf; // Added this line
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -209,5 +211,36 @@ class InvoiceController extends Controller
 
         return redirect()->route('super-admin.invoices.index')
             ->with('success', 'Invoice deleted successfully.');
+    }
+
+    /**
+     * Download the specified invoice as a PDF.
+     */
+    public function download(Invoice $invoice)
+    {
+        Gate::authorize('download', $invoice);
+
+        $invoice->load([
+            'enrollment.student',
+            'enrollment.guardian.user',
+            'items',
+            'payments',
+        ]);
+
+        $schoolAddress = SchoolInformation::getByKey('school_address', 'Lantapan, Bukidnon');
+        $schoolPhone = SchoolInformation::getByKey('school_phone', '');
+        $schoolEmail = SchoolInformation::getByKey('school_email', 'cbhlc@example.com');
+
+        $pdf = Pdf::loadView('pdf.invoice', [ // Assuming a 'pdf.invoice' blade view exists
+            'invoice' => $invoice,
+            'schoolAddress' => $schoolAddress,
+            'schoolPhone' => $schoolPhone,
+            'schoolEmail' => $schoolEmail,
+        ])
+            ->setPaper('a4', 'portrait')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true);
+
+        return $pdf->download("invoice-{$invoice->invoice_number}.pdf");
     }
 }

@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { ArrowLeft, BookOpen, Calendar, CreditCard, FileText, GraduationCap, Hash, User, Users } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, CreditCard, Download, FileText, GraduationCap, Hash, User, Users } from 'lucide-react';
 
 interface Student {
     id: number;
@@ -90,9 +90,25 @@ export default function SuperAdminEnrollmentsShow({ enrollment }: Props) {
                             <p className="text-sm text-muted-foreground">ID: {enrollment.enrollment_id}</p>
                         </div>
                     </div>
-                    <Link href={`/super-admin/enrollments/${enrollment.id}/edit`}>
-                        <Button>Edit Enrollment</Button>
-                    </Link>
+                    <div className="flex items-center gap-2">
+                        {enrollment.status === 'enrolled' && (
+                            <a href={`/super-admin/enrollments/${enrollment.id}/certificate`} download>
+                                <Button variant="outline">
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Certificate
+                                </Button>
+                            </a>
+                        )}
+                        <a href={`/super-admin/enrollments/${enrollment.id}/payment-history`} download>
+                            <Button variant="outline">
+                                <Download className="mr-2 h-4 w-4" />
+                                Payment History
+                            </Button>
+                        </a>
+                        <Link href={`/super-admin/enrollments/${enrollment.id}/edit`}>
+                            <Button>Edit Enrollment</Button>
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="grid gap-6 lg:grid-cols-3">
