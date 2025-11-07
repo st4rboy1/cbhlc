@@ -7,7 +7,8 @@ use App\Models\Enrollment;
 use App\Models\Guardian;
 use App\Models\Invoice;
 use App\Models\Payment;
-use App\Models\Setting;
+use App\Models\SchoolInformation;
+use App\Models\Setting; // Added this line
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -92,10 +93,14 @@ class InvoiceController extends Controller
 
         // Generate PDF
         $pdf = Pdf::loadView('pdf.invoice', [
+            'invoice' => $invoice,
             'enrollment' => $enrollment,
             'payments' => $payments,
             'settings' => $settings,
             'invoiceDate' => now()->format('F d, Y'),
+            'schoolAddress' => SchoolInformation::getByKey('school_address', 'Lantapan, Bukidnon'),
+            'schoolPhone' => SchoolInformation::getByKey('school_phone', ''),
+            'schoolEmail' => SchoolInformation::getByKey('school_email', 'cbhlc@example.com'),
         ])
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
