@@ -134,7 +134,7 @@
 
             <div class="student-name">
                 {{ strtoupper($enrollment->student->first_name) }}
-                {{ strtoupper($enrollment->student->middle_name) }}
+                {{ strtoupper($enrollment->student->middle_name ?? '') }}
                 {{ strtoupper($enrollment->student->last_name) }}
             </div>
 

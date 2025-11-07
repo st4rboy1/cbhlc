@@ -8,9 +8,11 @@ use App\Http\Requests\SuperAdmin\StoreEnrollmentRequest;
 use App\Http\Requests\SuperAdmin\UpdateEnrollmentRequest;
 use App\Models\Enrollment;
 use App\Models\Guardian;
+use App\Models\SchoolInformation; // Added this line
 use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Services\EnrollmentService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -330,5 +332,71 @@ class EnrollmentController extends Controller
             return redirect()->route('super-admin.enrollments.index')
                 ->with('error', $e->getMessage());
         }
+    }
+
+    /**
+     * Download enrollment certificate PDF
+     * Super Admins can download certificates for any enrolled student
+     */
+    public function downloadCertificate(Enrollment $enrollment)
+    {
+        // Only allow certificate download for enrolled status
+        if ($enrollment->status !== EnrollmentStatus::ENROLLED) {
+            abort(403, 'Certificate only available for enrolled students.');
+        }
+
+        $enrollment->load('student', 'guardian', 'schoolYear');
+
+        $schoolAddress = SchoolInformation::getByKey('school_address', 'Lantapan, Bukidnon');
+        $schoolPhone = SchoolInformation::getByKey('school_phone', '');
+
+        $pdf = Pdf::loadView('pdf.enrollment-certificate', [
+            'enrollment' => $enrollment,
+            'schoolAddress' => $schoolAddress,
+            'schoolPhone' => $schoolPhone,
+        ])
+            ->setPaper('a4', 'portrait')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true);
+
+        return $pdf->stream("enrollment-certificate-{$enrollment->enrollment_id}.pdf");
+    }
+
+    /**
+     * Download payment history PDF
+     * Super Admins can download payment history for any enrollment
+     */
+    public function downloadPaymentHistory(Enrollment $enrollment)
+    {
+        // Load enrollment with related data
+        $enrollment->load([
+            'student',
+            'invoices.payments',
+            'schoolYear',
+        ]);
+
+        $schoolAddress = SchoolInformation::getByKey('school_address', 'Lantapan, Bukidnon');
+        $schoolPhone = SchoolInformation::getByKey('school_phone', '');
+        $schoolEmail = SchoolInformation::getByKey('school_email', 'cbhlc@example.com');
+
+        // Get all payments for this enrollment through invoices
+        $payments = collect();
+        foreach ($enrollment->invoices as $invoice) {
+            $payments = $payments->merge($invoice->payments);
+        }
+        $payments = $payments->sortBy('payment_date');
+
+        $pdf = Pdf::loadView('pdf.payment-history', [
+            'enrollment' => $enrollment,
+            'payments' => $payments,
+            'schoolAddress' => $schoolAddress,
+            'schoolPhone' => $schoolPhone,
+            'schoolEmail' => $schoolEmail,
+        ])
+            ->setPaper('a4', 'portrait')
+            ->setOption('isHtml5ParserEnabled', true)
+            ->setOption('isRemoteEnabled', true);
+
+        return $pdf->stream("payment-history-{$enrollment->student->last_name}-{$enrollment->enrollment_id}.pdf");
     }
 }

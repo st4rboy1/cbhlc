@@ -152,9 +152,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('enrollments', SuperAdminEnrollmentController::class);
         Route::post('/enrollments/{enrollment}/approve', [SuperAdminEnrollmentController::class, 'approve'])->name('enrollments.approve');
         Route::post('/enrollments/{enrollment}/reject', [SuperAdminEnrollmentController::class, 'reject'])->name('enrollments.reject');
+        Route::get('/enrollments/{enrollment}/certificate', [SuperAdminEnrollmentController::class, 'downloadCertificate'])->name('enrollments.certificate');
+        Route::get('/enrollments/{enrollment}/payment-history', [SuperAdminEnrollmentController::class, 'downloadPaymentHistory'])->name('enrollments.payment-history');
 
         // Invoices Management
         Route::resource('invoices', SuperAdminInvoiceController::class);
+        Route::get('/invoices/{invoice}/download', [SuperAdminInvoiceController::class, 'download'])->name('invoices.download');
 
         // Payments Management
         Route::resource('payments', SuperAdminPaymentController::class);
@@ -207,6 +210,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Enrollments Management
         Route::resource('enrollments', AdminEnrollmentController::class);
+        Route::get('/enrollments/{enrollment}/certificate', [AdminEnrollmentController::class, 'downloadCertificate'])->name('enrollments.certificate');
+        Route::get('/enrollments/{enrollment}/payment-history', [AdminEnrollmentController::class, 'downloadPaymentHistory'])->name('enrollments.payment-history');
 
         // Students Management
         Route::resource('students', AdminStudentController::class);
