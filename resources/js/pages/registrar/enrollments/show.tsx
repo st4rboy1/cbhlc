@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/pages/registrar/enrollments/enrollments-table';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { ExternalLink, FileText } from 'lucide-react';
+import { Download, ExternalLink, FileText } from 'lucide-react';
 
 interface Document {
     id: number;
@@ -58,7 +58,25 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Enrollment #${enrollment.id}`} />
             <div className="px-4 py-6">
-                <h1 className="mb-4 text-2xl font-bold">Enrollment Details</h1>
+                <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <h1 className="text-2xl font-bold">Enrollment Details</h1>
+                        {enrollment.status === 'enrolled' && (
+                            <a href={`/registrar/enrollments/${enrollment.id}/certificate`} download>
+                                <Button variant="outline">
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Certificate
+                                </Button>
+                            </a>
+                        )}
+                        <a href={`/registrar/enrollments/${enrollment.id}/payment-history`} download>
+                            <Button variant="outline">
+                                <Download className="mr-2 h-4 w-4" />
+                                Payment History
+                            </Button>
+                        </a>
+                    </div>
+                </div>
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <Card>
