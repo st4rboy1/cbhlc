@@ -104,12 +104,14 @@ export default function SuperAdminEnrollmentsShow({ enrollment }: Props) {
                                 </Button>
                             </a>
                         )}
-                        <a href={`/super-admin/enrollments/${enrollment.id}/payment-history`} download>
-                            <Button variant="outline">
-                                <Download className="mr-2 h-4 w-4" />
-                                Payment History
-                            </Button>
-                        </a>
+                        {['ready_for_payment', 'paid', 'enrolled', 'completed'].includes(enrollment.status) && (
+                            <a href={`/super-admin/enrollments/${enrollment.id}/payment-history`} download>
+                                <Button variant="outline">
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Payment History
+                                </Button>
+                            </a>
+                        )}
                         <Link href={`/super-admin/enrollments/${enrollment.id}/edit`}>
                             <Button>Edit Enrollment</Button>
                         </Link>

@@ -8,7 +8,7 @@ const STATUS_VARIANTS: Record<string, { variant: 'default' | 'secondary' | 'dest
     pending: { variant: 'outline', className: 'bg-yellow-100 text-yellow-800', label: 'Pending Review' },
     approved: { variant: 'default', className: 'bg-blue-100 text-blue-800', label: 'Approved' },
     rejected: { variant: 'destructive', label: 'Rejected' },
-    ready_for_payment: { variant: 'outline', className: 'bg-yellow-100 text-yellow-800', label: 'Ready for Payment' },
+    ready_for_payment: { variant: 'outline', className: 'bg-purple-100 text-purple-800', label: 'Ready for Payment' },
     paid: { variant: 'default', className: 'bg-green-100 text-green-800', label: 'Paid' },
     enrolled: { variant: 'default', className: 'bg-primary text-primary-foreground', label: 'Enrolled' },
     completed: { variant: 'secondary', label: 'Completed' },

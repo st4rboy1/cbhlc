@@ -176,7 +176,7 @@ class EnrollmentController extends Controller
 
     public function show($id)
     {
-        $enrollment = Enrollment::with('student')->findOrFail($id);
+        $enrollment = Enrollment::with(['student', 'guardian', 'schoolYear'])->findOrFail($id);
 
         return Inertia::render('admin/enrollments/show', [
             'enrollment' => $enrollment,

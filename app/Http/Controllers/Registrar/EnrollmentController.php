@@ -27,8 +27,7 @@ class EnrollmentController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Enrollment::with(['student', 'guardian.user'])
-            ->selectRaw('*, (net_amount_cents - amount_paid_cents) / 100 as balance');
+        $query = Enrollment::with(['student', 'guardian.user']);
 
         // Exclude completed and enrolled enrollments (they should appear in Students page only)
         $query->whereNotIn('status', [
@@ -36,39 +35,55 @@ class EnrollmentController extends Controller
             EnrollmentStatus::ENROLLED,
         ]);
 
-        // Apply filters
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('school_year_id')) {
-            $query->where('school_year_id', $request->school_year_id);
-        }
-
-        if ($request->filled('grade_level')) {
-            $query->where('grade_level', $request->grade_level);
-        }
-
-        if ($request->filled('payment_status')) {
-            $query->where('payment_status', $request->payment_status);
-        }
-
+        // Search functionality
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('student', function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('student_id', 'like', "%{$search}%");
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('student', function ($sq) use ($search) {
+                    $sq->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('student_id', 'like', "%{$search}%");
+                })->orWhere('enrollment_id', 'like', "%{$search}%");
             });
         }
 
-        $enrollments = $query->latest('created_at')->paginate(20);
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->get('status'));
+        }
+
+        // Filter by grade level
+        if ($request->filled('grade_level')) {
+            $query->where('grade_level', $request->get('grade_level'));
+        }
+
+        // Filter by school year
+        if ($request->filled('school_year_id')) {
+            $query->where('school_year_id', $request->get('school_year_id'));
+        }
+
+        // Filter by payment status
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->get('payment_status'));
+        }
+
+        $enrollments = $query->latest()->paginate(15)->withQueryString();
+
+        if ($request->wantsJson()) {
+            return response()->json(['enrollments' => $enrollments]);
+        }
 
         return Inertia::render('registrar/enrollments/index', [
             'enrollments' => $enrollments,
-            'filters' => $request->only(['status', 'school_year_id', 'grade_level', 'payment_status', 'search']),
-            'statuses' => EnrollmentStatus::values(),
-            'paymentStatuses' => PaymentStatus::values(),
+            'filters' => $request->only(['search', 'status', 'grade_level', 'school_year_id', 'payment_status']),
+            'statuses' => array_map(fn ($status) => [
+                'label' => $status->label(),
+                'value' => $status->value,
+            ], EnrollmentStatus::cases()),
+            'paymentStatuses' => array_map(fn ($status) => [
+                'label' => $status->label(),
+                'value' => $status->value,
+            ], PaymentStatus::cases()),
             'schoolYears' => SchoolYear::orderBy('start_year', 'desc')->get(),
         ]);
     }
@@ -78,7 +93,7 @@ class EnrollmentController extends Controller
      */
     public function show(Enrollment $enrollment)
     {
-        $enrollment->load(['student.documents', 'guardian']);
+        $enrollment->load(['student.documents', 'guardian', 'schoolYear']);
 
         $enrollment->recalculateFees();
         $enrollment->updatePaymentDetails();
