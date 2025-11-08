@@ -25,6 +25,11 @@ interface Guardian {
     };
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+}
+
 interface Enrollment {
     id: number;
     enrollment_id: string;
@@ -32,7 +37,7 @@ interface Enrollment {
     guardian_id: number;
     grade_level: string;
     quarter: string;
-    school_year: string;
+    school_year: SchoolYear;
     status: string;
     type: string;
     previous_school: string | null;
@@ -153,7 +158,7 @@ export default function SuperAdminEnrollmentsShow({ enrollment }: Props) {
                                         <BookOpen className="h-4 w-4" />
                                         School Year
                                     </div>
-                                    <p className="text-lg font-medium">{enrollment.school_year}</p>
+                                    <p className="text-lg font-medium">{enrollment.school_year.name}</p>
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
