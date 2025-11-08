@@ -32,14 +32,12 @@ class PaymentController extends Controller
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
-                $q->where('payment_reference', 'like', "%{$search}%")
-                    ->orWhere('reference_number', 'like', "%{$search}%")
+                $q->where('reference_number', 'like', "%{$search}%")
                     ->orWhereHas('invoice', function ($iq) use ($search) {
                         $iq->where('invoice_number', 'like', "%{$search}%");
                     })
                     ->orWhereHas('invoice.enrollment.student', function ($sq) use ($search) {
-                        $sq->where('first_name', 'like', "%{$search}%")
-                            ->orWhere('last_name', 'like', "%{$search}%")
+                        $sq->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%")
                             ->orWhere('student_id', 'like', "%{$search}%");
                     });
             });
