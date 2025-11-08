@@ -31,7 +31,7 @@
     <div class="student-info">
         <div class="info-row">
             <strong>Student Name:</strong>
-            <span>{{ $enrollment->student->first_name }} {{ $enrollment->student->middle_name }} {{ $enrollment->student->last_name }}</span>
+            <span>{{ $enrollment->student->first_name }} {{ $enrollment->student->middle_name ?? '' }} {{ $enrollment->student->last_name }}</span>
         </div>
         <div class="info-row">
             <strong>Student ID:</strong>

@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { ArrowLeft, BookOpen, Calendar, CreditCard, FileText, GraduationCap, Hash, User, Users } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, CreditCard, Download, FileText, GraduationCap, Hash, User, Users } from 'lucide-react';
 
 interface Student {
     id: number;
@@ -86,6 +86,22 @@ export default function EnrollmentShow({ enrollment }: Props) {
                             <h1 className="text-2xl font-bold">Admin Enrollment Details</h1>
                             <p className="text-sm text-muted-foreground">Reference: {enrollment.reference_number}</p>
                         </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {enrollment.status === 'enrolled' && (
+                            <a href={`/admin/enrollments/${enrollment.id}/certificate`} download>
+                                <Button variant="outline">
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Certificate
+                                </Button>
+                            </a>
+                        )}
+                        <a href={`/admin/enrollments/${enrollment.id}/payment-history`} download>
+                            <Button variant="outline">
+                                <Download className="mr-2 h-4 w-4" />
+                                Payment History
+                            </Button>
+                        </a>
                     </div>
                 </div>
 
