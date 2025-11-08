@@ -4,10 +4,11 @@ namespace App\Notifications;
 
 use App\Models\Receipt;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ReceiptGeneratedNotification extends Notification
+class ReceiptGeneratedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
