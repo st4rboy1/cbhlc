@@ -25,6 +25,11 @@ interface Guardian {
     };
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+}
+
 interface Enrollment {
     id: number;
     reference_number: string;
@@ -32,7 +37,7 @@ interface Enrollment {
     guardian_id: number;
     grade_level: string;
     quarter: string;
-    school_year: string;
+    school_year: SchoolYear;
     status: string;
     tuition_fee_cents: number;
     miscellaneous_fee_cents: number;
@@ -96,12 +101,14 @@ export default function EnrollmentShow({ enrollment }: Props) {
                                 </Button>
                             </a>
                         )}
-                        <a href={`/admin/enrollments/${enrollment.id}/payment-history`} download>
-                            <Button variant="outline">
-                                <Download className="mr-2 h-4 w-4" />
-                                Payment History
-                            </Button>
-                        </a>
+                        {['ready_for_payment', 'paid', 'enrolled', 'completed'].includes(enrollment.status) && (
+                            <a href={`/admin/enrollments/${enrollment.id}/payment-history`} download>
+                                <Button variant="outline">
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Payment History
+                                </Button>
+                            </a>
+                        )}
                     </div>
                 </div>
 
@@ -147,7 +154,7 @@ export default function EnrollmentShow({ enrollment }: Props) {
                                         <BookOpen className="h-4 w-4" />
                                         School Year
                                     </div>
-                                    <p className="text-lg font-medium">{enrollment.school_year}</p>
+                                    <p className="text-lg font-medium">{enrollment.school_year.name}</p>
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
