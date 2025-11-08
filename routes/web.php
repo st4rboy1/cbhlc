@@ -271,6 +271,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Students Management
         Route::get('/students/export', [RegistrarStudentController::class, 'export'])->name('students.export');
+        Route::get('/students/{student}/enrollments', [RegistrarStudentController::class, 'enrollments'])->name('students.enrollments');
         Route::resource('students', RegistrarStudentController::class);
 
         // Enrollments Management

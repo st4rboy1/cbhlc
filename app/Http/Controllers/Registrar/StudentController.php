@@ -9,6 +9,7 @@ use App\Http\Requests\Registrar\StoreStudentRequest;
 use App\Http\Requests\Registrar\UpdateStudentRequest;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class StudentController extends Controller
@@ -82,7 +83,7 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-        $student->load(['enrollments.guardian.user', 'guardianStudents.guardian.user']);
+        $student->load(['enrollments.guardian.user', 'enrollments.schoolYear', 'guardianStudents.guardian.user']);
 
         return Inertia::render('registrar/students/show', [
             'student' => [
@@ -101,7 +102,7 @@ class StudentController extends Controller
                 'created_at' => $student->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $student->updated_at->format('Y-m-d H:i:s'),
                 /** @phpstan-ignore-next-line */
-                'enrollments' => $student->enrollments->map(function (\App\Models\Enrollment $enrollment) {
+                'enrollments' => $student->enrollments->sortByDesc('created_at')->values()->map(function (\App\Models\Enrollment $enrollment) {
                     return [
                         'id' => $enrollment->id,
                         'school_year' => $enrollment->schoolYear->name,
@@ -202,6 +203,42 @@ class StudentController extends Controller
 
         return redirect()->route('registrar.students.index')
             ->with('success', 'Student deleted successfully.');
+    }
+
+    /**
+     * Display the student's enrollments.
+     */
+    public function enrollments(Student $student)
+    {
+        Gate::authorize('view', $student);
+
+        $collection = $student->enrollments()
+            ->with(['guardian', 'schoolYear'])
+            ->latest()
+            ->get();
+
+        $enrollments = [];
+        foreach ($collection as $enrollment) {
+            $enrollments[] = [
+                'id' => $enrollment->id,
+                'enrollment_id' => $enrollment->enrollment_id,
+                'status' => $enrollment->status->value,
+                'grade_level' => $enrollment->grade_level->value,
+                'quarter' => $enrollment->quarter->value,
+                'school_year' => $enrollment->schoolYear ? $enrollment->schoolYear->name : 'N/A',
+                'guardian' => [
+                    'id' => $enrollment->guardian->id,
+                    'first_name' => $enrollment->guardian->first_name,
+                    'last_name' => $enrollment->guardian->last_name,
+                ],
+                'created_at' => $enrollment->created_at?->toISOString() ?? '',
+            ];
+        }
+
+        return Inertia::render('registrar/students/enrollments', [
+            'student' => $student,
+            'enrollments' => $enrollments,
+        ]);
     }
 
     /**

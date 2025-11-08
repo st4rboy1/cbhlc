@@ -16,6 +16,7 @@ import * as React from 'react';
 import { EnrollmentStatusBadge, PaymentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -27,6 +28,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Link, router } from '@inertiajs/react';
+import { toast } from 'sonner';
 
 interface Student {
     id: number;
@@ -70,6 +73,61 @@ export function calculateAge(birthdate: string) {
         age--;
     }
     return age;
+}
+
+function ActionsCell({ student }: { student: Student }) {
+    const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+
+    const handleDelete = () => {
+        router.delete(`/registrar/students/${student.id}`, {
+            onSuccess: () => {
+                toast.success('Student deleted successfully');
+                setDeleteDialogOpen(false);
+            },
+            onError: () => {
+                toast.error('Failed to delete student. Student may have enrollments.');
+            },
+        });
+    };
+
+    return (
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(student.student_id)}>Copy Student ID</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                        <Link href={`/registrar/students/${student.id}`}>View Student</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href={`/registrar/students/${student.id}/edit`}>Edit Student</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href={`/registrar/students/${student.id}/enrollments`}>View Enrollments</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>Delete Student</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <ConfirmationDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={handleDelete}
+                title="Delete Student?"
+                description="Are you sure you want to delete this student? This action cannot be undone."
+                confirmText="Delete"
+                variant="destructive"
+            />
+        </>
+    );
 }
 
 export const columns: ColumnDef<Student>[] = [
@@ -185,26 +243,7 @@ export const columns: ColumnDef<Student>[] = [
     },
     {
         id: 'actions',
-        cell: ({ row }) => {
-            const student = row.original;
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(student.student_id)}>Copy Student ID</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => (window.location.href = `/registrar/students/${student.id}`)}>View Student</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        },
+        cell: ({ row }) => <ActionsCell student={row.original} />,
     },
 ];
 

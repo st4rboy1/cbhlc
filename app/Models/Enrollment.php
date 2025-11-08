@@ -239,22 +239,32 @@ class Enrollment extends Model
         );
 
         if ($fees) {
-            $this->tuition_fee = $fees->tuition_fee;
-            $this->miscellaneous_fee = $fees->miscellaneous_fee ?? 0;
+            $this->tuition_fee_cents = $fees->tuition_fee_cents;
+            $this->miscellaneous_fee_cents = $fees->miscellaneous_fee_cents ?? 0;
+            $this->laboratory_fee_cents = $fees->laboratory_fee_cents ?? 0;
+            $this->library_fee_cents = $fees->library_fee_cents ?? 0;
+            $this->sports_fee_cents = $fees->sports_fee_cents ?? 0;
 
             // Calculate total from the fees we're actually using
-            $total = $this->tuition_fee + $this->miscellaneous_fee;
+            $total_cents = $this->tuition_fee_cents +
+                $this->miscellaneous_fee_cents +
+                $this->laboratory_fee_cents +
+                $this->library_fee_cents +
+                $this->sports_fee_cents;
 
-            $this->total_amount = $total;
-            $this->net_amount = $total - ($this->discount ?? 0);
-            $this->balance = $this->net_amount;
+            $this->total_amount_cents = $total_cents;
+            $this->net_amount_cents = $total_cents - ($this->discount_cents ?? 0);
+            $this->balance_cents = $this->net_amount_cents - $this->amount_paid_cents;
         } else {
             // Set default values if no fee structure found
-            $this->tuition_fee = 0;
-            $this->miscellaneous_fee = 0;
-            $this->total_amount = 0;
-            $this->net_amount = 0;
-            $this->balance = 0;
+            $this->tuition_fee_cents = 0;
+            $this->miscellaneous_fee_cents = 0;
+            $this->laboratory_fee_cents = 0;
+            $this->library_fee_cents = 0;
+            $this->sports_fee_cents = 0;
+            $this->total_amount_cents = 0;
+            $this->net_amount_cents = 0;
+            $this->balance_cents = 0;
         }
 
         $this->save();
