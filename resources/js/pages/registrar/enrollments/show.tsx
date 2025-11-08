@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { formatCurrency } from '@/pages/registrar/enrollments/enrollments-table';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Download, ExternalLink, FileText } from 'lucide-react';
@@ -17,6 +16,19 @@ interface Document {
     upload_date: string;
 }
 
+interface SchoolYear {
+    id: number;
+    name: string;
+    start_year: number;
+    end_year: number;
+    start_date: string;
+    end_date: string;
+    status: string;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+}
+
 interface Enrollment {
     id: number;
     student: {
@@ -26,7 +38,7 @@ interface Enrollment {
         documents: Document[];
     };
     guardian: { first_name: string; last_name: string };
-    school_year: string;
+    school_year: SchoolYear;
     quarter: string;
     grade_level: string;
     status: string;
@@ -45,6 +57,13 @@ interface Enrollment {
 
 interface Props {
     enrollment: Enrollment;
+}
+
+function formatCurrency(cents: number) {
+    return new Intl.NumberFormat('en-PH', {
+        style: 'currency',
+        currency: 'PHP',
+    }).format(cents / 100);
 }
 
 export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
@@ -69,12 +88,14 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                                 </Button>
                             </a>
                         )}
-                        <a href={`/registrar/enrollments/${enrollment.id}/payment-history`} download>
-                            <Button variant="outline">
-                                <Download className="mr-2 h-4 w-4" />
-                                Payment History
-                            </Button>
-                        </a>
+                        {['ready_for_payment', 'paid', 'enrolled', 'completed'].includes(enrollment.status) && (
+                            <a href={`/registrar/enrollments/${enrollment.id}/payment-history`} download>
+                                <Button variant="outline">
+                                    <Download className="mr-2 h-4 w-4" />
+                                    Payment History
+                                </Button>
+                            </a>
+                        )}
                     </div>
                 </div>
 
@@ -94,7 +115,7 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                             </div>
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">School Year</p>
-                                <p className="text-lg font-semibold">{enrollment.school_year}</p>
+                                <p className="text-lg font-semibold">{enrollment.school_year.name}</p>
                             </div>
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Quarter</p>
@@ -143,54 +164,54 @@ export default function RegistrarEnrollmentsShow({ enrollment }: Props) {
                                 <p className="text-sm font-semibold">Fee Breakdown</p>
                                 <div className="flex items-center justify-between text-sm">
                                     <p className="text-muted-foreground">Tuition Fee</p>
-                                    <p>{formatCurrency(enrollment.tuition_fee_cents / 100)}</p>
+                                    <p>{formatCurrency(enrollment.tuition_fee_cents)}</p>
                                 </div>
                                 <div className="flex items-center justify-between text-sm">
                                     <p className="text-muted-foreground">Miscellaneous Fee</p>
-                                    <p>{formatCurrency(enrollment.miscellaneous_fee_cents / 100)}</p>
+                                    <p>{formatCurrency(enrollment.miscellaneous_fee_cents)}</p>
                                 </div>
                                 {enrollment.laboratory_fee_cents > 0 && (
                                     <div className="flex items-center justify-between text-sm">
                                         <p className="text-muted-foreground">Laboratory Fee</p>
-                                        <p>{formatCurrency(enrollment.laboratory_fee_cents / 100)}</p>
+                                        <p>{formatCurrency(enrollment.laboratory_fee_cents)}</p>
                                     </div>
                                 )}
                                 {enrollment.library_fee_cents > 0 && (
                                     <div className="flex items-center justify-between text-sm">
                                         <p className="text-muted-foreground">Library Fee</p>
-                                        <p>{formatCurrency(enrollment.library_fee_cents / 100)}</p>
+                                        <p>{formatCurrency(enrollment.library_fee_cents)}</p>
                                     </div>
                                 )}
                                 {enrollment.other_fees_cents > 0 && (
                                     <div className="flex items-center justify-between text-sm">
                                         <p className="text-muted-foreground">Other Fees</p>
-                                        <p>{formatCurrency(enrollment.other_fees_cents / 100)}</p>
+                                        <p>{formatCurrency(enrollment.other_fees_cents)}</p>
                                     </div>
                                 )}
                             </div>
                             <Separator />
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Total Amount</p>
-                                <p className="text-lg font-semibold">{formatCurrency(enrollment.total_amount_cents / 100)}</p>
+                                <p className="text-lg font-semibold">{formatCurrency(enrollment.total_amount_cents)}</p>
                             </div>
                             {enrollment.discount_cents > 0 && (
                                 <div className="flex items-center justify-between">
                                     <p className="text-sm font-medium text-muted-foreground">Discount</p>
-                                    <p className="text-lg font-semibold text-green-600">-{formatCurrency(enrollment.discount_cents / 100)}</p>
+                                    <p className="text-lg font-semibold text-green-600">-{formatCurrency(enrollment.discount_cents)}</p>
                                 </div>
                             )}
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Net Amount</p>
-                                <p className="text-lg font-semibold">{formatCurrency(enrollment.net_amount_cents / 100)}</p>
+                                <p className="text-lg font-semibold">{formatCurrency(enrollment.net_amount_cents)}</p>
                             </div>
                             <Separator />
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Amount Paid</p>
-                                <p className="text-lg font-semibold">{formatCurrency(enrollment.amount_paid_cents / 100)}</p>
+                                <p className="text-lg font-semibold">{formatCurrency(enrollment.amount_paid_cents)}</p>
                             </div>
                             <div className="flex items-center justify-between">
                                 <p className="text-sm font-medium text-muted-foreground">Balance</p>
-                                <p className="text-lg font-semibold">{formatCurrency(enrollment.balance_cents / 100)}</p>
+                                <p className="text-lg font-semibold">{formatCurrency(enrollment.balance_cents)}</p>
                             </div>
                         </CardContent>
                     </Card>

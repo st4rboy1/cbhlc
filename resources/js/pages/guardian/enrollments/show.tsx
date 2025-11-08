@@ -24,7 +24,7 @@ interface Enrollment {
     section: string | null;
     adviser: string | null;
     quarter: string;
-    status: 'pending' | 'approved' | 'enrolled' | 'rejected' | 'completed';
+    status: 'pending' | 'approved' | 'enrolled' | 'rejected' | 'completed' | 'ready_for_payment' | 'paid';
     payment_status: 'pending' | 'partial' | 'paid' | 'overdue';
     tuition_fee_cents: number;
     miscellaneous_fee_cents: number;
@@ -181,12 +181,14 @@ export default function GuardianEnrollmentsShow({ enrollment, payments }: Props)
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle>Payment Information</CardTitle>
-                            <Button variant="outline" size="sm" asChild>
-                                <a href={`/guardian/enrollments/${enrollment.id}/payment-history-pdf`} download>
-                                    <Download className="mr-2 h-4 w-4" />
-                                    Download Report
-                                </a>
-                            </Button>
+                            {['ready_for_payment', 'paid', 'enrolled', 'completed'].includes(enrollment.status) && (
+                                <Button variant="outline" size="sm" asChild>
+                                    <a href={`/guardian/enrollments/${enrollment.id}/payment-history-pdf`} download>
+                                        <Download className="mr-2 h-4 w-4" />
+                                        Download Report
+                                    </a>
+                                </Button>
+                            )}
                         </CardHeader>
                         <CardContent className="grid gap-4">
                             <div className="flex items-center justify-between">
