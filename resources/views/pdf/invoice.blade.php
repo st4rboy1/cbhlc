@@ -105,6 +105,7 @@
 <body>
     <div class="container">
         <div class="header">
+            <img src="{{ public_path('images/cbhlc-logo.png') }}" alt="School Logo" style="width: 100px; float: left; margin-right: 20px;">
             <div class="school-name">Christian Bible Heritage Learning Center</div>
             <div class="school-address">{{ $schoolAddress }}</div>
             <div class="school-contact">Tel: {{ $schoolPhone }} | Email: {{ $schoolEmail }}</div>
