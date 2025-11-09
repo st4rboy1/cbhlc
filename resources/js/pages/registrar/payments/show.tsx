@@ -79,7 +79,7 @@ const getPaymentMethodLabel = (method: string): string => {
     return labels[method] || method;
 };
 
-export default function SuperAdminPaymentsShow({ payment }: Props) {
+export default function RegistrarPaymentsShow({ payment }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Registrar', href: '/registrar/dashboard' },
         { title: 'Payments', href: '/registrar/payments' },

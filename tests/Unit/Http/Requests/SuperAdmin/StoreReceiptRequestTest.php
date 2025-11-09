@@ -44,10 +44,21 @@ class StoreReceiptRequestTest extends TestCase
         $this->assertTrue($request->authorize());
     }
 
-    public function test_authorize_returns_false_for_non_admin(): void
+    public function test_authorize_returns_true_for_registrar(): void
     {
         $user = User::factory()->create();
         $user->assignRole('registrar');
+
+        $request = new StoreReceiptRequest;
+        $request->setUserResolver(fn () => $user);
+
+        $this->assertTrue($request->authorize());
+    }
+
+    public function test_authorize_returns_false_for_other_roles(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('guardian');
 
         $request = new StoreReceiptRequest;
         $request->setUserResolver(fn () => $user);

@@ -59,7 +59,7 @@ interface Props {
     invoices: Invoice[];
 }
 
-export default function SuperAdminPaymentsEdit({ payment, invoices }: Props) {
+export default function RegistrarPaymentsEdit({ payment, invoices }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Registrar', href: '/registrar/dashboard' },
         { title: 'Payments', href: '/registrar/payments' },

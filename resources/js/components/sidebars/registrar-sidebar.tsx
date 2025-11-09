@@ -2,21 +2,7 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import {
-    BadgeDollarSign,
-    Calendar,
-    CalendarDays,
-    CreditCard,
-    FileCheck,
-    FileClock,
-    GraduationCap,
-    LayoutGrid,
-    Receipt,
-    ReceiptText,
-    Settings,
-    ShieldCheck,
-    Users,
-} from 'lucide-react';
+import { BadgeDollarSign, FileCheck, GraduationCap, LayoutGrid, Receipt, ReceiptText, Settings, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -31,24 +17,9 @@ const mainNavItems: NavItem[] = [
         icon: GraduationCap,
     },
     {
-        title: 'Enrollment Periods',
-        href: '/registrar/enrollment-periods',
-        icon: Calendar,
-    },
-    {
-        title: 'School Years',
-        href: '/registrar/school-years',
-        icon: CalendarDays,
-    },
-    {
         title: 'Students',
         href: '/registrar/students',
         icon: Users,
-    },
-    {
-        title: 'Guardians',
-        href: '/registrar/guardians',
-        icon: ShieldCheck,
     },
     {
         title: 'Grade Level Fees',
@@ -56,9 +27,9 @@ const mainNavItems: NavItem[] = [
         icon: BadgeDollarSign,
     },
     {
-        title: 'Pending Documents',
-        href: '/registrar/documents/pending',
-        icon: FileClock,
+        title: 'Documents',
+        href: '/registrar/documents',
+        icon: FileCheck,
     },
     {
         title: 'Invoices',
@@ -74,11 +45,6 @@ const mainNavItems: NavItem[] = [
         title: 'Receipts',
         href: '/registrar/receipts',
         icon: ReceiptText,
-    },
-    {
-        title: 'Tuition Fees',
-        href: '/tuition',
-        icon: CreditCard,
     },
     {
         title: 'Profile Settings',

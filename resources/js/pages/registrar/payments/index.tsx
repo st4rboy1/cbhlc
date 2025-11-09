@@ -64,7 +64,7 @@ interface Props {
     };
 }
 
-export default function SuperAdminPaymentsIndex({ payments, filters }: Props) {
+export default function RegistrarPaymentsIndex({ payments, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [paymentMethod, setPaymentMethod] = useState(filters.payment_method || 'all');
     const [fromDate, setFromDate] = useState<Date | undefined>(filters.from_date ? new Date(filters.from_date) : undefined);
