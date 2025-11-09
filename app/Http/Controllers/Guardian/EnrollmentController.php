@@ -60,8 +60,9 @@ class EnrollmentController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->whereHas('student', function ($studentQuery) use ($search) {
-                    $studentQuery->where('first_name', 'like', "%{$search}%")
-                        ->orWhere('last_name', 'like', "%{$search}%");
+                    $studentQuery->whereRaw("LOWER(CONCAT(first_name, ' ', last_name)) LIKE ?", ['%'.strtolower($search).'%'])
+                        ->orWhereRaw('LOWER(first_name) LIKE ?', ['%'.strtolower($search).'%'])
+                        ->orWhereRaw('LOWER(last_name) LIKE ?', ['%'.strtolower($search).'%']);
                 })->orWhere('enrollment_id', 'like', "%{$search}%");
             });
         }

@@ -80,7 +80,7 @@ export default function ReceiptCreate({ payments, invoices, nextReceiptNumber }:
                             className="space-y-4"
                         >
                             <div>
-                                <Label>Payment (Optional)</Label>
+                                <Label>Payment</Label>
                                 <Select value={data.payment_id} onValueChange={(value) => setData('payment_id', value)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select a payment" />

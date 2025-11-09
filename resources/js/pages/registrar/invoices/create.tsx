@@ -269,7 +269,9 @@ export default function RegistrarInvoicesCreate({ enrollments }: Props) {
                                                             min="1"
                                                             step="1"
                                                             value={item.quantity}
-                                                            onChange={(e) => updateItem(index, 'quantity', Number(e.target.value))}
+                                                            onChange={(e) =>
+                                                                updateItem(index, 'quantity', e.target.value === '' ? '' : Number(e.target.value))
+                                                            }
                                                         />
                                                         {errors[`items.${index}.quantity`] && (
                                                             <p className="text-sm text-red-600">{errors[`items.${index}.quantity`]}</p>
@@ -286,7 +288,9 @@ export default function RegistrarInvoicesCreate({ enrollments }: Props) {
                                                             min="0"
                                                             step="0.01"
                                                             value={item.unit_price}
-                                                            onChange={(e) => updateItem(index, 'unit_price', Number(e.target.value))}
+                                                            onChange={(e) =>
+                                                                updateItem(index, 'unit_price', e.target.value === '' ? '' : Number(e.target.value))
+                                                            }
                                                         />
                                                         {errors[`items.${index}.unit_price`] && (
                                                             <p className="text-sm text-red-600">{errors[`items.${index}.unit_price`]}</p>
