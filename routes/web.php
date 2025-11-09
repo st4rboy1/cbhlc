@@ -325,6 +325,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Document Management
         Route::get('/documents/pending', [RegistrarDocumentController::class, 'pending'])->name('documents.pending');
+        Route::resource('documents', RegistrarDocumentController::class)->except(['show']);
         Route::get('/documents/{document}', [RegistrarDocumentController::class, 'show'])->name('documents.show');
         Route::get('/documents/{document}/view', [RegistrarDocumentController::class, 'view'])->name('documents.view');
         Route::get('/documents/{document}/download', [RegistrarDocumentController::class, 'download'])->name('documents.download');
@@ -332,17 +333,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/documents/{document}/reject', [RegistrarDocumentController::class, 'reject'])->name('documents.reject');
 
         // Invoice Management
-        Route::resource('invoices', \App\Http\Controllers\Registrar\InvoiceController::class)->only(['index', 'show']);
+        Route::resource('invoices', \App\Http\Controllers\Registrar\InvoiceController::class);
         Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Registrar\InvoiceController::class, 'download'])->name('invoices.download');
 
         // Guardian Management
         Route::resource('guardians', RegistrarGuardianController::class)->except(['destroy']);
 
         // Payment Management
-        Route::resource('payments', RegistrarPaymentController::class)->only(['index', 'create', 'store', 'show']);
+        Route::resource('payments', RegistrarPaymentController::class);
 
         // Receipt Management
-        Route::resource('receipts', RegistrarReceiptController::class)->only(['index', 'create', 'store', 'show']);
+        Route::resource('receipts', RegistrarReceiptController::class);
+
+        // Tuition Management
+        Route::get('/tuition', [TuitionController::class, 'index'])->name('tuition');
 
         // Enrollment Period Management (view only)
         Route::resource('enrollment-periods', RegistrarEnrollmentPeriodController::class)->only(['index', 'show']);

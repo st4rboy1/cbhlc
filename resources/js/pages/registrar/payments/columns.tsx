@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { ArrowUpDown, Eye, MoreHorizontal, SquarePen, Trash } from 'lucide-react';
@@ -166,7 +166,6 @@ export const columns: ColumnDef<Payment>[] = [
                             className="text-destructive"
                             onClick={() => {
                                 if (confirm('Are you sure you want to delete this payment?')) {
-                                    // @ts-expect-error - router is global
                                     router.delete(`/registrar/payments/${payment.id}`);
                                 }
                             }}

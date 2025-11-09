@@ -13,7 +13,7 @@ class UpdatePaymentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return $this->user()->hasRole('super_admin');
+        return $this->user()->hasAnyRole(['super_admin', 'administrator', 'registrar']);
     }
 
     /**

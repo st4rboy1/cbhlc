@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Registrar;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SuperAdmin\StorePaymentRequest;
+use App\Http\Requests\SuperAdmin\UpdatePaymentRequest;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Services\PaymentService;
@@ -123,5 +124,77 @@ class PaymentController extends Controller
         ]);
     }
 
-    // Note: edit, update, destroy, and refund methods removed - registrar only has view, create, record permissions
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Payment $payment)
+    {
+        Gate::authorize('update', $payment);
+
+        $payment->load(['invoice.enrollment.student', 'invoice.enrollment.guardian.user']);
+        $invoices = Invoice::with(['enrollment.student', 'enrollment.guardian.user'])
+            ->whereIn('status', ['sent', 'paid', 'overdue'])
+            ->get();
+
+        return Inertia::render('registrar/payments/edit', [
+            'payment' => $payment,
+            'invoices' => $invoices,
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdatePaymentRequest $request, Payment $payment)
+    {
+        Gate::authorize('update', $payment);
+
+        $validated = $request->validated();
+
+        DB::transaction(function () use ($validated, $payment) {
+            $oldInvoiceId = $payment->invoice_id;
+            $oldAmount = $payment->amount;
+
+            $payment->update($validated);
+
+            // Update invoice status if needed
+            if ($oldInvoiceId !== $validated['invoice_id'] || $oldAmount !== $validated['amount']) {
+                $invoice = $payment->invoice;
+                if ($invoice instanceof Invoice) {
+                    $this->paymentService->updateInvoiceStatus($invoice);
+                }
+
+                if ($oldInvoiceId !== $validated['invoice_id']) {
+                    $oldInvoice = Invoice::find($oldInvoiceId);
+                    if ($oldInvoice) {
+                        $this->paymentService->updateInvoiceStatus($oldInvoice);
+                    }
+                }
+            }
+        });
+
+        return redirect()->route('registrar.payments.index')
+            ->with('success', 'Payment updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Payment $payment)
+    {
+        Gate::authorize('delete', $payment);
+
+        DB::transaction(function () use ($payment) {
+            $invoice = $payment->invoice;
+            $payment->delete();
+
+            // Update invoice status after deleting payment
+            if ($invoice instanceof Invoice) {
+                $this->paymentService->updateInvoiceStatus($invoice);
+            }
+        });
+
+        return redirect()->route('registrar.payments.index')
+            ->with('success', 'Payment deleted successfully.');
+    }
 }

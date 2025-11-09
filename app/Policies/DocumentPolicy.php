@@ -109,7 +109,7 @@ class DocumentPolicy
     public function delete(User $user, Document $document): bool
     {
         // Super admins and administrators can delete any document
-        if ($user->hasAnyRole(['super_admin', 'administrator'])) {
+        if ($user->hasAnyRole(['super_admin', 'administrator', 'registrar'])) {
             return true;
         }
 
