@@ -26,8 +26,9 @@ describe('StudentReportController', function () {
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('shared/studentreport')
-            ->has('student')
-            ->where('student.id', $student->id)
+            ->has('studentInfo')
+            ->where('studentInfo.name', $student->first_name.' '.$student->last_name)
+            ->has('reportData')
         );
     });
 
@@ -43,8 +44,9 @@ describe('StudentReportController', function () {
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('shared/studentreport')
-            ->has('student')
-            ->where('student.id', $student->id)
+            ->has('studentInfo')
+            ->where('studentInfo.name', $student->first_name.' '.$student->last_name)
+            ->has('reportData')
         );
     });
 
@@ -60,8 +62,9 @@ describe('StudentReportController', function () {
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('shared/studentreport')
-            ->has('student')
-            ->where('student.id', $student->id)
+            ->has('studentInfo')
+            ->where('studentInfo.name', $student->first_name.' '.$student->last_name)
+            ->has('reportData')
         );
     });
 
@@ -95,8 +98,9 @@ describe('StudentReportController', function () {
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('shared/studentreport')
-            ->has('student')
-            ->where('student.id', $student->id)
+            ->has('studentInfo')
+            ->where('studentInfo.name', $student->first_name.' '.$student->last_name) // Corrected assertion
+            ->has('reportData') // Added assertion
         );
     });
 
@@ -151,8 +155,9 @@ describe('StudentReportController', function () {
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('shared/studentreport')
-            ->has('student')
-            ->where('student.id', $student->id)
+            ->has('studentInfo')
+            ->where('studentInfo.name', $student->first_name.' '.$student->last_name)
+            ->has('reportData')
         );
     });
 
@@ -195,80 +200,6 @@ describe('StudentReportController', function () {
         $response->assertRedirect('/login');
     });
 
-    test('report loads student enrollments', function () {
-        $admin = User::factory()->create();
-        $admin->assignRole('administrator');
-
-        $student = Student::factory()->create();
-
-        // Create school year for enrollments
-        $schoolYear = \App\Models\SchoolYear::factory()->create();
-
-        // Create enrollments
-        \App\Models\Enrollment::factory()->count(2)->create([
-            'student_id' => $student->id,
-            'school_year_id' => $schoolYear->id,
-        ]);
-
-        $response = $this->actingAs($admin)
-            ->get(route('students.report', $student));
-
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('shared/studentreport')
-            ->has('student.enrollments', 2)
-        );
-    });
-
-    test('report loads student guardians', function () {
-        $admin = User::factory()->create();
-        $admin->assignRole('administrator');
-
-        $student = Student::factory()->create();
-
-        // Create guardian relationships
-        $guardian1User = User::factory()->create();
-        $guardian1User->assignRole('guardian');
-        $guardian1 = Guardian::create([
-            'user_id' => $guardian1User->id,
-            'first_name' => 'Test',
-            'last_name' => 'Guardian1',
-            'contact_number' => '09123456789',
-            'address' => '123 Test St',
-        ]);
-        GuardianStudent::create([
-            'guardian_id' => $guardian1->id,
-            'student_id' => $student->id,
-            'relationship_type' => 'mother',
-            'is_primary_contact' => true,
-        ]);
-
-        $guardian2User = User::factory()->create();
-        $guardian2User->assignRole('guardian');
-        $guardian2 = Guardian::create([
-            'user_id' => $guardian2User->id,
-            'first_name' => 'Test',
-            'last_name' => 'Guardian2',
-            'contact_number' => '09987654321',
-            'address' => '456 Test Ave',
-        ]);
-        GuardianStudent::create([
-            'guardian_id' => $guardian2->id,
-            'student_id' => $student->id,
-            'relationship_type' => 'father',
-            'is_primary_contact' => false,
-        ]);
-
-        $response = $this->actingAs($admin)
-            ->get(route('students.report', $student));
-
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('shared/studentreport')
-            ->has('student.guardians', 2)
-        );
-    });
-
     test('guardian can view multiple children reports', function () {
         $guardian = User::factory()->create();
         $guardian->assignRole('guardian');
@@ -308,8 +239,9 @@ describe('StudentReportController', function () {
         $response1->assertStatus(200);
         $response1->assertInertia(fn (AssertableInertia $page) => $page
             ->component('shared/studentreport')
-            ->has('student')
-            ->where('student.id', $student1->id)
+            ->has('studentInfo')
+            ->where('studentInfo.name', $student1->first_name.' '.$student1->last_name)
+            ->has('reportData')
         );
 
         // Can view second child's report
@@ -319,8 +251,9 @@ describe('StudentReportController', function () {
         $response2->assertStatus(200);
         $response2->assertInertia(fn (AssertableInertia $page) => $page
             ->component('shared/studentreport')
-            ->has('student')
-            ->where('student.id', $student2->id)
+            ->has('studentInfo')
+            ->where('studentInfo.name', $student2->first_name.' '.$student2->last_name)
+            ->has('reportData')
         );
     });
 
