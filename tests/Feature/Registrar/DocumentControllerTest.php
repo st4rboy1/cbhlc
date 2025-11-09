@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 
-uses(RefreshDatabase::class);
+uses(RefreshDatabase::class)->group('vite-dependent');
 
 beforeEach(function () {
     Storage::fake('private');
