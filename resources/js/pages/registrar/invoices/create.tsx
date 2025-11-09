@@ -53,7 +53,7 @@ interface Props {
     enrollments: Enrollment[];
 }
 
-export default function SuperAdminInvoicesCreate({ enrollments }: Props) {
+export default function RegistrarInvoicesCreate({ enrollments }: Props) {
     const { data, setData, post, processing, errors } = useForm<FormData>({
         enrollment_id: '',
         invoice_date: new Date().toISOString().split('T')[0],

@@ -49,7 +49,7 @@ interface Props {
     invoices: Invoice[];
 }
 
-export default function ReceiptEdit({ receipt, payments, invoices }: Props) {
+export default function RegistrarReceiptEdit({ receipt, payments, invoices }: Props) {
     const { data, setData, put, processing, errors, wasSuccessful } = useForm({
         payment_id: receipt.payment_id?.toString() || null,
         invoice_id: receipt.invoice_id?.toString() || null,

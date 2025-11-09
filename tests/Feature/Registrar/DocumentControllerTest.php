@@ -236,15 +236,16 @@ test('super admin can verify document', function () {
 // VIEW DOCUMENT TESTS
 // ========================================
 
-test('registrar can view document with temporary URL', function () {
+test('registrar can view document', function () {
     $response = actingAs($this->registrar)
         ->get(route('registrar.documents.show', $this->document));
 
     $response->assertOk();
-    $response->assertJsonStructure([
-        'document',
-        'url',
-    ]);
+    $response->assertInertia(fn ($page) => $page
+        ->component('registrar/documents/show')
+        ->has('document')
+        ->has('fileUrl')
+    );
 });
 
 test('guardian cannot access registrar document routes', function () {
