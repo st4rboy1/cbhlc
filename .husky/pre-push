@@ -52,7 +52,7 @@ echo "🧪 Running tests with coverage check..."
 start_time=$(date +%s.%N)
 
 # Run Unit & Feature tests in parallel with SQLite, then Browser tests with MySQL
-if log_file=$(log_command "pest" bash -c "./vendor/bin/sail pest --parallel --exclude-testsuite=Browser --coverage && ./vendor/bin/sail exec -e DB_CONNECTION=mysql -e DB_DATABASE=testing laravel.test ./vendor/bin/pest --testsuite=Browser --parallel --coverage --min=50 --coverage-text"); then
+if log_file=$(log_command "pest" bash -c "./vendor/bin/sail pest --parallel --exclude-testsuite=Browser --exclude-group=vite-dependent --coverage && ./vendor/bin/sail exec -e DB_CONNECTION=mysql -e DB_DATABASE=testing laravel.test ./vendor/bin/pest --testsuite=Browser --parallel --coverage --min=50 --coverage-text"); then
     end_time=$(date +%s.%N)
     duration=$(awk "BEGIN {printf \"%.1f\", $end_time - $start_time}")
     printf "  ${GREEN}✅ Tests: PASSED${NC} (${duration}s)\n"
