@@ -4,17 +4,19 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { type NavItem } from '@/types';
 import {
     Banknote,
+    Calendar,
     CalendarDays,
-    CreditCard,
     DollarSign,
     FileCheck,
-    FileClock,
-    FilePieChart,
+    FileText,
     GraduationCap,
     History,
     LayoutGrid,
+    ReceiptText,
     School,
     Settings,
+    Settings2,
+    ShieldCheck,
     UserCog,
     Users,
 } from 'lucide-react';
@@ -32,9 +34,29 @@ const mainNavItems: NavItem[] = [
         icon: GraduationCap,
     },
     {
+        title: 'Enrollment Periods',
+        href: '/admin/enrollment-periods',
+        icon: Calendar,
+    },
+    {
+        title: 'School Years',
+        href: '/admin/school-years',
+        icon: CalendarDays,
+    },
+    {
         title: 'Students',
         href: '/admin/students',
         icon: Users,
+    },
+    {
+        title: 'Guardians',
+        href: '/admin/guardians',
+        icon: ShieldCheck,
+    },
+    {
+        title: 'Grade Level Fees',
+        href: '/admin/grade-level-fees',
+        icon: DollarSign,
     },
     {
         title: 'Users',
@@ -42,8 +64,13 @@ const mainNavItems: NavItem[] = [
         icon: UserCog,
     },
     {
+        title: 'Documents',
+        href: '/admin/documents',
+        icon: FileText,
+    },
+    {
         title: 'Invoices',
-        href: '/invoices',
+        href: '/admin/invoices',
         icon: FileCheck,
     },
     {
@@ -52,29 +79,9 @@ const mainNavItems: NavItem[] = [
         icon: Banknote,
     },
     {
-        title: 'Grade Level Fees',
-        href: '/admin/grade-level-fees',
-        icon: DollarSign,
-    },
-    {
-        title: 'Enrollment Periods',
-        href: '/admin/enrollment-periods',
-        icon: CalendarDays,
-    },
-    {
-        title: 'Pending Documents',
-        href: '/admin/documents/pending',
-        icon: FileClock,
-    },
-    {
-        title: 'Reports',
-        href: '/admin/reports',
-        icon: FilePieChart,
-    },
-    {
-        title: 'Audit Logs',
-        href: '/admin/audit-logs',
-        icon: History,
+        title: 'Receipts',
+        href: '/admin/receipts',
+        icon: ReceiptText,
     },
     {
         title: 'School Information',
@@ -82,9 +89,14 @@ const mainNavItems: NavItem[] = [
         icon: School,
     },
     {
-        title: 'Tuition Fees',
-        href: '/tuition',
-        icon: CreditCard,
+        title: 'Audit Logs',
+        href: '/admin/audit-logs',
+        icon: History,
+    },
+    {
+        title: 'System Settings',
+        href: '/admin/settings',
+        icon: Settings2,
     },
     {
         title: 'Profile Settings',
