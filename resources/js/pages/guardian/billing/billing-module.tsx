@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Link } from '@inertiajs/react';
-import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, Clock, DollarSign, Search } from 'lucide-react';
+import { AlertCircle, CheckCircle, ChevronDown, ChevronUp, CircleDollarSign, Clock, Search } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
 
@@ -78,7 +78,7 @@ export function BillingModule({ enrollments, summary, paymentPlans }: BillingMod
                                 <p className="text-2xl font-semibold text-foreground">{summary.total_due}</p>
                             </div>
                             <div className="rounded-lg bg-destructive/10 p-2">
-                                <DollarSign className="h-5 w-5 text-destructive" />
+                                <CircleDollarSign className="h-5 w-5 text-destructive" />
                             </div>
                         </div>
                     </Card>

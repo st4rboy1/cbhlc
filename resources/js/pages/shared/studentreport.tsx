@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { type PageProps } from '@inertiajs/core'; // Added this line
 import { Head } from '@inertiajs/react';
 import { Calendar, CheckCircle, FileText, GraduationCap, MapPin, User } from 'lucide-react';
 
@@ -11,43 +12,30 @@ interface StudentInfo {
     name: string;
     age: number;
     gender: string;
-    section: string;
     birthdate: string;
     address: string;
     gradeLevel: string;
 }
 
 interface ReportData {
-    academicYear: string;
+    schoolYear: string;
     semester: string;
     status: 'enrolled' | 'pending' | 'completed';
     enrollmentDate: string;
 }
 
-export default function StudentReport() {
+interface Props extends PageProps {
+    studentInfo: StudentInfo;
+    reportData: ReportData;
+}
+
+export default function StudentReport({ studentInfo, reportData }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Student Report',
             href: '/studentreport',
         },
     ];
-
-    const studentInfo: StudentInfo = {
-        name: 'Manero Sj Rodriguez',
-        age: 12,
-        gender: 'Male',
-        section: 'Grade 6-A',
-        birthdate: 'March 15, 2012',
-        address: '123 Sample Street, City, Province',
-        gradeLevel: 'Grade 6',
-    };
-
-    const reportData: ReportData = {
-        academicYear: '2024-2025',
-        semester: 'First Semester',
-        status: 'enrolled',
-        enrollmentDate: 'August 15, 2024',
-    };
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -69,7 +57,7 @@ export default function StudentReport() {
             case 'pending':
                 return 'Enrollment Pending';
             case 'completed':
-                return 'Academic Year Completed';
+                return 'School Year Completed';
             default:
                 return 'Unknown Status';
         }
@@ -94,7 +82,7 @@ export default function StudentReport() {
                             <div>
                                 <Badge className={getStatusColor(reportData.status)}>{getStatusText(reportData.status)}</Badge>
                                 <p className="mt-2 text-green-700">
-                                    Academic Year {reportData.academicYear} - {reportData.semester}
+                                    School Year {reportData.schoolYear} - {reportData.semester}
                                 </p>
                             </div>
                             <div className="text-right text-sm text-green-600">
@@ -137,11 +125,7 @@ export default function StudentReport() {
                                         {studentInfo.gradeLevel}
                                     </span>
                                 </div>
-                                <Separator />
-                                <div className="flex justify-between">
-                                    <span className="font-medium text-muted-foreground">Section:</span>
-                                    <span className="font-semibold">{studentInfo.section}</span>
-                                </div>
+
                                 <Separator />
                                 <div className="flex justify-between">
                                     <span className="font-medium text-muted-foreground">Date of Birth:</span>
@@ -165,8 +149,8 @@ export default function StudentReport() {
                         <CardContent className="space-y-4">
                             <div className="grid gap-3">
                                 <div className="flex justify-between">
-                                    <span className="font-medium text-muted-foreground">Academic Year:</span>
-                                    <span className="font-semibold">{reportData.academicYear}</span>
+                                    <span className="font-medium text-muted-foreground">School Year:</span>
+                                    <span className="font-semibold">{reportData.schoolYear}</span>
                                 </div>
                                 <Separator />
                                 <div className="flex justify-between">
@@ -220,12 +204,10 @@ export default function StudentReport() {
                     <CardContent className="text-blue-700">
                         <div className="space-y-2">
                             <p>
-                                <strong>Student Status:</strong> {studentInfo.name} is currently enrolled for the {reportData.academicYear} academic
-                                year.
+                                <strong>Student Status:</strong> {studentInfo.name} is currently enrolled for the {reportData.schoolYear} school year.
                             </p>
                             <p>
-                                <strong>Grade Placement:</strong> The student is assigned to {studentInfo.section} and is progressing normally through
-                                the curriculum.
+                                <strong>Grade Placement:</strong> The student is progressing normally through the curriculum.
                             </p>
                             <p>
                                 <strong>Next Steps:</strong> Continue regular attendance and maintain academic performance. Report any changes in
