@@ -146,3 +146,191 @@ test('student cannot create students', function () {
 
     expect($this->policy->create($user))->toBeFalse();
 });
+
+test('super admin can update a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super_admin');
+    $student = Student::factory()->create();
+
+    expect($this->policy->update($user, $student))->toBeTrue();
+});
+
+test('administrator can update a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('administrator');
+    $student = Student::factory()->create();
+
+    expect($this->policy->update($user, $student))->toBeTrue();
+});
+
+test('registrar can update a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('registrar');
+    $student = Student::factory()->create();
+
+    expect($this->policy->update($user, $student))->toBeTrue();
+});
+
+test('guardian can update their own student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+    $guardian = Guardian::factory()->create(['user_id' => $user->id]);
+    $student = Student::factory()->create();
+    $student->guardians()->attach($guardian->id);
+
+    expect($this->policy->update($user, $student))->toBeTrue();
+});
+
+test('guardian cannot update another guardian student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+    Guardian::factory()->create(['user_id' => $user->id]);
+
+    $otherGuardian = Guardian::factory()->create();
+    $student = Student::factory()->create();
+    $student->guardians()->attach($otherGuardian->id);
+
+    expect($this->policy->update($user, $student))->toBeFalse();
+});
+
+test('student cannot update students', function () {
+    $user = User::factory()->create();
+    $user->assignRole('student');
+    $student = Student::factory()->create();
+
+    expect($this->policy->update($user, $student))->toBeFalse();
+});
+
+test('super admin can delete a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super_admin');
+    $student = Student::factory()->create();
+
+    expect($this->policy->delete($user, $student))->toBeTrue();
+});
+
+test('administrator can delete a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('administrator');
+    $student = Student::factory()->create();
+
+    expect($this->policy->delete($user, $student))->toBeTrue();
+});
+
+test('registrar cannot delete a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('registrar');
+    $student = Student::factory()->create();
+
+    expect($this->policy->delete($user, $student))->toBeFalse();
+});
+
+test('guardian can delete their own student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+    $guardian = Guardian::factory()->create(['user_id' => $user->id]);
+    $student = Student::factory()->create();
+    $student->guardians()->attach($guardian->id);
+
+    expect($this->policy->delete($user, $student))->toBeTrue();
+});
+
+test('guardian cannot delete another guardian student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+    Guardian::factory()->create(['user_id' => $user->id]);
+
+    $otherGuardian = Guardian::factory()->create();
+    $student = Student::factory()->create();
+    $student->guardians()->attach($otherGuardian->id);
+
+    expect($this->policy->delete($user, $student))->toBeFalse();
+});
+
+test('student cannot delete students', function () {
+    $user = User::factory()->create();
+    $user->assignRole('student');
+    $student = Student::factory()->create();
+
+    expect($this->policy->delete($user, $student))->toBeFalse();
+});
+
+test('super admin can restore a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super_admin');
+    $student = Student::factory()->create();
+
+    expect($this->policy->restore($user, $student))->toBeTrue();
+});
+
+test('administrator can restore a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('administrator');
+    $student = Student::factory()->create();
+
+    expect($this->policy->restore($user, $student))->toBeTrue();
+});
+
+test('registrar cannot restore a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('registrar');
+    $student = Student::factory()->create();
+
+    expect($this->policy->restore($user, $student))->toBeFalse();
+});
+
+test('guardian cannot restore a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+    $student = Student::factory()->create();
+
+    expect($this->policy->restore($user, $student))->toBeFalse();
+});
+
+test('student cannot restore a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('student');
+    $student = Student::factory()->create();
+
+    expect($this->policy->restore($user, $student))->toBeFalse();
+});
+
+test('super admin can force delete a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('super_admin');
+    $student = Student::factory()->create();
+
+    expect($this->policy->forceDelete($user, $student))->toBeTrue();
+});
+
+test('administrator cannot force delete a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('administrator');
+    $student = Student::factory()->create();
+
+    expect($this->policy->forceDelete($user, $student))->toBeFalse();
+});
+
+test('registrar cannot force delete a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('registrar');
+    $student = Student::factory()->create();
+
+    expect($this->policy->forceDelete($user, $student))->toBeFalse();
+});
+
+test('guardian cannot force delete a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('guardian');
+    $student = Student::factory()->create();
+
+    expect($this->policy->forceDelete($user, $student))->toBeFalse();
+});
+
+test('student cannot force delete a student', function () {
+    $user = User::factory()->create();
+    $user->assignRole('student');
+    $student = Student::factory()->create();
+
+    expect($this->policy->forceDelete($user, $student))->toBeFalse();
+});
