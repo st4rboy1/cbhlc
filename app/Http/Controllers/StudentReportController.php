@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Inertia\Response;
+use Inertia\Response; // Import Carbon
 
 class StudentReportController extends Controller
 {
@@ -40,10 +41,30 @@ class StudentReportController extends Controller
         }
 
         // Load any additional data needed for the report
-        $student->load(['enrollments', 'guardians']);
+        $student->load(['enrollments.schoolYear', 'enrollments.enrollmentPeriod']);
+
+        $latestEnrollment = $student->enrollments->sortByDesc('created_at')->first();
+
+        $studentInfo = [
+            'name' => $student->first_name.' '.$student->last_name,
+            'age' => $student->birthdate ? Carbon::parse($student->birthdate)->age : null,
+            'gender' => $student->gender,
+            'section' => $latestEnrollment ? $latestEnrollment->section : 'N/A', // Assuming enrollment has a section
+            'birthdate' => $student->birthdate ? Carbon::parse($student->birthdate)->format('F d, Y') : 'N/A',
+            'address' => $student->address ?? 'N/A', // Assuming student has an address field
+            'gradeLevel' => $latestEnrollment ? $latestEnrollment->grade_level->value : 'N/A',
+        ];
+
+        $reportData = [
+            'schoolYear' => $latestEnrollment && $latestEnrollment->schoolYear ? $latestEnrollment->schoolYear->display_name : 'N/A',
+            'semester' => $latestEnrollment && $latestEnrollment->quarter ? $latestEnrollment->quarter->name : 'N/A', // Changed to quarter
+            'status' => $latestEnrollment ? $latestEnrollment->status : 'N/A',
+            'enrollmentDate' => $latestEnrollment ? Carbon::parse($latestEnrollment->created_at)->format('F d, Y') : 'N/A',
+        ];
 
         return Inertia::render('shared/studentreport', [
-            'student' => $student,
+            'studentInfo' => $studentInfo,
+            'reportData' => $reportData,
         ]);
     }
 }
