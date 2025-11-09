@@ -70,11 +70,11 @@ it('allows administrator to create receipts', function () {
     expect($this->policy->create($user))->toBeTrue();
 });
 
-it('denies registrar from creating receipts', function () {
+it('allows registrar to create receipts', function () {
     $user = User::factory()->create();
     $user->assignRole('registrar');
 
-    expect($this->policy->create($user))->toBeFalse();
+    expect($this->policy->create($user))->toBeTrue();
 });
 
 it('allows super_admin to update a receipt', function () {

@@ -62,7 +62,7 @@ interface Props {
     };
 }
 
-export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
+export default function RegistrarInvoicesIndex({ invoices, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || 'all');
     const [fromDate, setFromDate] = useState<Date | undefined>(filters.from_date ? new Date(filters.from_date) : undefined);

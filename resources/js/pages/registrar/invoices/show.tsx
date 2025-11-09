@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Calendar, Edit, FileText, User } from 'lucide-react';
+import { ArrowLeft, Calendar, FileText, User } from 'lucide-react';
 
 interface Student {
     id: number;
@@ -76,7 +76,7 @@ interface Props {
     invoice: Invoice;
 }
 
-export default function SuperAdminInvoicesShow({ invoice }: Props) {
+export default function RegistrarInvoicesShow({ invoice }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Registrar', href: '/registrar/dashboard' },
         { title: 'Invoices', href: '/registrar/invoices' },
@@ -129,12 +129,6 @@ export default function SuperAdminInvoicesShow({ invoice }: Props) {
                             <Button variant="outline">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to List
-                            </Button>
-                        </Link>
-                        <Link href={`/registrar/invoices/${invoice.id}/edit`}>
-                            <Button>
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit
                             </Button>
                         </Link>
                     </div>

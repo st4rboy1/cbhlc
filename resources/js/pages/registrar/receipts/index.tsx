@@ -67,7 +67,7 @@ interface Props {
     };
 }
 
-export default function ReceiptsIndex({ receipts }: Props) {
+export default function RegistrarReceiptsIndex({ receipts }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Registrar', href: '/registrar/dashboard' },
         { title: 'Receipts', href: '/registrar/receipts' },

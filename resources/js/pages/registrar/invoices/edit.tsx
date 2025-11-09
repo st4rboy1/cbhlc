@@ -66,11 +66,11 @@ interface Props {
     enrollments: Enrollment[];
 }
 
-export default function SuperAdminInvoicesEdit({ invoice, enrollments }: Props) {
+export default function RegistrarInvoicesEdit({ invoice, enrollments }: Props) {
     const { data, setData, put, processing, errors } = useForm<FormData>({
         enrollment_id: invoice.enrollment_id.toString(),
-        invoice_date: invoice.invoice_date,
-        due_date: invoice.due_date,
+        invoice_date: invoice.invoice_date.substring(0, 10),
+        due_date: invoice.due_date.substring(0, 10),
         status: invoice.status,
         items: invoice.items.map((item) => ({
             id: item.id,

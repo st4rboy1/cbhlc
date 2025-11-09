@@ -42,7 +42,7 @@ class ReceiptPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasAnyRole(['super_admin', 'administrator']);
+        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar']);
     }
 
     /**
@@ -50,7 +50,7 @@ class ReceiptPolicy
      */
     public function update(User $user, Receipt $receipt): bool
     {
-        return $user->hasAnyRole(['super_admin', 'administrator']);
+        return $user->hasAnyRole(['super_admin', 'administrator', 'registrar']);
     }
 
     /**
@@ -58,7 +58,7 @@ class ReceiptPolicy
      */
     public function delete(User $user, Receipt $receipt): bool
     {
-        return $user->hasRole('super_admin');
+        return $user->hasAnyRole(['super_admin', 'registrar']);
     }
 
     /**

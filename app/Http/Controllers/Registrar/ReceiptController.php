@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Registrar;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SuperAdmin\StoreReceiptRequest;
+use App\Http\Requests\SuperAdmin\UpdateReceiptRequest;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Receipt;
@@ -116,5 +117,59 @@ class ReceiptController extends Controller
         ]);
     }
 
-    // Note: edit, update, and destroy methods removed - registrar only has view, generate, download permissions
+    /**
+     * Show the form for editing the specified receipt.
+     */
+    public function edit(Receipt $receipt)
+    {
+        Gate::authorize('update', $receipt);
+
+        $receipt->load(['payment', 'invoice']);
+        $payments = Payment::with('invoice.enrollment.student')->get();
+        $invoices = Invoice::with('enrollment.student')->get();
+
+        return Inertia::render('registrar/receipts/edit', [
+            'receipt' => $receipt,
+            'payments' => $payments,
+            'invoices' => $invoices,
+        ]);
+    }
+
+    /**
+     * Update the specified receipt.
+     */
+    public function update(UpdateReceiptRequest $request, Receipt $receipt)
+    {
+        Gate::authorize('update', $receipt);
+
+        $validated = $request->validated();
+        $oldData = $receipt->toArray();
+        $receipt->update($validated);
+
+        activity()
+            ->performedOn($receipt)
+            ->withProperties(['old' => $oldData, 'new' => $receipt->fresh()->toArray()])
+            ->log('Receipt updated');
+
+        return redirect()->route('registrar.receipts.index')
+            ->with('success', 'Receipt updated successfully.');
+    }
+
+    /**
+     * Remove the specified receipt.
+     */
+    public function destroy(Receipt $receipt)
+    {
+        Gate::authorize('delete', $receipt);
+
+        $receiptData = $receipt->toArray();
+        $receipt->delete();
+
+        activity()
+            ->withProperties($receiptData)
+            ->log('Receipt deleted');
+
+        return redirect()->route('registrar.receipts.index')
+            ->with('success', 'Receipt deleted successfully.');
+    }
 }

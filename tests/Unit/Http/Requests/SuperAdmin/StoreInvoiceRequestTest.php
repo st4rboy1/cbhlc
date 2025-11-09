@@ -31,10 +31,21 @@ class StoreInvoiceRequestTest extends TestCase
         $this->assertTrue($request->authorize());
     }
 
-    public function test_authorize_returns_false_for_non_super_admin(): void
+    public function test_authorize_returns_true_for_registrar(): void
     {
         $user = User::factory()->create();
-        $user->assignRole('administrator');
+        $user->assignRole('registrar');
+
+        $request = new StoreInvoiceRequest;
+        $request->setUserResolver(fn () => $user);
+
+        $this->assertTrue($request->authorize());
+    }
+
+    public function test_authorize_returns_false_for_other_roles(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('guardian');
 
         $request = new StoreInvoiceRequest;
         $request->setUserResolver(fn () => $user);
