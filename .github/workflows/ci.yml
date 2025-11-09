@@ -56,6 +56,18 @@ jobs:
       - name: Build Assets
         run: npm run build
 
+      - name: Verify Build Output
+        run: |
+          echo "Checking build output..."
+          ls -la public/build/
+          if [ -f public/build/manifest.json ]; then
+            echo "Manifest exists, showing first 50 lines:"
+            head -50 public/build/manifest.json
+          else
+            echo "ERROR: manifest.json not found!"
+            exit 1
+          fi
+
       # Upload built assets and vendor as artifacts for other jobs
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
