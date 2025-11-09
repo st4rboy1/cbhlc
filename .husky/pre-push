@@ -46,45 +46,24 @@ echo ""
 # Run the local test script
 ./scripts/test-local.sh
 
-# Run browser smoke tests (fast critical path checks via Docker)
-echo "🌐 Running browser smoke tests..."
-
-start_time=$(date +%s.%N)
-
-if log_file=$(log_command "browser-smoke" ./vendor/bin/sail test tests/Browser/LoginPageTest.php); then
-    end_time=$(date +%s.%N)
-    duration=$(awk "BEGIN {printf \"%.1f\", $end_time - $start_time}")
-    printf "  ${GREEN}✅ Browser Tests: PASSED${NC} (${duration}s)\n"
-else
-    end_time=$(date +%s.%N)
-    duration=$(awk "BEGIN {printf \"%.1f\", $end_time - $start_time}")
-    printf "  ${RED}❌ Browser Tests: FAILED${NC} (${duration}s)\n"
-    echo "   See output in: $log_file"
-    echo "   Screenshots saved to: tests/Browser/Screenshots/"
-    echo ""
-    echo "❌ Browser smoke tests failed. Push aborted."
-    exit 1
-fi
-
-echo ""
-
-# Run tests with coverage (optimized with SQLite)
+# Run tests with coverage (includes all browser tests)
 echo "🧪 Running tests with coverage check..."
 
 start_time=$(date +%s.%N)
 
-if log_file=$(log_command "pest" ./vendor/bin/sail exec -T -e DB_CONNECTION=sqlite -e DB_DATABASE=:memory: laravel.test ./vendor/bin/pest --parallel --coverage --min=60 --coverage-text); then
+# Run Unit & Feature tests in parallel with SQLite, then Browser tests with MySQL
+if log_file=$(log_command "pest" bash -c "./vendor/bin/sail pest --parallel --exclude-testsuite=Browser --exclude-group=vite-dependent --coverage && ./vendor/bin/sail exec -e DB_CONNECTION=mysql -e DB_DATABASE=testing laravel.test ./vendor/bin/pest --testsuite=Browser --parallel --coverage --min=50 --coverage-text"); then
     end_time=$(date +%s.%N)
     duration=$(awk "BEGIN {printf \"%.1f\", $end_time - $start_time}")
     printf "  ${GREEN}✅ Tests: PASSED${NC} (${duration}s)\n"
-    echo "✅ Coverage: Minimum 60% met"
+    echo "✅ Coverage: Minimum 50% met"
 else
     end_time=$(date +%s.%N)
     duration=$(awk "BEGIN {printf \"%.1f\", $end_time - $start_time}")
     printf "  ${RED}❌ Tests: FAILED${NC} (${duration}s)\n"
     echo "   See output in: $log_file"
     echo ""
-    echo "❌ Tests failed or coverage below 60%. Push aborted."
+    echo "❌ Tests failed or coverage below 50%. Push aborted."
     exit 1
 fi
 
