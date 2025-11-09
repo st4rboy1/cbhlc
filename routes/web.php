@@ -6,9 +6,13 @@ use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
 use App\Http\Controllers\Admin\EnrollmentController as AdminEnrollmentController;
 use App\Http\Controllers\Admin\EnrollmentPeriodController as AdminEnrollmentPeriodController;
 use App\Http\Controllers\Admin\GradeLevelFeeController as AdminGradeLevelFeeController;
+use App\Http\Controllers\Admin\GuardianController as AdminGuardianController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\ReceiptController as AdminReceiptController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\SchoolInformationController as AdminSchoolInformationController;
+use App\Http\Controllers\Admin\SchoolYearController as AdminSchoolYearController;
+use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\StudentController as AdminStudentController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Guardian\BillingController as GuardianBillingController;
@@ -267,6 +271,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Invoice Management
         Route::resource('invoices', \App\Http\Controllers\Admin\InvoiceController::class)->only(['index', 'show']);
         Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Admin\InvoiceController::class, 'download'])->name('invoices.download');
+
+        // Guardian Management
+        Route::resource('guardians', AdminGuardianController::class);
+
+        // Receipt Management
+        Route::resource('receipts', AdminReceiptController::class);
+
+        // School Year Management
+        Route::resource('school-years', AdminSchoolYearController::class);
+        Route::post('/school-years/{schoolYear}/activate', [AdminSchoolYearController::class, 'activate'])->name('school-years.activate');
+
+        // System Settings
+        Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
+
+        // Documents Management (full CRUD, not just pending)
+        Route::get('/documents', [AdminDocumentController::class, 'index'])->name('documents.index');
+        Route::delete('/documents/{document}', [AdminDocumentController::class, 'destroy'])->name('documents.destroy');
     });
 
     // Registrar Routes
