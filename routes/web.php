@@ -23,7 +23,12 @@ use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Registrar\DashboardController as RegistrarDashboardController;
 use App\Http\Controllers\Registrar\DocumentController as RegistrarDocumentController;
 use App\Http\Controllers\Registrar\EnrollmentController as RegistrarEnrollmentController;
+use App\Http\Controllers\Registrar\EnrollmentPeriodController as RegistrarEnrollmentPeriodController;
 use App\Http\Controllers\Registrar\GradeLevelFeeController as RegistrarGradeLevelFeeController;
+use App\Http\Controllers\Registrar\GuardianController as RegistrarGuardianController;
+use App\Http\Controllers\Registrar\PaymentController as RegistrarPaymentController;
+use App\Http\Controllers\Registrar\ReceiptController as RegistrarReceiptController;
+use App\Http\Controllers\Registrar\SchoolYearController as RegistrarSchoolYearController;
 use App\Http\Controllers\Registrar\StudentController as RegistrarStudentController;
 use App\Http\Controllers\SharedController;
 use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
@@ -307,6 +312,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Invoice Management
         Route::resource('invoices', \App\Http\Controllers\Registrar\InvoiceController::class)->only(['index', 'show']);
         Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Registrar\InvoiceController::class, 'download'])->name('invoices.download');
+
+        // Guardian Management
+        Route::resource('guardians', RegistrarGuardianController::class)->except(['destroy']);
+
+        // Payment Management
+        Route::resource('payments', RegistrarPaymentController::class)->only(['index', 'create', 'store', 'show']);
+
+        // Receipt Management
+        Route::resource('receipts', RegistrarReceiptController::class)->only(['index', 'create', 'store', 'show']);
+
+        // Enrollment Period Management (view only)
+        Route::resource('enrollment-periods', RegistrarEnrollmentPeriodController::class)->only(['index', 'show']);
+
+        // School Year Management (view only)
+        Route::resource('school-years', RegistrarSchoolYearController::class)->only(['index', 'show']);
     });
 
     // Guardian Routes
