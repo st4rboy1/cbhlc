@@ -253,7 +253,6 @@ describe('Guardian BillingController', function () {
             ->component('guardian/billing/show')
             ->has('enrollment')
             ->has('billing')
-            ->has('paymentInstructions')
         );
     });
 
@@ -369,33 +368,6 @@ describe('Guardian BillingController', function () {
                 ->where('amount', '₱19,000.00') // 38000 / 2
                 ->where('status', 'pending')
                 ->etc()
-            )
-        );
-    });
-
-    test('billing show includes payment instructions', function () {
-        $enrollment = Enrollment::factory()->create([
-            'student_id' => $this->student->id,
-            'guardian_id' => $this->guardianModel->id,
-            'school_year_id' => $this->sy2024->id,
-            'status' => EnrollmentStatus::PENDING->value,
-            'payment_plan' => PaymentPlan::MONTHLY,
-            'tuition_fee_cents' => 2000000,
-            'miscellaneous_fee_cents' => 500000,
-            'total_amount_cents' => 2500000,
-        ]);
-
-        $response = $this->actingAs($this->guardian)
-            ->get(route('guardian.billing.show', $enrollment));
-
-        $response->assertStatus(200);
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('guardian/billing/show')
-            ->has('paymentInstructions', fn ($instructions) => $instructions
-                ->where('bank_name', 'Bank of the Philippine Islands')
-                ->where('account_name', 'Christian Bible Heritage Learning Center')
-                ->has('account_number')
-                ->has('notes')
             )
         );
     });

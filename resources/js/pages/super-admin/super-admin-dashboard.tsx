@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { ChevronRight, CreditCard, DollarSign, FileText, School, Settings, UserPlus } from 'lucide-react';
+import { ChevronRight, CreditCard, DollarSign, FileText, School, UserPlus } from 'lucide-react';
 
 interface Props {
     stats: {
@@ -211,15 +211,6 @@ export default function SuperAdminDashboardPage({ stats, activeSchoolYear }: Pro
                                     <span className="flex items-center gap-2">
                                         <FileText className="h-4 w-4" />
                                         Invoices
-                                    </span>
-                                    <ChevronRight className="h-4 w-4" />
-                                </Link>
-                            </Button>
-                            <Button variant="outline" className="w-full justify-between" asChild>
-                                <Link href="/super-admin/settings">
-                                    <span className="flex items-center gap-2">
-                                        <Settings className="h-4 w-4" />
-                                        System Settings
                                     </span>
                                     <ChevronRight className="h-4 w-4" />
                                 </Link>

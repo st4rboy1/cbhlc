@@ -221,12 +221,6 @@ class BillingController extends Controller
                 'total_amount' => $this->currencyService->format($totalFee),
                 'payment_schedule' => $paymentSchedule,
             ],
-            'paymentInstructions' => [
-                'bank_name' => 'Bank of the Philippine Islands',
-                'account_name' => 'Christian Bible Heritage Learning Center',
-                'account_number' => 'XXXX-XXXX-XXXX',
-                'notes' => 'Please include student ID as reference when making payment.',
-            ],
         ]);
     }
 }

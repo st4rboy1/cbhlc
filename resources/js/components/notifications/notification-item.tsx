@@ -59,7 +59,7 @@ export function NotificationItem({ notification, onRead, onDelete, showActions =
     const isUnread = !notification.read_at;
 
     return (
-        <div className={cn('transition-colors hover:bg-accent', compact ? 'p-3' : 'p-4', isUnread && 'bg-blue-50/50 dark:bg-blue-950/20')}>
+        <div className={cn('transition-colors hover:bg-accent', compact ? 'p-3' : 'p-4', isUnread && 'bg-blue-50/50 dark:bg-gray-700')}>
             <div className="flex gap-3">
                 <div className={cn('mt-0.5 flex-shrink-0', getIconColor(notification.type))}>{getNotificationIcon(notification.type)}</div>
 
