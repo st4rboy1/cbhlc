@@ -61,7 +61,7 @@ describe('Update Enrollment Status Functionality', function () {
             'school_year_id' => $enrollment->school_year_id,
             'status' => EnrollmentStatus::ENROLLED->value,
             'type' => $enrollment->type,
-            'payment_plan' => $enrollment->payment_plan,
+            'payment_plan' => $enrollment->payment_plan->value,
         ]);
 
         $response->assertRedirect('/super-admin/enrollments');
@@ -102,7 +102,7 @@ describe('Update Enrollment Status Functionality', function () {
             'school_year_id' => $enrollment->school_year_id,
             'status' => EnrollmentStatus::READY_FOR_PAYMENT->value,
             'type' => $enrollment->type,
-            'payment_plan' => $enrollment->payment_plan,
+            'payment_plan' => $enrollment->payment_plan->value,
         ]);
 
         $response->assertRedirect('/super-admin/enrollments');
@@ -136,7 +136,7 @@ describe('Update Enrollment Status Functionality', function () {
             'school_year_id' => $enrollment->school_year_id,
             'status' => EnrollmentStatus::PAID->value,
             'type' => $enrollment->type,
-            'payment_plan' => $enrollment->payment_plan,
+            'payment_plan' => $enrollment->payment_plan->value,
         ]);
 
         $response->assertRedirect('/super-admin/enrollments');
@@ -170,7 +170,7 @@ describe('Update Enrollment Status Functionality', function () {
             'school_year_id' => $enrollment->school_year_id,
             'status' => EnrollmentStatus::COMPLETED->value,
             'type' => $enrollment->type,
-            'payment_plan' => $enrollment->payment_plan,
+            'payment_plan' => $enrollment->payment_plan->value,
         ]);
 
         $response->assertRedirect('/super-admin/enrollments');
