@@ -24,13 +24,67 @@ beforeEach(function () {
         'password' => bcrypt('password'),
     ]);
 
-    // Create necessary records
-    $this->schoolYear = SchoolYear::factory()->create();
-    $this->enrollmentPeriod = EnrollmentPeriod::factory()->create([
-        'school_year_id' => $this->schoolYear->id,
-    ]);
-    $this->gradeLevelFee = GradeLevelFee::factory()->create([
-        'school_year' => $this->schoolYear->id,
+    // Calculate current school year name
+    $currentYear = now()->year;
+    $currentSchoolYearName = $currentYear.'-'.($currentYear + 1);
+
+    // Create or get the current school year and ensure it's active
+
+    $this->schoolYear = SchoolYear::firstOrCreate(
+
+        ['name' => $currentSchoolYearName],
+
+        [
+
+            'start_year' => $currentYear,
+
+            'end_year' => $currentYear + 1,
+
+            'start_date' => $currentYear.'-06-01',
+
+            'end_date' => ($currentYear + 1).'-03-31',
+
+            'status' => 'active',
+
+            'is_active' => true,
+
+        ]
+
+    );
+
+    // Create enrollment period for this school year
+
+    $this->enrollmentPeriod = EnrollmentPeriod::firstOrCreate(
+
+        ['school_year_id' => $this->schoolYear->id],
+
+        [
+
+            'start_date' => $currentYear.'-06-01',
+
+            'end_date' => ($currentYear + 1).'-03-31',
+
+            'early_registration_deadline' => $currentYear.'-05-31',
+
+            'regular_registration_deadline' => $currentYear.'-07-31',
+
+            'late_registration_deadline' => $currentYear.'-08-31',
+
+            'status' => 'active',
+
+            'is_active' => true,
+
+            'description' => "School Year {$currentSchoolYearName} Enrollment Period",
+
+            'allow_new_students' => true,
+
+            'allow_returning_students' => true,
+
+        ]
+
+    );
+
+    $this->gradeLevelFee = GradeLevelFee::factory()->schoolYear($this->schoolYear->name)->create([
         'enrollment_period_id' => $this->enrollmentPeriod->id,
     ]);
     $this->guardian = Guardian::factory()->create();
@@ -60,8 +114,8 @@ beforeEach(function () {
 describe('Admin Routes Smoke Tests - Dashboard', function () {
     test('can access admin dashboard', function () {
         visit('/admin/dashboard')
-            ->waitForText('Dashboard')
-            ->assertSee('Dashboard');
+            ->waitForText('Administrator Dashboard')
+            ->assertSee('Administrator Dashboard');
     })->group('smoke', 'admin');
 });
 

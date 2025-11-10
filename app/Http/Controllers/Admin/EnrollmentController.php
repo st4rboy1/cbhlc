@@ -99,7 +99,7 @@ class EnrollmentController extends Controller
             'students' => $students,
             'gradeLevels' => GradeLevel::values(),
             'quarters' => Quarter::values(),
-            'currentSchoolYear' => $currentSchoolYear,
+            'currentSchoolYear' => $currentSchoolYear?->name,
             'selectedStudentId' => $selectedStudentId,
             'submitRoute' => route('admin.enrollments.store'),
             'indexRoute' => route('admin.enrollments.index'),
