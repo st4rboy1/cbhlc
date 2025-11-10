@@ -13,6 +13,7 @@ interface Child {
     name: string;
     grade: string;
     enrollmentStatus: string;
+    enrollmentId: number | null;
     photo: string | null;
 }
 
@@ -81,8 +82,8 @@ export default function GuardianDashboard({ children, announcements, upcomingEve
                                                 View Report
                                             </Link>
                                         </Button>
-                                        <Button variant="outline" size="sm" className="w-full" asChild>
-                                            <Link href={`/tuition`}>
+                                        <Button variant="outline" size="sm" className="w-full" asChild disabled={!child.enrollmentId}>
+                                            <Link href={child.enrollmentId ? `/guardian/billing/${child.enrollmentId}` : '#'}>
                                                 <CreditCard className="mr-2 h-3 w-3" />
                                                 Tuition Info
                                             </Link>

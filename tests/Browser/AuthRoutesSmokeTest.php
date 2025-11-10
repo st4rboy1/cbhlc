@@ -12,7 +12,7 @@ describe('Auth Routes Smoke Tests', function () {
 
     test('can access register page', function () {
         visit('/register')
-            ->waitForText('Register')
+            ->waitForText('Create an account')
             ->assertSee('Name')
             ->assertSee('Email')
             ->assertSee('Password');
@@ -25,6 +25,9 @@ describe('Auth Routes Smoke Tests', function () {
     })->group('smoke', 'auth');
 
     test('can access verify email page', function () {
+        $user = \App\Models\User::factory()->unverified()->create();
+        $this->actingAs($user);
+
         visit('/verify-email')
             ->waitForText('Verify')
             ->assertSee('verify');
