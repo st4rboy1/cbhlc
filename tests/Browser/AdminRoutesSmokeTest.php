@@ -19,7 +19,7 @@ beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 
     // Create admin user
-    $this->admin = User::factory()->admin()->create([
+    $this->admin = User::factory()->administrator()->create([
         'email' => 'admin@test.com',
         'password' => bcrypt('password'),
     ]);
@@ -30,7 +30,7 @@ beforeEach(function () {
         'school_year_id' => $this->schoolYear->id,
     ]);
     $this->gradeLevelFee = GradeLevelFee::factory()->create([
-        'school_year_id' => $this->schoolYear->id,
+        'school_year' => $this->schoolYear->id,
         'enrollment_period_id' => $this->enrollmentPeriod->id,
     ]);
     $this->guardian = Guardian::factory()->create();

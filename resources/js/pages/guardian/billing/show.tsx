@@ -27,20 +27,12 @@ interface BillingDetails {
     payment_schedule: PaymentScheduleItem[];
 }
 
-interface PaymentInstructions {
-    bank_name: string;
-    account_name: string;
-    account_number: string;
-    notes: string;
-}
-
 interface GuardianBillingShowProps {
     enrollment: EnrollmentDetails;
     billing: BillingDetails;
-    paymentInstructions: PaymentInstructions;
 }
 
-export default function GuardianBillingShow({ enrollment, billing, paymentInstructions }: GuardianBillingShowProps) {
+export default function GuardianBillingShow({ enrollment, billing }: GuardianBillingShowProps) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Guardian', href: '/guardian/dashboard' },
         { title: 'Billing', href: '/guardian/billing' },
@@ -155,29 +147,6 @@ export default function GuardianBillingShow({ enrollment, billing, paymentInstru
                         ) : (
                             <p className="text-center text-gray-500">No payment schedule available for this enrollment.</p>
                         )}
-                    </div>
-                </div>
-
-                {/* Payment Instructions */}
-                <div className="rounded-lg bg-white p-6 shadow-md">
-                    <h2 className="mb-4 text-2xl font-semibold text-gray-800">Payment Instructions</h2>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        <div>
-                            <p className="text-sm font-medium text-gray-500">Bank Name:</p>
-                            <p className="text-lg font-semibold text-gray-900">{paymentInstructions.bank_name}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500">Account Name:</p>
-                            <p className="text-lg font-semibold text-gray-900">{paymentInstructions.account_name}</p>
-                        </div>
-                        <div>
-                            <p className="text-sm font-medium text-gray-500">Account Number:</p>
-                            <p className="text-lg font-semibold text-gray-900">{paymentInstructions.account_number}</p>
-                        </div>
-                        <div className="sm:col-span-2">
-                            <p className="text-sm font-medium text-gray-500">Notes:</p>
-                            <p className="text-lg font-semibold text-gray-900">{paymentInstructions.notes}</p>
-                        </div>
                     </div>
                 </div>
             </div>
