@@ -41,6 +41,9 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(Failed::class, [LogAuthenticationActivity::class, 'handleFailed']);
 
         // Register notification event listeners
+        // Register Laravel's default email verification listener
+        Event::listen(Registered::class, \Illuminate\Auth\Listeners\SendEmailVerificationNotification::class);
+        // Register custom listener for new user notifications
         Event::listen(Registered::class, NotifySuperAdminOfNewUser::class);
         Event::listen(StudentCreated::class, NotifyRegistrarOfNewStudent::class);
         Event::listen(EnrollmentCreated::class, NotifyRegistrarOfNewEnrollment::class);
