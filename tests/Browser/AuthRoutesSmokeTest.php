@@ -34,6 +34,9 @@ describe('Auth Routes Smoke Tests', function () {
     })->group('smoke', 'auth');
 
     test('can access confirm password page', function () {
+        $user = \App\Models\User::factory()->create();
+        $this->actingAs($user);
+
         visit('/confirm-password')
             ->waitForText('Confirm Password')
             ->assertSee('Password');

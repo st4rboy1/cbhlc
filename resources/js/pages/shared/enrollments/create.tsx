@@ -52,7 +52,7 @@ export default function EnrollmentCreate({
 
     // Initialize with the selectedStudentId if provided
     const { data, setData, post, processing, errors } = useForm({
-        student_id: selectedStudentId ? String(selectedStudentId) : '',
+        student_id: selectedStudentId ? String(selectedStudentId) : students.length > 0 ? String(students[0].id) : '', // Automatically select first student
         school_year: currentSchoolYear,
         quarter: '',
         grade_level: '',
