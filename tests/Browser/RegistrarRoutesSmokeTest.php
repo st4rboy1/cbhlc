@@ -58,228 +58,296 @@ beforeEach(function () {
 
 describe('Registrar Routes Smoke Tests - Dashboard', function () {
     test('can access registrar dashboard', function () {
-        visit('/registrar/dashboard')
+        $browser = visit('/registrar/dashboard')
             ->waitForText('Dashboard')
             ->assertSee('Dashboard');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });
 
 describe('Registrar Routes Smoke Tests - Enrollments', function () {
     test('can access enrollments index', function () {
-        visit('/registrar/enrollments')
+        $browser = visit('/registrar/enrollments')
             ->waitForText('Enrollments')
             ->assertSee('Enrollments');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access enrollment show', function () {
-        visit("/registrar/enrollments/{$this->enrollment->id}")
+        $browser = visit("/registrar/enrollments/{$this->enrollment->id}")
             ->waitForText('Enrollment')
             ->assertSee('Enrollment');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });
 
 describe('Registrar Routes Smoke Tests - Students', function () {
     test('can access students index', function () {
-        visit('/registrar/students')
+        $browser = visit('/registrar/students')
             ->waitForText('Students')
             ->assertSee('Students');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access students create', function () {
-        visit('/registrar/students/create')
+        $browser = visit('/registrar/students/create')
             ->waitForText('Create Student')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access student show', function () {
-        visit("/registrar/students/{$this->student->id}")
+        $browser = visit("/registrar/students/{$this->student->id}")
             ->waitForText('Student')
             ->assertSee($this->student->first_name);
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access student edit', function () {
-        visit("/registrar/students/{$this->student->id}/edit")
+        $browser = visit("/registrar/students/{$this->student->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });
 
 describe('Registrar Routes Smoke Tests - Guardians', function () {
     test('can access guardians index', function () {
-        visit('/registrar/guardians')
+        $browser = visit('/registrar/guardians')
             ->waitForText('Guardians')
             ->assertSee('Guardians');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access guardians create', function () {
-        visit('/registrar/guardians/create')
+        $browser = visit('/registrar/guardians/create')
             ->waitForText('Create Guardian')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access guardian show', function () {
-        visit("/registrar/guardians/{$this->guardian->id}")
+        $browser = visit("/registrar/guardians/{$this->guardian->id}")
             ->waitForText('Guardian')
             ->assertSee($this->guardian->first_name);
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access guardian edit', function () {
-        visit("/registrar/guardians/{$this->guardian->id}/edit")
+        $browser = visit("/registrar/guardians/{$this->guardian->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });
 
 describe('Registrar Routes Smoke Tests - Documents', function () {
     test('can access documents pending', function () {
-        visit('/registrar/documents/pending')
+        $browser = visit('/registrar/documents/pending')
             ->waitForText('Documents')
             ->assertSee('Documents');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access document show', function () {
-        visit("/registrar/documents/{$this->document->id}")
+        $browser = visit("/registrar/documents/{$this->document->id}")
             ->waitForText('Document')
             ->assertSee('Document');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });
 
 describe('Registrar Routes Smoke Tests - Grade Level Fees', function () {
     test('can access grade level fees index', function () {
-        visit('/registrar/grade-level-fees')
+        $browser = visit('/registrar/grade-level-fees')
             ->waitForText('Grade Level Fees')
             ->assertSee('Fees');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access grade level fees create', function () {
-        visit('/registrar/grade-level-fees/create')
+        $browser = visit('/registrar/grade-level-fees/create')
             ->waitForText('Create')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access grade level fee show', function () {
-        visit("/registrar/grade-level-fees/{$this->gradeLevelFee->id}")
+        $browser = visit("/registrar/grade-level-fees/{$this->gradeLevelFee->id}")
             ->waitForText('Grade Level Fee')
             ->assertSee('Fee');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access grade level fee edit', function () {
-        visit("/registrar/grade-level-fees/{$this->gradeLevelFee->id}/edit")
+        $browser = visit("/registrar/grade-level-fees/{$this->gradeLevelFee->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });
 
 describe('Registrar Routes Smoke Tests - Enrollment Periods', function () {
     test('can access enrollment periods index', function () {
-        visit('/registrar/enrollment-periods')
+        $browser = visit('/registrar/enrollment-periods')
             ->waitForText('Enrollment Periods')
             ->assertSee('Periods');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access enrollment period show', function () {
-        visit("/registrar/enrollment-periods/{$this->enrollmentPeriod->id}")
+        $browser = visit("/registrar/enrollment-periods/{$this->enrollmentPeriod->id}")
             ->waitForText('Enrollment Period')
             ->assertSee('Period');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });
 
 describe('Registrar Routes Smoke Tests - School Years', function () {
     test('can access school years index', function () {
-        visit('/registrar/school-years')
+        $browser = visit('/registrar/school-years')
             ->waitForText('School Years')
             ->assertSee('School Years');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access school year show', function () {
-        visit("/registrar/school-years/{$this->schoolYear->id}")
+        $browser = visit("/registrar/school-years/{$this->schoolYear->id}")
             ->waitForText('School Year')
             ->assertSee('School Year');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });
 
 describe('Registrar Routes Smoke Tests - Invoices', function () {
     test('can access invoices index', function () {
-        visit('/registrar/invoices')
+        $browser = visit('/registrar/invoices')
             ->waitForText('Invoices')
             ->assertSee('Invoices');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access invoice show', function () {
-        visit("/registrar/invoices/{$this->invoice->id}")
+        $browser = visit("/registrar/invoices/{$this->invoice->id}")
             ->waitForText('Invoice')
             ->assertSee('Invoice');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });
 
 describe('Registrar Routes Smoke Tests - Payments', function () {
     test('can access payments index', function () {
-        visit('/registrar/payments')
+        $browser = visit('/registrar/payments')
             ->waitForText('Payments')
             ->assertSee('Payments');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access payments create', function () {
-        visit('/registrar/payments/create')
+        $browser = visit('/registrar/payments/create')
             ->waitForText('Record Payment')
             ->assertSee('Payment');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access payment show', function () {
-        visit("/registrar/payments/{$this->payment->id}")
+        $browser = visit("/registrar/payments/{$this->payment->id}")
             ->waitForText('Payment')
             ->assertSee('Payment');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });
 
 describe('Registrar Routes Smoke Tests - Receipts', function () {
     test('can access receipts index', function () {
-        visit('/registrar/receipts')
+        $browser = visit('/registrar/receipts')
             ->waitForText('Receipts')
             ->assertSee('Receipts');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access receipts create', function () {
-        visit('/registrar/receipts/create')
+        $browser = visit('/registrar/receipts/create')
             ->waitForText('Generate Receipt')
             ->assertSee('Receipt');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access receipt show', function () {
-        visit("/registrar/receipts/{$this->receipt->id}")
+        $browser = visit("/registrar/receipts/{$this->receipt->id}")
             ->waitForText('Receipt')
             ->assertSee('Receipt');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });
 
 describe('Registrar Routes Smoke Tests - Settings', function () {
     test('can access settings profile', function () {
-        visit('/settings/profile')
+        $browser = visit('/settings/profile')
             ->waitForText('Profile')
             ->assertSee('Profile');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access settings password', function () {
-        visit('/settings/password')
+        $browser = visit('/settings/password')
             ->waitForText('Password')
             ->assertSee('Password');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access settings appearance', function () {
-        visit('/settings/appearance')
+        $browser = visit('/settings/appearance')
             ->waitForText('Appearance')
             ->assertSee('Appearance');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access settings notifications', function () {
-        visit('/settings/notifications')
+        $browser = visit('/settings/notifications')
             ->waitForText('Notifications')
             ->assertSee('Notifications');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 
     test('can access notifications page', function () {
-        visit('/notifications')
+        $browser = visit('/notifications')
             ->waitForText('Notifications')
             ->assertSee('Notifications');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'registrar');
 });

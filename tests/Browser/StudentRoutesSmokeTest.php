@@ -24,44 +24,58 @@ beforeEach(function () {
 
 describe('Student Routes Smoke Tests', function () {
     test('can access student dashboard', function () {
-        visit('/student/dashboard')
+        $browser = visit('/student/dashboard')
             ->waitForText('Dashboard')
             ->assertSee('Dashboard');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'student');
 
     test('can access student report', function () {
-        visit("/students/{$this->student->id}/report")
+        $browser = visit("/students/{$this->student->id}/report")
             ->waitForText('Report')
             ->assertSee('Report');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'student');
 
     test('can access settings profile', function () {
-        visit('/settings/profile')
+        $browser = visit('/settings/profile')
             ->waitForText('Profile')
             ->assertSee('Profile');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'student');
 
     test('can access settings password', function () {
-        visit('/settings/password')
+        $browser = visit('/settings/password')
             ->waitForText('Password')
             ->assertSee('Password');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'student');
 
     test('can access settings appearance', function () {
-        visit('/settings/appearance')
+        $browser = visit('/settings/appearance')
             ->waitForText('Appearance')
             ->assertSee('Appearance');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'student');
 
     test('can access settings notifications', function () {
-        visit('/settings/notifications')
+        $browser = visit('/settings/notifications')
             ->waitForText('Notifications')
             ->assertSee('Notifications');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'student');
 
     test('can access notifications page', function () {
-        visit('/notifications')
+        $browser = visit('/notifications')
             ->waitForText('Notifications')
             ->assertSee('Notifications');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'student');
 });
