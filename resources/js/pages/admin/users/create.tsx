@@ -35,7 +35,7 @@ export default function UserCreate({ roles }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('super-admin.users.store'));
+        post(route('admin.users.store'));
     };
 
     useEffect(() => {

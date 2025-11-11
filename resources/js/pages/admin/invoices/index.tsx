@@ -79,7 +79,7 @@ export default function AdminInvoicesIndex({ invoices, filters }: Props) {
     useEffect(() => {
         const handler = setTimeout(() => {
             router.get(
-                route('super-admin.invoices.index'),
+                route('admin.invoices.index'),
                 {
                     ...filters,
                     sort_by: sorting.length > 0 ? sorting[0].id : undefined,

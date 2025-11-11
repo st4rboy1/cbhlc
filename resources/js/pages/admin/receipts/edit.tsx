@@ -85,7 +85,7 @@ export default function ReceiptEdit({ receipt, payments, invoices }: Props) {
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-                                put(route('super-admin.receipts.update', { receipt: receipt.id }));
+                                put(route('admin.receipts.update', { receipt: receipt.id }));
                             }}
                             className="space-y-4"
                         >
