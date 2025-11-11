@@ -76,7 +76,7 @@ class GuardianController extends Controller
             })->count(),
         ];
 
-        return Inertia::render('super-admin/guardians/index', [
+        return Inertia::render('admin/guardians/index', [
             'guardians' => $guardians,
             'filters' => $request->only(['search']),
             'stats' => $stats,
@@ -90,7 +90,7 @@ class GuardianController extends Controller
     {
         Gate::authorize('create', Guardian::class);
 
-        return Inertia::render('super-admin/guardians/create');
+        return Inertia::render('admin/guardians/create');
     }
 
     /**
@@ -194,7 +194,7 @@ class GuardianController extends Controller
             });
         });
 
-        return Inertia::render('super-admin/guardians/show', [
+        return Inertia::render('admin/guardians/show', [
             'guardian' => $guardianData,
             'students' => $students,
             'enrollments' => $enrollments,
@@ -210,7 +210,7 @@ class GuardianController extends Controller
 
         $guardian->load('user');
 
-        return Inertia::render('super-admin/guardians/edit', [
+        return Inertia::render('admin/guardians/edit', [
             'guardian' => $guardian,
         ]);
     }
