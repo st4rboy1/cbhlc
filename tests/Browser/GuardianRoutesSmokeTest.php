@@ -50,128 +50,170 @@ beforeEach(function () {
 
 describe('Guardian Routes Smoke Tests', function () {
     test('can access guardian dashboard', function () {
-        visit('/guardian/dashboard')
+        $browser = visit('/guardian/dashboard')
             ->waitForText('Dashboard')
             ->assertSee('Dashboard');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian enrollments index', function () {
-        visit('/guardian/enrollments')
+        $browser = visit('/guardian/enrollments')
             ->waitForText('Enrollments')
             ->assertSee('Enrollments');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian enrollments create', function () {
-        visit('/guardian/enrollments/create')
+        $browser = visit('/guardian/enrollments/create')
             ->waitForText('Create Enrollment')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian enrollment show', function () {
-        visit("/guardian/enrollments/{$this->enrollment->id}")
+        $browser = visit("/guardian/enrollments/{$this->enrollment->id}")
             ->waitForText('Enrollment')
             ->assertSee('Enrollment');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian enrollment edit', function () {
-        visit("/guardian/enrollments/{$this->enrollment->id}/edit")
+        $browser = visit("/guardian/enrollments/{$this->enrollment->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian students index', function () {
-        visit('/guardian/students')
+        $browser = visit('/guardian/students')
             ->waitForText('Students')
             ->assertSee('Students');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian students create', function () {
-        visit('/guardian/students/create')
+        $browser = visit('/guardian/students/create')
             ->waitForText('Create Student')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian student show', function () {
-        visit("/guardian/students/{$this->student->id}")
+        $browser = visit("/guardian/students/{$this->student->id}")
             ->waitForText('Student')
             ->assertSee($this->student->first_name);
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian student edit', function () {
-        visit("/guardian/students/{$this->student->id}/edit")
+        $browser = visit("/guardian/students/{$this->student->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian billing index', function () {
-        visit('/guardian/billing')
+        $browser = visit('/guardian/billing')
             ->waitForText('Billing')
             ->assertSee('Billing');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian billing for enrollment', function () {
-        visit("/guardian/billing/{$this->enrollment->id}")
+        $browser = visit("/guardian/billing/{$this->enrollment->id}")
             ->waitForText('Billing')
             ->assertSee('Billing');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian invoices index', function () {
-        visit('/guardian/invoices')
+        $browser = visit('/guardian/invoices')
             ->waitForText('Invoices')
             ->assertSee('Invoices');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian invoice show', function () {
-        visit("/guardian/invoices/{$this->invoice->id}")
+        $browser = visit("/guardian/invoices/{$this->invoice->id}")
             ->waitForText('Invoice')
             ->assertSee('Invoice');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian payments index', function () {
-        visit('/guardian/payments')
+        $browser = visit('/guardian/payments')
             ->waitForText('Payments')
             ->assertSee('Payments');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian receipts index', function () {
-        visit('/guardian/receipts')
+        $browser = visit('/guardian/receipts')
             ->waitForText('Receipts')
             ->assertSee('Receipts');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access guardian receipt show', function () {
-        visit("/guardian/receipts/{$this->receipt->id}")
+        $browser = visit("/guardian/receipts/{$this->receipt->id}")
             ->waitForText('Receipt')
             ->assertSee('Receipt');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access settings profile', function () {
-        visit('/settings/profile')
+        $browser = visit('/settings/profile')
             ->waitForText('Profile')
             ->assertSee('Profile');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access settings password', function () {
-        visit('/settings/password')
+        $browser = visit('/settings/password')
             ->waitForText('Password')
             ->assertSee('Password');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access settings appearance', function () {
-        visit('/settings/appearance')
+        $browser = visit('/settings/appearance')
             ->waitForText('Appearance')
             ->assertSee('Appearance');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access settings notifications', function () {
-        visit('/settings/notifications')
+        $browser = visit('/settings/notifications')
             ->waitForText('Notifications')
             ->assertSee('Notifications');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 
     test('can access notifications page', function () {
-        visit('/notifications')
+        $browser = visit('/notifications')
             ->waitForText('Notifications')
             ->assertSee('Notifications');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
 });

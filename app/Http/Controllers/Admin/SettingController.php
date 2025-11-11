@@ -32,7 +32,7 @@ class SettingController extends Controller
 
         $settings = $query->latest()->paginate(20)->withQueryString();
 
-        return Inertia::render('super-admin/settings/index', [
+        return Inertia::render('admin/settings/index', [
             'settings' => $settings,
             'filters' => $request->only(['search']),
         ]);
@@ -45,7 +45,7 @@ class SettingController extends Controller
     {
         Gate::authorize('create', Setting::class);
 
-        return Inertia::render('super-admin/settings/create');
+        return Inertia::render('admin/settings/create');
     }
 
     /**
@@ -74,7 +74,7 @@ class SettingController extends Controller
     {
         Gate::authorize('view', $setting);
 
-        return Inertia::render('super-admin/settings/show', [
+        return Inertia::render('admin/settings/show', [
             'setting' => $setting,
         ]);
     }
@@ -86,7 +86,7 @@ class SettingController extends Controller
     {
         Gate::authorize('update', $setting);
 
-        return Inertia::render('super-admin/settings/edit', [
+        return Inertia::render('admin/settings/edit', [
             'setting' => $setting,
         ]);
     }

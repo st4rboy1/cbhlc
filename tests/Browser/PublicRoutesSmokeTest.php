@@ -4,62 +4,82 @@ uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
 
 describe('Public Routes Smoke Tests', function () {
     test('can access homepage', function () {
-        visit('/')
+        $browser = visit('/')
             ->waitForText('Christian Bible Heritage Learning Center')
             ->assertSee('Christian Bible Heritage Learning Center');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'public');
 
     test('can access about page', function () {
-        visit('/about')
+        $browser = visit('/about')
             ->waitForText('About')
             ->assertSee('About');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'public');
 
     test('can access contact page', function () {
-        visit('/contact')
+        $browser = visit('/contact')
             ->waitForText('Contact')
             ->assertSee('Contact');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'public');
 
     test('can access application page', function () {
-        visit('/application')
+        $browser = visit('/application')
             ->waitForText('Application')
             ->assertSee('Application');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'public');
 
     test('can access tuition page', function () {
-        visit('/tuition')
+        $browser = visit('/tuition')
             ->waitForText('Tuition')
             ->assertSee('Tuition');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'public');
 
     test('can access help page', function () {
-        visit('/help')
+        $browser = visit('/help')
             ->waitForText('Help')
             ->assertSee('Help');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'public');
 
     test('can access support page', function () {
-        visit('/support')
+        $browser = visit('/support')
             ->waitForText('Support')
             ->assertSee('Support');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'public');
 
     test('can access resources page', function () {
-        visit('/resources')
+        $browser = visit('/resources')
             ->waitForText('Resources')
             ->assertSee('Resources');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'public');
 
     test('can access docs page', function () {
-        visit('/docs')
+        $browser = visit('/docs')
             ->waitForText('Documentation')
             ->assertSee('Documentation');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'public');
 
     test('can access parent guide page', function () {
-        visit('/parent-guide')
+        $browser = visit('/parent-guide')
             ->waitForText('Parent Guide')
             ->assertSee('Parent Guide');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'public');
 });

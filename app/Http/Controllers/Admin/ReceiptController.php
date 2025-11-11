@@ -50,7 +50,7 @@ class ReceiptController extends Controller
 
         $receipts = $query->latest('receipt_date')->paginate(20)->withQueryString();
 
-        return Inertia::render('super-admin/receipts/index', [
+        return Inertia::render('admin/receipts/index', [
             'receipts' => $receipts,
             'filters' => $request->only(['search', 'payment_method', 'date_from', 'date_to']),
         ]);
@@ -66,7 +66,7 @@ class ReceiptController extends Controller
         $payments = Payment::with('invoice.enrollment.student')->whereDoesntHave('receipt')->get();
         $invoices = Invoice::with('enrollment.student')->get();
 
-        return Inertia::render('super-admin/receipts/create', [
+        return Inertia::render('admin/receipts/create', [
             'payments' => $payments,
             'invoices' => $invoices,
             'nextReceiptNumber' => Receipt::generateReceiptNumber(),
@@ -112,7 +112,7 @@ class ReceiptController extends Controller
 
         $receipt->load(['payment.invoice.enrollment.student', 'invoice.enrollment.student', 'receivedBy']);
 
-        return Inertia::render('super-admin/receipts/show', [
+        return Inertia::render('admin/receipts/show', [
             'receipt' => $receipt,
         ]);
     }
@@ -128,7 +128,7 @@ class ReceiptController extends Controller
         $payments = Payment::with('invoice.enrollment.student')->get();
         $invoices = Invoice::with('enrollment.student')->get();
 
-        return Inertia::render('super-admin/receipts/edit', [
+        return Inertia::render('admin/receipts/edit', [
             'receipt' => $receipt,
             'payments' => $payments,
             'invoices' => $invoices,

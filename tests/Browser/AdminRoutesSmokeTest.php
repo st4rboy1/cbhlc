@@ -173,47 +173,61 @@ describe('Admin Routes Smoke Tests - Students', function () {
 
 describe('Admin Routes Smoke Tests - Guardians', function () {
     test('can access guardians index', function () {
-        visit('/admin/guardians')
+        $browser = visit('/admin/guardians')
             ->waitForText('Guardians')
             ->assertSee('Guardians');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access guardians create', function () {
-        visit('/admin/guardians/create')
+        $browser = visit('/admin/guardians/create')
             ->waitForText('Create Guardian')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access guardian show', function () {
-        visit("/admin/guardians/{$this->guardian->id}")
+        $browser = visit("/admin/guardians/{$this->guardian->id}")
             ->waitForText('Guardian')
             ->assertSee($this->guardian->first_name);
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access guardian edit', function () {
-        visit("/admin/guardians/{$this->guardian->id}/edit")
+        $browser = visit("/admin/guardians/{$this->guardian->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 });
 
 describe('Admin Routes Smoke Tests - Documents', function () {
     test('can access documents index', function () {
-        visit('/admin/documents')
+        $browser = visit('/admin/documents')
             ->waitForText('Documents')
             ->assertSee('Documents');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access documents pending', function () {
-        visit('/admin/documents/pending')
+        $browser = visit('/admin/documents/pending')
             ->waitForText('Documents')
             ->assertSee('Documents');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access document show', function () {
-        visit("/admin/documents/{$this->document->id}")
+        $browser = visit("/admin/documents/{$this->document->id}")
             ->waitForText('Document')
             ->assertSee('Document');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 });
 
@@ -271,27 +285,36 @@ describe('Admin Routes Smoke Tests - Enrollment Periods', function () {
 
 describe('Admin Routes Smoke Tests - School Years', function () {
     test('can access school years index', function () {
-        visit('/admin/school-years')
+        $browser = visit('/admin/school-years')
             ->waitForText('School Years')
             ->assertSee('School Years');
+
+        // Check for console errors and failed network requests
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access school years create', function () {
-        visit('/admin/school-years/create')
+        $browser = visit('/admin/school-years/create')
             ->waitForText('Create')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access school year show', function () {
-        visit("/admin/school-years/{$this->schoolYear->id}")
+        $browser = visit("/admin/school-years/{$this->schoolYear->id}")
             ->waitForText('School Year')
             ->assertSee('School Year');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access school year edit', function () {
-        visit("/admin/school-years/{$this->schoolYear->id}/edit")
+        $browser = visit("/admin/school-years/{$this->schoolYear->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 });
 
@@ -337,27 +360,35 @@ describe('Admin Routes Smoke Tests - Payments', function () {
 
 describe('Admin Routes Smoke Tests - Receipts', function () {
     test('can access receipts index', function () {
-        visit('/admin/receipts')
+        $browser = visit('/admin/receipts')
             ->waitForText('Receipts')
             ->assertSee('Receipts');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access receipts create', function () {
-        visit('/admin/receipts/create')
+        $browser = visit('/admin/receipts/create')
             ->waitForText('Generate Receipt')
             ->assertSee('Receipt');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access receipt show', function () {
-        visit("/admin/receipts/{$this->receipt->id}")
+        $browser = visit("/admin/receipts/{$this->receipt->id}")
             ->waitForText('Receipt')
             ->assertSee('Receipt');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access receipt edit', function () {
-        visit("/admin/receipts/{$this->receipt->id}/edit")
+        $browser = visit("/admin/receipts/{$this->receipt->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 });
 
@@ -413,9 +444,11 @@ describe('Admin Routes Smoke Tests - School Information', function () {
 
 describe('Admin Routes Smoke Tests - Settings', function () {
     test('can access settings index', function () {
-        visit('/admin/settings')
+        $browser = visit('/admin/settings')
             ->waitForText('Settings')
             ->assertSee('Settings');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
 
     test('can access settings profile', function () {

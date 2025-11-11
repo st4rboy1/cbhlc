@@ -74,7 +74,7 @@ class DocumentController extends Controller
                 ];
             });
 
-        return Inertia::render('super-admin/documents/index', [
+        return Inertia::render('admin/documents/index', [
             'studentsWithDocuments' => $studentsWithDocuments,
             'filters' => $request->only(['verification_status', 'document_type', 'student_id', 'search', 'sort_by', 'sort_direction']),
             'students' => $allStudents,
@@ -93,7 +93,7 @@ class DocumentController extends Controller
         // Generate URL for file viewing using the view route
         $url = route('admin.documents.view', $document);
 
-        return Inertia::render('super-admin/documents/show', [
+        return Inertia::render('admin/documents/show', [
             'document' => $document,
             'fileUrl' => $url,
         ]);

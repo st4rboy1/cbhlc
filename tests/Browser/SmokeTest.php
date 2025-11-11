@@ -18,7 +18,7 @@ describe('Critical Path Smoke Tests', function () {
             'password' => bcrypt('password'),
         ]);
 
-        visit('/login')
+        $browser = visit('/login')
             ->type('email', $admin->email)
             ->type('password', 'password')
             ->press('Log in')
@@ -48,6 +48,8 @@ describe('Critical Path Smoke Tests', function () {
             ->assertSee('First Name')
             ->assertSee('Last Name')
             ->assertSee('Birth Date');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'critical', 'student-form');
 
     test('registrar can login and access dashboard', function () {

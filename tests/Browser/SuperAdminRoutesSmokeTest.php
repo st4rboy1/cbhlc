@@ -59,350 +59,456 @@ beforeEach(function () {
 
 describe('Super Admin Routes Smoke Tests - Dashboard', function () {
     test('can access super admin dashboard', function () {
-        visit('/super-admin/dashboard')
+        $browser = visit('/super-admin/dashboard')
             ->waitForText('Dashboard')
             ->assertSee('Dashboard');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Enrollments', function () {
     test('can access enrollments index', function () {
-        visit('/super-admin/enrollments')
+        $browser = visit('/super-admin/enrollments')
             ->waitForText('Enrollments')
             ->assertSee('Enrollments');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access enrollments create', function () {
-        visit('/super-admin/enrollments/create')
+        $browser = visit('/super-admin/enrollments/create')
             ->waitForText('Create Enrollment')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access enrollment show', function () {
-        visit("/super-admin/enrollments/{$this->enrollment->id}")
+        $browser = visit("/super-admin/enrollments/{$this->enrollment->id}")
             ->waitForText('Enrollment')
             ->assertSee('Enrollment');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access enrollment edit', function () {
-        visit("/super-admin/enrollments/{$this->enrollment->id}/edit")
+        $browser = visit("/super-admin/enrollments/{$this->enrollment->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Students', function () {
     test('can access students index', function () {
-        visit('/super-admin/students')
+        $browser = visit('/super-admin/students')
             ->waitForText('Students')
             ->assertSee('Students');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access students create', function () {
-        visit('/super-admin/students/create')
+        $browser = visit('/super-admin/students/create')
             ->waitForText('Create Student')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access student show', function () {
-        visit("/super-admin/students/{$this->student->id}")
+        $browser = visit("/super-admin/students/{$this->student->id}")
             ->waitForText('Student')
             ->assertSee($this->student->first_name);
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access student edit', function () {
-        visit("/super-admin/students/{$this->student->id}/edit")
+        $browser = visit("/super-admin/students/{$this->student->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Guardians', function () {
     test('can access guardians index', function () {
-        visit('/super-admin/guardians')
+        $browser = visit('/super-admin/guardians')
             ->waitForText('Guardians')
             ->assertSee('Guardians');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access guardians create', function () {
-        visit('/super-admin/guardians/create')
+        $browser = visit('/super-admin/guardians/create')
             ->waitForText('Create Guardian')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access guardian show', function () {
-        visit("/super-admin/guardians/{$this->guardian->id}")
+        $browser = visit("/super-admin/guardians/{$this->guardian->id}")
             ->waitForText('Guardian')
             ->assertSee($this->guardian->first_name);
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access guardian edit', function () {
-        visit("/super-admin/guardians/{$this->guardian->id}/edit")
+        $browser = visit("/super-admin/guardians/{$this->guardian->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Documents', function () {
     test('can access documents index', function () {
-        visit('/super-admin/documents')
+        $browser = visit('/super-admin/documents')
             ->waitForText('Documents')
             ->assertSee('Documents');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access documents pending', function () {
-        visit('/super-admin/documents/pending')
+        $browser = visit('/super-admin/documents/pending')
             ->waitForText('Documents')
             ->assertSee('Documents');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access document show', function () {
-        visit("/super-admin/documents/{$this->document->id}")
+        $browser = visit("/super-admin/documents/{$this->document->id}")
             ->waitForText('Document')
             ->assertSee('Document');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Grade Level Fees', function () {
     test('can access grade level fees index', function () {
-        visit('/super-admin/grade-level-fees')
+        $browser = visit('/super-admin/grade-level-fees')
             ->waitForText('Grade Level Fees')
             ->assertSee('Fees');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access grade level fees create', function () {
-        visit('/super-admin/grade-level-fees/create')
+        $browser = visit('/super-admin/grade-level-fees/create')
             ->waitForText('Create')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access grade level fee show', function () {
-        visit("/super-admin/grade-level-fees/{$this->gradeLevelFee->id}")
+        $browser = visit("/super-admin/grade-level-fees/{$this->gradeLevelFee->id}")
             ->waitForText('Grade Level Fee')
             ->assertSee('Fee');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access grade level fee edit', function () {
-        visit("/super-admin/grade-level-fees/{$this->gradeLevelFee->id}/edit")
+        $browser = visit("/super-admin/grade-level-fees/{$this->gradeLevelFee->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Enrollment Periods', function () {
     test('can access enrollment periods index', function () {
-        visit('/super-admin/enrollment-periods')
+        $browser = visit('/super-admin/enrollment-periods')
             ->waitForText('Enrollment Periods')
             ->assertSee('Periods');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access enrollment periods create', function () {
-        visit('/super-admin/enrollment-periods/create')
+        $browser = visit('/super-admin/enrollment-periods/create')
             ->waitForText('Create')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access enrollment period show', function () {
-        visit("/super-admin/enrollment-periods/{$this->enrollmentPeriod->id}")
+        $browser = visit("/super-admin/enrollment-periods/{$this->enrollmentPeriod->id}")
             ->waitForText('Enrollment Period')
             ->assertSee('Period');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access enrollment period edit', function () {
-        visit("/super-admin/enrollment-periods/{$this->enrollmentPeriod->id}/edit")
+        $browser = visit("/super-admin/enrollment-periods/{$this->enrollmentPeriod->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - School Years', function () {
     test('can access school years index', function () {
-        visit('/super-admin/school-years')
+        $browser = visit('/super-admin/school-years')
             ->waitForText('School Years')
             ->assertSee('School Years');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access school years create', function () {
-        visit('/super-admin/school-years/create')
+        $browser = visit('/super-admin/school-years/create')
             ->waitForText('Create')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access school year show', function () {
-        visit("/super-admin/school-years/{$this->schoolYear->id}")
+        $browser = visit("/super-admin/school-years/{$this->schoolYear->id}")
             ->waitForText('School Year')
             ->assertSee('School Year');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access school year edit', function () {
-        visit("/super-admin/school-years/{$this->schoolYear->id}/edit")
+        $browser = visit("/super-admin/school-years/{$this->schoolYear->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Invoices', function () {
     test('can access invoices index', function () {
-        visit('/super-admin/invoices')
+        $browser = visit('/super-admin/invoices')
             ->waitForText('Invoices')
             ->assertSee('Invoices');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access invoices create', function () {
-        visit('/super-admin/invoices/create')
+        $browser = visit('/super-admin/invoices/create')
             ->waitForText('Create Invoice')
             ->assertSee('Invoice');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access invoice show', function () {
-        visit("/super-admin/invoices/{$this->invoice->id}")
+        $browser = visit("/super-admin/invoices/{$this->invoice->id}")
             ->waitForText('Invoice')
             ->assertSee('Invoice');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access invoice edit', function () {
-        visit("/super-admin/invoices/{$this->invoice->id}/edit")
+        $browser = visit("/super-admin/invoices/{$this->invoice->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Payments', function () {
     test('can access payments index', function () {
-        visit('/super-admin/payments')
+        $browser = visit('/super-admin/payments')
             ->waitForText('Payments')
             ->assertSee('Payments');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access payments create', function () {
-        visit('/super-admin/payments/create')
+        $browser = visit('/super-admin/payments/create')
             ->waitForText('Record Payment')
             ->assertSee('Payment');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access payment show', function () {
-        visit("/super-admin/payments/{$this->payment->id}")
+        $browser = visit("/super-admin/payments/{$this->payment->id}")
             ->waitForText('Payment')
             ->assertSee('Payment');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access payment edit', function () {
-        visit("/super-admin/payments/{$this->payment->id}/edit")
+        $browser = visit("/super-admin/payments/{$this->payment->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Receipts', function () {
     test('can access receipts index', function () {
-        visit('/super-admin/receipts')
+        $browser = visit('/super-admin/receipts')
             ->waitForText('Receipts')
             ->assertSee('Receipts');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access receipts create', function () {
-        visit('/super-admin/receipts/create')
+        $browser = visit('/super-admin/receipts/create')
             ->waitForText('Generate Receipt')
             ->assertSee('Receipt');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access receipt show', function () {
-        visit("/super-admin/receipts/{$this->receipt->id}")
+        $browser = visit("/super-admin/receipts/{$this->receipt->id}")
             ->waitForText('Receipt')
             ->assertSee('Receipt');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access receipt edit', function () {
-        visit("/super-admin/receipts/{$this->receipt->id}/edit")
+        $browser = visit("/super-admin/receipts/{$this->receipt->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Users', function () {
     test('can access users index', function () {
-        visit('/super-admin/users')
+        $browser = visit('/super-admin/users')
             ->waitForText('Users')
             ->assertSee('Users');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access users create', function () {
-        visit('/super-admin/users/create')
+        $browser = visit('/super-admin/users/create')
             ->waitForText('Create User')
             ->assertSee('Create');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access user show', function () {
-        visit("/super-admin/users/{$this->user->id}")
+        $browser = visit("/super-admin/users/{$this->user->id}")
             ->waitForText('User')
             ->assertSee($this->user->name);
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access user edit', function () {
-        visit("/super-admin/users/{$this->user->id}/edit")
+        $browser = visit("/super-admin/users/{$this->user->id}/edit")
             ->waitForText('Edit')
             ->assertSee('Edit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Reports', function () {
     test('can access reports index', function () {
-        visit('/super-admin/reports')
+        $browser = visit('/super-admin/reports')
             ->waitForText('Reports')
             ->assertSee('Reports');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Audit Logs', function () {
     test('can access audit logs index', function () {
-        visit('/super-admin/audit-logs')
+        $browser = visit('/super-admin/audit-logs')
             ->waitForText('Audit Logs')
             ->assertSee('Audit');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - School Information', function () {
     test('can access school information', function () {
-        visit('/super-admin/school-information')
+        $browser = visit('/super-admin/school-information')
             ->waitForText('School Information')
             ->assertSee('School');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
 
 describe('Super Admin Routes Smoke Tests - Settings', function () {
     test('can access settings index', function () {
-        visit('/super-admin/settings')
+        $browser = visit('/super-admin/settings')
             ->waitForText('Settings')
             ->assertSee('Settings');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access settings profile', function () {
-        visit('/settings/profile')
+        $browser = visit('/settings/profile')
             ->waitForText('Profile')
             ->assertSee('Profile');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access settings password', function () {
-        visit('/settings/password')
+        $browser = visit('/settings/password')
             ->waitForText('Password')
             ->assertSee('Password');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access settings appearance', function () {
-        visit('/settings/appearance')
+        $browser = visit('/settings/appearance')
             ->waitForText('Appearance')
             ->assertSee('Appearance');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access settings notifications', function () {
-        visit('/settings/notifications')
+        $browser = visit('/settings/notifications')
             ->waitForText('Notifications')
             ->assertSee('Notifications');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 
     test('can access notifications page', function () {
-        visit('/notifications')
+        $browser = visit('/notifications')
             ->waitForText('Notifications')
             ->assertSee('Notifications');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'super-admin');
 });
