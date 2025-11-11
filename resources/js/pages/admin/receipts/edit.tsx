@@ -66,8 +66,8 @@ export default function ReceiptEdit({ receipt, payments, invoices }: Props) {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Admin', href: '/admin/dashboard' },
-                { title: 'Receipts', href: '/admin/receipts' },
+                { title: 'Super Admin', href: '/super-admin/dashboard' },
+                { title: 'Receipts', href: '/super-admin/receipts' },
                 { title: 'Edit', href: '#' },
             ]}
         >
@@ -85,7 +85,7 @@ export default function ReceiptEdit({ receipt, payments, invoices }: Props) {
                         <form
                             onSubmit={(e) => {
                                 e.preventDefault();
-                                put(route('admin.receipts.update', { receipt: receipt.id }));
+                                put(route('super-admin.receipts.update', { receipt: receipt.id }));
                             }}
                             className="space-y-4"
                         >
