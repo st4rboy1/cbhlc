@@ -40,7 +40,7 @@ class SchoolYearController extends Controller
 
         $activeSchoolYear = SchoolYear::active();
 
-        return Inertia::render('super-admin/school-years/index', [
+        return Inertia::render('admin/school-years/index', [
             'schoolYears' => $schoolYears,
             'activeSchoolYear' => $activeSchoolYear,
             'filters' => $request->only(['search', 'status']),
@@ -54,7 +54,7 @@ class SchoolYearController extends Controller
     {
         Gate::authorize('create', SchoolYear::class);
 
-        return Inertia::render('super-admin/school-years/create');
+        return Inertia::render('admin/school-years/create');
     }
 
     /**
@@ -89,7 +89,7 @@ class SchoolYearController extends Controller
             $query->latest()->limit(10);
         }]);
 
-        return Inertia::render('super-admin/school-years/show', [
+        return Inertia::render('admin/school-years/show', [
             'schoolYear' => $schoolYear,
         ]);
     }
@@ -101,7 +101,7 @@ class SchoolYearController extends Controller
     {
         Gate::authorize('update', $schoolYear);
 
-        return Inertia::render('super-admin/school-years/edit', [
+        return Inertia::render('admin/school-years/edit', [
             'schoolYear' => $schoolYear,
         ]);
     }
