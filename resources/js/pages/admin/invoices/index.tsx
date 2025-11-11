@@ -62,7 +62,7 @@ interface Props {
     };
 }
 
-export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
+export default function AdminInvoicesIndex({ invoices, filters }: Props) {
     const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || 'all');
     const [fromDate, setFromDate] = useState<Date | undefined>(filters.from_date ? new Date(filters.from_date) : undefined);
@@ -72,8 +72,8 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
     );
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Invoices', href: '/super-admin/invoices' },
+        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Invoices', href: '/admin/invoices' },
     ];
 
     useEffect(() => {
@@ -94,7 +94,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
 
     const handleSearch = () => {
         router.get(
-            '/super-admin/invoices',
+            '/admin/invoices',
             {
                 search: search || undefined,
                 status: status && status !== 'all' ? status : undefined,
@@ -116,7 +116,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
         setFromDate(undefined);
         setToDate(undefined);
         setSorting([]);
-        router.get('/super-admin/invoices', {}, { preserveState: true, preserveScroll: true });
+        router.get('/admin/invoices', {}, { preserveState: true, preserveScroll: true });
     };
 
     return (
@@ -125,7 +125,7 @@ export default function SuperAdminInvoicesIndex({ invoices, filters }: Props) {
             <div className="container mx-auto px-4 py-6">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Invoices</h1>
-                    <Link href="/super-admin/invoices/create">
+                    <Link href="/admin/invoices/create">
                         <Button>
                             <PlusCircle className="mr-2 h-4 w-4" />
                             Create Invoice

@@ -59,11 +59,11 @@ interface Props {
     invoices: Invoice[];
 }
 
-export default function SuperAdminPaymentsEdit({ payment, invoices }: Props) {
+export default function AdminPaymentsEdit({ payment, invoices }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Payments', href: '/super-admin/payments' },
-        { title: 'Edit Payment', href: `/super-admin/payments/${payment.id}/edit` },
+        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Payments', href: '/admin/payments' },
+        { title: 'Edit Payment', href: `/admin/payments/${payment.id}/edit` },
     ];
 
     const [paymentDate, setPaymentDate] = useState<Date>(new Date(payment.payment_date));
@@ -84,7 +84,7 @@ export default function SuperAdminPaymentsEdit({ payment, invoices }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/super-admin/payments/${payment.id}`);
+        put(`/admin/payments/${payment.id}`);
     };
 
     return (
@@ -92,7 +92,7 @@ export default function SuperAdminPaymentsEdit({ payment, invoices }: Props) {
             <Head title="Edit Payment" />
             <div className="container mx-auto px-4 py-6">
                 <div className="mb-6 flex items-center gap-4">
-                    <Link href="/super-admin/payments">
+                    <Link href="/admin/payments">
                         <Button variant="outline" size="icon">
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
@@ -274,7 +274,7 @@ export default function SuperAdminPaymentsEdit({ payment, invoices }: Props) {
                                         <Save className="mr-2 h-4 w-4" />
                                         {processing ? 'Updating...' : 'Update Payment'}
                                     </Button>
-                                    <Link href="/super-admin/payments" className="block">
+                                    <Link href="/admin/payments" className="block">
                                         <Button type="button" variant="outline" className="w-full">
                                             Cancel
                                         </Button>

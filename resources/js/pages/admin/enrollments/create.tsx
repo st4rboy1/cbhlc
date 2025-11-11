@@ -50,11 +50,11 @@ interface FormData {
     payment_plan: string;
 }
 
-export default function SuperAdminEnrollmentsCreate({ students, gradelevels, quarters, schoolYears }: Props) {
+export default function AdminEnrollmentsCreate({ students, gradelevels, quarters, schoolYears }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Enrollments', href: '/super-admin/enrollments' },
-        { title: 'Create Enrollment', href: '/super-admin/enrollments/create' },
+        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Enrollments', href: '/admin/enrollments' },
+        { title: 'Create Enrollment', href: '/admin/enrollments/create' },
     ];
 
     const activeSchoolYear = schoolYears.find((sy) => sy.is_active);
@@ -71,7 +71,7 @@ export default function SuperAdminEnrollmentsCreate({ students, gradelevels, qua
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/super-admin/enrollments');
+        post('/admin/enrollments');
     };
 
     return (
@@ -79,7 +79,7 @@ export default function SuperAdminEnrollmentsCreate({ students, gradelevels, qua
             <Head title="Create Enrollment" />
             <div className="container mx-auto px-4 py-6">
                 <div className="mb-6 flex items-center gap-4">
-                    <Link href="/super-admin/enrollments">
+                    <Link href="/admin/enrollments">
                         <Button variant="outline" size="icon">
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
@@ -256,7 +256,7 @@ export default function SuperAdminEnrollmentsCreate({ students, gradelevels, qua
                                         <Save className="mr-2 h-4 w-4" />
                                         {processing ? 'Creating...' : 'Create Enrollment'}
                                     </Button>
-                                    <Link href="/super-admin/enrollments" className="block">
+                                    <Link href="/admin/enrollments" className="block">
                                         <Button type="button" variant="outline" className="w-full">
                                             Cancel
                                         </Button>

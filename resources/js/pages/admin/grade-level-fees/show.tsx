@@ -34,10 +34,10 @@ interface Props {
     fee: GradeLevelFee;
 }
 
-export default function SuperAdminGradeLevelFeesShow({ fee }: Props) {
+export default function AdminGradeLevelFeesShow({ fee }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Grade Level Fees', href: '/super-admin/grade-level-fees' },
+        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Grade Level Fees', href: '/admin/grade-level-fees' },
         { title: 'View', href: '#' },
     ];
 
@@ -48,13 +48,13 @@ export default function SuperAdminGradeLevelFeesShow({ fee }: Props) {
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Grade Level Fee Details</h1>
                     <div className="flex gap-2">
-                        <Link href="/super-admin/grade-level-fees">
+                        <Link href="/admin/grade-level-fees">
                             <Button variant="outline">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to List
                             </Button>
                         </Link>
-                        <Link href={`/super-admin/grade-level-fees/${fee.id}/edit`}>
+                        <Link href={`/admin/grade-level-fees/${fee.id}/edit`}>
                             <Button>
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit

@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { formatCurrency } from '@/lib/format-currency';
-import { store } from '@/routes/super-admin/receipts';
+import { store } from '@/routes/admin/receipts';
 import { Head, useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
@@ -56,8 +56,8 @@ export default function ReceiptCreate({ payments, invoices, nextReceiptNumber }:
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Super Admin', href: '/super-admin/dashboard' },
-                { title: 'Receipts', href: '/super-admin/receipts' },
+                { title: 'Administrator', href: '/admin/dashboard' },
+                { title: 'Receipts', href: '/admin/receipts' },
                 { title: 'Create', href: '#' },
             ]}
         >

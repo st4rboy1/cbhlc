@@ -20,9 +20,9 @@ interface Props {
 
 export default function UserCreate({ roles }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Users', href: '/super-admin/users' },
-        { title: 'Create User', href: '/super-admin/users/create' },
+        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Users', href: '/admin/users' },
+        { title: 'Create User', href: '/admin/users/create' },
     ];
 
     const { data, setData, post, processing, errors, wasSuccessful } = useForm({

@@ -48,11 +48,11 @@ interface Props {
     invoices: Invoice[];
 }
 
-export default function SuperAdminPaymentsCreate({ invoices }: Props) {
+export default function AdminPaymentsCreate({ invoices }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Payments', href: '/super-admin/payments' },
-        { title: 'Record Payment', href: '/super-admin/payments/create' },
+        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Payments', href: '/admin/payments' },
+        { title: 'Record Payment', href: '/admin/payments/create' },
     ];
 
     const [paymentDate, setPaymentDate] = useState<Date>(new Date());
@@ -71,7 +71,7 @@ export default function SuperAdminPaymentsCreate({ invoices }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/super-admin/payments');
+        post('/admin/payments');
     };
 
     return (
@@ -79,7 +79,7 @@ export default function SuperAdminPaymentsCreate({ invoices }: Props) {
             <Head title="Record Payment" />
             <div className="container mx-auto px-4 py-6">
                 <div className="mb-6 flex items-center gap-4">
-                    <Link href="/super-admin/payments">
+                    <Link href="/admin/payments">
                         <Button variant="outline" size="icon">
                             <ArrowLeft className="h-4 w-4" />
                         </Button>
@@ -259,7 +259,7 @@ export default function SuperAdminPaymentsCreate({ invoices }: Props) {
                                         <Save className="mr-2 h-4 w-4" />
                                         {processing ? 'Recording...' : 'Record Payment'}
                                     </Button>
-                                    <Link href="/super-admin/payments" className="block">
+                                    <Link href="/admin/payments" className="block">
                                         <Button type="button" variant="outline" className="w-full">
                                             Cancel
                                         </Button>

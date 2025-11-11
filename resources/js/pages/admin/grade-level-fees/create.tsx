@@ -34,7 +34,7 @@ interface Props {
     schoolYears: SchoolYear[];
 }
 
-export default function SuperAdminGradeLevelFeesCreate({ gradeLevels = [], schoolYears }: Props) {
+export default function AdminGradeLevelFeesCreate({ gradeLevels = [], schoolYears }: Props) {
     const activeSchoolYear = schoolYears.find((sy) => sy.is_active);
 
     const { data, setData, post, processing, errors } = useForm<FormData>({
@@ -50,14 +50,14 @@ export default function SuperAdminGradeLevelFeesCreate({ gradeLevels = [], schoo
     });
 
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Grade Level Fees', href: '/super-admin/grade-level-fees' },
+        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Grade Level Fees', href: '/admin/grade-level-fees' },
         { title: 'Create', href: '#' },
     ];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/super-admin/grade-level-fees');
+        post('/admin/grade-level-fees');
     };
 
     return (
@@ -66,7 +66,7 @@ export default function SuperAdminGradeLevelFeesCreate({ gradeLevels = [], schoo
             <div className="container mx-auto max-w-3xl px-4 py-6">
                 <div className="mb-6 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Create Grade Level Fee</h1>
-                    <Link href="/super-admin/grade-level-fees">
+                    <Link href="/admin/grade-level-fees">
                         <Button variant="outline">
                             <ArrowLeft className="mr-2 h-4 w-4" />
                             Back to List
@@ -207,7 +207,7 @@ export default function SuperAdminGradeLevelFeesCreate({ gradeLevels = [], schoo
                     </Card>
 
                     <div className="mt-6 flex justify-end gap-4">
-                        <Link href="/super-admin/grade-level-fees">
+                        <Link href="/admin/grade-level-fees">
                             <Button type="button" variant="outline">
                                 Cancel
                             </Button>

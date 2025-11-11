@@ -55,15 +55,15 @@ interface Props {
 export default function ReceiptShow({ receipt }: Props) {
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this receipt? This action cannot be undone.')) {
-            router.delete(`/super-admin/receipts/${receipt.id}`);
+            router.delete(`/admin/receipts/${receipt.id}`);
         }
     };
 
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Super Admin', href: '/super-admin/dashboard' },
-                { title: 'Receipts', href: '/super-admin/receipts' },
+                { title: 'Administrator', href: '/admin/dashboard' },
+                { title: 'Receipts', href: '/admin/receipts' },
                 { title: receipt.receipt_number, href: '#' },
             ]}
         >
@@ -71,7 +71,7 @@ export default function ReceiptShow({ receipt }: Props) {
             <div className="px-4 py-6">
                 <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href="/super-admin/receipts">
+                        <Link href="/admin/receipts">
                             <Button variant="outline" size="sm">
                                 <ArrowLeft className="mr-2 h-4 w-4" />
                                 Back to Receipts
@@ -85,7 +85,7 @@ export default function ReceiptShow({ receipt }: Props) {
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <Link href={`/super-admin/receipts/${receipt.id}/edit`}>
+                        <Link href={`/admin/receipts/${receipt.id}/edit`}>
                             <Button variant="outline">Edit Receipt</Button>
                         </Link>
                         <Button variant="destructive" onClick={handleDelete}>
@@ -156,7 +156,7 @@ export default function ReceiptShow({ receipt }: Props) {
                                 <div>
                                     <span className="font-medium">Payment Amount:</span> {formatCurrency(receipt.payment.amount)}
                                 </div>
-                                <Link href={`/super-admin/payments/${receipt.payment.id}`}>
+                                <Link href={`/admin/payments/${receipt.payment.id}`}>
                                     <Button variant="outline" size="sm" className="mt-2">
                                         View Payment
                                     </Button>
@@ -180,7 +180,7 @@ export default function ReceiptShow({ receipt }: Props) {
                                         {receipt.invoice.enrollment.student.last_name}
                                     </div>
                                 )}
-                                <Link href={`/super-admin/invoices/${receipt.invoice.id}`}>
+                                <Link href={`/admin/invoices/${receipt.invoice.id}`}>
                                     <Button variant="outline" size="sm" className="mt-2">
                                         View Invoice
                                     </Button>

@@ -24,9 +24,9 @@ interface Props {
 
 export default function EnrollmentPeriodCreate({ schoolYears }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Enrollment Periods', href: '/super-admin/enrollment-periods' },
-        { title: 'Create', href: '/super-admin/enrollment-periods/create' },
+        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Enrollment Periods', href: '/admin/enrollment-periods' },
+        { title: 'Create', href: '/admin/enrollment-periods/create' },
     ];
 
     const { data, setData, post, processing, errors } = useForm({
@@ -43,7 +43,7 @@ export default function EnrollmentPeriodCreate({ schoolYears }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/super-admin/enrollment-periods', {
+        post('/admin/enrollment-periods', {
             onSuccess: () => {
                 toast.success('Enrollment period created successfully');
             },

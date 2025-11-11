@@ -40,10 +40,10 @@ interface Props {
 
 export default function EnrollmentPeriodEdit({ period, schoolYears }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Enrollment Periods', href: '/super-admin/enrollment-periods' },
-        { title: period.school_year, href: `/super-admin/enrollment-periods/${period.id}` },
-        { title: 'Edit', href: `/super-admin/enrollment-periods/${period.id}/edit` },
+        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Enrollment Periods', href: '/admin/enrollment-periods' },
+        { title: period.school_year, href: `/admin/enrollment-periods/${period.id}` },
+        { title: 'Edit', href: `/admin/enrollment-periods/${period.id}/edit` },
     ];
 
     const { data, setData, put, processing, errors } = useForm({
@@ -60,7 +60,7 @@ export default function EnrollmentPeriodEdit({ period, schoolYears }: Props) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/super-admin/enrollment-periods/${period.id}`, {
+        put(`/admin/enrollment-periods/${period.id}`, {
             onSuccess: () => {
                 toast.success('Enrollment period updated successfully');
             },

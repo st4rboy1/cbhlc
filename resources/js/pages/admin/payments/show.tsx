@@ -79,11 +79,11 @@ const getPaymentMethodLabel = (method: string): string => {
     return labels[method] || method;
 };
 
-export default function SuperAdminPaymentsShow({ payment }: Props) {
+export default function AdminPaymentsShow({ payment }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Payments', href: '/super-admin/payments' },
-        { title: 'Payment Details', href: `/super-admin/payments/${payment.id}` },
+        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Payments', href: '/admin/payments' },
+        { title: 'Payment Details', href: `/admin/payments/${payment.id}` },
     ];
 
     const student = payment.invoice.enrollment.student;
@@ -95,7 +95,7 @@ export default function SuperAdminPaymentsShow({ payment }: Props) {
             <div className="container mx-auto px-4 py-6">
                 <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href="/super-admin/payments">
+                        <Link href="/admin/payments">
                             <Button variant="outline" size="icon">
                                 <ArrowLeft className="h-4 w-4" />
                             </Button>
@@ -105,7 +105,7 @@ export default function SuperAdminPaymentsShow({ payment }: Props) {
                             <p className="text-sm text-muted-foreground">Reference: {payment.reference_number || 'N/A'}</p>
                         </div>
                     </div>
-                    <Link href={`/super-admin/payments/${payment.id}/edit`}>
+                    <Link href={`/admin/payments/${payment.id}/edit`}>
                         <Button>Edit Payment</Button>
                     </Link>
                 </div>
@@ -169,7 +169,7 @@ export default function SuperAdminPaymentsShow({ payment }: Props) {
                         <Card className="mt-6 p-6">
                             <div className="mb-4 flex items-center justify-between">
                                 <h2 className="text-lg font-semibold">Invoice Details</h2>
-                                <Link href={`/super-admin/invoices/${payment.invoice.id}`} className="text-sm text-primary hover:underline">
+                                <Link href={`/admin/invoices/${payment.invoice.id}`} className="text-sm text-primary hover:underline">
                                     View Full Invoice
                                 </Link>
                             </div>

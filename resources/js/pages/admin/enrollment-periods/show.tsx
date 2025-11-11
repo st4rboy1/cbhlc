@@ -30,15 +30,15 @@ interface Props {
 
 export default function EnrollmentPeriodShow({ period }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Super Admin', href: '/super-admin/dashboard' },
-        { title: 'Enrollment Periods', href: '/super-admin/enrollment-periods' },
-        { title: period.school_year, href: `/super-admin/enrollment-periods/${period.id}` },
+        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Enrollment Periods', href: '/admin/enrollment-periods' },
+        { title: period.school_year, href: `/admin/enrollment-periods/${period.id}` },
     ];
 
     const handleActivate = () => {
         if (confirm('Are you sure you want to activate this enrollment period? This will close any currently active period.')) {
             router.post(
-                `/super-admin/enrollment-periods/${period.id}/activate`,
+                `/admin/enrollment-periods/${period.id}/activate`,
                 {},
                 {
                     onSuccess: () => {
@@ -55,7 +55,7 @@ export default function EnrollmentPeriodShow({ period }: Props) {
     const handleClose = () => {
         if (confirm('Are you sure you want to close this enrollment period? This action cannot be undone.')) {
             router.post(
-                `/super-admin/enrollment-periods/${period.id}/close`,
+                `/admin/enrollment-periods/${period.id}/close`,
                 {},
                 {
                     onSuccess: () => {
@@ -71,7 +71,7 @@ export default function EnrollmentPeriodShow({ period }: Props) {
 
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this enrollment period? This action cannot be undone.')) {
-            router.delete(`/super-admin/enrollment-periods/${period.id}`, {
+            router.delete(`/admin/enrollment-periods/${period.id}`, {
                 onSuccess: () => {
                     toast.success('Enrollment period deleted successfully');
                 },
@@ -105,7 +105,7 @@ export default function EnrollmentPeriodShow({ period }: Props) {
                                 Close
                             </Button>
                         )}
-                        <Link href={`/super-admin/enrollment-periods/${period.id}/edit`}>
+                        <Link href={`/admin/enrollment-periods/${period.id}/edit`}>
                             <Button variant="outline">
                                 <Edit className="mr-2 h-4 w-4" />
                                 Edit
