@@ -49,7 +49,33 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Helper to check for console errors in browser tests
+ */
+function assertNoConsoleErrors($browser)
 {
-    // ..
+    $consoleLogs = $browser->driver->manage()->getLog('browser');
+
+    $errors = collect($consoleLogs)->filter(function ($log) {
+        return $log['level'] === 'SEVERE' ||
+               (isset($log['message']) && str_contains($log['message'], '403')) ||
+               (isset($log['message']) && str_contains($log['message'], '404')) ||
+               (isset($log['message']) && str_contains($log['message'], '500'));
+    });
+
+    if ($errors->isNotEmpty()) {
+        $errorMessages = $errors->map(fn ($log) => $log['message'])->join("\n");
+        throw new \Exception("Console errors detected:\n".$errorMessages);
+    }
+
+    return $browser;
+}
+
+/**
+ * Helper to check for failed network requests (403, 404, 500 errors)
+ */
+function assertNoNetworkErrors($browser)
+{
+    // This will be caught by console errors check since XHR errors appear in console
+    return assertNoConsoleErrors($browser);
 }
