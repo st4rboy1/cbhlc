@@ -4,41 +4,51 @@ uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
 
 describe('Auth Routes Smoke Tests', function () {
     test('can access login page', function () {
-        visit('/login')
+        $browser = visit('/login')
             ->waitForText('Log in')
             ->assertSee('Email')
             ->assertSee('Password');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'auth');
 
     test('can access register page', function () {
-        visit('/register')
+        $browser = visit('/register')
             ->waitForText('Create an account')
             ->assertSee('Name')
             ->assertSee('Email')
             ->assertSee('Password');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'auth');
 
     test('can access forgot password page', function () {
-        visit('/forgot-password')
+        $browser = visit('/forgot-password')
             ->waitForText('Forgot Password')
             ->assertSee('Email');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'auth');
 
     test('can access verify email page', function () {
         $user = \App\Models\User::factory()->unverified()->create();
         $this->actingAs($user);
 
-        visit('/verify-email')
+        $browser = visit('/verify-email')
             ->waitForText('Verify')
             ->assertSee('verify');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'auth');
 
     test('can access confirm password page', function () {
         $user = \App\Models\User::factory()->create();
         $this->actingAs($user);
 
-        visit('/confirm-password')
+        $browser = visit('/confirm-password')
             ->waitForText('Confirm Password')
             ->assertSee('Password');
+
+        assertNoConsoleErrors($browser);
     })->group('smoke', 'auth');
 });
