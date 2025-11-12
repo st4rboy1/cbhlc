@@ -1,8 +1,10 @@
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { logout } from '@/routes';
 import { type NavItem } from '@/types';
-import { CreditCard, FileCheck, FileText, GraduationCap, LayoutGrid, Settings, Users } from 'lucide-react';
+import { Link, router } from '@inertiajs/react';
+import { CreditCard, FileCheck, FileText, GraduationCap, LayoutGrid, LogOut, Settings, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -60,6 +62,10 @@ const secondaryNavItems: NavItem[] = [
 ];
 
 export function GuardianSidebar() {
+    const handleLogout = () => {
+        router.flushAll();
+    };
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -79,6 +85,16 @@ export function GuardianSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild tooltip="Log out">
+                            <Link href={logout()} method="post" as="button" onClick={handleLogout}>
+                                <LogOut />
+                                <span>Log out</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

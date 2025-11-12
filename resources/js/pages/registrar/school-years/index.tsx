@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { ColumnDef, SortingState } from '@tanstack/react-table';
-import { Calendar, Plus } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface SchoolYear {
@@ -105,14 +105,9 @@ export default function SchoolYearsIndex({ schoolYears, activeSchoolYear }: Prop
             id: 'actions',
             header: 'Actions',
             cell: ({ row }) => (
-                <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => router.visit(`/registrar/school-years/${row.original.id}`)}>
-                        View
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => router.visit(`/registrar/school-years/${row.original.id}/edit`)}>
-                        Edit
-                    </Button>
-                </div>
+                <Button size="sm" variant="outline" onClick={() => router.visit(`/registrar/school-years/${row.original.id}`)}>
+                    View
+                </Button>
             ),
         },
     ];
@@ -121,22 +116,14 @@ export default function SchoolYearsIndex({ schoolYears, activeSchoolYear }: Prop
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="School Years" />
             <div className="px-4 py-6">
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">School Years</h1>
-                        {activeSchoolYear && (
-                            <p className="mt-1 text-sm text-muted-foreground">
-                                <Calendar className="mr-1 inline h-4 w-4" />
-                                Active: {activeSchoolYear.name}
-                            </p>
-                        )}
-                    </div>
-                    <Link href="/registrar/school-years/create">
-                        <Button>
-                            <Plus className="mr-2 h-4 w-4" />
-                            Create School Year
-                        </Button>
-                    </Link>
+                <div className="mb-6">
+                    <h1 className="text-2xl font-bold">School Years</h1>
+                    {activeSchoolYear && (
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            <Calendar className="mr-1 inline h-4 w-4" />
+                            Active: {activeSchoolYear.name}
+                        </p>
+                    )}
                 </div>
                 <DataTable columns={columns} data={schoolYears.data} sorting={sorting} onSortingChange={setSorting} />
             </div>
