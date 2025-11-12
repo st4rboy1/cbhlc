@@ -47,8 +47,10 @@ use App\Http\Controllers\SuperAdmin\GuardianController as SuperAdminGuardianCont
 use App\Http\Controllers\SuperAdmin\InvoiceController as SuperAdminInvoiceController;
 use App\Http\Controllers\SuperAdmin\PaymentController as SuperAdminPaymentController;
 use App\Http\Controllers\SuperAdmin\ReceiptController as SuperAdminReceiptController;
+use App\Http\Controllers\SuperAdmin\ReportController as SuperAdminReportController;
 use App\Http\Controllers\SuperAdmin\SchoolInformationController as SuperAdminSchoolInformationController;
 use App\Http\Controllers\SuperAdmin\SchoolYearController as SuperAdminSchoolYearController;
+use App\Http\Controllers\SuperAdmin\SettingController as SuperAdminSettingController;
 use App\Http\Controllers\SuperAdmin\StudentController as SuperAdminStudentController;
 use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use App\Http\Controllers\TuitionController;
@@ -175,6 +177,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('receipts', SuperAdminReceiptController::class);
 
         // Documents Management
+        Route::get('/documents/pending', [SuperAdminDocumentController::class, 'pending'])->name('documents.pending');
         Route::resource('documents', SuperAdminDocumentController::class)->only(['index', 'show', 'destroy']);
         Route::get('/documents/{document}/view', [SuperAdminDocumentController::class, 'view'])->name('documents.view');
         Route::get('/documents/{document}/download', [SuperAdminDocumentController::class, 'download'])->name('documents.download');
@@ -207,6 +210,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/', [SuperAdminSchoolInformationController::class, 'index'])->name('index');
             Route::put('/', [SuperAdminSchoolInformationController::class, 'update'])->name('update');
         });
+
+        // Reports Management
+        Route::get('/reports', [SuperAdminReportController::class, 'index'])->name('reports');
+
+        // Settings Management
+        Route::get('/settings', [SuperAdminSettingController::class, 'index'])->name('settings');
 
     });
 
