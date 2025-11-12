@@ -1,8 +1,7 @@
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Calendar, FileText, Users } from 'lucide-react';
 
 interface SchoolYear {
@@ -33,17 +32,12 @@ export default function SchoolYearShow({ schoolYear }: Props) {
         >
             <Head title={schoolYear.name} />
             <div className="px-4 py-6">
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h1 className="flex items-center gap-2 text-2xl font-bold">
-                            {schoolYear.name}
-                            {schoolYear.is_active && <Badge>Active</Badge>}
-                        </h1>
-                        <p className="text-muted-foreground">{schoolYear.status}</p>
-                    </div>
-                    <Link href={`/registrar/school-years/${schoolYear.id}/edit`}>
-                        <Button>Edit School Year</Button>
-                    </Link>
+                <div className="mb-6">
+                    <h1 className="flex items-center gap-2 text-2xl font-bold">
+                        {schoolYear.name}
+                        {schoolYear.is_active && <Badge>Active</Badge>}
+                    </h1>
+                    <p className="text-muted-foreground">{schoolYear.status}</p>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-3">

@@ -4,9 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Calendar, PlusCircle } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -67,72 +67,13 @@ export default function EnrollmentPeriodsIndex({ periods, activePeriod }: Props)
         }
     }, []);
 
-    const handleActivate = (periodId: number) => {
-        if (confirm('Are you sure you want to activate this enrollment period? This will close any currently active period.')) {
-            router.post(
-                `/registrar/enrollment-periods/${periodId}/activate`,
-                {},
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        toast.success('Enrollment period activated successfully');
-                    },
-                    onError: () => {
-                        toast.error('Failed to activate enrollment period');
-                    },
-                },
-            );
-        }
-    };
-
-    const handleClose = (periodId: number) => {
-        if (confirm('Are you sure you want to close this enrollment period? This action cannot be undone.')) {
-            router.post(
-                `/registrar/enrollment-periods/${periodId}/close`,
-                {},
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        toast.success('Enrollment period closed successfully');
-                    },
-                    onError: () => {
-                        toast.error('Failed to close enrollment period');
-                    },
-                },
-            );
-        }
-    };
-
-    const handleDelete = (periodId: number) => {
-        if (confirm('Are you sure you want to delete this enrollment period? This action cannot be undone.')) {
-            router.delete(`/registrar/enrollment-periods/${periodId}`, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    toast.success('Enrollment period deleted successfully');
-                },
-                onError: (errors) => {
-                    const errorMessage = errors.period || 'Failed to delete enrollment period';
-                    toast.error(errorMessage);
-                },
-            });
-        }
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Enrollment Periods" />
             <div className="px-4 py-6">
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">Enrollment Periods</h1>
-                        <p className="text-muted-foreground">Manage school year enrollment periods and registration deadlines</p>
-                    </div>
-                    <Link href="/registrar/enrollment-periods/create">
-                        <Button>
-                            <PlusCircle className="mr-2 h-4 w-4" />
-                            Create Period
-                        </Button>
-                    </Link>
+                <div className="mb-6">
+                    <h1 className="text-2xl font-bold">Enrollment Periods</h1>
+                    <p className="text-muted-foreground">View school year enrollment periods and registration deadlines</p>
                 </div>
 
                 {activePeriod && (
@@ -195,11 +136,6 @@ export default function EnrollmentPeriodsIndex({ periods, activePeriod }: Props)
                                             <div className="flex flex-col items-center justify-center text-muted-foreground">
                                                 <Calendar className="mb-2 h-8 w-8" />
                                                 <p>No enrollment periods found</p>
-                                                <Link href="/registrar/enrollment-periods/create" className="mt-2">
-                                                    <Button variant="outline" size="sm">
-                                                        Create your first period
-                                                    </Button>
-                                                </Link>
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -215,33 +151,11 @@ export default function EnrollmentPeriodsIndex({ periods, activePeriod }: Props)
                                             <TableCell>{format(new Date(period.regular_registration_deadline), 'MMM d, yyyy')}</TableCell>
                                             <TableCell>{period.enrollments_count || 0}</TableCell>
                                             <TableCell className="text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    <Link href={`/registrar/enrollment-periods/${period.id}`}>
-                                                        <Button variant="outline" size="sm">
-                                                            View
-                                                        </Button>
-                                                    </Link>
-                                                    {period.status === 'upcoming' && (
-                                                        <Button variant="default" size="sm" onClick={() => handleActivate(period.id)}>
-                                                            Activate
-                                                        </Button>
-                                                    )}
-                                                    {period.status === 'active' && (
-                                                        <Button variant="outline" size="sm" onClick={() => handleClose(period.id)}>
-                                                            Close
-                                                        </Button>
-                                                    )}
-                                                    <Link href={`/registrar/enrollment-periods/${period.id}/edit`}>
-                                                        <Button variant="outline" size="sm">
-                                                            Edit
-                                                        </Button>
-                                                    </Link>
-                                                    {period.status !== 'active' && (period.enrollments_count || 0) === 0 && (
-                                                        <Button variant="destructive" size="sm" onClick={() => handleDelete(period.id)}>
-                                                            Delete
-                                                        </Button>
-                                                    )}
-                                                </div>
+                                                <Link href={`/registrar/enrollment-periods/${period.id}`}>
+                                                    <Button variant="outline" size="sm">
+                                                        View
+                                                    </Button>
+                                                </Link>
                                             </TableCell>
                                         </TableRow>
                                     ))
