@@ -29,21 +29,10 @@ class StudentController extends Controller
 
     public function show($id)
     {
-        $student = Student::findOrFail($id);
+        $student = Student::with(['guardians', 'enrollments'])->findOrFail($id);
 
         return Inertia::render('admin/students/show', [
-            'student' => [
-                'id' => $student->id,
-                'name' => $student->full_name,
-                'grade' => $student->grade_level?->label() ?? 'N/A',
-                'status' => 'active', // Assuming a default status or fetching from model if available
-                'birth_date' => $student->birth_date?->format('Y-m-d'),
-                'address' => $student->address,
-                'email' => $student->email,
-                'gender' => $student->gender,
-                'contact_number' => $student->contact_number,
-                'student_id' => $student->student_id,
-            ],
+            'student' => $student,
         ]);
     }
 

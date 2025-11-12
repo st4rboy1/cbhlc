@@ -369,7 +369,7 @@ describe('Admin Routes Smoke Tests - Receipts', function () {
 
     test('can access receipts create', function () {
         $browser = visit('/admin/receipts/create')
-            ->waitForText('Generate Receipt')
+            ->waitForText('Create Receipt')
             ->assertSee('Receipt');
 
         assertNoConsoleErrors($browser);
