@@ -50,7 +50,6 @@ use App\Http\Controllers\SuperAdmin\ReceiptController as SuperAdminReceiptContro
 use App\Http\Controllers\SuperAdmin\ReportController as SuperAdminReportController;
 use App\Http\Controllers\SuperAdmin\SchoolInformationController as SuperAdminSchoolInformationController;
 use App\Http\Controllers\SuperAdmin\SchoolYearController as SuperAdminSchoolYearController;
-use App\Http\Controllers\SuperAdmin\SettingController as SuperAdminSettingController;
 use App\Http\Controllers\SuperAdmin\StudentController as SuperAdminStudentController;
 use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use App\Http\Controllers\TuitionController;
@@ -213,9 +212,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Reports Management
         Route::get('/reports', [SuperAdminReportController::class, 'index'])->name('reports');
-
-        // Settings Management
-        Route::get('/settings', [SuperAdminSettingController::class, 'index'])->name('settings');
 
     });
 

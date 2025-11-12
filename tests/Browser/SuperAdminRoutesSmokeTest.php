@@ -463,14 +463,6 @@ describe('Super Admin Routes Smoke Tests - School Information', function () {
 });
 
 describe('Super Admin Routes Smoke Tests - Settings', function () {
-    test('can access settings index', function () {
-        $browser = visit('/super-admin/settings')
-            ->waitForText('Account Settings')
-            ->assertSee('Settings');
-
-        assertNoConsoleErrors($browser);
-    })->group('smoke', 'super-admin');
-
     test('can access settings profile', function () {
         $browser = visit('/settings/profile')
             ->waitForText('Profile')
