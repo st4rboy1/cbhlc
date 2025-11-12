@@ -71,3 +71,54 @@ function assertNoNetworkErrors($browser)
     // TODO: Implement network error checking when Pest v4 API supports it
     return assertNoConsoleErrors($browser);
 }
+
+/*
+|--------------------------------------------------------------------------
+| Global Hooks
+|--------------------------------------------------------------------------
+|
+| Pest allows you to define global hooks that run before or after each test.
+| This is useful for cleaning up resources, resetting state, etc.
+|
+*/
+
+/**
+ * Clean up Storage::fake() test directories after each test
+ *
+ * This prevents root-owned directories from accumulating and causing permission errors.
+ * Laravel's Storage::fake() creates temporary directories in storage/framework/testing/disks/
+ * that sometimes get created with root ownership when running in Laravel Sail (Docker).
+ *
+ * By cleaning up after each test, we ensure:
+ * 1. No accumulation of old test directories
+ * 2. Fresh state for each test run
+ * 3. No permission conflicts from root-owned directories
+ *
+ * Note: This runs AFTER each test, so if a test fails, the directories still exist for debugging.
+ * They'll be cleaned up before the next test runs.
+ */
+afterEach(function () {
+    // Only clean up if we're in a test environment
+    if (app()->environment('testing')) {
+        $testDisksPath = storage_path('framework/testing/disks');
+
+        // Check if the test disks directory exists
+        if (is_dir($testDisksPath)) {
+            try {
+                // Get all directories in the test disks path
+                $directories = glob($testDisksPath.'/*', GLOB_ONLYDIR);
+
+                if ($directories !== false) {
+                    foreach ($directories as $directory) {
+                        // Use Laravel's File facade for cross-platform compatibility
+                        // deleteDirectory() recursively removes directory and contents
+                        \Illuminate\Support\Facades\File::deleteDirectory($directory);
+                    }
+                }
+            } catch (\Exception $e) {
+                // Silently fail if we can't clean up (e.g., permission issues)
+                // The manual fix script can handle these cases
+            }
+        }
+    }
+});
