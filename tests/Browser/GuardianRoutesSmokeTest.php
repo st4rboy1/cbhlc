@@ -67,8 +67,8 @@ describe('Guardian Routes Smoke Tests', function () {
 
     test('can access guardian enrollments create', function () {
         $browser = visit('/guardian/enrollments/create')
-            ->waitForText('Create Enrollment')
-            ->assertSee('Create');
+            ->waitForText('New Enrollment')
+            ->assertSee('New Enrollment');
 
         assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
@@ -83,8 +83,8 @@ describe('Guardian Routes Smoke Tests', function () {
 
     test('can access guardian enrollment edit', function () {
         $browser = visit("/guardian/enrollments/{$this->enrollment->id}/edit")
-            ->waitForText('Edit')
-            ->assertSee('Edit');
+            ->waitForText('Edit Enrollment')
+            ->assertSee('Edit Enrollment');
 
         assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
@@ -99,8 +99,8 @@ describe('Guardian Routes Smoke Tests', function () {
 
     test('can access guardian students create', function () {
         $browser = visit('/guardian/students/create')
-            ->waitForText('Create Student')
-            ->assertSee('Create');
+            ->waitForText('Add New Student')
+            ->assertSee('Add New Student');
 
         assertNoConsoleErrors($browser);
     })->group('smoke', 'guardian');
