@@ -1,13 +1,11 @@
 import { EnrollmentPeriodStatusBadge } from '@/components/status-badges';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Calendar, CheckCircle2, Edit, Trash2, XCircle } from 'lucide-react';
-import { toast } from 'sonner';
+import { Calendar } from 'lucide-react';
 
 export type EnrollmentPeriod = {
     id: number;
@@ -35,89 +33,13 @@ export default function EnrollmentPeriodShow({ period }: Props) {
         { title: period.school_year, href: `/registrar/enrollment-periods/${period.id}` },
     ];
 
-    const handleActivate = () => {
-        if (confirm('Are you sure you want to activate this enrollment period? This will close any currently active period.')) {
-            router.post(
-                `/registrar/enrollment-periods/${period.id}/activate`,
-                {},
-                {
-                    onSuccess: () => {
-                        toast.success('Enrollment period activated successfully');
-                    },
-                    onError: () => {
-                        toast.error('Failed to activate enrollment period');
-                    },
-                },
-            );
-        }
-    };
-
-    const handleClose = () => {
-        if (confirm('Are you sure you want to close this enrollment period? This action cannot be undone.')) {
-            router.post(
-                `/registrar/enrollment-periods/${period.id}/close`,
-                {},
-                {
-                    onSuccess: () => {
-                        toast.success('Enrollment period closed successfully');
-                    },
-                    onError: () => {
-                        toast.error('Failed to close enrollment period');
-                    },
-                },
-            );
-        }
-    };
-
-    const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this enrollment period? This action cannot be undone.')) {
-            router.delete(`/registrar/enrollment-periods/${period.id}`, {
-                onSuccess: () => {
-                    toast.success('Enrollment period deleted successfully');
-                },
-                onError: (errors) => {
-                    const errorMessage = errors.period || 'Failed to delete enrollment period';
-                    toast.error(errorMessage);
-                },
-            });
-        }
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Enrollment Period ${period.school_year}`} />
             <div className="px-4 py-6">
-                <div className="mb-6 flex items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold">Enrollment Period Details</h1>
-                        <p className="text-muted-foreground">View enrollment period information and settings</p>
-                    </div>
-                    <div className="flex gap-2">
-                        {period.status === 'upcoming' && (
-                            <Button onClick={handleActivate}>
-                                <CheckCircle2 className="mr-2 h-4 w-4" />
-                                Activate
-                            </Button>
-                        )}
-                        {period.status === 'active' && (
-                            <Button variant="outline" onClick={handleClose}>
-                                <XCircle className="mr-2 h-4 w-4" />
-                                Close
-                            </Button>
-                        )}
-                        <Link href={`/registrar/enrollment-periods/${period.id}/edit`}>
-                            <Button variant="outline">
-                                <Edit className="mr-2 h-4 w-4" />
-                                Edit
-                            </Button>
-                        </Link>
-                        {period.status !== 'active' && (period.enrollments_count || 0) === 0 && (
-                            <Button variant="destructive" onClick={handleDelete}>
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                            </Button>
-                        )}
-                    </div>
+                <div className="mb-6">
+                    <h1 className="text-2xl font-bold">Enrollment Period Details</h1>
+                    <p className="text-muted-foreground">View enrollment period information and settings</p>
                 </div>
 
                 <div className="grid gap-6">

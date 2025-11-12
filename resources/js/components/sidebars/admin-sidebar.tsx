@@ -1,9 +1,12 @@
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { logout } from '@/routes';
 import { type NavItem } from '@/types';
+import { Link, router } from '@inertiajs/react';
 import {
     Banknote,
+    BarChart3,
     Calendar,
     CalendarDays,
     DollarSign,
@@ -12,6 +15,7 @@ import {
     GraduationCap,
     History,
     LayoutGrid,
+    LogOut,
     ReceiptText,
     School,
     Settings,
@@ -89,6 +93,11 @@ const mainNavItems: NavItem[] = [
         icon: School,
     },
     {
+        title: 'Reports',
+        href: '/admin/reports',
+        icon: BarChart3,
+    },
+    {
         title: 'Audit Logs',
         href: '/admin/audit-logs',
         icon: History,
@@ -106,6 +115,10 @@ const mainNavItems: NavItem[] = [
 ];
 
 export function AdminSidebar() {
+    const handleLogout = () => {
+        router.flushAll();
+    };
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -123,6 +136,16 @@ export function AdminSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton asChild tooltip="Log out">
+                            <Link href={logout()} method="post" as="button" onClick={handleLogout}>
+                                <LogOut />
+                                <span>Log out</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

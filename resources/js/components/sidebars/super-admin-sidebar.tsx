@@ -6,6 +6,7 @@ import { type NavItem } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import {
     BadgeDollarSign,
+    BarChart3,
     Building2,
     Calendar,
     CalendarDays,
@@ -89,6 +90,11 @@ const mainNavItems: NavItem[] = [
         title: 'School Information',
         href: '/super-admin/school-information',
         icon: Building2,
+    },
+    {
+        title: 'Reports',
+        href: '/super-admin/reports',
+        icon: BarChart3,
     },
     {
         title: 'Audit Logs',
