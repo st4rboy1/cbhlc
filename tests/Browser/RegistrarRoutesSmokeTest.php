@@ -30,7 +30,6 @@ beforeEach(function () {
         'school_year_id' => $this->schoolYear->id,
     ]);
     $this->gradeLevelFee = GradeLevelFee::factory()->create([
-        'school_year_id' => $this->schoolYear->id,
         'enrollment_period_id' => $this->enrollmentPeriod->id,
     ]);
     $this->guardian = Guardian::factory()->create();
