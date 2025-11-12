@@ -29,10 +29,28 @@ class StudentController extends Controller
 
     public function show($id)
     {
-        $student = Student::with(['guardians', 'enrollments'])->findOrFail($id);
+        $student = Student::with(['guardians.user', 'enrollments'])->findOrFail($id);
+
+        // Get the latest enrollment status
+        $latestEnrollment = $student->enrollments()->latest()->first();
+        $status = $latestEnrollment?->status?->label() ?? 'No Enrollment';
+
+        // Transform student data to match frontend expectations
+        $studentData = [
+            'id' => $student->id,
+            'student_id' => $student->student_id,
+            'first_name' => $student->first_name,
+            'middle_name' => $student->middle_name,
+            'last_name' => $student->last_name,
+            'grade' => $student->grade_level?->label() ?? 'N/A',
+            'status' => $status,
+            'birth_date' => $student->birthdate->format('F d, Y'),
+            'address' => $student->address ?? 'N/A',
+            'guardians' => $student->guardians,
+        ];
 
         return Inertia::render('admin/students/show', [
-            'student' => $student,
+            'student' => $studentData,
         ]);
     }
 
