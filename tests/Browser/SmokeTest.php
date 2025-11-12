@@ -42,7 +42,7 @@ describe('Critical Path Smoke Tests', function () {
             ->waitForText('Dashboard');
 
         // Navigate to create student form
-        visit('/super-admin/students/create')
+        $browser = visit('/super-admin/students/create')
             ->waitForText('Create Student')
             ->assertSee('Create Student')
             ->assertSee('First Name')

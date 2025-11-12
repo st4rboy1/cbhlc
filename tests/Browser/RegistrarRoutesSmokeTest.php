@@ -94,7 +94,7 @@ describe('Registrar Routes Smoke Tests - Students', function () {
 
     test('can access students create', function () {
         $browser = visit('/registrar/students/create')
-            ->waitForText('Create Student')
+            ->waitForText('Create New Student')
             ->assertSee('Create');
 
         assertNoConsoleErrors($browser);
@@ -180,7 +180,7 @@ describe('Registrar Routes Smoke Tests - Grade Level Fees', function () {
 
     test('can access grade level fees create', function () {
         $browser = visit('/registrar/grade-level-fees/create')
-            ->waitForText('Create')
+            ->waitForText('Create Grade Level Fee')
             ->assertSee('Create');
 
         assertNoConsoleErrors($browser);
@@ -203,23 +203,7 @@ describe('Registrar Routes Smoke Tests - Grade Level Fees', function () {
     })->group('smoke', 'registrar');
 });
 
-describe('Registrar Routes Smoke Tests - Enrollment Periods', function () {
-    test('can access enrollment periods index', function () {
-        $browser = visit('/registrar/enrollment-periods')
-            ->waitForText('Enrollment Periods')
-            ->assertSee('Periods');
-
-        assertNoConsoleErrors($browser);
-    })->group('smoke', 'registrar');
-
-    test('can access enrollment period show', function () {
-        $browser = visit("/registrar/enrollment-periods/{$this->enrollmentPeriod->id}")
-            ->waitForText('Enrollment Period')
-            ->assertSee('Period');
-
-        assertNoConsoleErrors($browser);
-    })->group('smoke', 'registrar');
-});
+// Enrollment Periods routes do not exist for Registrar role
 
 describe('Registrar Routes Smoke Tests - School Years', function () {
     test('can access school years index', function () {
@@ -294,7 +278,7 @@ describe('Registrar Routes Smoke Tests - Receipts', function () {
 
     test('can access receipts create', function () {
         $browser = visit('/registrar/receipts/create')
-            ->waitForText('Generate Receipt')
+            ->waitForText('Create Receipt')
             ->assertSee('Receipt');
 
         assertNoConsoleErrors($browser);

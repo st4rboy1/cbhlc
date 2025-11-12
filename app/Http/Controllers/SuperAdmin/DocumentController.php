@@ -82,6 +82,14 @@ class DocumentController extends Controller
     }
 
     /**
+     * Display pending documents.
+     */
+    public function pending()
+    {
+        return Inertia::render('super-admin/documents/pending');
+    }
+
+    /**
      * Display the specified document.
      */
     public function show(Document $document)

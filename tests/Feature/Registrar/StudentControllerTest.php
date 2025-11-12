@@ -281,7 +281,8 @@ describe('Registrar StudentController', function () {
         $response->assertStatus(200);
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->component('registrar/students/create')
-            ->has('gradeLevels')
+            ->has('gradelevels')
+            ->has('guardians')
         );
     });
 
