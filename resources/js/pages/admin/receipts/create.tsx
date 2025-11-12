@@ -56,7 +56,7 @@ export default function ReceiptCreate({ payments, invoices, nextReceiptNumber }:
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Admin', href: '/admin/dashboard' },
+                { title: 'Administrator', href: '/admin/dashboard' },
                 { title: 'Receipts', href: '/admin/receipts' },
                 { title: 'Create', href: '#' },
             ]}

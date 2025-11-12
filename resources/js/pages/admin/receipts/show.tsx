@@ -62,7 +62,7 @@ export default function ReceiptShow({ receipt }: Props) {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Admin', href: '/admin/dashboard' },
+                { title: 'Administrator', href: '/admin/dashboard' },
                 { title: 'Receipts', href: '/admin/receipts' },
                 { title: receipt.receipt_number, href: '#' },
             ]}

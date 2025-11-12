@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Enrollment;
+use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Setting;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class InvoiceController extends Controller
@@ -17,12 +19,41 @@ class InvoiceController extends Controller
      */
     public function index(Request $request)
     {
-        $enrollments = Enrollment::with(['student', 'guardian', 'schoolYear'])
-            ->latest()
-            ->paginate(10);
+        Gate::authorize('viewAny', Invoice::class);
+
+        $query = Invoice::with(['enrollment.student', 'enrollment.guardian.user', 'items']);
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('invoice_number', 'like', "%{$search}%")
+                    ->orWhereHas('enrollment.student', function ($sq) use ($search) {
+                        $sq->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('student_id', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->get('status'));
+        }
+
+        // Filter by date range
+        if ($request->filled('from_date')) {
+            $query->whereDate('invoice_date', '>=', $request->get('from_date'));
+        }
+        if ($request->filled('to_date')) {
+            $query->whereDate('invoice_date', '<=', $request->get('to_date'));
+        }
+
+        $invoices = $query->latest('invoice_date')->paginate(15)->withQueryString();
 
         return Inertia::render('admin/invoices/index', [
-            'enrollments' => $enrollments,
+            'invoices' => $invoices,
+            'filters' => $request->only(['search', 'status', 'from_date', 'to_date']),
         ]);
     }
 

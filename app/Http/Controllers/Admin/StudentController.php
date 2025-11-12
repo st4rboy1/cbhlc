@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SuperAdmin\StoreStudentRequest;
+use App\Models\Guardian;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class StudentController extends Controller
@@ -27,23 +31,76 @@ class StudentController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        Gate::authorize('create', Student::class);
+
+        $guardians = Guardian::with('user')->get();
+
+        return Inertia::render('admin/students/create', [
+            'guardians' => $guardians,
+            'gradelevels' => \App\Enums\GradeLevel::cases(),
+        ]);
+    }
+
+    public function store(StoreStudentRequest $request)
+    {
+        Gate::authorize('create', Student::class);
+
+        $validated = $request->validated();
+
+        $student = DB::transaction(function () use ($validated) {
+            $student = Student::create([
+                'first_name' => $validated['first_name'],
+                'middle_name' => $validated['middle_name'],
+                'last_name' => $validated['last_name'],
+                'birthdate' => $validated['birthdate'],
+                'birth_place' => $validated['birth_place'],
+                'gender' => $validated['gender'],
+                'nationality' => $validated['nationality'],
+                'religion' => $validated['religion'],
+                'address' => $validated['address'],
+                'contact_number' => $validated['contact_number'],
+                'email' => $validated['email'],
+            ]);
+
+            // Attach guardians
+            if (! empty($validated['guardian_ids'])) {
+                $student->guardians()->attach($validated['guardian_ids']);
+            }
+
+            return $student;
+        });
+
+        return redirect()->route('admin.students.index')
+            ->with('success', 'Student created successfully.');
+    }
+
     public function show($id)
     {
-        $student = Student::findOrFail($id);
+        $student = Student::with(['guardians.user', 'enrollments'])->findOrFail($id);
+
+        // Get the latest enrollment status
+        $latestEnrollment = $student->enrollments()->latest()->first();
+        $status = $latestEnrollment?->status?->label() ?? 'No Enrollment';
+
+        // Transform student data to match frontend expectations
+        $studentData = [
+            'id' => $student->id,
+            'student_id' => $student->student_id,
+            'name' => trim("{$student->first_name} {$student->middle_name} {$student->last_name}"),
+            'first_name' => $student->first_name,
+            'middle_name' => $student->middle_name,
+            'last_name' => $student->last_name,
+            'grade' => $student->grade_level?->label() ?? 'N/A',
+            'status' => $status,
+            'birth_date' => $student->birthdate->format('F d, Y'),
+            'address' => $student->address ?? 'N/A',
+            'guardians' => $student->guardians,
+        ];
 
         return Inertia::render('admin/students/show', [
-            'student' => [
-                'id' => $student->id,
-                'name' => $student->full_name,
-                'grade' => $student->grade_level?->label() ?? 'N/A',
-                'status' => 'active', // Assuming a default status or fetching from model if available
-                'birth_date' => $student->birth_date?->format('Y-m-d'),
-                'address' => $student->address,
-                'email' => $student->email,
-                'gender' => $student->gender,
-                'contact_number' => $student->contact_number,
-                'student_id' => $student->student_id,
-            ],
+            'student' => $studentData,
         ]);
     }
 
