@@ -246,7 +246,7 @@ describe('Admin Routes Smoke Tests - Grade Level Fees', function () {
 
     test('can access grade level fee show', function () {
         visit("/admin/grade-level-fees/{$this->gradeLevelFee->id}")
-            ->waitForText('Grade Level Fee')
+            ->waitForText('Grade Level Fee Details')
             ->assertSee('Fee');
     })->group('smoke', 'admin');
 

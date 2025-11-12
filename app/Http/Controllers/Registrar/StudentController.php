@@ -141,8 +141,11 @@ class StudentController extends Controller
      */
     public function create()
     {
+        $guardians = \App\Models\Guardian::with('user')->get();
+
         return Inertia::render('registrar/students/create', [
-            'gradeLevels' => GradeLevel::values(),
+            'guardians' => $guardians,
+            'gradelevels' => \App\Enums\GradeLevel::cases(),
         ]);
     }
 
