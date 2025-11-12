@@ -66,7 +66,7 @@ export default function ReceiptEdit({ receipt, payments, invoices }: Props) {
     return (
         <AppLayout
             breadcrumbs={[
-                { title: 'Admin', href: '/admin/dashboard' },
+                { title: 'Administrator', href: '/admin/dashboard' },
                 { title: 'Receipts', href: '/admin/receipts' },
                 { title: 'Edit', href: '#' },
             ]}

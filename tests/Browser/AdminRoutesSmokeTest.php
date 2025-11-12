@@ -128,8 +128,8 @@ describe('Admin Routes Smoke Tests - Enrollments', function () {
 
     test('can access enrollments create', function () {
         visit('/admin/enrollments/create')
-            ->waitForText('Create Enrollment')
-            ->assertSee('Create');
+            ->waitForText('New Enrollment')
+            ->assertSee('New Enrollment');
     })->group('smoke', 'admin');
 
     test('can access enrollment show', function () {
@@ -216,8 +216,8 @@ describe('Admin Routes Smoke Tests - Documents', function () {
 
     test('can access documents pending', function () {
         $browser = visit('/admin/documents/pending')
-            ->waitForText('Documents')
-            ->assertSee('Documents');
+            ->waitForText('Pending Documents')
+            ->assertSee('Pending');
 
         assertNoConsoleErrors($browser);
     })->group('smoke', 'admin');
@@ -240,8 +240,8 @@ describe('Admin Routes Smoke Tests - Grade Level Fees', function () {
 
     test('can access grade level fees create', function () {
         visit('/admin/grade-level-fees/create')
-            ->waitForText('Create')
-            ->assertSee('Create');
+            ->waitForText('Create Grade Level Fee')
+            ->assertSee('Fee Details');
     })->group('smoke', 'admin');
 
     test('can access grade level fee show', function () {
@@ -252,8 +252,8 @@ describe('Admin Routes Smoke Tests - Grade Level Fees', function () {
 
     test('can access grade level fee edit', function () {
         visit("/admin/grade-level-fees/{$this->gradeLevelFee->id}/edit")
-            ->waitForText('Edit')
-            ->assertSee('Edit');
+            ->waitForText('Edit Grade Level Fee')
+            ->assertSee('Fee Details');
     })->group('smoke', 'admin');
 });
 
@@ -369,7 +369,7 @@ describe('Admin Routes Smoke Tests - Receipts', function () {
 
     test('can access receipts create', function () {
         $browser = visit('/admin/receipts/create')
-            ->waitForText('Generate Receipt')
+            ->waitForText('Create Receipt')
             ->assertSee('Receipt');
 
         assertNoConsoleErrors($browser);
@@ -401,8 +401,8 @@ describe('Admin Routes Smoke Tests - Users', function () {
 
     test('can access users create', function () {
         visit('/admin/users/create')
-            ->waitForText('Create User')
-            ->assertSee('Create');
+            ->waitForText('Create New User')
+            ->assertSee('User Information');
     })->group('smoke', 'admin');
 
     test('can access user show', function () {

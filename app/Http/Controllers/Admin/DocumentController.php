@@ -82,6 +82,33 @@ class DocumentController extends Controller
     }
 
     /**
+     * Display a listing of pending documents.
+     */
+    public function pending(Request $request)
+    {
+        Gate::authorize('viewAny', Document::class);
+
+        $studentsQuery = Student::with(['documents' => function ($query) {
+            $query->where('verification_status', 'pending');
+        }, 'documents.verifiedBy']);
+
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $studentsQuery->where(function ($query) use ($search) {
+                $query->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%");
+            });
+        }
+
+        $studentsWithDocuments = $studentsQuery->latest('created_at')->paginate(20)->withQueryString();
+
+        return Inertia::render('admin/documents/pending', [
+            'studentsWithDocuments' => $studentsWithDocuments,
+            'filters' => $request->only(['search']),
+        ]);
+    }
+
+    /**
      * Display the specified document.
      */
     public function show(Document $document)
