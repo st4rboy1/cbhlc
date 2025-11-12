@@ -179,7 +179,7 @@ describe('Super Admin Routes Smoke Tests - Documents', function () {
 
     test('can access documents pending', function () {
         $browser = visit('/super-admin/documents/pending')
-            ->waitForText('Documents')
+            ->waitForText('Pending Documents')
             ->assertSee('Documents');
 
         assertNoConsoleErrors($browser);
@@ -375,7 +375,7 @@ describe('Super Admin Routes Smoke Tests - Receipts', function () {
 
     test('can access receipts create', function () {
         $browser = visit('/super-admin/receipts/create')
-            ->waitForText('Generate Receipt')
+            ->waitForText('Create Receipt')
             ->assertSee('Receipt');
 
         assertNoConsoleErrors($browser);
@@ -435,7 +435,7 @@ describe('Super Admin Routes Smoke Tests - Users', function () {
 describe('Super Admin Routes Smoke Tests - Reports', function () {
     test('can access reports index', function () {
         $browser = visit('/super-admin/reports')
-            ->waitForText('Reports')
+            ->waitForText('System Reports')
             ->assertSee('Reports');
 
         assertNoConsoleErrors($browser);
@@ -465,7 +465,7 @@ describe('Super Admin Routes Smoke Tests - School Information', function () {
 describe('Super Admin Routes Smoke Tests - Settings', function () {
     test('can access settings index', function () {
         $browser = visit('/super-admin/settings')
-            ->waitForText('Settings')
+            ->waitForText('Account Settings')
             ->assertSee('Settings');
 
         assertNoConsoleErrors($browser);

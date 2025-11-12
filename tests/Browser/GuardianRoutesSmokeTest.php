@@ -28,7 +28,7 @@ beforeEach(function () {
 
     $this->student->guardians()->attach($this->guardian->id);
 
-    $this->enrollment = Enrollment::factory()->create([
+    $this->enrollment = Enrollment::factory()->pending()->create([
         'student_id' => $this->student->id,
         'guardian_id' => $this->guardian->id,
     ]);
