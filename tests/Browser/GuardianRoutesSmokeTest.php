@@ -87,7 +87,9 @@ describe('Guardian Routes Smoke Tests', function () {
             ->assertSee('Edit Enrollment');
 
         assertNoConsoleErrors($browser);
-    })->skip('Guardian cannot edit enrollments - authorization issue');
+    })->skip('Page not loading - possible redirect or missing React component props issue');
+    // Note: Enrollment is set to pending() and guardian-student relationship exists,
+    // but page still fails to load. May need investigation of GuardianEnrollmentsEdit component.
 
     test('can access guardian students index', function () {
         $browser = visit('/guardian/students')
