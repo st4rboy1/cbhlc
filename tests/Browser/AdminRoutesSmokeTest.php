@@ -240,8 +240,8 @@ describe('Admin Routes Smoke Tests - Grade Level Fees', function () {
 
     test('can access grade level fees create', function () {
         visit('/admin/grade-level-fees/create')
-            ->waitForText('Create')
-            ->assertSee('Create');
+            ->waitForText('Create Grade Level Fee')
+            ->assertSee('Fee Details');
     })->group('smoke', 'admin');
 
     test('can access grade level fee show', function () {
@@ -252,8 +252,8 @@ describe('Admin Routes Smoke Tests - Grade Level Fees', function () {
 
     test('can access grade level fee edit', function () {
         visit("/admin/grade-level-fees/{$this->gradeLevelFee->id}/edit")
-            ->waitForText('Edit')
-            ->assertSee('Edit');
+            ->waitForText('Edit Grade Level Fee')
+            ->assertSee('Fee Details');
     })->group('smoke', 'admin');
 });
 
@@ -401,8 +401,8 @@ describe('Admin Routes Smoke Tests - Users', function () {
 
     test('can access users create', function () {
         visit('/admin/users/create')
-            ->waitForText('Create User')
-            ->assertSee('Create');
+            ->waitForText('Create New User')
+            ->assertSee('User Information');
     })->group('smoke', 'admin');
 
     test('can access user show', function () {
