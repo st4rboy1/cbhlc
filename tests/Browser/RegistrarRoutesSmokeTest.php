@@ -203,23 +203,7 @@ describe('Registrar Routes Smoke Tests - Grade Level Fees', function () {
     })->group('smoke', 'registrar');
 });
 
-describe('Registrar Routes Smoke Tests - Enrollment Periods', function () {
-    test('can access enrollment periods index', function () {
-        $browser = visit('/registrar/enrollment-periods')
-            ->waitForText('Enrollment Periods')
-            ->assertSee('Periods');
-
-        assertNoConsoleErrors($browser);
-    })->group('smoke', 'registrar');
-
-    test('can access enrollment period show', function () {
-        $browser = visit("/registrar/enrollment-periods/{$this->enrollmentPeriod->id}")
-            ->waitForText('Enrollment Periods')
-            ->assertSee('Period');
-
-        assertNoConsoleErrors($browser);
-    })->group('smoke', 'registrar');
-});
+// Enrollment Periods routes do not exist for Registrar role
 
 describe('Registrar Routes Smoke Tests - School Years', function () {
     test('can access school years index', function () {
