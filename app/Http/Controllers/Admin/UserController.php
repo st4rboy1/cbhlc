@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -25,6 +27,37 @@ class UserController extends Controller
             'users' => $users,
             'total' => $users->count(),
         ]);
+    }
+
+    public function create()
+    {
+        Gate::authorize('create', User::class);
+
+        $roles = Role::all();
+
+        return Inertia::render('admin/users/create', [
+            'roles' => $roles,
+        ]);
+    }
+
+    public function store(StoreUserRequest $request)
+    {
+        Gate::authorize('create', User::class);
+
+        $validated = $request->validated();
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => bcrypt($validated['password']),
+        ]);
+
+        if (isset($validated['role'])) {
+            $user->assignRole($validated['role']);
+        }
+
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User created successfully.');
     }
 
     public function show($id)
