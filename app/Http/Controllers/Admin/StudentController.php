@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreStudentRequest;
+use App\Http\Requests\SuperAdmin\StoreStudentRequest;
 use App\Models\Guardian;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -88,6 +88,7 @@ class StudentController extends Controller
         $studentData = [
             'id' => $student->id,
             'student_id' => $student->student_id,
+            'name' => trim("{$student->first_name} {$student->middle_name} {$student->last_name}"),
             'first_name' => $student->first_name,
             'middle_name' => $student->middle_name,
             'last_name' => $student->last_name,

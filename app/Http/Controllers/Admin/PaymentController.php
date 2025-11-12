@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StorePaymentRequest;
-use App\Http\Requests\UpdatePaymentRequest;
+use App\Http\Requests\SuperAdmin\StorePaymentRequest;
+use App\Http\Requests\SuperAdmin\UpdatePaymentRequest;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Services\PaymentService;
