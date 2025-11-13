@@ -46,7 +46,7 @@ class UserSeeder extends Seeder
     {
         // Super Admin
         $superAdmin = User::firstOrCreate(
-            ['email' => 'admin@cbhlc.edu'],
+            ['email' => 'super.admin@cbhlc.edu'],
             [
                 'name' => 'Super Admin',
                 'email_verified_at' => now(),
@@ -58,17 +58,17 @@ class UserSeeder extends Seeder
         }
 
         // Administrator
-        // $admin = User::firstOrCreate(
-        //     ['email' => 'admin@cbhlc.edu'],
-        //     [
-        //         'name' => 'Administrator',
-        //         'email_verified_at' => now(),
-        //         'password' => bcrypt('password'),
-        //     ]
-        // );
-        // if (! $admin->hasRole('administrator')) {
-        //     $admin->assignRole('administrator');
-        // }
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@cbhlc.edu'],
+            [
+                'name' => 'Administrator',
+                'email_verified_at' => now(),
+                'password' => bcrypt('password'),
+            ]
+        );
+        if (! $admin->hasRole('administrator')) {
+            $admin->assignRole('administrator');
+        }
 
         // Registrar
         $registrar = User::firstOrCreate(
