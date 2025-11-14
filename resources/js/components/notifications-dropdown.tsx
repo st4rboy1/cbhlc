@@ -146,15 +146,15 @@ export default function NotificationsDropdown({ notifications }: Props) {
                         notifications.map((notification) => (
                             <DropdownMenuItem
                                 key={notification.id}
-                                className={`flex cursor-pointer flex-col items-start gap-1 p-3 ${!notification.read_at ? 'bg-blue-50' : ''}`}
+                                className={`flex cursor-pointer flex-col items-start gap-1 p-3 ${!notification.read_at ? 'bg-blue-50 dark:bg-blue-950/30' : ''}`}
                                 onClick={() => handleNotificationClick(notification)}
                             >
                                 <div className="flex w-full items-start justify-between gap-2">
                                     <div className="flex-1">
-                                        <p className="text-sm font-semibold">{getNotificationTitle(notification)}</p>
+                                        <p className="text-sm font-semibold text-foreground">{getNotificationTitle(notification)}</p>
                                         <p className="text-xs text-muted-foreground">{notification.data.message}</p>
                                     </div>
-                                    {!notification.read_at && <div className="h-2 w-2 rounded-full bg-blue-600" />}
+                                    {!notification.read_at && <div className="h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400" />}
                                 </div>
                                 <div className="flex w-full items-center justify-between">
                                     <span className="text-xs text-muted-foreground">{formatDate(notification.created_at)}</span>
