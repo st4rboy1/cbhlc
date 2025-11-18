@@ -12,6 +12,12 @@ class StudentObserverTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        \App\Models\Student::observe(\App\Observers\StudentObserver::class);
+    }
+
     public function test_student_id_is_generated_automatically_when_creating(): void
     {
         $student = Student::factory()->create(['student_id' => null]);

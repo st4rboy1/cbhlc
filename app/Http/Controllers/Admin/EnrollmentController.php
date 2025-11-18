@@ -230,10 +230,18 @@ class EnrollmentController extends Controller
         Gate::authorize('update-enrollment', $enrollment);
 
         $validated = $request->validate([
-            'status' => 'required|string|in:'.implode(',', array_column(EnrollmentStatus::cases(), 'value')),
+            'student_id' => 'sometimes|integer|exists:students,id',
+            'guardian_id' => 'sometimes|integer|exists:guardians,id',
+            'school_year_id' => 'sometimes|integer|exists:school_years,id',
+            'grade_level' => 'sometimes|string|in:'.implode(',', array_column(\App\Enums\GradeLevel::cases(), 'value')),
+            'quarter' => 'sometimes|string|in:'.implode(',', array_column(\App\Enums\Quarter::cases(), 'value')),
+            'status' => 'sometimes|string|in:'.implode(',', array_column(EnrollmentStatus::cases(), 'value')),
+            'payment_status' => 'sometimes|string|in:'.implode(',', array_column(\App\Enums\PaymentStatus::cases(), 'value')),
+            'type' => 'sometimes|string|in:new,continuing,returnee,transferee',
+            'payment_plan' => 'sometimes|string|in:annual,semestral,monthly',
         ]);
 
-        $enrollment->update($validated);
+        $this->enrollmentService->updateEnrollment($enrollment, $validated);
 
         return redirect()->route('admin.enrollments.index')->with('success', 'Enrollment updated successfully.');
     }

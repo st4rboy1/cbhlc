@@ -14,18 +14,13 @@ class StudentControllerTest extends TestCase
 
     protected User $admin;
 
-    protected $students;
-
     protected function setUp(): void
     {
         parent::setUp();
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(\Database\Seeders\UserSeeder::class); // Seed UserSeeder to populate with students and users
 
-        $this->admin = User::factory()->create();
-        $this->admin->assignRole('administrator');
-
-        // Create students for testing
-        $this->students = Student::factory()->count(2)->create();
+        $this->admin = User::where('email', 'admin@cbhlc.edu')->first(); // Get admin from seeder
     }
 
     public function test_admin_can_view_students_index(): void
@@ -42,14 +37,20 @@ class StudentControllerTest extends TestCase
 
     public function test_admin_can_view_student_details(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('admin.students.show', $this->students->first()->id));
+        // Get an enrolled student from the seeder data (e.g., Juan Santos)
+        $student = Student::whereHas('user', fn ($query) => $query->where('email', 'juan.santos@student.cbhlc.edu'))->first();
+        if (! $student) {
+            $this->fail('Seeded student "Juan Santos" not found. Check UserSeeder and Enrollment statuses.');
+        }
+
+        $response = $this->actingAs($this->admin)->get(route('admin.students.show', $student->id));
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/students/show')
                 ->has('student')
-                ->where('student.id', $this->students->first()->id)
-                ->has('student.name')
+                ->where('student.id', $student->id)
+                ->has('student.full_name') // Changed from ->has('student.name')
                 ->has('student.grade')
                 ->has('student.status')
                 ->has('student.birth_date')
@@ -59,13 +60,19 @@ class StudentControllerTest extends TestCase
 
     public function test_admin_can_view_student_edit_page(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('admin.students.edit', $this->students->first()->id));
+        // Get an enrolled student from the seeder data (e.g., Juan Santos)
+        $student = Student::whereHas('user', fn ($query) => $query->where('email', 'juan.santos@student.cbhlc.edu'))->first();
+        if (! $student) {
+            $this->fail('Seeded student "Juan Santos" not found. Check UserSeeder and Enrollment statuses.');
+        }
+
+        $response = $this->actingAs($this->admin)->get(route('admin.students.edit', $student->id));
 
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/students/edit')
                 ->has('student')
-                ->where('student.id', $this->students->first()->id)
+                ->where('student.id', $student->id)
             );
     }
 
@@ -74,25 +81,37 @@ class StudentControllerTest extends TestCase
         $user = User::factory()->create();
         $user->assignRole('guardian');
 
+        // Get any student for this test
+        $student = Student::first();
+        if (! $student) {
+            $this->fail('No students found for non-admin access test.');
+        }
+
         $response = $this->actingAs($user)->get(route('admin.students.index'));
         $response->assertForbidden();
 
-        $response = $this->actingAs($user)->get(route('admin.students.show', $this->students->first()->id));
+        $response = $this->actingAs($user)->get(route('admin.students.show', $student->id));
         $response->assertForbidden();
 
-        $response = $this->actingAs($user)->get(route('admin.students.edit', $this->students->first()->id));
+        $response = $this->actingAs($user)->get(route('admin.students.edit', $student->id));
         $response->assertForbidden();
     }
 
     public function test_guest_redirected_to_login(): void
     {
+        // Get any student for this test
+        $student = Student::first();
+        if (! $student) {
+            $this->fail('No students found for guest redirect test.');
+        }
+
         $response = $this->get(route('admin.students.index'));
         $response->assertRedirect(route('login'));
 
-        $response = $this->get(route('admin.students.show', $this->students->first()->id));
+        $response = $this->get(route('admin.students.show', $student->id));
         $response->assertRedirect(route('login'));
 
-        $response = $this->get(route('admin.students.edit', $this->students->first()->id));
+        $response = $this->get(route('admin.students.edit', $student->id));
         $response->assertRedirect(route('login'));
     }
 
@@ -103,14 +122,32 @@ class StudentControllerTest extends TestCase
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/students/index')
-                ->has('students', $this->students->count())
-                ->has('students.0', fn ($student) => $student
+                ->has('students.data', 2) // Expect 2 enrolled students from UserSeeder
+                ->has('students.data.0', fn ($student) => $student
                     ->has('id')
-                    ->has('name')
-                    ->has('grade')
-                    ->has('status')
+                    ->has('guardian_id')
+                    ->has('student_id')
+                    ->has('first_name')
+                    ->has('last_name')
+                    ->has('middle_name')
+                    ->has('birthdate')
+                    ->has('gender')
+                    ->has('address')
+                    ->has('contact_number')
+                    ->has('email')
+                    ->has('grade_level')
+                    ->has('section')
+                    ->has('user_id')
+                    ->has('created_at')
+                    ->has('updated_at')
+                    ->has('birth_place')
+                    ->has('nationality')
+                    ->has('religion')
+                    ->has('guardians')
+                    ->has('enrollments')
+                    ->has('full_name')
                 )
-                ->where('total', 2)
+                ->where('total', 2) // Expect total to be 2 enrolled students
             );
     }
 }

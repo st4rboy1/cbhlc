@@ -172,12 +172,10 @@ export default function ReceiptEdit({ receipt, payments, invoices }: Props) {
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="Cash">Cash</SelectItem>
-                                        <SelectItem value="Check">Check</SelectItem>
+
                                         <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
-                                        <SelectItem value="Credit Card">Credit Card</SelectItem>
-                                        <SelectItem value="Debit Card">Debit Card</SelectItem>
+
                                         <SelectItem value="GCash">GCash</SelectItem>
-                                        <SelectItem value="PayMaya">PayMaya</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 {errors.payment_method && <p className="text-sm text-red-500">{errors.payment_method}</p>}

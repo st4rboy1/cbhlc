@@ -110,7 +110,7 @@ class StudentController extends Controller
                 'birth_place' => $student->birth_place,
                 'nationality' => $student->nationality,
                 'religion' => $student->religion,
-                /** @phpstan-ignore-next-line */
+
                 'enrollments' => $student->enrollments->map(function (\App\Models\Enrollment $enrollment) {
                     return [
                         'id' => $enrollment->id,
@@ -122,7 +122,7 @@ class StudentController extends Controller
                         'created_at' => $enrollment->created_at->format('Y-m-d'),
                     ];
                 }),
-                /** @phpstan-ignore-next-line */
+
                 'documents' => $student->documents->map(function (\App\Models\Document $document) {
                     return [
                         'id' => $document->id,

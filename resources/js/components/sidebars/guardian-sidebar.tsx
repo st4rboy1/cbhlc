@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { logout } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link, router } from '@inertiajs/react';
-import { CreditCard, FileCheck, FileText, GraduationCap, LayoutGrid, LogOut, Settings, Users } from 'lucide-react';
+import { FileCheck, FileText, GraduationCap, LayoutGrid, LogOut, Settings, Users } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -49,11 +49,6 @@ const billingNavItems: NavItem[] = [
 ];
 
 const secondaryNavItems: NavItem[] = [
-    {
-        title: 'Tuition Fees',
-        href: '/tuition',
-        icon: CreditCard,
-    },
     {
         title: 'Profile Settings',
         href: '/settings/profile',

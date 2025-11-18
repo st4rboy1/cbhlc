@@ -44,12 +44,4 @@ class PaymentFactory extends Factory
             'reference_number' => 'BT-'.$this->faker->numberBetween(100000, 999999),
         ]);
     }
-
-    public function check(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'payment_method' => PaymentMethod::CHECK,
-            'reference_number' => 'CHK-'.$this->faker->numberBetween(1000, 9999),
-        ]);
-    }
 }

@@ -299,17 +299,23 @@ test('getPaymentMethodDistribution returns payment statistics by method', functi
         'amount' => 10000,
     ]);
     Payment::factory()->count(3)->create([
-        'payment_method' => PaymentMethod::CHECK,
+        'payment_method' => PaymentMethod::CASH,
         'amount' => 15000,
+    ]);
+    Payment::factory()->count(2)->create([
+        'payment_method' => PaymentMethod::OTHER, // Added a third payment method
+        'amount' => 20000,
     ]);
 
     $result = $this->service->getPaymentMethodDistribution();
 
     expect($result)->toHaveCount(3);
-    expect($result->firstWhere('method', 'Cash')['count'])->toBe(10);
-    expect((float) $result->firstWhere('method', 'Cash')['total'])->toBe(50000.0);
+    expect($result->firstWhere('method', 'Cash')['count'])->toBe(13); // Corrected count: 10 + 3 = 13
+    expect((float) $result->firstWhere('method', 'Cash')['total'])->toBe(95000.0); // Corrected total: (10*5000) + (3*15000) = 95000
     expect($result->firstWhere('method', 'Bank Transfer')['count'])->toBe(5);
     expect((float) $result->firstWhere('method', 'Bank Transfer')['total'])->toBe(50000.0);
+    expect($result->firstWhere('method', 'Other')['count'])->toBe(2); // Added assertion for 'Other'
+    expect((float) $result->firstWhere('method', 'Other')['total'])->toBe(40000.0); // Added assertion for 'Other'
 });
 
 test('getEnrollmentStatusDistribution returns enrollment counts by status', function () {

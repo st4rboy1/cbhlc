@@ -64,6 +64,6 @@ class StudentObserver
             $sequence = 1;
         }
 
-        return sprintf('%d-%04d', $year, $sequence);
+        return sprintf('%d%04d', $year, $sequence);
     }
 }

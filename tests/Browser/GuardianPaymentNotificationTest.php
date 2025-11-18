@@ -158,7 +158,7 @@ describe('Guardian Payment Notification', function () {
         $payment = Payment::factory()->create([
             'invoice_id' => $invoice->id,
             'amount' => 30000.00,
-            'payment_method' => 'credit_card',
+            'payment_method' => 'cash',
         ]);
 
         // Send notification

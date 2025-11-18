@@ -3,17 +3,24 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SuperAdmin\StoreInvoiceRequest;
+use App\Http\Requests\SuperAdmin\UpdateInvoiceRequest;
 use App\Models\Enrollment;
 use App\Models\Invoice;
-use App\Models\Payment;
-use App\Models\Setting;
+use App\Models\InvoiceItem;
+use App\Services\InvoiceService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class InvoiceController extends Controller
 {
+    public function __construct(
+        protected InvoiceService $invoiceService
+    ) {}
+
     /**
      * Display a listing of all invoices (admin can view all)
      */
@@ -58,49 +65,162 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        Gate::authorize('create', Invoice::class);
+
+        $enrollments = Enrollment::with(['student', 'guardian.user'])
+            ->whereIn('status', [\App\Enums\EnrollmentStatus::APPROVED, \App\Enums\EnrollmentStatus::READY_FOR_PAYMENT, \App\Enums\EnrollmentStatus::ENROLLED])
+            ->get();
+
+        return Inertia::render('admin/invoices/create', [
+            'enrollments' => $enrollments,
+        ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreInvoiceRequest $request)
+    {
+        Gate::authorize('create', Invoice::class);
+
+        $validated = $request->validated();
+
+        $invoice = DB::transaction(function () use ($validated) {
+            $invoice = $this->invoiceService->createInvoice($validated);
+
+            // Notify guardian about the new invoice
+            $invoice->load(['enrollment.guardian.user']);
+            if ($invoice->enrollment && $invoice->enrollment->guardian && $invoice->enrollment->guardian->user) {
+                $invoice->enrollment->guardian->user->notify(new \App\Notifications\InvoiceCreatedNotification($invoice));
+            }
+
+            return $invoice;
+        });
+
+        return redirect()->route('admin.invoices.index')
+            ->with('success', 'Invoice created successfully.');
+    }
+
+    /**
      * Display the invoice for a specific enrollment (admin can view any)
      */
-    public function show(Request $request, Enrollment $invoice)
+    public function show(Invoice $invoice)
     {
-        // Load related data
-        $invoice->load(['student', 'guardian', 'schoolYear']);
-        $settings = Setting::pluck('value', 'key');
+        Gate::authorize('view', $invoice);
 
-        return Inertia::render('shared/invoice', [
-            'enrollment' => $invoice,
-            'invoiceNumber' => $invoice->enrollment_id ?? 'No Invoice Available',
-            'currentDate' => now()->format('F d, Y'),
-            'settings' => $settings,
+        $invoice->load(['enrollment.student', 'enrollment.guardian.user', 'items', 'payments']);
+
+        return Inertia::render('admin/invoices/show', [
+            'invoice' => $invoice,
         ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Invoice $invoice)
+    {
+        Gate::authorize('update', $invoice);
+
+        $invoice->load(['enrollment', 'items']);
+        $enrollments = Enrollment::with(['student', 'guardian.user'])
+            ->where('status', 'approved')
+            ->get();
+
+        return Inertia::render('admin/invoices/edit', [
+            'invoice' => $invoice,
+            'enrollments' => $enrollments,
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateInvoiceRequest $request, Invoice $invoice)
+    {
+        Gate::authorize('update', $invoice);
+
+        $validated = $request->validated();
+
+        DB::transaction(function () use ($validated, $invoice) {
+            $invoice->update([
+                'enrollment_id' => $validated['enrollment_id'],
+                'invoice_date' => $validated['invoice_date'],
+                'due_date' => $validated['due_date'],
+                'status' => $validated['status'],
+            ]);
+
+            // Handle invoice items
+            $existingItemIds = collect($validated['items'])
+                ->pluck('id')
+                ->filter()
+                ->toArray();
+
+            // Delete removed items
+            $invoice->items()
+                ->whereNotIn('id', $existingItemIds)
+                ->delete();
+
+            // Update or create items
+            foreach ($validated['items'] as $item) {
+                if (isset($item['id'])) {
+                    InvoiceItem::where('id', $item['id'])
+                        ->update([
+                            'description' => $item['description'],
+                            'quantity' => $item['quantity'],
+                            'unit_price' => $item['unit_price'],
+                            'amount' => $item['amount'],
+                        ]);
+                } else {
+                    $invoice->items()->create([
+                        'description' => $item['description'],
+                        'quantity' => $item['quantity'],
+                        'unit_price' => $item['unit_price'],
+                        'amount' => $item['amount'],
+                    ]);
+                }
+            }
+
+            // Recalculate totals
+            $this->invoiceService->recalculateTotals($invoice);
+        });
+
+        return redirect()->route('admin.invoices.index')
+            ->with('success', 'Invoice updated successfully.');
     }
 
     /**
      * Download invoice as PDF (admin can download any)
      */
-    public function download(Enrollment $invoice)
+    public function download(Invoice $invoice)
     {
-        // Load relationships
-        $invoice->load(['student', 'guardian', 'schoolYear']);
+        Gate::authorize('download', $invoice);
 
-        // Get payments for this enrollment
-        $payments = Payment::where('invoice_id', $invoice->id)
-            ->orderBy('payment_date', 'asc')
-            ->get();
+        $invoice->load([
+            'enrollment.student',
+            'enrollment.guardian.user',
+            'items',
+            'payments',
+        ]);
 
-        // Get school settings
-        $settings = Setting::pluck('value', 'key');
+        $schoolAddress = \App\Models\SchoolInformation::getByKey('school_address', 'Lantapan, Bukidnon');
+        $schoolPhone = \App\Models\SchoolInformation::getByKey('school_phone', '');
+        $schoolEmail = \App\Models\SchoolInformation::getByKey('school_email', 'cbhlc@example.com');
 
-        // Generate PDF
         $pdf = Pdf::loadView('pdf.invoice', [
-            'enrollment' => $invoice,
-            'payments' => $payments,
-            'settings' => $settings,
-            'invoiceDate' => now()->format('F d, Y'),
+            'invoice' => $invoice,
+            'schoolAddress' => $schoolAddress,
+            'schoolPhone' => $schoolPhone,
+            'schoolEmail' => $schoolEmail,
         ])
             ->setPaper('a4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);
 
-        return $pdf->download("invoice-{$invoice->enrollment_id}.pdf");
+        return $pdf->download("invoice-{$invoice->invoice_number}.pdf");
     }
 }
