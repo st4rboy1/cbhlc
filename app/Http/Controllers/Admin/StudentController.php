@@ -159,7 +159,7 @@ class StudentController extends Controller
         $studentData = [
             'id' => $student->id,
             'student_id' => $student->student_id,
-            'full_name' => $student->full_name,
+            'name' => $student->first_name.' '.$student->middle_name.' '.$student->last_name,
             'first_name' => $student->first_name,
             'middle_name' => $student->middle_name,
             'last_name' => $student->last_name,

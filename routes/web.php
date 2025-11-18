@@ -216,7 +216,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Admin Routes (for administrator roles)
-    Route::prefix('admin')->name('admin.')->middleware('role:administrator|super_admin')->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware('role:administrator')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         // Enrollments Management
@@ -272,7 +272,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         // Invoice Management
-        Route::resource('invoices', \App\Http\Controllers\Admin\InvoiceController::class)->except(['destroy']);
+        Route::resource('invoices', \App\Http\Controllers\Admin\InvoiceController::class)->only(['index', 'show']);
         Route::get('/invoices/{invoice}/download', [\App\Http\Controllers\Admin\InvoiceController::class, 'download'])->name('invoices.download');
 
         // Guardian Management

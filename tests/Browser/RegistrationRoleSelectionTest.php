@@ -3,11 +3,14 @@
 namespace Tests\Browser;
 
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Laravel\Dusk\Browser;
 use Tests\DuskTestCase;
 
 class RegistrationRoleSelectionTest extends DuskTestCase
 {
+    use DatabaseMigrations;
+
     protected function setUp(): void
     {
         parent::setUp();

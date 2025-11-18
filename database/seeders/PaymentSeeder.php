@@ -43,7 +43,8 @@ class PaymentSeeder extends Seeder
             PaymentMethod::CASH,
             PaymentMethod::BANK_TRANSFER,
             PaymentMethod::GCASH,
-            PaymentMethod::CASH,        ];
+            PaymentMethod::CREDIT_CARD,
+        ];
 
         foreach ($enrollments as $enrollment) {
             foreach ($enrollment->invoices as $invoice) {

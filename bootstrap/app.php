@@ -7,10 +7,6 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 
-if (file_exists(__DIR__.'/../.env.dusk.local') && (php_sapi_name() == 'cli' || php_sapi_name() == 'phpdbg')) {
-    Dotenv\Dotenv::createImmutable(dirname(__DIR__), '.env.dusk.local')->load();
-}
-
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',

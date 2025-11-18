@@ -348,7 +348,6 @@ class UserSeeder extends Seeder
             'student_id' => $student1->id,
             'school_year_id' => $sy2025->id,
         ], [
-            'enrollment_id' => Enrollment::generateEnrollmentId(),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_5->value,
@@ -390,7 +389,6 @@ class UserSeeder extends Seeder
             'student_id' => $student2->id,
             'school_year_id' => $sy2025->id,
         ], [
-            'enrollment_id' => Enrollment::generateEnrollmentId(),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_4->value,
@@ -450,7 +448,6 @@ class UserSeeder extends Seeder
             'student_id' => $student1->id,
             'school_year_id' => $sy2025->id,
         ], [
-            'enrollment_id' => Enrollment::generateEnrollmentId(),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::SECOND,
             'grade_level' => GradeLevel::GRADE_6->value,
@@ -494,7 +491,6 @@ class UserSeeder extends Seeder
             'student_id' => $student2->id,
             'school_year_id' => $sy2024->id,
         ], [
-            'enrollment_id' => Enrollment::generateEnrollmentId(),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_5->value,
@@ -551,7 +547,6 @@ class UserSeeder extends Seeder
             'student_id' => $student1->id,
             'school_year_id' => $sy2025->id,
         ], [
-            'enrollment_id' => Enrollment::generateEnrollmentId(),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::KINDER->value,
@@ -593,7 +588,6 @@ class UserSeeder extends Seeder
             'student_id' => $student2->id,
             'school_year_id' => $sy2025->id,
         ], [
-            'enrollment_id' => Enrollment::generateEnrollmentId(),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_1->value,
@@ -637,7 +631,6 @@ class UserSeeder extends Seeder
             'student_id' => $student->id,
             'school_year_id' => $sy2022->id,
         ], [
-            'enrollment_id' => Enrollment::generateEnrollmentId(),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_4->value,
@@ -658,7 +651,6 @@ class UserSeeder extends Seeder
             'student_id' => $student->id,
             'school_year_id' => $sy2023->id,
         ], [
-            'enrollment_id' => Enrollment::generateEnrollmentId(),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_5->value,
@@ -679,7 +671,6 @@ class UserSeeder extends Seeder
             'student_id' => $student->id,
             'school_year_id' => $sy2024->id,
         ], [
-            'enrollment_id' => Enrollment::generateEnrollmentId(),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_6->value,
