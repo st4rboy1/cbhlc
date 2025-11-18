@@ -8,7 +8,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 
 if (file_exists(__DIR__.'/../.env.dusk.local') && (php_sapi_name() == 'cli' || php_sapi_name() == 'phpdbg')) {
-    (new Dotenv\Dotenv(dirname(__DIR__), '.env.dusk.local'))->load();
+    Dotenv\Dotenv::createImmutable(dirname(__DIR__), '.env.dusk.local')->load();
 }
 
 return Application::configure(basePath: dirname(__DIR__))

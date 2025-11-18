@@ -7,6 +7,7 @@ enum PaymentMethod: string
     case CASH = 'cash';
     case BANK_TRANSFER = 'bank_transfer';
     case GCASH = 'gcash';
+    case OTHER = 'other';
 
     public function label(): string
     {
@@ -14,6 +15,7 @@ enum PaymentMethod: string
             self::CASH => 'Cash',
             self::BANK_TRANSFER => 'Bank Transfer',
             self::GCASH => 'GCash',
+            self::OTHER => 'Other',
         };
     }
 
@@ -23,6 +25,7 @@ enum PaymentMethod: string
             self::CASH => 'banknotes',
             self::BANK_TRANSFER => 'building-2',
             self::GCASH => 'device-mobile',
+            self::OTHER => 'question_mark',
         };
     }
 
