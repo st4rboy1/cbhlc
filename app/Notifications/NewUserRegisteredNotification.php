@@ -45,7 +45,7 @@ class NewUserRegisteredNotification extends Notification implements ShouldQueue
             ->line('Email: '.$this->user->email)
             ->line('Role(s): '.$roles)
             ->line('Registration Date: '.$this->user->created_at->format('F d, Y h:i A'))
-            ->action('View User', route('super-admin.users.show', $this->user))
+            ->action('View User', route('admin.users.show', $this->user))
             ->line('Please review this new user registration.');
     }
 
@@ -71,7 +71,7 @@ class NewUserRegisteredNotification extends Notification implements ShouldQueue
                 'Role(s)' => $roles,
                 'Registration Date' => $this->user->created_at->format('F d, Y h:i A'),
             ],
-            'action_url' => route('super-admin.users.show', $this->user),
+            'action_url' => route('admin.users.show', $this->user),
         ];
     }
 }

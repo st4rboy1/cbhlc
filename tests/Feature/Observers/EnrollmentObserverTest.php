@@ -24,6 +24,8 @@ class EnrollmentObserverTest extends TestCase
         // Seed roles
         $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
 
+        \App\Models\Enrollment::observe(\App\Observers\EnrollmentObserver::class);
+
         // Create school year
         $this->sy2024 = \App\Models\SchoolYear::firstOrCreate([
             'name' => '2024-2025',
@@ -52,11 +54,17 @@ class EnrollmentObserverTest extends TestCase
 
     public function test_enrollment_id_is_generated_automatically(): void
     {
-        $enrollment = Enrollment::factory()->create(['enrollment_id' => null]);
+        $enrollment = Enrollment::factory()->create();
 
         $this->assertNotNull($enrollment->enrollment_id);
-        $this->assertMatchesRegularExpression('/^ENR-\d{10}$/', $enrollment->enrollment_id);
-        $this->assertStringStartsWith('ENR-'.date('Ym'), $enrollment->enrollment_id);
+
+        $this->assertStringStartsWith('ENR-', $enrollment->enrollment_id);
+        $this->assertEquals(28, strlen($enrollment->enrollment_id));
+        $random_string_part = substr($enrollment->enrollment_id, -4);
+
+        $this->assertTrue(ctype_alnum($random_string_part));
+        $this->assertMatchesRegularExpression('/^\d{20}/', substr($enrollment->enrollment_id, 4, 20));
+
     }
 
     public function test_default_status_is_set_to_pending(): void

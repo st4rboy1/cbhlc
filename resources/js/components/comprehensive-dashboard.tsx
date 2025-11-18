@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/format-currency';
-import { CreditCard, DollarSign, FileText, GraduationCap, School, TrendingUp, UserCheck } from 'lucide-react';
+import { Banknote, DollarSign, FileText, GraduationCap, School, TrendingUp, UserCheck } from 'lucide-react';
 
 interface DashboardStats {
     // Core metrics
@@ -173,7 +173,7 @@ export function ComprehensiveDashboard({ stats }: Props) {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">Total Payments</CardTitle>
-                            <CreditCard className="h-4 w-4 text-muted-foreground" />
+                            <Banknote className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">{stats.totalPayments}</div>

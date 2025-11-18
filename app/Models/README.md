@@ -325,7 +325,7 @@
 
 - `invoice_id` (FK)
 - `amount` - Decimal(10,2)
-- `payment_method` - Enum: cash, bank_transfer, check, credit_card, gcash, paymaya
+- `payment_method` - Enum: cash, bank_transfer, gcash
 - `payment_date` - Date
 - `reference_number` - External reference (bank ref, etc.) - nullable
 - `receipt_number` - Generated receipt number - nullable, unique

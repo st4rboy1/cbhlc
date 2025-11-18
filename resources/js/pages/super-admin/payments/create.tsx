@@ -188,10 +188,7 @@ export default function SuperAdminPaymentsCreate({ invoices }: Props) {
                                             <SelectContent>
                                                 <SelectItem value="cash">Cash</SelectItem>
                                                 <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                                                <SelectItem value="check">Check</SelectItem>
-                                                <SelectItem value="credit_card">Credit Card</SelectItem>
                                                 <SelectItem value="gcash">GCash</SelectItem>
-                                                <SelectItem value="paymaya">PayMaya</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         {errors.payment_method && <p className="text-sm text-destructive">{errors.payment_method}</p>}

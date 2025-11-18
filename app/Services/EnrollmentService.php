@@ -175,6 +175,38 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
     }
 
     /**
+     * Update enrollment application
+     */
+    public function updateEnrollment(Enrollment $enrollment, array $data): Enrollment
+    {
+        return DB::transaction(function () use ($enrollment, $data) {
+            if (isset($data['grade_level']) && $data['grade_level'] !== $enrollment->grade_level) {
+                $fees = $this->calculateFees($data['grade_level']);
+                $data = array_merge($data, [
+                    'tuition_fee_cents' => $fees['tuition'] * 100,
+                    'miscellaneous_fee_cents' => $fees['miscellaneous'] * 100,
+                    'laboratory_fee_cents' => $fees['laboratory'] * 100,
+                    'library_fee_cents' => $fees['library'] * 100,
+                    'sports_fee_cents' => $fees['sports'] * 100,
+                    'total_amount_cents' => $fees['total'] * 100,
+                    'net_amount_cents' => $fees['total'] * 100, // Assuming no discount at creation
+                    'amount_paid_cents' => 0,
+                    'balance_cents' => $fees['total'] * 100,
+                ]);
+            }
+
+            $enrollment->update($data);
+
+            $this->logActivity('updateEnrollment', [
+                'enrollment_id' => $enrollment->id,
+                'data' => $data,
+            ]);
+
+            return $enrollment->fresh();
+        });
+    }
+
+    /**
      * Approve enrollment
      */
     public function approveEnrollment(Enrollment $enrollment): Enrollment

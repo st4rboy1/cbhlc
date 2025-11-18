@@ -59,7 +59,7 @@ class UserEmailVerifiedNotification extends Notification implements ShouldQueue
             ->line('• Account Status: Active')
             ->line('')
             ->line('The user can now fully access the system and may begin submitting enrollment applications.')
-            ->action('View User Profile', route('super-admin.users.show', $this->user->id));
+            ->action('View User Profile', route('admin.users.show', $this->user->id));
 
         // Add note if verification took longer than usual
         $hoursToVerify = $this->user->created_at->diffInHours($this->verifiedAt);
@@ -89,7 +89,7 @@ class UserEmailVerifiedNotification extends Notification implements ShouldQueue
             'verification_date' => $this->verifiedAt->format('c'),
             'time_to_verify' => $this->timeToVerify,
             'account_status' => 'active',
-            'action_url' => route('super-admin.users.show', $this->user->id),
+            'action_url' => route('admin.users.show', $this->user->id),
         ];
     }
 

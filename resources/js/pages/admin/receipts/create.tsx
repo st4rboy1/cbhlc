@@ -155,11 +155,9 @@ export default function ReceiptCreate({ payments, invoices, nextReceiptNumber }:
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value="cash">Cash</SelectItem>
-                                        <SelectItem value="check">Check</SelectItem>
                                         <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                                        <SelectItem value="credit_card">Credit Card</SelectItem>
+
                                         <SelectItem value="gcash">GCash</SelectItem>
-                                        <SelectItem value="paymaya">PayMaya</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 {errors.payment_method && <p className="text-sm text-red-500">{errors.payment_method}</p>}

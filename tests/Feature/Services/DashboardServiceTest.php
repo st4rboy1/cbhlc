@@ -299,8 +299,7 @@ test('getPaymentMethodDistribution returns payment statistics by method', functi
         'amount' => 10000,
     ]);
     Payment::factory()->count(3)->create([
-        'payment_method' => PaymentMethod::CHECK,
-        'amount' => 15000,
+        'payment_method' => PaymentMethod::CASH,        'amount' => 15000,
     ]);
 
     $result = $this->service->getPaymentMethodDistribution();

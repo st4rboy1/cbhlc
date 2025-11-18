@@ -71,10 +71,7 @@ const getPaymentMethodLabel = (method: string): string => {
     const labels: Record<string, string> = {
         cash: 'Cash',
         bank_transfer: 'Bank Transfer',
-        check: 'Check',
-        credit_card: 'Credit Card',
         gcash: 'GCash',
-        paymaya: 'PayMaya',
     };
     return labels[method] || method;
 };
