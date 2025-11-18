@@ -3,23 +3,30 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\EnrollmentStatus;
-use App\Enums\GradeLevel;
-use App\Enums\Quarter;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Guardian\StoreEnrollmentRequest;
+use App\Http\Requests\Admin\StoreEnrollmentRequest;
 use App\Models\Enrollment;
 use App\Models\Guardian;
 use App\Models\SchoolInformation;
+use App\Models\SchoolYear;
 use App\Models\Student;
+use App\Services\EnrollmentService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class EnrollmentController extends Controller
 {
+    public function __construct(
+        protected EnrollmentService $enrollmentService
+    ) {}
+
     public function index(Request $request)
     {
+        Gate::authorize('viewAny-enrollment');
+
         $enrollmentsQuery = Enrollment::query();
 
         // Exclude completed and enrolled enrollments from count (they should appear in Students page only)
@@ -43,7 +50,7 @@ class EnrollmentController extends Controller
                 EnrollmentStatus::COMPLETED,
                 EnrollmentStatus::ENROLLED,
             ])
-            ->with(['student'])
+            ->with(['student', 'guardian.user'])
             ->when($request->input('search'), function ($query, $search) {
                 $query->whereHas('student', function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
@@ -66,117 +73,103 @@ class EnrollmentController extends Controller
             'enrollments' => $enrollments,
             'filters' => $request->only(['search', 'status', 'grade']),
             'statusCounts' => $statusCounts,
+            'statuses' => collect(EnrollmentStatus::cases())->map(fn ($status) => ['value' => $status->value, 'label' => $status->label()]),
+            'schoolYears' => SchoolYear::orderBy('start_year', 'desc')->get(),
         ]);
     }
 
     public function create(Request $request)
     {
-        $currentSchoolYearName = date('Y').'-'.(date('Y') + 1);
-        $currentSchoolYear = \App\Models\SchoolYear::where('name', $currentSchoolYearName)->first();
-        $currentSchoolYearId = $currentSchoolYear?->id;
-        $selectedStudentId = $request->query('student_id');
+        Gate::authorize('create-enrollment');
 
-        // Get all students for admin (unlike guardian who only sees their students)
-        $studentsQuery = Student::query()->get();
+        // Get active school year for filtering
+        $activeSchoolYear = SchoolYear::active();
+        $activeSchoolYearId = $activeSchoolYear?->id;
 
-        $students = $studentsQuery->map(function ($student) use ($currentSchoolYearId) {
-            return [
-                'id' => $student->id,
-                'first_name' => $student->first_name,
-                'middle_name' => $student->middle_name,
-                'last_name' => $student->last_name,
-                'student_id' => $student->student_id,
-                'is_new_student' => $student->isNewStudent(),
-                'current_grade_level' => $student->getCurrentGradeLevel()?->value,
-                'available_grade_levels' => array_map(
-                    fn ($grade) => $grade->value,
-                    $student->getAvailableGradeLevels($currentSchoolYearId)
-                ),
-            ];
-        });
+        // Exclude students who already have enrollments for active school year
+        $students = Student::with('guardians')
+            ->when($activeSchoolYearId, function ($query) use ($activeSchoolYearId) {
+                $query->whereDoesntHave('enrollments', function ($q) use ($activeSchoolYearId) {
+                    $q->where('school_year_id', $activeSchoolYearId);
+                });
+            })
+            ->get();
 
-        return Inertia::render('shared/enrollments/create', [
+        $guardians = Guardian::with('user')->get();
+
+        // Get available school years (active and upcoming)
+        $schoolYears = SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
+
+        return Inertia::render('admin/enrollments/create', [
             'students' => $students,
-            'gradeLevels' => GradeLevel::values(),
-            'quarters' => Quarter::values(),
-            'currentSchoolYear' => $currentSchoolYear?->name,
-            'selectedStudentId' => $selectedStudentId,
-            'submitRoute' => route('admin.enrollments.store'),
-            'indexRoute' => route('admin.enrollments.index'),
+            'guardians' => $guardians,
+            'schoolYears' => $schoolYears,
+            'gradelevels' => array_map(fn ($grade) => [
+                'label' => $grade->label(),
+                'value' => $grade->value,
+            ], \App\Enums\GradeLevel::cases()),
+            'quarters' => array_map(fn ($quarter) => [
+                'label' => $quarter->label(),
+                'value' => $quarter->value,
+            ], \App\Enums\Quarter::cases()),
         ]);
     }
 
     public function store(StoreEnrollmentRequest $request)
     {
+        Gate::authorize('create-enrollment');
+
         $validated = $request->validated();
 
+        // Check if student can enroll
         $student = Student::findOrFail($validated['student_id']);
-
-        // Check if student is an existing student (has previous enrollments)
-        $previousEnrollments = Enrollment::where('student_id', $validated['student_id'])
-            ->orderBy('created_at', 'desc')
-            ->first();
-
-        if ($previousEnrollments) {
-            // Business Rule 1: Existing students must enroll in First quarter
-            $validated['quarter'] = Quarter::FIRST->value;
+        $schoolYear = SchoolYear::findOrFail($validated['school_year_id']);
+        if (! $this->enrollmentService->canEnroll($student, $schoolYear->name)) {
+            return redirect()->back()
+                ->withErrors(['student_id' => 'Student already has a pending enrollment for this school year.'])
+                ->withInput();
         }
 
-        // Get the fee for the selected grade level and school year
-        $gradeLevelFee = \App\Models\GradeLevelFee::where('grade_level', $validated['grade_level'])
-            ->where('school_year_id', $validated['school_year_id'])
+        // Automatically get primary guardian from student
+        /** @var Guardian|null $primaryGuardian */
+        $primaryGuardian = $student->guardians()
+            ->wherePivot('is_primary_contact', true)
             ->first();
 
-        $tuitionFeeCents = ($gradeLevelFee ? $gradeLevelFee->tuition_fee : 0) * 100;
-        $miscFeeCents = ($gradeLevelFee ? $gradeLevelFee->miscellaneous_fee : 0) * 100;
-        $laboratoryFeeCents = 0;
-        $libraryFeeCents = 0;
-        $sportsFeeCents = 0;
-        $discountCents = 0;
-
-        // Calculate totals
-        $totalAmountCents = $tuitionFeeCents + $miscFeeCents + $laboratoryFeeCents + $libraryFeeCents + $sportsFeeCents;
-        $netAmountCents = $totalAmountCents - $discountCents;
-        $amountPaidCents = 0;
-        $balanceCents = $netAmountCents - $amountPaidCents;
-
-        // Get the guardian for this student (use the first guardian)
-        $guardian = $student->guardians()->first();
-
-        if (! $guardian) {
-            return back()->withErrors(['student_id' => 'This student does not have an associated guardian.']);
+        if (! $primaryGuardian) {
+            // If no primary guardian, get any guardian
+            /** @var Guardian|null $primaryGuardian */
+            $primaryGuardian = $student->guardians()->first();
         }
 
-        /** @var Guardian $guardian */
-        $enrollment = Enrollment::create([
-            'student_id' => $validated['student_id'],
-            'guardian_id' => $guardian->id,
-            'school_year' => $validated['school_year'],
-            'quarter' => Quarter::from($validated['quarter']),
-            'grade_level' => GradeLevel::from($validated['grade_level']),
-            'status' => EnrollmentStatus::PENDING,
-            'tuition_fee_cents' => $tuitionFeeCents,
-            'miscellaneous_fee_cents' => $miscFeeCents,
-            'laboratory_fee_cents' => $laboratoryFeeCents,
-            'library_fee_cents' => $libraryFeeCents,
-            'sports_fee_cents' => $sportsFeeCents,
-            'total_amount_cents' => $totalAmountCents,
-            'discount_cents' => $discountCents,
-            'net_amount_cents' => $netAmountCents,
-            'amount_paid_cents' => $amountPaidCents,
-            'balance_cents' => $balanceCents,
-        ]);
+        if (! $primaryGuardian) {
+            return redirect()->back()
+                ->withErrors(['student_id' => 'Selected student has no associated guardian.'])
+                ->withInput();
+        }
 
-        // Dispatch event to notify registrars
-        event(new \App\Events\EnrollmentCreated($enrollment));
+        // Add guardian_id to validated data
+        $validated['guardian_id'] = $primaryGuardian->id;
+
+        DB::transaction(function () use ($validated) {
+            $enrollment = $this->enrollmentService->createEnrollment($validated);
+
+            // Auto-approve if created by admin
+            if (auth()->user()->hasRole('administrator')) {
+                $this->enrollmentService->approveEnrollment($enrollment);
+            }
+        });
 
         return redirect()->route('admin.enrollments.index')
-            ->with('success', 'Enrollment application submitted successfully.');
+            ->with('success', 'Enrollment created successfully.');
     }
 
     public function show($id)
     {
         $enrollment = Enrollment::with(['student', 'guardian', 'schoolYear'])->findOrFail($id);
+        Gate::authorize('view-enrollment', $enrollment);
 
         return Inertia::render('admin/enrollments/show', [
             'enrollment' => $enrollment,
@@ -186,16 +179,55 @@ class EnrollmentController extends Controller
     public function edit($id)
     {
         $enrollment = Enrollment::findOrFail($id);
+        Gate::authorize('update-enrollment', $enrollment);
+        $enrollment->load(['student', 'guardian']);
+        $students = Student::with('guardians')->get();
+        $guardians = Guardian::with('user')->get();
+
+        // Get available school years (active and upcoming)
+        $schoolYears = SchoolYear::whereIn('status', ['active', 'upcoming'])
+            ->orderBy('start_year', 'desc')
+            ->get();
 
         return Inertia::render('admin/enrollments/edit', [
             'enrollment' => $enrollment,
-            'statuses' => collect(EnrollmentStatus::cases())->map(fn ($status) => ['value' => $status->value, 'label' => $status->label()]),
+            'students' => $students,
+            'guardians' => $guardians,
+            'schoolYears' => $schoolYears,
+            'gradelevels' => array_map(fn ($grade) => [
+                'label' => $grade->label(),
+                'value' => $grade->value,
+            ], \App\Enums\GradeLevel::cases()),
+            'quarters' => array_map(fn ($quarter) => [
+                'label' => $quarter->label(),
+                'value' => $quarter->value,
+            ], \App\Enums\Quarter::cases()),
+            'statuses' => array_map(fn ($status) => [
+                'label' => $status->label(),
+                'value' => $status->value,
+            ], EnrollmentStatus::cases()),
+            'paymentStatuses' => array_map(fn ($status) => [
+                'label' => $status->label(),
+                'value' => $status->value,
+            ], \App\Enums\PaymentStatus::cases()),
+            'types' => [
+                ['label' => 'New Student', 'value' => 'new'],
+                ['label' => 'Continuing Student', 'value' => 'continuing'],
+                ['label' => 'Returnee', 'value' => 'returnee'],
+                ['label' => 'Transferee', 'value' => 'transferee'],
+            ],
+            'paymentPlans' => [
+                ['label' => 'Annual', 'value' => 'annual'],
+                ['label' => 'Semestral', 'value' => 'semestral'],
+                ['label' => 'Monthly', 'value' => 'monthly'],
+            ],
         ]);
     }
 
     public function update(Request $request, $id)
     {
         $enrollment = Enrollment::findOrFail($id);
+        Gate::authorize('update-enrollment', $enrollment);
 
         $validated = $request->validate([
             'status' => 'required|string|in:'.implode(',', array_column(EnrollmentStatus::cases(), 'value')),
@@ -209,6 +241,7 @@ class EnrollmentController extends Controller
     public function destroy($id)
     {
         $enrollment = Enrollment::findOrFail($id);
+        Gate::authorize('delete-enrollment', $enrollment);
         $enrollment->delete();
 
         return redirect()->route('admin.enrollments.index')->with('success', 'Enrollment deleted successfully.');

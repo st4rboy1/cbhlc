@@ -29,7 +29,7 @@ interface Props {
 
 export default function StudentCreate({ guardians, gradelevels }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Admin', href: '/admin/dashboard' },
         { title: 'Students', href: '/admin/students' },
         { title: 'Create Student', href: '/admin/students/create' },
     ];

@@ -6,10 +6,8 @@ use App\Models\SchoolYear;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Schema;
 
-uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
-
 beforeEach(function () {
-    $this->seed(RolesAndPermissionsSeeder::class);
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => RolesAndPermissionsSeeder::class]);
 });
 
 describe('Enrollment Period Migration', function () {

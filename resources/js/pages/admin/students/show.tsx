@@ -21,7 +21,7 @@ interface Props {
 
 export default function StudentShow({ student }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Admin', href: '/admin/dashboard' },
         { title: 'Students', href: '/admin/students' },
         { title: `${student.first_name} ${student.last_name}`, href: `/admin/students/${student.id}` },
     ];

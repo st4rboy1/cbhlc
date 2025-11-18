@@ -52,7 +52,7 @@ interface FormData {
 
 export default function AdminEnrollmentsCreate({ students, gradelevels, quarters, schoolYears }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Admin', href: '/admin/dashboard' },
         { title: 'Enrollments', href: '/admin/enrollments' },
         { title: 'Create Enrollment', href: '/admin/enrollments/create' },
     ];

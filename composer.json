@@ -77,7 +77,8 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
-            "@php artisan test"
+            "@php artisan optimize:clear",
+            "./run-tests.sh"
         ]
     },
     "extra": {
@@ -89,6 +90,7 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "process-timeout": 600,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true

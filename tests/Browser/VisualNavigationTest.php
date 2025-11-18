@@ -3,11 +3,9 @@
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Laravel\Dusk\Browser;
 
-uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
-
 beforeEach(function () {
     // Seed roles and permissions for each test
-    $this->seed(RolesAndPermissionsSeeder::class);
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => RolesAndPermissionsSeeder::class]);
 
     // Set environment variable to disable headless mode
     putenv('DUSK_HEADLESS_DISABLED=true');

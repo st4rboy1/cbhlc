@@ -10,8 +10,6 @@ use App\Notifications\InvoiceCreatedNotification;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Notification;
 
-uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
-
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 });

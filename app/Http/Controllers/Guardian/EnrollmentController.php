@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Guardian;
 
 use App\Enums\EnrollmentStatus;
 use App\Enums\GradeLevel;
-use App\Enums\PaymentStatus;
 use App\Enums\Quarter;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guardian\StoreEnrollmentRequest;
@@ -17,6 +16,7 @@ use App\Models\SchoolInformation;
 use App\Models\SchoolYear;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\EnrollmentService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +24,10 @@ use Inertia\Inertia;
 
 class EnrollmentController extends Controller
 {
+    public function __construct(
+        protected EnrollmentService $enrollmentService
+    ) {}
+
     /**
      * Display a listing of guardian's children enrollments.
      */
@@ -244,27 +248,17 @@ class EnrollmentController extends Controller
         // Get Guardian model ID for the authenticated user
         $guardian = \App\Models\Guardian::where('user_id', Auth::id())->firstOrFail();
 
-        $enrollment = Enrollment::create([
+        $enrollment = $this->enrollmentService->createEnrollment([
             'student_id' => $validated['student_id'],
             'guardian_id' => $guardian->id,
             'school_year_id' => $activePeriod->school_year_id,
             'enrollment_period_id' => $activePeriod->id,
-            'quarter' => Quarter::from($validated['quarter']),
-            'grade_level' => GradeLevel::from($validated['grade_level']),
-            'status' => EnrollmentStatus::PENDING,
+            'quarter' => $validated['quarter'],
+            'grade_level' => $validated['grade_level'],
+            'type' => $student->isNewStudent() ? 'new' : 'continuing', // Determine type based on student status
             'payment_plan' => $validated['payment_plan'],
-            'tuition_fee_cents' => $tuitionFeeCents,
-            'miscellaneous_fee_cents' => $miscFeeCents,
-            'laboratory_fee_cents' => $laboratoryFeeCents,
-            'library_fee_cents' => $libraryFeeCents,
-            'sports_fee_cents' => $sportsFeeCents,
-            'other_fees_cents' => $otherFeeCents,
-            'total_amount_cents' => $totalAmountCents,
-            'discount_cents' => $discountCents,
-            'net_amount_cents' => $netAmountCents,
-            'payment_status' => PaymentStatus::PENDING,
-            'amount_paid_cents' => $amountPaidCents,
-            'balance_cents' => $balanceCents,
+            'previous_school' => $validated['previous_school'] ?? null,
+            'previous_school_address' => $validated['previous_school_address'] ?? null,
         ]);
 
         // Load relationships for notifications

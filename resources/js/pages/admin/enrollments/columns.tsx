@@ -1,8 +1,11 @@
 import { EnrollmentStatusBadge } from '@/components/status-badges';
 import { Button } from '@/components/ui/button';
-import { Link } from '@inertiajs/react';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
+import { Link, router } from '@inertiajs/react';
 import { type ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, Edit, Eye } from 'lucide-react';
+import { ArrowUpDown, Edit, Eye, Trash } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export interface Student {
     id: number;
@@ -32,8 +35,54 @@ export interface Enrollment {
     created_at: string;
 }
 
-// The handleDelete function is removed as admin users typically don't have direct delete access from the table.
-// If needed, a different approach for admin-level deletion with proper authorization should be implemented.
+function ActionsCell({ enrollment }: { enrollment: Enrollment }) {
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+    const handleDelete = () => {
+        router.delete(`/admin/enrollments/${enrollment.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Enrollment deleted successfully');
+                setDeleteDialogOpen(false);
+            },
+            onError: () => {
+                toast.error('Failed to delete enrollment. Please try again.');
+            },
+        });
+    };
+
+    return (
+        <>
+            <div className="flex justify-end gap-2">
+                <Link href={`/admin/enrollments/${enrollment.id}`}>
+                    <Button size="sm" variant="outline">
+                        <Eye className="h-4 w-4" />
+                    </Button>
+                </Link>
+                <Link href={`/admin/enrollments/${enrollment.id}/edit`}>
+                    <Button size="sm" variant="outline">
+                        <Edit className="h-4 w-4" />
+                    </Button>
+                </Link>
+                {enrollment.status === 'pending' && (
+                    <Button size="sm" variant="destructive" onClick={() => setDeleteDialogOpen(true)}>
+                        <Trash className="h-4 w-4" />
+                    </Button>
+                )}
+            </div>
+
+            <ConfirmationDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={handleDelete}
+                title="Delete Enrollment?"
+                description={`Are you sure you want to delete enrollment ${enrollment.enrollment_id}? This action cannot be undone and only pending enrollments can be deleted.`}
+                confirmText="Delete"
+                variant="destructive"
+            />
+        </>
+    );
+}
 
 export const columns: ColumnDef<Enrollment>[] = [
     {
@@ -41,7 +90,7 @@ export const columns: ColumnDef<Enrollment>[] = [
         header: ({ column }) => {
             return (
                 <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                    Reference #
+                    Enrollment ID
                     <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
             );
@@ -54,7 +103,7 @@ export const columns: ColumnDef<Enrollment>[] = [
     },
     {
         id: 'student',
-        accessorFn: (row) => `${row.student?.first_name} ${row.student?.last_name}`,
+        accessorFn: (row) => `${row.student.first_name} ${row.student.last_name}`,
         header: ({ column }) => {
             return (
                 <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
@@ -68,16 +117,16 @@ export const columns: ColumnDef<Enrollment>[] = [
             return (
                 <div>
                     <div>
-                        {enrollment.student?.first_name} {enrollment.student?.last_name}
+                        {enrollment.student.first_name} {enrollment.student.last_name}
                     </div>
-                    <div className="text-sm text-muted-foreground">ID: {enrollment.student?.student_id}</div>
+                    <div className="text-sm text-muted-foreground">ID: {enrollment.student.student_id}</div>
                 </div>
             );
         },
     },
     {
         id: 'guardian',
-        accessorFn: (row) => `${row.guardian?.first_name} ${row.guardian?.last_name}`,
+        accessorFn: (row) => `${row.guardian.first_name} ${row.guardian.last_name}`,
         header: ({ column }) => {
             return (
                 <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
@@ -91,9 +140,9 @@ export const columns: ColumnDef<Enrollment>[] = [
             return (
                 <div>
                     <div>
-                        {enrollment.guardian?.first_name} {enrollment.guardian?.last_name}
+                        {enrollment.guardian.first_name} {enrollment.guardian.last_name}
                     </div>
-                    <div className="text-sm text-muted-foreground">{enrollment.guardian?.user?.email}</div>
+                    <div className="text-sm text-muted-foreground">{enrollment.guardian.user.email}</div>
                 </div>
             );
         },
@@ -137,23 +186,6 @@ export const columns: ColumnDef<Enrollment>[] = [
     {
         id: 'actions',
         header: () => <div className="text-right">Actions</div>,
-        cell: ({ row }) => {
-            const enrollment = row.original;
-
-            return (
-                <div className="flex justify-end gap-2">
-                    <Link href={`/admin/enrollments/${enrollment.id}`}>
-                        <Button size="sm" variant="outline">
-                            <Eye className="h-4 w-4" />
-                        </Button>
-                    </Link>
-                    <Link href={`/admin/enrollments/${enrollment.id}/edit`}>
-                        <Button size="sm" variant="outline">
-                            <Edit className="h-4 w-4" />
-                        </Button>
-                    </Link>
-                </div>
-            );
-        },
+        cell: ({ row }) => <ActionsCell enrollment={row.original} />,
     },
 ];

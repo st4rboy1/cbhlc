@@ -3,8 +3,6 @@
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 
-uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
-
 beforeEach(function () {
     // Seed roles and permissions for each test
     $this->seed(RolesAndPermissionsSeeder::class);

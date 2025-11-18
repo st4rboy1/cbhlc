@@ -1,8 +1,17 @@
 <?php
 
-pest()->extend(Tests\DuskTestCase::class)
-//  ->use(Illuminate\Foundation\Testing\DatabaseMigrations::class)
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Browser');
+
+// Helper function to generate a unique enrollment ID for tests
+function generateUniqueEnrollmentId(): string
+{
+    do {
+        $id = 'ENR-'.str_pad((string) rand(1, 9999), 4, '0', STR_PAD_LEFT);
+    } while (\App\Models\Enrollment::where('enrollment_id', $id)->exists());
+
+    return $id;
+}
 
 // Pest v4 Browser Testing Configuration
 // Using HEADLESS mode (default) - fast, perfect for pre-push hooks and CI/CD
