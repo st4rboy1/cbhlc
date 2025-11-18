@@ -34,7 +34,10 @@ const getPaymentMethodBadge = (method: string) => {
     const variants: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
         cash: { label: 'Cash', variant: 'default' },
         bank_transfer: { label: 'Bank Transfer', variant: 'secondary' },
+        check: { label: 'Check', variant: 'outline' },
+        credit_card: { label: 'Credit Card', variant: 'default' },
         gcash: { label: 'GCash', variant: 'secondary' },
+        paymaya: { label: 'PayMaya', variant: 'secondary' },
     };
 
     const config = variants[method] || { label: method, variant: 'outline' as const };

@@ -1,15 +1,5 @@
 <?php
 
-use App\Enums\EnrollmentPeriodStatus;
-use App\Enums\EnrollmentStatus;
-use App\Enums\PaymentStatus;
-use App\Enums\Quarter;
-use App\Models\Enrollment;
-use App\Models\EnrollmentPeriod;
-use App\Models\Guardian;
-use App\Models\GuardianStudent;
-use App\Models\Student;
-use App\Models\User;
 use Inertia\Testing\AssertableInertia;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);

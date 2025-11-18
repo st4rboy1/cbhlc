@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { logout } from '@/routes';
 import { type NavItem, type SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
-import { ClipboardList, FileCheck, LayoutGrid, LogOut, Settings } from 'lucide-react';
+import { ClipboardList, CreditCard, FileCheck, LayoutGrid, LogOut, Settings } from 'lucide-react';
 import AppLogo from '../app-logo';
 
 export function StudentSidebar() {
@@ -25,6 +25,11 @@ export function StudentSidebar() {
             title: 'My Invoices',
             href: '/invoices',
             icon: FileCheck,
+        },
+        {
+            title: 'Tuition Fees',
+            href: '/tuition',
+            icon: CreditCard,
         },
         ...(studentId
             ? [

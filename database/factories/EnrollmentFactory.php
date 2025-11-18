@@ -40,7 +40,7 @@ class EnrollmentFactory extends Factory
         $balance = $netAmount - $amountPaid;
 
         // Generate a unique enrollment ID
-        $enrollmentId = Enrollment::generateEnrollmentId();
+        $enrollmentId = 'ENR-'.date('Y').'-'.str_pad($this->faker->unique()->numberBetween(1, 9999), 4, '0', STR_PAD_LEFT);
 
         $status = $this->faker->randomElement(EnrollmentStatus::values());
         $approvedAt = null;
@@ -84,7 +84,7 @@ class EnrollmentFactory extends Factory
             'quarter' => $this->faker->randomElement(Quarter::values()),
             'grade_level' => $this->faker->randomElement(GradeLevel::values()),
             'payment_plan' => $this->faker->randomElement(PaymentPlan::values()),
-            'status' => $status ?? EnrollmentStatus::PENDING,
+            'status' => $status,
             'tuition_fee_cents' => $tuitionFee,
             'miscellaneous_fee_cents' => $miscFee,
             'laboratory_fee_cents' => $labFee,

@@ -327,16 +327,4 @@ class Enrollment extends Model
 
         return $errors;
     }
-
-    /**
-     * Generate a unique enrollment ID.
-     */
-    public static function generateEnrollmentId(): string
-    {
-        $prefix = 'ENR-';
-        $timestamp = now()->format('YmdHisu'); // YYYYMMDDHHMMSS + microseconds
-        $randomString = \Illuminate\Support\Str::random(4); // Add a random string for extra uniqueness
-
-        return "{$prefix}{$timestamp}{$randomString}";
-    }
 }

@@ -42,9 +42,6 @@ class EnrollmentObserver
      */
     public function created(Enrollment $enrollment): void
     {
-        // Ensure guardian and its user are loaded for email
-        $enrollment->loadMissing('guardian.user');
-
         // Send enrollment submitted email
         if ($enrollment->guardian && $enrollment->guardian->user && ! empty($enrollment->guardian->user->email)) {
             Mail::to($enrollment->guardian->user->email)

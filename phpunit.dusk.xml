@@ -7,9 +7,6 @@
          stopOnFailure="false"
          cacheDirectory=".phpunit.cache"
          backupStaticProperties="false">
-    <php>
-        <env name="APP_ENV" value="dusk"/>
-    </php>
     <testsuites>
         <testsuite name="Browser Test Suite">
             <directory suffix="Test.php">./tests/Browser</directory>

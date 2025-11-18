@@ -98,7 +98,7 @@ class SettingsSeeder extends Seeder
         Setting::updateOrCreate(
             ['key' => 'payment_methods'],
             [
-                'value' => 'Cash (Face-to-face payment only)',
+                'value' => 'Cash or Check (Face-to-face payment only)',
                 'type' => 'string',
                 'description' => 'Accepted payment methods',
                 'is_public' => true,

@@ -159,12 +159,15 @@ class EmailNotificationTest extends TestCase
         $enrollmentIds = collect($enrollments)->pluck('id')->toArray();
         $this->actingAs(User::factory()->create());
 
+        // Reset mail fake to clear enrollment creation emails
+        Mail::fake();
+
         // Act
         $count = $this->service->bulkApproveEnrollments($enrollmentIds);
 
         // Assert
         $this->assertEquals(3, $count);
-        Mail::assertQueued(EnrollmentApproved::class, 3);
+        Mail::assertQueuedCount(3);
 
         foreach ($enrollments as $index => $enrollment) {
             Mail::assertQueued(EnrollmentApproved::class, function ($mail) use ($users, $enrollment, $index) {
