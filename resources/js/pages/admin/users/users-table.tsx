@@ -1,6 +1,5 @@
 'use client';
 
-import { Link, router } from '@inertiajs/react';
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -16,8 +15,10 @@ import {
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react';
 import * as React from 'react';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ConfirmationDialog } from '@/components/ui/confirmation-dialog';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -29,17 +30,90 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Link, router } from '@inertiajs/react';
+import { toast } from 'sonner';
+import { useDebounce } from 'use-debounce';
+import { type User } from './index';
 
-type User = {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-};
+function formatDate(dateString: string) {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+}
 
-type UsersTableProps = {
-    users: User[];
-};
+function getRoleVariant(role: string): 'default' | 'secondary' | 'outline' {
+    switch (role) {
+        case 'super_admin':
+            return 'default';
+        case 'administrator':
+        case 'registrar':
+            return 'secondary';
+        default:
+            return 'outline';
+    }
+}
+
+function formatRoleName(role: string) {
+    return role
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
+
+function ActionsCell({ user }: { user: User }) {
+    const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+
+    const handleDelete = () => {
+        router.delete(`/admin/users/${user.id}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('User deleted successfully');
+                setDeleteDialogOpen(false);
+            },
+            onError: () => {
+                toast.error('Failed to delete user. Please try again.');
+            },
+        });
+    };
+
+    return (
+        <>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id.toString())}>Copy User ID</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                        <Link href={`/admin/users/${user.id}`}>View User</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href={`/admin/users/${user.id}/edit`}>Edit User</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)}>Delete User</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <ConfirmationDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+                onConfirm={handleDelete}
+                title="Delete User?"
+                description="Are you sure you want to delete this user? This action cannot be undone."
+                confirmText="Delete"
+                variant="destructive"
+            />
+        </>
+    );
+}
 
 export const columns: ColumnDef<User>[] = [
     {
@@ -58,6 +132,10 @@ export const columns: ColumnDef<User>[] = [
         enableHiding: false,
     },
     {
+        accessorKey: 'id',
+        header: 'ID',
+    },
+    {
         accessorKey: 'name',
         header: ({ column }) => {
             return (
@@ -67,67 +145,69 @@ export const columns: ColumnDef<User>[] = [
                 </Button>
             );
         },
-        cell: ({ row }) => <div>{row.getValue('name')}</div>,
     },
     {
         accessorKey: 'email',
-        header: ({ column }) => {
-            return (
-                <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-                    Email
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
-        cell: ({ row }) => <div className="lowercase">{row.getValue('email')}</div>,
+        header: 'Email',
     },
     {
-        accessorKey: 'role',
+        accessorKey: 'roles',
         header: 'Role',
-        cell: ({ row }) => <div className="capitalize">{row.getValue('role')}</div>,
+        cell: ({ row }) => {
+            const roles = row.getValue('roles') as { name: string }[];
+            return (
+                <div className="flex flex-wrap gap-1">
+                    {roles.map((role) => (
+                        <Badge key={role.name} variant={getRoleVariant(role.name)} className="text-xs">
+                            {formatRoleName(role.name)}
+                        </Badge>
+                    ))}
+                </div>
+            );
+        },
+    },
+    {
+        accessorKey: 'email_verified_at',
+        header: 'Status',
+        cell: ({ row }) => {
+            const email_verified_at = row.getValue('email_verified_at');
+            return (
+                <>
+                    {email_verified_at ? (
+                        <Badge variant="default" className="text-xs">
+                            Verified
+                        </Badge>
+                    ) : (
+                        <Badge variant="outline" className="text-xs">
+                            Unverified
+                        </Badge>
+                    )}
+                </>
+            );
+        },
+    },
+    {
+        accessorKey: 'created_at',
+        header: 'Created At',
+        cell: ({ row }) => {
+            const created_at = row.getValue('created_at') as string;
+            return formatDate(created_at);
+        },
     },
     {
         id: 'actions',
-        enableHiding: false,
-        cell: ({ row }) => {
-            const user = row.original;
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id.toString())}>Copy user ID</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href={`/admin/users/${user.id}`}>View</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href={`/admin/users/${user.id}/edit`}>Edit</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            onClick={() => {
-                                if (window.confirm('Are you sure you want to delete this user?')) {
-                                    router.delete(`/admin/users/${user.id}`);
-                                }
-                            }}
-                        >
-                            Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        },
+        cell: ({ row }) => <ActionsCell user={row.original} />,
     },
 ];
 
-export function UsersTable({ users }: UsersTableProps) {
+interface UsersTableProps {
+    users: User[];
+    filters: {
+        search: string | null;
+    };
+}
+
+export function UsersTable({ users, filters }: UsersTableProps) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -152,13 +232,29 @@ export function UsersTable({ users }: UsersTableProps) {
         },
     });
 
+    const searchValue = (table.getColumn('name')?.getFilterValue() as string) ?? '';
+    const [debouncedSearchTerm] = useDebounce(searchValue, 500);
+
+    React.useEffect(() => {
+        if (debouncedSearchTerm !== (filters.search || '')) {
+            router.get(
+                '/admin/users',
+                { search: debouncedSearchTerm },
+                {
+                    preserveState: true,
+                    replace: true,
+                },
+            );
+        }
+    }, [debouncedSearchTerm, filters.search]);
+
     return (
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Filter emails..."
-                    value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-                    onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value)}
+                    placeholder="Filter by name..."
+                    value={searchValue}
+                    onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
                     className="max-w-sm"
                 />
                 <DropdownMenu>

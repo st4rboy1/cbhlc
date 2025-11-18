@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SuperAdmin\StoreGuardianRequest;
-use App\Http\Requests\SuperAdmin\UpdateGuardianRequest;
+use App\Http\Requests\Admin\StoreGuardianRequest;
+use App\Http\Requests\Admin\UpdateGuardianRequest;
 use App\Models\Guardian;
 use App\Models\User;
 use Illuminate\Http\Request;

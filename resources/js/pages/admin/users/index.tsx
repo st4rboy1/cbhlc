@@ -1,19 +1,46 @@
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { UsersTable } from '@/pages/admin/users/users-table';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { Plus } from 'lucide-react';
 
-interface Props {
-    users?: Array<{
-        id: number;
-        name: string;
-        email: string;
-        role: string;
-    }>;
-    total?: number;
+// From the controller, the User model has these properties
+export type User = {
+    id: number;
+    name: string;
+    email: string;
+    email_verified_at: string | null;
+    created_at: string;
+    roles: { name: string }[];
+};
+
+// The controller returns a paginated response
+interface PaginatedUsers {
+    current_page: number;
+    data: User[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: { url: string | null; label: string; active: boolean }[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
 }
 
-export default function UsersIndex({ users }: Props) {
+interface Props {
+    users: PaginatedUsers;
+    filters: {
+        search: string | null;
+        role: string | null;
+    };
+}
+
+export default function UsersIndex({ users, filters }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin', href: '/admin/dashboard' },
         { title: 'Users', href: '/admin/users' },
@@ -21,10 +48,18 @@ export default function UsersIndex({ users }: Props) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Admin Users" />
+            <Head title="Users" />
             <div className="px-4 py-6">
-                <h1 className="mb-4 text-2xl font-bold">Admin Users Index</h1>
-                <UsersTable users={users || []} />
+                <div className="mb-4 flex items-center justify-between">
+                    <h1 className="text-2xl font-bold">Users Index</h1>
+                    <Link href="/admin/users/create">
+                        <Button>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Create User
+                        </Button>
+                    </Link>
+                </div>
+                <UsersTable users={users.data} filters={filters} />
             </div>
         </AppLayout>
     );

@@ -6,7 +6,6 @@ import { type NavItem } from '@/types';
 import { Link, router } from '@inertiajs/react';
 import {
     Banknote,
-    BarChart3,
     Calendar,
     CalendarDays,
     DollarSign,
@@ -19,7 +18,6 @@ import {
     ReceiptText,
     School,
     Settings,
-    Settings2,
     ShieldCheck,
     UserCog,
     Users,
@@ -92,21 +90,13 @@ const mainNavItems: NavItem[] = [
         href: '/admin/school-information',
         icon: School,
     },
-    {
-        title: 'Reports',
-        href: '/admin/reports',
-        icon: BarChart3,
-    },
+
     {
         title: 'Audit Logs',
         href: '/admin/audit-logs',
         icon: History,
     },
-    {
-        title: 'System Settings',
-        href: '/admin/settings',
-        icon: Settings2,
-    },
+
     {
         title: 'Profile Settings',
         href: '/settings/profile',

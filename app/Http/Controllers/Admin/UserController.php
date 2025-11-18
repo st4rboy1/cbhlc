@@ -3,29 +3,49 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\SuperAdmin\StoreUserRequest;
+use App\Http\Requests\Admin\StoreUserRequest;
+use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
     {
-        $users = User::all()->map(function (User $user) {
-            return [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->getRoleNames()->first(),
-            ];
-        });
+        Gate::authorize('viewAny', User::class);
+
+        $query = User::with('roles');
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by role
+        if ($request->filled('role')) {
+            $query->whereHas('roles', function ($q) use ($request) {
+                $q->where('name', $request->get('role'));
+            });
+        }
+
+        $users = $query->latest()->paginate(15)->withQueryString();
+        $roles = Role::all();
 
         return Inertia::render('admin/users/index', [
             'users' => $users,
-            'total' => $users->count(),
+            'roles' => $roles,
+            'filters' => $request->only(['search', 'role']),
         ]);
     }
 
@@ -49,75 +69,81 @@ class UserController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
+            'password' => Hash::make($validated['password']),
         ]);
 
-        if (isset($validated['role'])) {
-            $user->assignRole($validated['role']);
-        }
+        $user->assignRole($validated['role']);
 
         return redirect()->route('admin.users.index')
             ->with('success', 'User created successfully.');
     }
 
-    public function show($id)
+    public function show(User $user)
     {
-        $user = User::findOrFail($id);
-        $userData = [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'role' => $user->getRoleNames()->first(),
-            'created_at' => $user->created_at,
-        ];
+        Gate::authorize('view', $user);
+
+        $user->load('roles', 'permissions');
+
+        // Load guardian profile if user has guardian role
+        if ($user->hasRole('guardian')) {
+            $user->load('guardian');
+        }
 
         return Inertia::render('admin/users/show', [
-            'user' => $userData,
+            'user' => $user,
         ]);
     }
 
-    public function edit($id)
+    public function edit(User $user)
     {
-        $user = User::findOrFail($id);
-        $userData = [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'role' => $user->getRoleNames()->first(),
-            'created_at' => $user->created_at,
-        ];
+        Gate::authorize('update', $user);
+
+        $user->load('roles');
+
+        // Load guardian profile if user has guardian role
+        if ($user->hasRole('guardian')) {
+            $user->load('guardian');
+        }
+
+        $roles = Role::all();
 
         return Inertia::render('admin/users/edit', [
-            'user' => $userData,
-            'roles' => Role::pluck('name'),
+            'user' => $user,
+            'roles' => $roles,
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        $user = User::findOrFail($id);
+        Gate::authorize('update', $user);
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,'.$id,
-            'role' => 'required|string|exists:roles,name',
-        ]);
+        $validated = $request->validated();
 
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'address' => $validated['address'] ?? $user->address,
         ]);
+
+        if ($request->filled('password')) {
+            $user->update([
+                'password' => Hash::make($validated['password']),
+            ]);
+        }
 
         $user->syncRoles([$validated['role']]);
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User updated successfully.');
     }
 
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $user = User::findOrFail($id);
+        Gate::authorize('delete', $user);
+
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('admin.users.index')
+            ->with('success', 'User deleted successfully.');
     }
 }

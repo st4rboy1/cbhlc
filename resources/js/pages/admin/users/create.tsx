@@ -20,7 +20,7 @@ interface Props {
 
 export default function UserCreate({ roles }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
-        { title: 'Administrator', href: '/admin/dashboard' },
+        { title: 'Admin', href: '/admin/dashboard' },
         { title: 'Users', href: '/admin/users' },
         { title: 'Create User', href: '/admin/users/create' },
     ];

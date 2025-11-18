@@ -32,13 +32,16 @@ interface SchoolYear {
 
 interface Enrollment {
     id: number;
-    reference_number: string;
+    enrollment_id: string;
     student_id: number;
     guardian_id: number;
     grade_level: string;
     quarter: string;
     school_year: SchoolYear;
     status: string;
+    type: string;
+    previous_school: string | null;
+    payment_plan: string;
     tuition_fee_cents: number;
     miscellaneous_fee_cents: number;
     laboratory_fee_cents: number;
@@ -69,16 +72,16 @@ const formatCurrency = (cents: number) => {
     }).format(cents / 100);
 };
 
-export default function EnrollmentShow({ enrollment }: Props) {
+export default function AdminEnrollmentsShow({ enrollment }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Admin', href: '/admin/dashboard' },
         { title: 'Enrollments', href: '/admin/enrollments' },
-        { title: enrollment.reference_number, href: `/admin/enrollments/${enrollment.id}` },
+        { title: enrollment.enrollment_id, href: `/admin/enrollments/${enrollment.id}` },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Enrollment ${enrollment.reference_number}`} />
+            <Head title={`Enrollment ${enrollment.enrollment_id}`} />
             <div className="container mx-auto px-4 py-6">
                 <div className="mb-6 flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -88,8 +91,8 @@ export default function EnrollmentShow({ enrollment }: Props) {
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-2xl font-bold">Admin Enrollment Details</h1>
-                            <p className="text-sm text-muted-foreground">Reference: {enrollment.reference_number}</p>
+                            <h1 className="text-2xl font-bold">Enrollment Details</h1>
+                            <p className="text-sm text-muted-foreground">ID: {enrollment.enrollment_id}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -109,6 +112,9 @@ export default function EnrollmentShow({ enrollment }: Props) {
                                 </Button>
                             </a>
                         )}
+                        <Link href={`/admin/enrollments/${enrollment.id}/edit`}>
+                            <Button>Edit Enrollment</Button>
+                        </Link>
                     </div>
                 </div>
 
@@ -122,9 +128,9 @@ export default function EnrollmentShow({ enrollment }: Props) {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                         <Hash className="h-4 w-4" />
-                                        Reference Number
+                                        Enrollment ID
                                     </div>
-                                    <p className="text-lg font-bold">{enrollment.reference_number}</p>
+                                    <p className="text-lg font-bold">{enrollment.enrollment_id}</p>
                                 </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -164,6 +170,29 @@ export default function EnrollmentShow({ enrollment }: Props) {
                                     <div>
                                         <PaymentStatusBadge status={enrollment.payment_status} />
                                     </div>
+                                </div>
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <FileText className="h-4 w-4" />
+                                        Enrollment Type
+                                    </div>
+                                    <p className="text-lg font-medium capitalize">{enrollment.type.replace('_', ' ')}</p>
+                                </div>
+                                {enrollment.previous_school && (
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <BookOpen className="h-4 w-4" />
+                                            Previous School
+                                        </div>
+                                        <p className="text-lg font-medium">{enrollment.previous_school}</p>
+                                    </div>
+                                )}
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                        <CreditCard className="h-4 w-4" />
+                                        Payment Plan
+                                    </div>
+                                    <p className="text-lg font-medium capitalize">{enrollment.payment_plan}</p>
                                 </div>
                             </div>
                         </Card>
@@ -240,17 +269,18 @@ export default function EnrollmentShow({ enrollment }: Props) {
                                 <div>
                                     <p className="text-sm text-muted-foreground">Name</p>
                                     <p className="font-medium">
-                                        {enrollment.student?.first_name} {enrollment.student?.last_name}
+                                        {enrollment.student.first_name} {enrollment.student.last_name}
                                     </p>
                                 </div>
                                 <div>
                                     <p className="text-sm text-muted-foreground">Student ID</p>
-                                    <p className="font-medium">{enrollment.student?.student_id}</p>
+                                    <p className="font-medium">{enrollment.student.student_id}</p>
                                 </div>
                             </div>
                         </Card>
 
                         {/* Guardian Information */}
+
                         <Card className="p-6">
                             <div className="mb-4 flex items-center gap-2">
                                 <Users className="h-4 w-4 text-muted-foreground" />
@@ -260,10 +290,10 @@ export default function EnrollmentShow({ enrollment }: Props) {
                                 <div>
                                     <p className="text-sm text-muted-foreground">Name</p>
                                     <p className="font-medium">
-                                        {enrollment.guardian?.first_name} {enrollment.guardian?.last_name}
+                                        {enrollment.guardian.first_name} {enrollment.guardian.last_name}
                                     </p>
                                 </div>
-                                {enrollment.guardian?.user?.email && (
+                                {enrollment.guardian.user?.email && (
                                     <div>
                                         <p className="text-sm text-muted-foreground">Email</p>
                                         <p className="text-sm font-medium">{enrollment.guardian.user.email}</p>

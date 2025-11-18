@@ -58,12 +58,12 @@ class StudentObserver
 
         if ($latestStudent) {
             // Extract the sequence number and increment
-            $sequence = intval(substr($latestStudent->student_id, 4)) + 1;
+            $sequence = intval(substr($latestStudent->student_id, 5)) + 1;
         } else {
             // Start with 1 if no students for this year
             $sequence = 1;
         }
 
-        return sprintf('%s%04d', $year, $sequence);
+        return sprintf('%d-%04d', $year, $sequence);
     }
 }

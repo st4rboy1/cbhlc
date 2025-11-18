@@ -226,6 +226,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Students Management
         Route::resource('students', AdminStudentController::class);
+        Route::get('/students/{student}/enrollments', [AdminStudentController::class, 'enrollments'])->name('students.enrollments');
 
         // Users Management (limited compared to super-admin)
         Route::resource('users', AdminUserController::class);
