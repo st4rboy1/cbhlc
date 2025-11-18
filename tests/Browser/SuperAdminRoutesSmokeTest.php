@@ -1,56 +1,6 @@
 <?php
 
-use App\Models\Document;
-use App\Models\Enrollment;
-use App\Models\EnrollmentPeriod;
-use App\Models\GradeLevelFee;
-use App\Models\Guardian;
-use App\Models\Invoice;
-use App\Models\Payment;
-use App\Models\Receipt;
-use App\Models\SchoolYear;
-use App\Models\Student;
-use App\Models\User;
-use Database\Seeders\RolesAndPermissionsSeeder;
-
 beforeEach(function () {
-    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => RolesAndPermissionsSeeder::class]);
-
-    // Create super admin user
-    $this->superAdmin = User::factory()->superAdmin()->create([
-        'email' => 'superadmin@test.com',
-        'password' => bcrypt('password'),
-    ]);
-
-    // Create necessary records
-    $this->schoolYear = SchoolYear::factory()->create();
-    $this->enrollmentPeriod = EnrollmentPeriod::factory()->create([
-        'school_year_id' => $this->schoolYear->id,
-    ]);
-    $this->gradeLevelFee = GradeLevelFee::factory()->create([
-        'enrollment_period_id' => $this->enrollmentPeriod->id,
-    ]);
-    $this->guardian = Guardian::factory()->create();
-    $this->student = Student::factory()->create();
-    $this->enrollment = Enrollment::factory()->create([
-        'student_id' => $this->student->id,
-        'guardian_id' => $this->guardian->id,
-        'school_year_id' => $this->schoolYear->id,
-    ]);
-    $this->document = Document::factory()->create([
-        'student_id' => $this->student->id,
-    ]);
-    $this->invoice = Invoice::factory()->create([
-        'enrollment_id' => $this->enrollment->id,
-    ]);
-    $this->payment = Payment::factory()->create([
-        'invoice_id' => $this->invoice->id,
-    ]);
-    $this->receipt = Receipt::factory()->create([
-        'payment_id' => $this->payment->id,
-    ]);
-    $this->user = User::factory()->create();
-
     $this->actingAs($this->superAdmin);
 });
 
