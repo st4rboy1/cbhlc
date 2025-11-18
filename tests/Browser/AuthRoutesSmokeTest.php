@@ -1,7 +1,5 @@
 <?php
 
-uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
-
 describe('Auth Routes Smoke Tests', function () {
     test('can access login page', function () {
         $browser = visit('/login')

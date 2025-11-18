@@ -103,7 +103,7 @@ class StudentControllerTest extends TestCase
         $response->assertOk()
             ->assertInertia(fn (AssertableInertia $page) => $page
                 ->component('admin/students/index')
-                ->has('students', 2)
+                ->has('students', $this->students->count())
                 ->has('students.0', fn ($student) => $student
                     ->has('id')
                     ->has('name')

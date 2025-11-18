@@ -64,6 +64,7 @@ describe('enrollment pending constraint', function () {
 
         // Create first pending enrollment
         Enrollment::create([
+            'enrollment_id' => generateUniqueEnrollmentId(),
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
             'school_year_id' => $this->sy2024->id,
@@ -125,6 +126,7 @@ describe('enrollment pending constraint', function () {
 
         // Create completed enrollment for previous year
         Enrollment::create([
+            'enrollment_id' => generateUniqueEnrollmentId(),
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
             'school_year_id' => \App\Models\SchoolYear::firstOrCreate(['name' => '2023-2024', 'start_year' => 2023, 'end_year' => 2024, 'start_date' => '2023-06-01', 'end_date' => '2024-05-31', 'status' => 'completed'])->id,
@@ -177,6 +179,7 @@ describe('enrollment pending constraint', function () {
 
         // Create enrolled enrollment for current year
         Enrollment::create([
+            'enrollment_id' => generateUniqueEnrollmentId(),
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
             'school_year_id' => $this->sy2024->id,
@@ -228,6 +231,7 @@ describe('enrollment pending constraint', function () {
 
         // Create rejected enrollment
         Enrollment::create([
+            'enrollment_id' => generateUniqueEnrollmentId(),
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
             'school_year_id' => $this->sy2024->id,

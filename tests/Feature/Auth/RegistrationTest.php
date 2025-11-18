@@ -14,10 +14,11 @@ test('registration page can be rendered', function () {
 });
 
 test('new users can register and are assigned guardian role', function () {
+    $uniqueEmail = 'guardian_'.uniqid().'@example.com';
     $response = $this->post(route('register.store'), [
         'first_name' => 'Test',
         'last_name' => 'Parent',
-        'email' => 'guardian@example.com',
+        'email' => $uniqueEmail,
         'password' => 'password',
         'password_confirmation' => 'password',
         'contact_number' => '+63912345678',
@@ -27,7 +28,7 @@ test('new users can register and are assigned guardian role', function () {
     ]);
 
     // Check if user was created and has guardian role
-    $user = \App\Models\User::where('email', 'guardian@example.com')->first();
+    $user = \App\Models\User::where('email', $uniqueEmail)->first();
     expect($user)->not->toBeNull();
     expect($user->hasRole('guardian'))->toBeTrue();
 

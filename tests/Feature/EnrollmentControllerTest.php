@@ -1,16 +1,5 @@
 <?php
 
-use App\Enums\EnrollmentPeriodStatus;
-use App\Enums\EnrollmentStatus;
-use App\Enums\PaymentStatus;
-use App\Enums\Quarter;
-use App\Models\Enrollment;
-use App\Models\EnrollmentPeriod;
-use App\Models\Guardian;
-use App\Models\GuardianStudent;
-use App\Models\Student;
-use App\Models\User;
-use Database\Seeders\RolesAndPermissionsSeeder;
 use Inertia\Testing\AssertableInertia;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
@@ -78,7 +67,10 @@ describe('enrollment controller', function () {
         // Create some enrollments with statuses that won't be filtered out
         // (COMPLETED and ENROLLED statuses are excluded from the enrollments index)
         Student::factory()->count(3)->create()->each(function ($student) {
-            Enrollment::factory()->pending()->create(['student_id' => $student->id]);
+            Enrollment::factory()->pending()->create([
+                'student_id' => $student->id,
+                'enrollment_id' => generateUniqueEnrollmentId(),
+            ]);
         });
 
         $response = $this->actingAs($admin)->get(route('registrar.enrollments.index'));
@@ -113,11 +105,15 @@ describe('enrollment controller', function () {
         Enrollment::factory()->create([
             'student_id' => $ownStudent->id,
             'guardian_id' => $guardian->id,
+            'enrollment_id' => generateUniqueEnrollmentId(),
         ]);
 
         // Create other student's enrollment
         $otherStudent = Student::factory()->create();
-        Enrollment::factory()->create(['student_id' => $otherStudent->id]);
+        Enrollment::factory()->create([
+            'student_id' => $otherStudent->id,
+            'enrollment_id' => generateUniqueEnrollmentId(),
+        ]);
 
         $response = $this->actingAs($guardianUser)->get(route('enrollments.index'));
 
@@ -195,7 +191,9 @@ describe('enrollment controller', function () {
         $admin = User::factory()->create();
         $admin->assignRole('administrator');
 
-        $enrollment = Enrollment::factory()->create();
+        $enrollment = Enrollment::factory()->create([
+            'enrollment_id' => generateUniqueEnrollmentId(),
+        ]);
 
         $response = $this->actingAs($admin)->get(route('registrar.enrollments.show', $enrollment));
 
@@ -238,6 +236,7 @@ describe('enrollment controller', function () {
 
         // Create first enrollment
         $firstEnrollment = Enrollment::create([
+            'enrollment_id' => generateUniqueEnrollmentId(),
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
             'school_year_id' => $this->sy2024->id,
@@ -298,6 +297,7 @@ describe('enrollment controller', function () {
 
         // Create first enrollment for 2024-2025
         Enrollment::create([
+            'enrollment_id' => generateUniqueEnrollmentId(),
             'student_id' => $student->id,
             'guardian_id' => $guardianModel->id,
             'school_year_id' => $this->sy2024->id,
@@ -406,6 +406,7 @@ describe('enrollment controller', function () {
 
             // Create previous enrollment to make student "existing"
             Enrollment::create([
+                'enrollment_id' => generateUniqueEnrollmentId(),
                 'student_id' => $student->id,
                 'guardian_id' => $guardianModel->id,
                 'school_year_id' => $this->sy2023->id,
@@ -507,6 +508,7 @@ describe('enrollment controller', function () {
 
             // Create previous enrollment to establish current grade
             Enrollment::create([
+                'enrollment_id' => generateUniqueEnrollmentId(),
                 'student_id' => $student->id,
                 'guardian_id' => $guardianModel->id,
                 'school_year_id' => $this->sy2023->id,
@@ -563,6 +565,7 @@ describe('enrollment controller', function () {
 
             // Create previous enrollment to establish current grade
             Enrollment::create([
+                'enrollment_id' => generateUniqueEnrollmentId(),
                 'student_id' => $student->id,
                 'guardian_id' => $guardianModel->id,
                 'school_year_id' => $this->sy2023->id,
@@ -624,6 +627,7 @@ describe('enrollment controller', function () {
 
             // Create previous enrollment to establish current grade
             Enrollment::create([
+                'enrollment_id' => generateUniqueEnrollmentId(),
                 'student_id' => $student->id,
                 'guardian_id' => $guardianModel->id,
                 'school_year_id' => $this->sy2023->id,

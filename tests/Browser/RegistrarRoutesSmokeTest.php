@@ -13,8 +13,6 @@ use App\Models\Student;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 
-uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
-
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 

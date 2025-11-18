@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\StoreUserRequest;
 use App\Models\Guardian;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -12,7 +13,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -31,7 +31,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreUserRequest $request): RedirectResponse
     {
         Log::info('Registration attempt started', [
             'email' => $request->email,
@@ -39,17 +39,6 @@ class RegisteredUserController extends Controller
             'last_name' => $request->last_name,
             'has_password' => ! empty($request->password),
             'has_password_confirmation' => ! empty($request->password_confirmation),
-        ]);
-
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'contact_number' => 'required|string|max:50',
-            'address' => 'required|string|max:500',
-            'occupation' => 'nullable|string|max:100',
-            'employer' => 'nullable|string|max:255',
         ]);
 
         Log::info('Registration validation passed', ['email' => $request->email]);
@@ -60,12 +49,12 @@ class RegisteredUserController extends Controller
             Log::info('Creating user', ['email' => $request->email]);
 
             // Create full name from first and last name
-            $fullName = trim($request->first_name.' '.$request->last_name);
+            $fullName = trim($request->validated('first_name').' '.$request->validated('last_name'));
 
             $user = User::create([
                 'name' => $fullName,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'email' => $request->validated('email'),
+                'password' => Hash::make($request->validated('password')),
             ]);
 
             // Registration is limited to guardians only
@@ -74,12 +63,12 @@ class RegisteredUserController extends Controller
             // Create Guardian profile with complete information from registration
             Guardian::create([
                 'user_id' => $user->id,
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'contact_number' => $request->contact_number,
-                'address' => $request->address,
-                'occupation' => $request->occupation,
-                'employer' => $request->employer,
+                'first_name' => $request->validated('first_name'),
+                'last_name' => $request->validated('last_name'),
+                'contact_number' => $request->validated('contact_number'),
+                'address' => $request->validated('address'),
+                'occupation' => $request->validated('occupation'),
+                'employer' => $request->validated('employer'),
             ]);
 
             DB::commit();

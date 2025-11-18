@@ -9,10 +9,8 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
-uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
-
 beforeEach(function () {
-    $this->seed(RolesAndPermissionsSeeder::class);
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => RolesAndPermissionsSeeder::class]);
     Storage::fake('private');
 });
 

@@ -8,8 +8,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
-uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
-
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
     Storage::fake('private');

@@ -1,7 +1,5 @@
 <?php
 
-uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
-
 describe('Public Routes Smoke Tests', function () {
     test('can access homepage', function () {
         $browser = visit('/')

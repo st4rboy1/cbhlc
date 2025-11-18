@@ -4,10 +4,8 @@ use App\Models\Student;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 
-uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
-
 beforeEach(function () {
-    $this->seed(RolesAndPermissionsSeeder::class);
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => RolesAndPermissionsSeeder::class]);
 });
 
 describe('Delete Student Functionality', function () {

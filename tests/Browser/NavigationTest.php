@@ -3,8 +3,6 @@
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Laravel\Dusk\Browser;
 
-uses(\Illuminate\Foundation\Testing\DatabaseMigrations::class);
-
 beforeEach(function () {
     // Seed roles and permissions for each test
     $this->seed(RolesAndPermissionsSeeder::class);

@@ -141,7 +141,7 @@ class EnrollmentService extends BaseService implements EnrollmentServiceInterfac
             $fees = $this->calculateFees($data['grade_level']);
 
             // Generate enrollment ID
-            $enrollmentId = $this->generateEnrollmentId();
+            $enrollmentId = (string) $this->generateEnrollmentId();
 
             // Prepare enrollment data
             $enrollmentData = array_merge($data, [
