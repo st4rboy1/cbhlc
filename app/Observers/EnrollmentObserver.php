@@ -45,27 +45,10 @@ class EnrollmentObserver
         // Ensure guardian and its user are loaded for email
         $enrollment->loadMissing('guardian.user');
 
-        // Log for debugging
-        \Illuminate\Support\Facades\Log::debug('EnrollmentObserver: created event fired.', ['enrollment_id' => $enrollment->id]);
-        \Illuminate\Support\Facades\Log::debug('EnrollmentObserver: Guardian user email check.', [
-            'has_guardian' => (bool) $enrollment->guardian,
-            'has_user' => (bool) $enrollment->guardian?->user,
-            'user_email' => $enrollment->guardian?->user?->email,
-            'email_empty' => empty($enrollment->guardian?->user?->email),
-        ]);
-
         // Send enrollment submitted email
         if ($enrollment->guardian && $enrollment->guardian->user && ! empty($enrollment->guardian->user->email)) {
-            \Illuminate\Support\Facades\Log::debug('EnrollmentObserver: Attempting to queue EnrollmentSubmitted email.', [
-                'recipient' => $enrollment->guardian->user->email,
-                'enrollment_id' => $enrollment->id,
-            ]);
             Mail::to($enrollment->guardian->user->email)
                 ->queue(new EnrollmentSubmitted($enrollment));
-        } else {
-            \Illuminate\Support\Facades\Log::debug('EnrollmentObserver: Email not queued due to missing guardian/user/email.', [
-                'enrollment_id' => $enrollment->id,
-            ]);
         }
 
         // Note: Activity logging is handled automatically by LogsActivity trait
