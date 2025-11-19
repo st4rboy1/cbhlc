@@ -14,7 +14,7 @@ interface Enrollment {
         first_name: string;
         last_name: string;
         student_id: string;
-        birthdate: string;
+        birth_date: string;
         gender: string;
         address: string;
         phone: string;
