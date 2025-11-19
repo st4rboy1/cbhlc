@@ -5,6 +5,7 @@
 
 set -e  # Exit on error
 
+sudo echo ''
 echo "🚀 Starting local development environment setup..."
 echo ""
 

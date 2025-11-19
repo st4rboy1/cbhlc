@@ -348,6 +348,7 @@ class UserSeeder extends Seeder
             'student_id' => $student1->id,
             'school_year_id' => $sy2025->id,
         ], [
+            'enrollment_id' => $this->generateEnrollmentId(2025, 1),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_5->value,
@@ -389,6 +390,7 @@ class UserSeeder extends Seeder
             'student_id' => $student2->id,
             'school_year_id' => $sy2025->id,
         ], [
+            'enrollment_id' => $this->generateEnrollmentId(2025, 2),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_4->value,
@@ -448,6 +450,7 @@ class UserSeeder extends Seeder
             'student_id' => $student1->id,
             'school_year_id' => $sy2025->id,
         ], [
+            'enrollment_id' => $this->generateEnrollmentId(2025, 3),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::SECOND,
             'grade_level' => GradeLevel::GRADE_6->value,
@@ -491,6 +494,7 @@ class UserSeeder extends Seeder
             'student_id' => $student2->id,
             'school_year_id' => $sy2024->id,
         ], [
+            'enrollment_id' => $this->generateEnrollmentId(2024, 4),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_5->value,
@@ -547,6 +551,7 @@ class UserSeeder extends Seeder
             'student_id' => $student1->id,
             'school_year_id' => $sy2025->id,
         ], [
+            'enrollment_id' => $this->generateEnrollmentId(2025, 5),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::KINDER->value,
@@ -588,6 +593,7 @@ class UserSeeder extends Seeder
             'student_id' => $student2->id,
             'school_year_id' => $sy2025->id,
         ], [
+            'enrollment_id' => $this->generateEnrollmentId(2025, 6),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_1->value,
@@ -602,6 +608,14 @@ class UserSeeder extends Seeder
             'payment_status' => PaymentStatus::PENDING,
             'created_at' => now()->subHours(3),
         ]);
+    }
+
+    /**
+     * Generate a unique enrollment ID
+     */
+    private function generateEnrollmentId(int $year, int $sequence): string
+    {
+        return 'ENR-'.$year.'-'.str_pad($sequence, 4, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -631,6 +645,7 @@ class UserSeeder extends Seeder
             'student_id' => $student->id,
             'school_year_id' => $sy2022->id,
         ], [
+            'enrollment_id' => $this->generateEnrollmentId(2022, $student->id),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_4->value,
@@ -651,6 +666,7 @@ class UserSeeder extends Seeder
             'student_id' => $student->id,
             'school_year_id' => $sy2023->id,
         ], [
+            'enrollment_id' => $this->generateEnrollmentId(2023, $student->id + 1000),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_5->value,
@@ -671,6 +687,7 @@ class UserSeeder extends Seeder
             'student_id' => $student->id,
             'school_year_id' => $sy2024->id,
         ], [
+            'enrollment_id' => $this->generateEnrollmentId(2024, $student->id + 2000),
             'guardian_id' => $guardianModel->id,
             'quarter' => Quarter::FIRST,
             'grade_level' => GradeLevel::GRADE_6->value,
