@@ -83,7 +83,7 @@ class DashboardController extends Controller
                     ($student->middle_name ? $student->middle_name.' ' : '').
                     $student->last_name),
                 'grade' => $student->grade_level ? ($student->grade_level->label ?? $student->grade_level->value) : 'N/A',
-                'enrollmentStatus' => $latestEnrollment ? $latestEnrollment->status->value : 'No Enrollment',
+                'enrollmentStatus' => $latestEnrollment ? $latestEnrollment->status->label() : 'No Enrollment',
                 'enrollmentId' => $latestEnrollment ? $latestEnrollment->id : null,
                 'photo' => null, // Placeholder for future profile photos
             ];

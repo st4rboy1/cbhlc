@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Enums\InvoiceStatus;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Notifications\PaymentReceivedNotification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class PaymentService
 {
@@ -29,6 +31,11 @@ class PaymentService
             $invoice = $payment->invoice;
             if ($invoice instanceof Invoice) {
                 $this->updateInvoiceStatus($invoice);
+            }
+
+            // Notify guardian
+            if ($payment->invoice?->enrollment?->guardian?->user) {
+                Notification::send($payment->invoice->enrollment->guardian->user, new PaymentReceivedNotification($payment->fresh('invoice')));
             }
 
             return $payment->fresh('invoice');

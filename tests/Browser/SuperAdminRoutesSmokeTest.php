@@ -15,7 +15,6 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 
 beforeEach(function () {
     \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => RolesAndPermissionsSeeder::class]);
-    dd(env('APP_ENV'));
 
     // Create super admin user
     $this->superAdmin = User::factory()->superAdmin()->create([
