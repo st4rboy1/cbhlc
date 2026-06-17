@@ -1,0 +1,64 @@
+name: Update Dependencies - Security Patches
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sundays
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: mbstring, dom, fileinfo, mysql, iconv
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Update Composer dependencies
+        run: composer update --with-dependencies --no-interaction
+
+      - name: Run Security Audit
+        run: composer audit
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: 'chore: update dependencies to latest secure versions'
+          title: 'chore: update dependencies for security patches'
+          body: |
+            ## Security Update
+            
+            This PR updates all dependencies to their latest versions with security patches applied.
+            
+            ### Changes
+            - Updated `composer.lock` with latest patched versions
+            - All security vulnerabilities resolved
+            - GitHub Actions security audit passing
+            
+            ### Testing
+            Before merge, verify:
+            - [ ] All tests pass
+            - [ ] No new vulnerabilities found
+            - [ ] Build completes successfully
+          branch: chore/update-dependencies
+          delete-branch: true
+          base: main
