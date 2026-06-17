@@ -73,13 +73,14 @@ test('generateReceiptNumber includes current year', function () {
 });
 
 test('generateReceiptNumber increments sequence correctly', function () {
+    $currentYear = now()->year;
     // Create receipts to establish a sequence
-    Receipt::factory()->create(['receipt_number' => 'OR-2025-0001']);
-    Receipt::factory()->create(['receipt_number' => 'OR-2025-0002']);
+    Receipt::factory()->create(['receipt_number' => "OR-{$currentYear}-0001"]);
+    Receipt::factory()->create(['receipt_number' => "OR-{$currentYear}-0002"]);
 
     $nextNumber = Receipt::generateReceiptNumber();
 
-    expect($nextNumber)->toBe('OR-2025-0003');
+    expect($nextNumber)->toBe("OR-{$currentYear}-0003");
 });
 
 test('formatted receipt number attribute returns receipt number', function () {

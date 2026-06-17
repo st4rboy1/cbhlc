@@ -13,10 +13,11 @@ export default defineConfig({
         }),
         react(),
         tailwindcss(),
-        wayfinder({
+        // Skip wayfinder in frontend-only deployments (e.g., Vercel) where PHP is not available
+        process.env.SKIP_WAYFINDER !== 'true' && wayfinder({
             formVariants: true,
         }),
-    ],
+    ].filter(Boolean),
     esbuild: {
         jsx: 'automatic',
     },
